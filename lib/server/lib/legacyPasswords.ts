@@ -15,10 +15,30 @@ export const isImportedHash = (hashed: string) => /^\$2[aby]\$\d{2}\$/.test(hash
 
 export async function verifyLegacyPassword(hashed: string, password: string): Promise<boolean> {
   if (isImportedHash(hashed)) return bcrypt.compare(password, hashed.replace(/^\$2y\$/, '$2b$')).catch(() => false);
-  // A native module: loaded when needed and kept out of the Next.js bundle (webpackIgnore).
-  const { verify } = await import(/* webpackIgnore: true */ '@node-rs/argon2');
-  return verify(hashed, password).catch(() => false);
+  return verifyArgon2(hashed, password).catch(() => false);
 }
+
+/**
+ * Checks a PHC-format argon2 hash (`$argon2id$v=19$m=…,t=…,p=…$salt$hash`) in pure JS, so it
+ * runs on Cloudflare Workers as well as Node (Workers cannot load native modules).
+ */
+async function verifyArgon2(hashed: string, password: string): Promise<boolean> {
+  const m = /^\$(argon2(?:id|i|d))\$(?:v=(\d+)\$)?m=(\d+),t=(\d+),p=(\d+)\$([A-Za-z0-9+/]+)\$([A-Za-z0-9+/]+)$/.exec(hashed);
+  if (!m) return false;
+  const [, variant, version, mem, time, par, salt64, hash64] = m;
+  const { argon2idAsync, argon2iAsync, argon2dAsync } = await import('@noble/hashes/argon2.js');
+  const fn = variant === 'argon2id' ? argon2idAsync : variant === 'argon2i' ? argon2iAsync : argon2dAsync;
+  const expected = fromB64(hash64);
+  const actual = await fn(new TextEncoder().encode(password), fromB64(salt64), {
+    t: Number(time), m: Number(mem), p: Number(par), version: version ? Number(version) : 0x10, dkLen: expected.length,
+  });
+  if (actual.length !== expected.length) return false;
+  let diff = 0;
+  for (let i = 0; i < actual.length; i++) diff |= actual[i] ^ expected[i];
+  return diff === 0;
+}
+
+const fromB64 = (s: string) => Uint8Array.from(atob(s + '='.repeat((4 - (s.length % 4)) % 4)), (c) => c.charCodeAt(0));
 
 export const legacyKey = (email: string) => email.trim().toLowerCase();
 

@@ -24,6 +24,7 @@ const COLUMNS = [
   {
     title: 'Resources',
     links: [
+      { label: 'Blog', href: '/blog' },
       { label: 'Help center', href: '/help' },
       { label: 'Citation styles', href: '/citation-styles' },
     ],

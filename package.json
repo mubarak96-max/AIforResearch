@@ -6,11 +6,11 @@
   "type": "module",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "dev": "next dev -p 3050",
+    "dev": "node scripts/build-blog.mjs && next dev -p 3050",
     "dev:collab": "tsx watch --env-file-if-exists=.env.local services/collab/src/index.ts",
     "dev:all": "firebase emulators:exec --ui --import=.emulator-data --export-on-exit \"node scripts/dev.mjs\"",
     "emulators": "firebase emulators:start --import=.emulator-data --export-on-exit",
-    "build": "next build",
+    "build": "node scripts/build-blog.mjs && next build",
     "build:collab": "node services/collab/build.mjs",
     "build:functions": "pnpm --dir functions build",
     "start": "next start -p 3000",
@@ -20,10 +20,11 @@
     "install:all": "pnpm install && pnpm --dir functions install && pnpm --dir tools/migrate install",
     "deploy:firebase": "firebase deploy --only firestore,storage,functions",
     "migrate": "pnpm --dir tools/migrate start --",
-    "dev:vinext": "vite dev --port 3001",
-    "build:vinext": "vite build",
+    "dev:vinext": "node scripts/build-blog.mjs && vite dev --port 3001",
+    "build:vinext": "node scripts/build-blog.mjs && vite build",
     "start:vinext": "vite preview",
-    "deploy:vinext": "vinext-cloudflare deploy --warm-cache"
+    "deploy:vinext": "vinext-cloudflare deploy --warm-cache",
+    "build:blog": "node scripts/build-blog.mjs"
   },
   "dependencies": {
     "@blocknote/core": "0.47.3",
@@ -37,7 +38,7 @@
     "@hocuspocus/server": "2.15.3",
     "@mantine/core": "8.3.18",
     "@mantine/hooks": "8.3.18",
-    "@node-rs/argon2": "2.2.2",
+    "@noble/hashes": "^2",
     "@tiptap/pm": "^3.22.4",
     "@vinext/cloudflare": "^1.3.3",
     "bcryptjs": "3.0.2",
@@ -71,6 +72,7 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "2.0.0-beta.v.12",
     "@firebase/rules-unit-testing": "6.0.0",
+    "@node-rs/argon2": "2.2.2",
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "22.20.5",
     "@types/react": "19.3.0",
@@ -85,6 +87,7 @@
     "tsx": "4.23.15",
     "typescript": "5.9.3",
     "vite": "8.3.0",
-    "vitest": "3.2.7"
+    "vitest": "3.2.7",
+    "yaml": "^2.9.1"
   }
 }

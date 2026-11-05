@@ -1,6 +1,6 @@
 # ResearchCove blog: articles for writers
 
-The 30 articles from [the content plan](../content-plan-writers.md), written 6 November 2026. Each file has YAML
+The 30 articles from [the content plan](../../docs/content-plan-writers.md), written 6 November 2026. Each file has YAML
 frontmatter (title, slug, description, keywords, cluster, pillar, author, dates, `faq` for `FAQPage` schema) and links to
 other articles as `/blog/<slug>`.
 

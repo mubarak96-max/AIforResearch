@@ -18,6 +18,14 @@ describe('legacy passwords (moved into Firebase Auth on first sign-in)', () => {
     expect(await verifyLegacyPassword(ours, 'nope')).toBe(false);
   });
 
+  it('checks argon2 hashes with several lanes and other variants', async () => {
+    const multi = await hash('lanes-3', { memoryCost: 4096, timeCost: 3, parallelism: 4 });
+    expect(await verifyLegacyPassword(multi, 'lanes-3')).toBe(true);
+    expect(await verifyLegacyPassword(multi, 'lanes-4')).toBe(false);
+    const i = await hash('variant-i', { memoryCost: 4096, timeCost: 2, parallelism: 1, algorithm: 1 });
+    expect(await verifyLegacyPassword(i, 'variant-i')).toBe(true);
+  });
+
   it('refuses garbage instead of throwing', async () => {
     expect(await verifyLegacyPassword('not-a-hash', 'x')).toBe(false);
   });

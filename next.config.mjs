@@ -6,11 +6,9 @@
  */
 const nextConfig = {
   reactStrictMode: true,
-  // Node-only packages the API uses load from node_modules at run time (argon2 is native; jsdom, under
+  // Node-only packages the API uses load from node_modules at run time (jsdom, under
   // isomorphic-dompurify, reads its own files).
-  serverExternalPackages: ['firebase-admin', '@node-rs/argon2', 'nodemailer', 'stripe', 'isomorphic-dompurify', 'jsdom'],
-  // argon2 is loaded lazily (for imported passwords), so tracing misses it.
-  outputFileTracingIncludes: { '/api/**': ['./node_modules/@node-rs/argon2/**', './node_modules/.pnpm/@node-rs+argon2*/node_modules/@node-rs/**'] },
+  serverExternalPackages: ['firebase-admin', 'nodemailer', 'stripe', 'isomorphic-dompurify', 'jsdom'],
   poweredByHeader: false,
   // lib/server imports its files with .js extensions (it also runs under Node in functions/ and
   // services/collab); let webpack find the .ts source.

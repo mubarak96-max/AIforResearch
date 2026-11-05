@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { LuCircleHelp, LuLayers, LuListChecks, LuTag } from 'react-icons/lu';
+import { LuCircleHelp, LuLayers, LuListChecks, LuNewspaper, LuTag } from 'react-icons/lu';
 import { Logo } from '@/components/Logo';
 import { CloseIcon, MenuIcon } from './icons';
 import { AuthAware } from './AuthAware';
@@ -15,7 +15,8 @@ export const NAV_LINKS = [
   { label: 'Features', href: '/features', hint: 'Autocomplete, papers, review', Icon: LuLayers },
   { label: 'How it works', href: '/how-it-works', hint: 'From blank page to export', Icon: LuListChecks },
   { label: 'Pricing', href: '/pricing', hint: 'Free and paid plans', Icon: LuTag },
-  { label: 'Help', href: '/help', hint: 'Guides and answers', Icon: LuCircleHelp },
+  { label: 'Blog', href: '/blog', hint: 'Guides for writers', Icon: LuNewspaper },
+  { label: 'Help', href: '/help', hint: 'Product how-tos', Icon: LuCircleHelp },
 ];
 
 /** Signed-in people get the pricing pop-up instead of leaving the page. */
