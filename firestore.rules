@@ -1,0 +1,36 @@
+rules_version = '2';
+
+// Every write goes through the API (Admin SDK), which checks access, plan limits and credits;
+// the Admin SDK is not bound by these rules. Browsers may only read a few things of their own,
+// for live listeners. Everything else is closed. Tests: tests/rules.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function mine() { return signedIn() && resource.data.user_id == request.auth.uid; }
+
+    // Your own profile (not other people's, and never the server-only fields' writes).
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+    }
+
+    // Documents you own or are an active member of (member_ids lists both).
+    match /documents/{documentId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.member_ids;
+    }
+
+    match /library_folders/{id} { allow read: if mine(); }
+    match /library_documents/{id} { allow read: if mine(); }
+    match /library_import_jobs/{id} { allow read: if mine(); }
+    match /chat_threads/{id} { allow read: if mine(); }
+
+    // Public plans for the pricing page.
+    match /plans/{id} {
+      allow read: if resource.data.is_public == true;
+    }
+
+    // Default: closed (accounts, credits, API keys, settings, legacy passwords, members, chunks, …).
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}

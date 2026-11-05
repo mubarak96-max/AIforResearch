@@ -1,0 +1,20 @@
+{
+  "name": "@researchcove/migrate",
+  "version": "0.2.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "start": "tsx migrate.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "firebase-admin": "14.5.0",
+    "postgres": "3.4.9"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@researchcove/collab",
+  "version": "0.2.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@hocuspocus/extension-database": "2.15.3",
+    "@hocuspocus/server": "2.15.3",
+    "@researchcove/server": "workspace:*",
+    "firebase-admin": "14.5.0",
+    "ws": "8.22.0",
+    "yjs": "^13.6.30"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "@types/ws": "^8.5.13",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  }
+}

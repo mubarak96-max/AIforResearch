@@ -1,0 +1,12 @@
+rules_version = '2';
+
+// Files (Library PDFs, document blocks and Yjs state, images) are read and written only by the
+// API, the collab service and Cloud Functions with the Admin SDK, which checks access first.
+// Browsers get files through the API or a short-lived signed URL.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

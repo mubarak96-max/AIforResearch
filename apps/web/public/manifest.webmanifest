@@ -1,0 +1,10 @@
+{
+  "name": "ResearchCove",
+  "short_name": "ResearchCove",
+  "description": "The AI editor for academic writing",
+  "start_url": "/editor",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
