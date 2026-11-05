@@ -6,7 +6,7 @@ const cache = await createWorkersCacheConfig();
 export default defineConfig({
   worker: defineWorker({
     ...cache,
-    name: "researchcove",
+    name: "writeorbit",
     entrypoint: "vinext/server/fetch-handler",
     compatibilityDate: "2026-11-05",
     compatibilityFlags: ["nodejs_compat"],
