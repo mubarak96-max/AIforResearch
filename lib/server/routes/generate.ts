@@ -245,7 +245,8 @@ export function generateRoutes(slots: Slots) {
   });
 
   // Generations are never queued, so there is nothing to recover or acknowledge.
-  app.get('/documents/:documentId/generation', requireUser, (c) => c.json({ detail: 'AI Editor generation not found' }, 404));
+  // 204 rather than 404 so the editor's recovery check on every load doesn't log a failed request.
+  app.get('/documents/:documentId/generation', requireUser, (c) => c.body(null, 204));
   app.post('/generations/:jobId/delivery', requireUser, (c) => c.json({ detail: 'AI Editor generation not found' }, 404));
 
   return app;

@@ -140,11 +140,11 @@ describe('POST /api/editor/generate', () => {
     expect(body.citations[0].bibtex).toContain('doi = {10.5/x}');
   });
 
-  it('rejects bad types and viewers; recovery routes answer 404', async () => {
+  it('rejects bad types and viewers; recovery routes report nothing to recover', async () => {
     const app = makeApp({ llm: fakeLlm('x'), papers: fakePapers() });
     expect((await post(app, '/api/editor/generate', { type: 'poem', context })).status).toBe(400);
     expect((await post(app, '/api/editor/generate', { type: 'paragraph', context, document_id: 'viewer-doc' })).status).toBe(403);
-    expect((await app.request('/api/editor/documents/doc-1/generation?request_id=r1')).status).toBe(404);
+    expect((await app.request('/api/editor/documents/doc-1/generation?request_id=r1')).status).toBe(204);
     expect((await post(app, '/api/editor/generations/abc/delivery', { action: 'seen' })).status).toBe(404);
   });
 

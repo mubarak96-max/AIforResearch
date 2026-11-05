@@ -235,7 +235,7 @@ async function recoveryJson<T>(url: string, init?: RequestInit): Promise<T | nul
       ...(init?.headers || {}),
     },
   });
-  if (response.status === 404) return null;
+  if (response.status === 404 || response.status === 204) return null;
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
     throw new Error(String(body?.detail || body?.error || `AI writing recovery failed (${response.status})`));

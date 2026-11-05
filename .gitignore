@@ -17,3 +17,5 @@ firestore-debug.log
 ui-debug.log
 .firebaserc
 service-account*.json
+.vinext/
+.cloudflare/
