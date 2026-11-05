@@ -1,19 +1,18 @@
-# The collab service, built from the monorepo root:
+# The collab service. Build from the repository root (it bundles lib/server):
 #   docker build -f services/collab/Dockerfile -t collab .
-# or: gcloud run deploy collab --source . (with this Dockerfile; see README.md)
 FROM node:22-slim AS build
 WORKDIR /repo
 RUN corepack enable
-COPY . .
-RUN pnpm install --frozen-lockfile --filter @researchcove/collab...
-RUN pnpm --filter @researchcove/server build && pnpm --filter @researchcove/collab build
-# A self-contained folder with production dependencies only (workspace packages copied in).
-RUN pnpm deploy --filter @researchcove/collab --prod /out \
- && cp -r services/collab/dist /out/dist
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --ignore-scripts
+COPY lib/server lib/server
+COPY services/collab services/collab
+RUN pnpm build:collab
 
 FROM node:22-slim
 WORKDIR /app
 ENV NODE_ENV=production PORT=8080
-COPY --from=build /out /app
+COPY --from=build /repo/services/collab/dist /app
+RUN npm install --omit=dev --no-audit --no-fund
 EXPOSE 8080
-CMD ["node", "dist/index.js"]
+CMD ["node", "index.js"]

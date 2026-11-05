@@ -1,7 +1,7 @@
 # Data model (Firestore + Cloud Storage)
 
 Every Postgres table became a collection. **Field names are the old column names (snake_case)**,
-so code reads a document exactly like it read a row. `packages/server/src/firebase.ts` has the
+so code reads a document exactly like it read a row. `lib/server/firebase.ts` has the
 helpers: `row()` / `rows()` return `{ id, ...fields }` with Firestore Timestamps turned back
 into `Date`s; writing a `Date` stores a Timestamp. Ids are the old ids (uuid strings), new ones
 come from `newId()` (a random UUID), except where noted.

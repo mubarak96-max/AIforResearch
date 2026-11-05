@@ -1,5 +1,5 @@
 {
-  "name": "@researchcove/functions",
+  "name": "researchcove-functions",
   "version": "0.2.0",
   "private": true,
   "license": "UNLICENSED",
@@ -23,7 +23,6 @@
     "openai": "4.104.0"
   },
   "devDependencies": {
-    "@researchcove/server": "workspace:*",
     "@types/node": "22.20.5",
     "esbuild": "0.28.2",
     "typescript": "5.9.3"

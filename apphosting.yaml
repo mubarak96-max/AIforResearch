@@ -1,0 +1,85 @@
+# Firebase App Hosting: the web app and its API (app/api, app/v1).
+# Create the backend from GitHub with the app root directory left at the repository root.
+# App Hosting runs `pnpm install` and `pnpm build` (next build). Secrets: `firebase apphosting:secrets:set NAME`.
+# Admin › settings override most of these at run time (stored encrypted in Firestore).
+
+runConfig:
+  cpu: 1
+  memoryMiB: 1024
+  concurrency: 80
+  minInstances: 0
+  maxInstances: 20
+  # Long AI answers stream for a while.
+  timeoutSeconds: 300
+  # Reach services/convert, which runs with internal ingress (see services/convert/README.md).
+  # vpcAccess:
+  #   egress: PRIVATE_RANGES_ONLY
+  #   connector: projects/<project>/locations/us-central1/connectors/researchcove
+
+env:
+  # --- Browser (Firebase web app config: Project settings › Your apps) ---
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: replace-me
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: your-project.firebaseapp.com
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: your-project
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: your-project.firebasestorage.app
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: replace-me
+    availability: [BUILD, RUNTIME]
+  # App Check (reCAPTCHA Enterprise site key); leave empty to turn App Check off.
+  - variable: NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+    value: ""
+    availability: [BUILD, RUNTIME]
+  # services/collab on Cloud Run.
+  - variable: NEXT_PUBLIC_REALTIME_URL
+    value: wss://collab-xxxxx.a.run.app/collab
+    availability: [BUILD, RUNTIME]
+
+  # --- Server ---
+  - variable: PUBLIC_URL
+    value: https://app.example.com
+  - variable: FIREBASE_STORAGE_BUCKET
+    value: your-project.firebasestorage.app
+  - variable: FIREBASE_AUTH_DOMAIN
+    value: your-project.firebaseapp.com
+  - variable: CONVERT_URL
+    value: https://convert-xxxxx.a.run.app
+  - variable: COLLAB_URL
+    value: https://collab-xxxxx.a.run.app
+  - variable: ADMIN_EMAILS
+    value: you@example.com
+  - variable: SUPPORT_EMAIL
+    value: ""
+  - variable: LLM_PROVIDER
+    value: deepseek
+  - variable: PAPERS_PROVIDER
+    value: scholar
+  - variable: BILLING_LIVE
+    value: "0"
+
+  # --- Secrets (Cloud Secret Manager) ---
+  - variable: SETTINGS_KEY
+    secret: SETTINGS_KEY
+  - variable: INTERNAL_SECRET
+    secret: INTERNAL_SECRET
+  # Moved from the self-hosted version without a SETTINGS_KEY? Add the old JWT_SECRET as a
+  # secret too (a fallback for reading saved Admin keys):
+  # - variable: JWT_SECRET
+  #   secret: JWT_SECRET
+  - variable: LLM_API_KEY
+    secret: LLM_API_KEY
+  - variable: SCHOLAR_API_KEY
+    secret: SCHOLAR_API_KEY
+  - variable: STRIPE_SECRET_KEY
+    secret: STRIPE_SECRET_KEY
+  - variable: STRIPE_WEBHOOK_SECRET
+    secret: STRIPE_WEBHOOK_SECRET
+  - variable: EMBEDDINGS_API_KEY
+    secret: EMBEDDINGS_API_KEY

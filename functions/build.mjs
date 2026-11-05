@@ -4,11 +4,11 @@ import { existsSync } from 'node:fs';
 
 /**
  * Builds functions/dist, the folder `firebase deploy` uploads (firebase.json "source"):
- *   dist/index.js      the functions plus the parts of @researchcove/server they use, bundled
- *   dist/package.json  runtime dependencies only (no workspace packages, which Cloud Build
- *                      could not install)
+ *   dist/index.js      the functions plus the parts of ../lib/server they use, bundled
+ *   dist/package.json  runtime dependencies only
  *   dist/.env*         copied from functions/ when present
- * Packages with native code, or that Firebase provides, stay external.
+ * Packages with native code, or that Firebase provides, stay external. lib/server's other
+ * imports (hono, zod, …) resolve from the root node_modules, so run `pnpm install` at the root first.
  */
 const external = ['firebase-admin', 'firebase-functions', '@node-rs/argon2', 'nodemailer', 'stripe', 'openai'];
 
@@ -30,7 +30,7 @@ await build({
 
 const pkg = JSON.parse(await readFile('package.json', 'utf8'));
 await writeFile('dist/package.json', JSON.stringify({
-  name: pkg.name.replace('@researchcove/', 'researchcove-'), private: true, type: 'module', main: 'index.js',
+  name: pkg.name, private: true, type: 'module', main: 'index.js',
   engines: pkg.engines, dependencies: pkg.dependencies,
 }, null, 2) + '\n');
 for (const file of ['.env', '.env.local', `.env.${process.env.GCLOUD_PROJECT || ''}`]) {

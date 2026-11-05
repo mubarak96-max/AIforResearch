@@ -7,9 +7,9 @@ ResearchCove runs on one Firebase project. Each part, what it does and where it 
   Browser           │                                                                          │
   ───────           │  Authentication ◄─── sign-in, ID tokens (App Check optional)             │
   Next.js pages     │                                                                          │
-  @researchcove/editor ──┼─ https ─► App Hosting (apps/web)                                         │
+  editor ───────────┼─ https ─► App Hosting (the Next.js app)                                  │
                     │             ├─ pages (Next.js 15)                                        │
-                    │             └─ app/api, app/v1 → @researchcove/server (Hono) ─┐               │
+                    │             └─ app/api, app/v1 → lib/server (Hono) ─────┐                │
                     │                                                         │ Admin SDK     │
                     │   Firestore ◄───────────────────────────────────────────┤               │
                     │   Cloud Storage ◄───────────────────────────────────────┤               │
@@ -24,16 +24,16 @@ ResearchCove runs on one Firebase project. Each part, what it does and where it 
 
 ## The pieces
 
-**apps/web: App Hosting.** The Next.js app serves the pages and the HTTP API. The API is
-`@researchcove/server`, a Hono app mounted by two catch-all route handlers:
+**The Next.js app (repository root): App Hosting.** It serves the pages and the HTTP API. The API is
+`lib/server`, a Hono app mounted by two catch-all route handlers:
 `app/api/[[...route]]` and `app/v1/[[...route]]`. The URLs are the same ones the self-hosted
-server used, so the editor package needed no change for HTTP. Server components that need API
+server used, so the editor needed no change for HTTP. Server components that need API
 data (pricing, developer prices) call the app in-process (`getApp().request(...)`).
 
 **Authentication.** Firebase Authentication handles every sign-in method (email and password,
 Google, Microsoft, Apple) and sends the reset and confirmation emails. The browser keeps the
-latest ID token (`apps/web/lib/session.ts`) and sends it as `Authorization: Bearer`. The API
-verifies it with the Admin SDK (`packages/server/src/auth.ts`). On a person's first request it
+latest ID token (`lib/session.ts`) and sends it as `Authorization: Bearer`. The API
+verifies it with the Admin SDK (`lib/server/auth.ts`). On a person's first request it
 creates their `users/{uid}` and `accounts/{id}` documents (`lib/users.ts`). Admins are the
 `ADMIN_EMAILS` whose email Firebase reports as verified.
 
@@ -62,12 +62,12 @@ extraction, unchanged from the self-hosted version. Internal ingress only.
 | `closeStuckImports` | Hourly | Marks imports that stopped |
 | `onUserDeleted` | Auth user deleted | Removes the person's data |
 
-The functions import the same `@researchcove/server` code. `functions/build.mjs` bundles it into
+The functions import the same `lib/server` code. `functions/build.mjs` bundles it into
 `functions/dist`, which `firebase deploy` uploads.
 
 ## Settings
 
-Environment variables (`apps/web/apphosting.yaml`, the Cloud Run services' variables, and
+Environment variables (`apphosting.yaml`, the Cloud Run services' variables, and
 `functions/.env`) set the defaults. Admin › Settings overrides them, stored encrypted with
 `SETTINGS_KEY` in `app_settings`. Every instance watches that collection, so a change applies
 everywhere within a second.

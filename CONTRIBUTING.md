@@ -11,8 +11,8 @@ Thanks for helping. Bug reports, fixes and features are welcome.
 ## Working on the code
 
 ```bash
-pnpm install
-cp .env.example apps/web/.env.local   # NEXT_PUBLIC_USE_EMULATORS=1 for local work
+pnpm install:all
+cp .env.example .env.local   # NEXT_PUBLIC_USE_EMULATORS=1 for local work
 pnpm dev:all                          # Firebase emulators + web app (and API) on :3000 + collab on :4200
 ```
 
@@ -22,7 +22,7 @@ Before you send a pull request:
 
 ```bash
 pnpm typecheck
-pnpm --filter @researchcove/server test
+pnpm test
 pnpm test:rules                       # firestore.rules against the emulator
 cd services/convert && pytest
 ```
@@ -33,7 +33,7 @@ Changes to how a page looks should come with a screenshot at desktop and phone w
 
 - Match the code around you: names, comment density, how errors are handled.
 - Text people see is short and plain. One icon set: `react-icons/lu`.
-- New settings go in `packages/server/src/env.ts` and, if an admin should change them in the browser, `packages/server/src/lib/settings.ts`. Document them in `.env.example` and `apps/web/apphosting.yaml`.
+- New settings go in `lib/server/env.ts` and, if an admin should change them in the browser, `lib/server/lib/settings.ts`. Document them in `.env.example` and `apphosting.yaml`.
 - Data changes follow [docs/data-model.md](docs/data-model.md) (update it with the change). A new query that filters on two or more fields, or a collection group, needs an entry in `firestore.indexes.json`. Firestore has no migrations: code must read documents written before the change (missing fields get defaults).
 - Browsers never write Firestore or Storage; add an API route instead. `firestore.rules` stays closed for writes.
 

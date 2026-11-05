@@ -2,7 +2,7 @@
 
 A small, stateless HTTP service that converts between the ResearchCove editor's documents (BlockNote
 blocks) and Word, PDF and LaTeX, and extracts text from PDFs. It listens on **port 4100** and is
-**internal only**: publish no host port. The ResearchCove API (`packages/server`, running in the web app on Firebase
+**internal only**: publish no host port. The ResearchCove API (`lib/server`, running in the web app on Firebase
 App Hosting, and Cloud Functions; `CONVERT_URL`) owns authentication, storage and the database, and
 calls this service.
 
@@ -11,7 +11,7 @@ calls this service.
   **sends** the template and tells the converter where to fetch images.
 - **Response shapes match the editor's original API.** `blocks`, `comments`, `settings`,
   `warnings`, `stats` and `title` have the same shape the browser client
-  (`packages/editor/src/lib/aiEditor/wordApi.ts`) already expects, so the API server can pass
+  (`components/editor/lib/aiEditor/wordApi.ts`) already expects, so the API server can pass
   them through unchanged.
 - **Engines.** The Word reader and writers are in `researchcove_convert/word/` (python-docx, lxml,
   Pillow, latex2mathml). LibreOffice handles .doc/.odt/.rtf and PDF output, and pypdfium2
@@ -21,7 +21,7 @@ calls this service.
 
 The API and the Library PDF function call this service; nothing else should. Deploy it with
 internal ingress and reach it over Serverless VPC Access (or Direct VPC egress) from App Hosting
-(`runConfig.vpcAccess` in `apps/web/apphosting.yaml`) and from Cloud Functions (`vpcConnector`):
+(`runConfig.vpcAccess` in `apphosting.yaml`) and from Cloud Functions (`vpcConnector`):
 
 ```sh
 gcloud run deploy convert --source services/convert --region us-central1 \
@@ -120,7 +120,7 @@ forwarded as it is.
 {
   "blocks":   [ /* BlockNote blocks, as the editor's original API returned them */ ],
   "comments": [ /* comment threads: {id, actorSessionId:"word-import", actorDisplayName, text, selectedText, blockId, createdAt, status, replies[]} */ ],
-  "settings": {            // WordSettings (packages/editor/src/lib/aiEditor/wordSchema.tsx)
+  "settings": {            // WordSettings (components/editor/lib/aiEditor/wordSchema.tsx)
     "version": 1, "styles": {...}, "page": {...}, "header": {...}, "footer": {...},
     "differentFirstPage": false, "pageNumberStart": 1, "sections": [...],
     "source": {"fileName": "thesis.docx", "importedAt": "2026-10-28T16:35:52.123456+00:00"}

@@ -5,7 +5,7 @@ import {
   userFromToken, resolveAccess, loadDocument, displayName, EDIT_ROLES, COMMENT_ROLES,
   documentToRead, membersOf, documentRef, membersRef, updateDocument, maybeAutoVersion,
   type AuthUser, type DocumentRow, type Role,
-} from '@researchcove/server';
+} from '../../../lib/server/index.js';
 import { mergeStaleComments } from './merge.js';
 
 export { mergeStaleComments };

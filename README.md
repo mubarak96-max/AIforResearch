@@ -32,7 +32,7 @@ You pay Google Cloud for what your Firebase project uses (the free tier covers s
 ```
   Browser ──────────────► Firebase Authentication   (password, Google, Microsoft, Apple; App Check)
      │  ID token
-     ├─ https ─────────►  App Hosting: apps/web       Next.js pages + the API (/api, /v1) in route handlers
+     ├─ https ─────────►  App Hosting: Next.js app    Next.js pages + the API (/api, /v1) in route handlers
      │                       │  Admin SDK
      │                       ├──► Firestore           accounts, documents, Library, plans, credits, settings
      │                       ├──► Cloud Storage        PDFs, document blocks, Yjs state, images
@@ -52,7 +52,7 @@ You need a Firebase project on the **Blaze** plan (App Hosting, Functions and Cl
 2. **Rules, indexes and functions:**
    ```bash
    git clone <your repository URL> && cd ResearchCove
-   pnpm install
+   pnpm install:all                          # the app, functions/ and tools/migrate
    cp .firebaserc.example .firebaserc        # put your project id in it
    cp functions/.env.example functions/.env  # CONVERT_URL, PUBLIC_URL
    firebase functions:secrets:set SETTINGS_KEY      # 32+ random characters; the same value as the web app's
@@ -60,7 +60,7 @@ You need a Firebase project on the **Blaze** plan (App Hosting, Functions and Cl
    ```
    Then turn on the TTL policy for `rate_limits.expires_at` (Firestore › TTL).
 3. **Converter and collab on Cloud Run:** see [services/convert](services/convert/README.md) (internal ingress) and [services/collab](services/collab/README.md) (one instance, WebSockets).
-4. **Web app on App Hosting:** create a backend from your GitHub repo with app root directory `apps/web`. Fill in [`apps/web/apphosting.yaml`](apps/web/apphosting.yaml) (Firebase web config, `PUBLIC_URL`, `CONVERT_URL`, `NEXT_PUBLIC_REALTIME_URL`, `ADMIN_EMAILS`) and add the secrets it names:
+4. **Web app on App Hosting:** create a backend from your GitHub repo (app root directory: the repository root). Fill in [`apphosting.yaml`](apphosting.yaml) (Firebase web config, `PUBLIC_URL`, `CONVERT_URL`, `NEXT_PUBLIC_REALTIME_URL`, `ADMIN_EMAILS`) and add the secrets it names:
    ```bash
    firebase apphosting:secrets:set SETTINGS_KEY
    firebase apphosting:secrets:set INTERNAL_SECRET
@@ -81,7 +81,7 @@ You need a Firebase project on the **Blaze** plan (App Hosting, Functions and Cl
 
 ### Connect services
 
-Each service is a slot with its own provider. Set them in `apps/web/apphosting.yaml` (secrets in Secret Manager) or in **Admin** (the admin page wins, and applies to every instance within a second).
+Each service is a slot with its own provider. Set them in `apphosting.yaml` (secrets in Secret Manager) or in **Admin** (the admin page wins, and applies to every instance within a second).
 
 | Slot | Options | Settings |
 | --- | --- | --- |
@@ -109,7 +109,7 @@ If Scholar is busy, searches fall back to [OpenAlex](https://openalex.org) autom
 
 ## Developer API
 
-Your deployment can offer its services to other apps at `/v1`: people create keys at `/developers/keys` and pay in credits (Stripe). The API calls the same providers you connected above, using the upstream keys in **Admin › Developer API**. Prices and free allowances are defaults you can change in [`packages/server/src/lib/prices.ts`](packages/server/src/lib/prices.ts) and Admin.
+Your deployment can offer its services to other apps at `/v1`: people create keys at `/developers/keys` and pay in credits (Stripe). The API calls the same providers you connected above, using the upstream keys in **Admin › Developer API**. Prices and free allowances are defaults you can change in [`lib/server/lib/prices.ts`](lib/server/lib/prices.ts) and Admin.
 
 | Service | Endpoint | Credits |
 | --- | --- | --- |
@@ -138,24 +138,31 @@ Every response reports `X-Credits-Charged` and `X-Credits-Balance`; out of credi
 You need Node 22, pnpm 9 and Java 21 (for the Firebase emulators).
 
 ```bash
-pnpm install
-cp .env.example apps/web/.env.local     # NEXT_PUBLIC_USE_EMULATORS=1 for local work
+pnpm install:all
+cp .env.example .env.local     # NEXT_PUBLIC_USE_EMULATORS=1 for local work
 pnpm dev:all                            # Firebase emulators (UI on :4000) + web app and API on :3000 + collab on :4200
 ```
 
 `pnpm emulators` runs only the emulators; data is kept in `.emulator-data/` between runs. For Word, PDF and LaTeX, run the converter too (`services/convert`, port 4100).
 
-Tests: `pnpm --filter @researchcove/server test` and `pnpm --filter @researchcove/collab test` (Vitest), `pnpm test:rules` (security rules against the emulator), `pytest` in `services/convert`, and browser tests in [`tests/e2e`](tests/e2e).
+Tests: `pnpm test` (Vitest: the API and collab), `pnpm test:rules` (security rules against the emulator), `pytest` in `services/convert`, and browser tests in [`tests/e2e`](tests/e2e).
+
+The repository root is the Next.js app (Next.js 15, React 19, Tailwind 4, Firebase Authentication), deployed to App Hosting. The parts that run elsewhere have their own folders.
 
 | Folder | What it is |
 | --- | --- |
-| `apps/web` | The web app: Next.js 15, React 19, Tailwind 4, Firebase Authentication. Runs the API in `app/api` and `app/v1` route handlers. Deploys to App Hosting. |
-| `packages/server` | `@researchcove/server`: the API (Hono), data layer on Firestore and Storage, plans, credits, AI and papers slots, the developer API (/v1), and the background jobs. |
-| `packages/editor` | `@researchcove/editor`, the editor as a React package (BlockNote + Yjs). Host apps connect it with `<ResearchCoveEditorProvider config={…}>`. |
-| `services/collab` | Live text (Hocuspocus) and presence over WebSockets, on Cloud Run. |
-| `services/convert` | Word, LaTeX and PDF converter (FastAPI, LibreOffice, pypdfium2), on Cloud Run. |
-| `functions` | Cloud Functions: Storage, Firestore, Auth and scheduled triggers. |
-| `tools/migrate` | Copies a Postgres install of this app into Firebase. |
+| `app` | Pages, plus the API's two route handlers, `app/api/[[...route]]` and `app/v1/[[...route]]`. |
+| `components` | The site and app components. |
+| `components/editor` | The editor (BlockNote + Yjs), mounted with `<ResearchCoveEditorProvider config={…}>`. |
+| `lib` | Browser helpers (Firebase, session, sign-in). |
+| `lib/server` | The API (Hono) and data layer on Firestore and Storage: plans, credits, AI and papers slots, the developer API (/v1) and the background jobs. Server-only. |
+| `public` | Static files. |
+| `tests/server` | API unit tests (Vitest). `tests/rules`: security rules. `tests/e2e`: browser tests. |
+| `services/collab` | Live text (Hocuspocus) and presence over WebSockets, on Cloud Run. Uses the root's packages and bundles `lib/server` (`pnpm build:collab`). |
+| `services/convert` | Word, LaTeX and PDF converter (Python: FastAPI, LibreOffice, pypdfium2), on Cloud Run. |
+| `functions` | Cloud Functions: Storage, Firestore, Auth and scheduled triggers. Its own `package.json`; bundles `lib/server` (`pnpm build:functions`). |
+| `tools/migrate` | Copies a Postgres install of this app into Firebase. Its own `package.json`. |
+| `scripts` | `dev.mjs`, which `pnpm dev:all` uses to run the app and collab together. |
 | `firestore.rules`, `firestore.indexes.json`, `storage.rules`, `firebase.json` | The Firebase project's configuration. |
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) to send a change and [SECURITY.md](SECURITY.md) to report a vulnerability.

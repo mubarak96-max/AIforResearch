@@ -7,116 +7,6 @@ settings:
 importers:
 
   .:
-    devDependencies:
-      '@firebase/rules-unit-testing':
-        specifier: 6.0.0
-        version: 6.0.0(firebase@13.2.0(@types/react@19.3.0)(next@15.5.28(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.1.10(react@19.1.10))(react@19.1.10))(react@19.1.10))
-      '@types/node':
-        specifier: 22.20.5
-        version: 22.20.5
-      firebase:
-        specifier: 13.2.0
-        version: 13.2.0(@types/react@19.3.0)(next@15.5.28(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.1.10(react@19.1.10))(react@19.1.10))(react@19.1.10)
-      firebase-tools:
-        specifier: 15.35.0
-        version: 15.35.0(@types/node@22.20.5)(bare-buffer@3.7.1)
-      turbo:
-        specifier: 2.11.10
-        version: 2.11.10
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
-      vitest:
-        specifier: 3.2.7
-        version: 3.2.7(@types/debug@4.1.13)(@types/node@22.20.5)(jiti@2.7.0)(jsdom@28.1.0)(lightningcss@1.32.0)(tsx@4.23.15)(yaml@2.9.1)
-
-  apps/web:
-    dependencies:
-      '@node-rs/argon2':
-        specifier: 2.2.2
-        version: 2.2.2
-      '@researchcove/editor':
-        specifier: workspace:*
-        version: link:../../packages/editor
-      '@researchcove/server':
-        specifier: workspace:*
-        version: link:../../packages/server
-      firebase:
-        specifier: 13.2.0
-        version: 13.2.0(@types/react@19.3.0)(next@15.5.28(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.1.10(react@19.1.10))(react@19.1.10))(react@19.1.10)
-      firebase-admin:
-        specifier: 14.5.0
-        version: 14.5.0(@firebase/app-compat@0.5.21)(@firebase/app@0.16.5)
-      hono:
-        specifier: 4.13.14
-        version: 4.13.14
-      next:
-        specifier: 15.5.28
-        version: 15.5.28(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.1.10(react@19.1.10))(react@19.1.10)
-      react:
-        specifier: 19.1.10
-        version: 19.1.10
-      react-dom:
-        specifier: 19.1.10
-        version: 19.1.10(react@19.1.10)
-      react-icons:
-        specifier: ^5.5.0
-        version: 5.7.0(react@19.1.10)
-    devDependencies:
-      '@tailwindcss/postcss':
-        specifier: 4.3.3
-        version: 4.3.3
-      '@types/node':
-        specifier: 22.20.5
-        version: 22.20.5
-      '@types/react':
-        specifier: 19.3.0
-        version: 19.3.0
-      '@types/react-dom':
-        specifier: 19.3.0
-        version: 19.3.0(@types/react@19.3.0)
-      tailwindcss:
-        specifier: 4.3.3
-        version: 4.3.3
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
-
-  functions:
-    dependencies:
-      '@node-rs/argon2':
-        specifier: 2.2.2
-        version: 2.2.2
-      firebase-admin:
-        specifier: 14.5.0
-        version: 14.5.0(@firebase/app-compat@0.5.21)(@firebase/app@0.16.5)
-      firebase-functions:
-        specifier: 7.4.0
-        version: 7.4.0(firebase-admin@14.5.0(@firebase/app-compat@0.5.21)(@firebase/app@0.16.5))
-      nodemailer:
-        specifier: 10.1.1
-        version: 10.1.1
-      openai:
-        specifier: 4.104.0
-        version: 4.104.0(ws@8.22.0)(zod@3.25.76)
-      stripe:
-        specifier: 23.0.1
-        version: 23.0.1(@types/node@22.20.5)
-    devDependencies:
-      '@types/node':
-        specifier: 22.20.5
-        version: 22.20.5
-      '@researchcove/server':
-        specifier: workspace:*
-        version: link:../packages/server
-      esbuild:
-        specifier: 0.28.2
-        version: 0.28.2
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
-
-  packages/editor:
     dependencies:
       '@blocknote/core':
         specifier: 0.47.3
@@ -136,7 +26,13 @@ importers:
       '@citation-js/plugin-csl':
         specifier: ^0.7.21
         version: 0.7.22(@citation-js/core@0.7.21)
+      '@hocuspocus/extension-database':
+        specifier: 2.15.3
+        version: 2.15.3(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@hocuspocus/provider':
+        specifier: 2.15.3
+        version: 2.15.3(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+      '@hocuspocus/server':
         specifier: 2.15.3
         version: 2.15.3(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@mantine/core':
@@ -145,24 +41,57 @@ importers:
       '@mantine/hooks':
         specifier: 8.3.18
         version: 8.3.18(react@19.1.10)
+      '@node-rs/argon2':
+        specifier: 2.2.2
+        version: 2.2.2
       '@tiptap/pm':
         specifier: ^3.22.4
         version: 3.32.3
+      bcryptjs:
+        specifier: 3.0.2
+        version: 3.0.2
       docx:
         specifier: ^9.5.1
         version: 9.15.2
+      firebase:
+        specifier: 13.2.0
+        version: 13.2.0(@types/react@19.3.0)(next@15.5.28(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.1.10(react@19.1.10))(react@19.1.10))(react@19.1.10)
+      firebase-admin:
+        specifier: 14.5.0
+        version: 14.5.0(@firebase/app-compat@0.5.21)(@firebase/app@0.16.5)
       framer-motion:
         specifier: ^12.43.0
         version: 12.43.0(react-dom@19.1.10(react@19.1.10))(react@19.1.10)
+      hono:
+        specifier: 4.13.14
+        version: 4.13.14
       isomorphic-dompurify:
         specifier: ^2.26.0
         version: 2.36.0
+      jose:
+        specifier: 5.10.0
+        version: 5.10.0
       katex:
         specifier: ^0.16.25
         version: 0.16.47
       mammoth:
         specifier: ^1.12.0
         version: 1.13.0
+      next:
+        specifier: 15.5.28
+        version: 15.5.28(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.1.10(react@19.1.10))(react@19.1.10)
+      nodemailer:
+        specifier: 10.1.1
+        version: 10.1.1
+      openai:
+        specifier: 4.104.0
+        version: 4.104.0(ws@8.22.0)(zod@3.25.76)
+      react:
+        specifier: 19.1.10
+        version: 19.1.10
+      react-dom:
+        specifier: 19.1.10
+        version: 19.1.10(react@19.1.10)
       react-hot-toast:
         specifier: ^2.4.1
         version: 2.6.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.1.10(react@19.1.10))(react@19.1.10)
@@ -175,6 +104,12 @@ importers:
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1
+      stripe:
+        specifier: 23.0.1
+        version: 23.0.1(@types/node@22.20.5)
+      ws:
+        specifier: 8.22.0
+        version: 8.22.0
       y-indexeddb:
         specifier: 9.0.12
         version: 9.0.12(yjs@13.6.33)
@@ -184,93 +119,37 @@ importers:
       yjs:
         specifier: ^13.6.30
         version: 13.6.33
+      zod:
+        specifier: 3.25.76
+        version: 3.25.76
     devDependencies:
+      '@firebase/rules-unit-testing':
+        specifier: 6.0.0
+        version: 6.0.0(firebase@13.2.0(@types/react@19.3.0)(next@15.5.28(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(react-dom@19.1.10(react@19.1.10))(react@19.1.10))(react@19.1.10))
+      '@tailwindcss/postcss':
+        specifier: 4.3.3
+        version: 4.3.3
+      '@types/node':
+        specifier: 22.20.5
+        version: 22.20.5
       '@types/react':
         specifier: 19.3.0
         version: 19.3.0
       '@types/react-dom':
         specifier: 19.3.0
         version: 19.3.0(@types/react@19.3.0)
-      next:
-        specifier: 15.5.28
-        version: 15.5.28(@opentelemetry/api@1.10.0)(@types/node@22.20.5)(react-dom@19.1.10(react@19.1.10))(react@19.1.10)
-      react:
-        specifier: 19.1.10
-        version: 19.1.10
-      react-dom:
-        specifier: 19.1.10
-        version: 19.1.10(react@19.1.10)
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
-
-  packages/server:
-    dependencies:
-      '@node-rs/argon2':
-        specifier: 2.2.2
-        version: 2.2.2
-      bcryptjs:
-        specifier: 3.0.2
-        version: 3.0.2
-      firebase-admin:
-        specifier: 14.5.0
-        version: 14.5.0(@firebase/app-compat@0.5.21)(@firebase/app@0.16.5)
-      hono:
-        specifier: 4.13.14
-        version: 4.13.14
-      jose:
-        specifier: 5.10.0
-        version: 5.10.0
-      nodemailer:
-        specifier: 10.1.1
-        version: 10.1.1
-      openai:
-        specifier: 4.104.0
-        version: 4.104.0(ws@8.22.0)(zod@3.25.76)
-      stripe:
-        specifier: 23.0.1
-        version: 23.0.1(@types/node@22.20.5)
-      zod:
-        specifier: 3.25.76
-        version: 3.25.76
-    devDependencies:
-      '@types/node':
-        specifier: 22.20.5
-        version: 22.20.5
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
-      vitest:
-        specifier: 3.2.7
-        version: 3.2.7(@types/debug@4.1.13)(@types/node@22.20.5)(jiti@2.7.0)(jsdom@28.1.0)(lightningcss@1.32.0)(tsx@4.23.15)(yaml@2.9.1)
-
-  services/collab:
-    dependencies:
-      '@hocuspocus/extension-database':
-        specifier: 2.15.3
-        version: 2.15.3(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
-      '@hocuspocus/server':
-        specifier: 2.15.3
-        version: 2.15.3(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
-      '@researchcove/server':
-        specifier: workspace:*
-        version: link:../../packages/server
-      firebase-admin:
-        specifier: 14.5.0
-        version: 14.5.0(@firebase/app-compat@0.5.21)(@firebase/app@0.16.5)
-      ws:
-        specifier: 8.22.0
-        version: 8.22.0
-      yjs:
-        specifier: ^13.6.30
-        version: 13.6.33
-    devDependencies:
-      '@types/node':
-        specifier: 22.20.5
-        version: 22.20.5
       '@types/ws':
         specifier: ^8.5.13
         version: 8.18.2
+      esbuild:
+        specifier: 0.28.2
+        version: 0.28.2
+      firebase-tools:
+        specifier: 15.35.0
+        version: 15.35.0(@types/node@22.20.5)(bare-buffer@3.7.1)
+      tailwindcss:
+        specifier: 4.3.3
+        version: 4.3.3
       tsx:
         specifier: 4.23.15
         version: 4.23.15
@@ -281,24 +160,6 @@ importers:
         specifier: 3.2.7
         version: 3.2.7(@types/debug@4.1.13)(@types/node@22.20.5)(jiti@2.7.0)(jsdom@28.1.0)(lightningcss@1.32.0)(tsx@4.23.15)(yaml@2.9.1)
 
-  tools/migrate:
-    dependencies:
-      firebase-admin:
-        specifier: 14.5.0
-        version: 14.5.0(@firebase/app-compat@0.5.21)(@firebase/app@0.16.5)
-      postgres:
-        specifier: 3.4.9
-        version: 3.4.9
-    devDependencies:
-      '@types/node':
-        specifier: 22.20.5
-        version: 22.20.5
-      tsx:
-        specifier: 4.23.15
-        version: 4.23.15
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
 
 packages:
 
@@ -2004,36 +1865,6 @@ packages:
       '@types/react-dom': ^17.0.0 || ^18.0.0 || ^19.0.0
       react: ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
-
-  '@turbo/darwin-64@2.11.10':
-    resolution: {integrity: sha512-By4idRap5+nLnMuRzLB4qkOPRlvNdyY1ne4VJYDyUoUB11H94k7uif9mbe3JT8JSNXs1D68uMcBj6hJ/jMQRvA==}
-    cpu: [x64]
-    os: [darwin]
-
-  '@turbo/darwin-arm64@2.11.10':
-    resolution: {integrity: sha512-pyEYlVcuexOPa92p0Wlwl9YT1Is5D60lxN3ItWm3g30YLvFaUq86TF4BBWg5ZAc0uMTnrOzCvuCsOBTdzUWnRQ==}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@turbo/linux-64@2.11.10':
-    resolution: {integrity: sha512-1tYeR/IDZ5HEdsb0jNq2L2xam5nMQ+g80tlV2BZmv4OFw+pMcUM0mMmUcfc5wXPPNHVNPuDMjh9Y8G8HgXPLZA==}
-    cpu: [x64]
-    os: [android, linux]
-
-  '@turbo/linux-arm64@2.11.10':
-    resolution: {integrity: sha512-HuekQxvVGhUd46g1Im/DKdOtglHr4/gguZAvzEpPUgtxNkztSa8lWhQEGQ+EmPQ0n7w19qjThFU+OfEEd0uvlw==}
-    cpu: [arm64]
-    os: [android, linux]
-
-  '@turbo/windows-64@2.11.10':
-    resolution: {integrity: sha512-UJOP3BkbreY3/JlMgJR6ZiimxYIBn+c+B4tnBIxD0E9c3Estmk+XoVNVBNBottZLNRXe3/ScgOU4+/k8tIWysg==}
-    cpu: [x64]
-    os: [win32]
-
-  '@turbo/windows-arm64@2.11.10':
-    resolution: {integrity: sha512-xOkEjF3ws/b/YNlc+bvJHMYBn+vL+QbEISZFVi0qS+ImmhA1X3/gmNmBrjjIG3dg6aeN+n6gQitzSkXQ286qJQ==}
-    cpu: [arm64]
-    os: [win32]
 
   '@types/body-parser@1.19.6':
     resolution: {integrity: sha512-HLFeCYgz89uk22N5Qg3dvGvsv46B8GLvKKo1zKG4NybA8U2DiEO3w9lqGg29t/tfLRJpJ6iQxnVw4OnB7MoM9g==}
@@ -5022,10 +4853,6 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
-  turbo@2.11.10:
-    resolution: {integrity: sha512-3GJYwig8ygEI89oaOZdduJX8/aw6O9eRPYHoIt6T3FZl9hkKjiyIspufJoVgqXihPoJu8M5CSV0DlZvzfohBCw==}
-    hasBin: true
-
   type-fest@0.20.2:
     resolution: {integrity: sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ==}
     engines: {node: '>=10'}
@@ -7236,24 +7063,6 @@ snapshots:
       '@tiptap/extension-floating-menu': 3.32.3(@floating-ui/dom@1.8.0)(@tiptap/core@3.32.3(@tiptap/pm@3.32.3))(@tiptap/pm@3.32.3)
     transitivePeerDependencies:
       - '@floating-ui/dom'
-
-  '@turbo/darwin-64@2.11.10':
-    optional: true
-
-  '@turbo/darwin-arm64@2.11.10':
-    optional: true
-
-  '@turbo/linux-64@2.11.10':
-    optional: true
-
-  '@turbo/linux-arm64@2.11.10':
-    optional: true
-
-  '@turbo/windows-64@2.11.10':
-    optional: true
-
-  '@turbo/windows-arm64@2.11.10':
-    optional: true
 
   '@types/body-parser@1.19.6':
     dependencies:
@@ -11009,15 +10818,6 @@ snapshots:
       esbuild: 0.28.2
     optionalDependencies:
       fsevents: 2.3.3
-
-  turbo@2.11.10:
-    optionalDependencies:
-      '@turbo/darwin-64': 2.11.10
-      '@turbo/darwin-arm64': 2.11.10
-      '@turbo/linux-64': 2.11.10
-      '@turbo/linux-arm64': 2.11.10
-      '@turbo/windows-64': 2.11.10
-      '@turbo/windows-arm64': 2.11.10
 
   type-fest@0.20.2: {}
 

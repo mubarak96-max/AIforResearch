@@ -19,8 +19,8 @@ import { cert, initializeApp, applicationDefault } from 'firebase-admin/app';
 import { getAuth, type UserImportRecord } from 'firebase-admin/auth';
 import { getFirestore, type DocumentReference, type Firestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
-import { searchTerms } from '../../packages/server/src/firebase.ts';
-import { blocksToText } from '../../packages/server/src/lib/blocks.ts';
+import { searchTerms } from '../../lib/server/firebase.ts';
+import { blocksToText } from '../../lib/server/lib/blocks.ts';
 
 const args = new Map(process.argv.slice(2).map((arg) => {
   const [key, value] = arg.replace(/^--/, '').split('=');

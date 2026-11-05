@@ -9,7 +9,7 @@ WebSockets that the Next.js app on Firebase App Hosting cannot serve:
 | `/health` | Liveness, with open rooms and sockets. |
 
 Sign-in is the browser's Firebase ID token (`?token=`), checked with the same access rules as the
-HTTP API (`resolveAccess` from `@researchcove/server`).
+HTTP API (`resolveAccess` from `lib/server`).
 
 The HTTP API runs in another process, so it cannot push changes to open sockets. While a document
 has viewers, this service listens to `documents/{id}` and its `members` in Firestore and sends
@@ -46,5 +46,5 @@ gcloud run deploy collab \
 firebase emulators:start          # Firestore, Auth, Storage
 FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 \
 FIREBASE_STORAGE_EMULATOR_HOST=127.0.0.1:9199 FIREBASE_PROJECT_ID=demo-researchcove \
-  pnpm --filter @researchcove/collab dev   # listens on :4200
+  pnpm dev:collab   # listens on :4200 (run from the repository root)
 ```

@@ -3,7 +3,7 @@ import type { Duplex } from 'node:stream';
 import { Server } from '@hocuspocus/server';
 import { Database } from '@hocuspocus/extension-database';
 import { WebSocketServer } from 'ws';
-import { userFromToken, resolveAccess, EDIT_ROLES, documentRef, readYdoc, writeYdoc } from '@researchcove/server';
+import { userFromToken, resolveAccess, EDIT_ROLES, documentRef, readYdoc, writeYdoc } from '../../../lib/server/index.js';
 
 /**
  * Real-time document text (Yjs over Hocuspocus) at /collab. The document name is the document

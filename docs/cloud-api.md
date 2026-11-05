@@ -140,7 +140,7 @@ Returns `{ report, recommendation, reviewed_words, truncated }`. The first 90,00
 
 ## Documents: `POST /v1/convert`
 
-Turns an editor document (the block JSON `@researchcove/editor` produces) into a file:
+Turns an editor document (the block JSON the editor (`components/editor`) produces) into a file:
 
 ```json
 { "title": "My paper", "format": "docx", "blocks": [ … ], "settings": { } }

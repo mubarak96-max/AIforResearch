@@ -1,6 +1,0 @@
-packages:
-  - "apps/*"
-  - "packages/*"
-  - "services/collab"
-  - "functions"
-  - "tools/migrate"

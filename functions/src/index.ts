@@ -3,11 +3,11 @@ import { onObjectFinalized } from 'firebase-functions/v2/storage';
 import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import * as v1 from 'firebase-functions/v1';
-import { closeInterruptedImports, deleteUserData, newsletterOn, processPdf, ready, runImportJob, syncNewsletter } from '@researchcove/server/jobs';
+import { closeInterruptedImports, deleteUserData, newsletterOn, processPdf, ready, runImportJob, syncNewsletter } from '../../lib/server/jobs.js';
 
 /**
  * Background work that used to run inside the self-hosted server process. The code lives in
- * @researchcove/server (src/jobs.ts); build.mjs bundles it into lib/index.js for deployment.
+ * lib/server (jobs.ts); build.mjs bundles it into dist/index.js for deployment.
  * Settings (CONVERT_URL, SETTINGS_KEY, …) come from functions/.env and Secret Manager.
  */
 

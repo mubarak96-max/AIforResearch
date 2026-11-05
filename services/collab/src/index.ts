@@ -1,5 +1,5 @@
 import { createServer } from 'node:http';
-import { ready } from '@researchcove/server';
+import { ready } from '../../../lib/server/index.js';
 import { handleCollabUpgrade, hocuspocus } from './collab.js';
 import { handleRealtimeUpgrade, realtimeStats } from './realtime.js';
 
