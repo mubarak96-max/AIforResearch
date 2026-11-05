@@ -1,0 +1,85 @@
+diff --git a/dist/version-deploy.js b/dist/version-deploy.js
+index 6245b4a52c24479c4b6fcc8f14fd146920b2bf76..9ccf647ccce644a8ee25fba6e780c8b773804848 100644
+--- a/dist/version-deploy.js
++++ b/dist/version-deploy.js
+@@ -3,7 +3,7 @@ import { parseCdnWarmupDeploymentUrl } from "./worker-deployment-url.js";
+ import { buildNodeCliInvocation, resolveCfBin, resolveWranglerBin, validateWranglerEnvName } from "./deploy.js";
+ import fs from "node:fs";
+ import path from "node:path";
+-import { execFileSync } from "node:child_process";
++import { execFileSync, spawnSync } from "node:child_process";
+ import { stripVTControlCharacters } from "node:util";
+ //#region src/version-deploy.ts
+ function isRecord(value) {
+@@ -175,14 +175,32 @@ function runWranglerCommand(root, args, execute = execFileSync, verbose = false)
+ 	if (verbose && output.trim()) for (const line of output.trim().split("\n")) console.log(`  ${line}`);
+ 	return output;
+ }
+-function runCfCommand(root, args, execute = execFileSync, verbose = false) {
++function runCfCommand(root, args, execute, verbose = false) {
+ 	const invocation = buildNodeCliInvocation(resolveCfBin(root), args);
+-	const output = execute(invocation.file, invocation.args, {
++	const execOpts = {
+ 		cwd: root,
+ 		stdio: "pipe",
+ 		encoding: "utf-8",
+ 		shell: false
+-	});
++	};
++	let output;
++	if (execute) output = execute(invocation.file, invocation.args, execOpts);
++	else {
++		// cf writes its log lines (including "Worker Version ID: ...") to stderr, so read both
++		// streams; keep stdout alone when it is JSON so JSON parsing still works.
++		const result = spawnSync(invocation.file, invocation.args, { ...execOpts, maxBuffer: 64 * 1024 * 1024 });
++		if (result.error) throw result.error;
++		const stdout = result.stdout ?? "";
++		const stderr = result.stderr ?? "";
++		if (result.status !== 0) {
++			const error = new Error(`Command failed: cf ${args.join(" ")}
++${stderr}`);
++			Object.assign(error, { status: result.status, stdout, stderr, output: [null, stdout, stderr] });
++			throw error;
++		}
++		output = parseJsonObject(stdout) ? stdout : `${stdout}
++${stderr}`;
++	}
+ 	if (verbose && output.trim()) for (const line of output.trim().split("\n")) console.log(`  ${line}`);
+ 	return output;
+ }
+@@ -254,7 +272,7 @@ function parseCfDeploymentStatusOutput(output) {
+ 		output
+ 	};
+ }
+-function runCfDeploymentStatus(root, options, execute = execFileSync) {
++function runCfDeploymentStatus(root, options, execute) {
+ 	return parseCfDeploymentStatusOutput(runCfCommand(root, [
+ 		"workers",
+ 		"deployments",
+@@ -264,7 +282,7 @@ function runCfDeploymentStatus(root, options, execute = execFileSync) {
+ 		...options.env ? ["--mode", validateWranglerEnvName(options.env)] : []
+ 	], execute, options.verbose));
+ }
+-function runCfVersionDeploy(root, versionTraffic, options, _phase = "promote-uploaded", execute = execFileSync) {
++function runCfVersionDeploy(root, versionTraffic, options, _phase = "promote-uploaded", execute) {
+ 	const versions = versionTraffic.map(({ versionId, percentage }) => ({
+ 		version_id: versionId,
+ 		percentage
+@@ -286,7 +304,7 @@ function runCfVersionDeploy(root, versionTraffic, options, _phase = "promote-upl
+ 		output
+ 	};
+ }
+-function runCfTriggersDeploy(root, options, execute = execFileSync) {
++function runCfTriggersDeploy(root, options, execute) {
+ 	const output = runCfCommand(root, [
+ 		"workers",
+ 		"triggers",
+@@ -312,7 +330,7 @@ function runWranglerVersionUpload(root, options, execute = execFileSync) {
+ 		throw error;
+ 	}
+ }
+-function runCfVersionUpload(root, options, execute = execFileSync) {
++function runCfVersionUpload(root, options, execute) {
+ 	const workerName = readBuildOutputWorkerName(root);
+ 	const { args, mode } = buildCfVersionUploadArgs(options);
+ 	console.log(mode ? `\n  Uploading Worker Build Output in mode: ${mode}...` : "\n  Uploading Worker Build Output...");
