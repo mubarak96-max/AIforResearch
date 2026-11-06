@@ -11,11 +11,11 @@ published: "2026-11-06"
 updated: "2026-11-06"
 faq:
   - q: "Is there a free AI writing assistant?"
-    a: "Yes. Grammarly, ChatGPT, Claude, QuillBot, Wordtune and ResearchCove all have free plans with daily or monthly limits. Jasper has a 7-day trial instead of a free plan. Free plans are good for short pieces and testing. They run out quickly on long, sourced work, and their privacy defaults differ, so check the training settings before you paste a draft in."
+    a: "Yes. Grammarly, ChatGPT, Claude, QuillBot, Wordtune and WriteGrid all have free plans with daily or monthly limits. Jasper has a 7-day trial instead of a free plan. Free plans are good for short pieces and testing. They run out quickly on long, sourced work, and their privacy defaults differ, so check the training settings before you paste a draft in."
   - q: "Does Grammarly cite sources?"
     a: "Partly. Grammarly's Citation Finder agent, which works in Grammarly's own docs editor, flags claims that may need a source, suggests sources and inserts citations in APA, MLA or Chicago. Free users can insert up to five citations a day. Grammarly's core checker in other apps fixes grammar, clarity and tone and does not look for sources."
   - q: "Can I use an AI writing assistant in Word?"
-    a: "Yes. Grammarly works inside Microsoft Word through its desktop app, and Anthropic offers a Claude add-in for Word. Another route is to write in a web editor that opens .docx files and exports back to Word, which is how ResearchCove works. Check whether your organization allows add-ins before you install one."
+    a: "Yes. Grammarly works inside Microsoft Word through its desktop app, and Anthropic offers a Claude add-in for Word. Another route is to write in a web editor that opens .docx files and exports back to Word, which is how WriteGrid works. Check whether your organization allows add-ins before you install one."
   - q: "Which AI writing assistant is most accurate?"
     a: "No AI writing assistant is accurate by default. Every tool built on a large language model can produce false statements. The more useful question is which tool lets you check its output fastest. Pick an assistant whose claims link to sources you can open, such as real papers, web pages or page numbers in your own PDFs, and check every one."
   - q: "What is the best AI writing assistant for journalists?"
@@ -35,7 +35,7 @@ This guide ranks tools on that test: can you verify what they write? It is the p
 | You are a… | Main need | Best fit | Why |
 | --- | --- | --- | --- |
 | Journalist | Speed, accuracy, an edit trail | A source-grounded editor plus a grammar checker | Your name is on every claim. You need sources you can open and tracked changes for your editor. See [AI tools for journalists](/blog/ai-tools-for-journalists). |
-| Report or white-paper writer | Citations to real studies, Word output | ResearchCove, or Claude/ChatGPT plus a reference manager | Readers check your references. Output usually has to go back into Word. |
+| Report or white-paper writer | Citations to real studies, Word output | WriteGrid, or Claude/ChatGPT plus a reference manager | Readers check your references. Output usually has to go back into Word. |
 | Screenwriter | Ideas, research, notes | Claude or ChatGPT for brainstorming; a screenwriting app for formatting | No general assistant formats screenplays well. Use AI for research and notes, not the script itself. |
 | Student | Citations in APA, MLA or Chicago, honest drafting | A tool with real citation styles, used within your school's AI rules | Fake references are the fastest way to fail an assignment. |
 | Marketer | Volume, brand voice, many channels | Jasper, or ChatGPT/Claude with saved instructions | Brand voice and templates matter more than citations, until you quote a statistic. |
@@ -118,7 +118,7 @@ Prices are list prices for one person, in US dollars, as of November 2026. They 
 | **Jasper** | Marketing content at scale, brand voice | Not its focus | None built in | Team features on higher plans | Browser extension and copy/paste | Pro $69/seat/month, or $59 billed yearly; 7-day trial[15] |
 | **QuillBot** | Paraphrasing and summarizing | No | Separate citation formatter | No | Browser and Word integrations <!-- VERIFY: QuillBot Word add-in availability --> | Premium <!-- VERIFY: QuillBot pricing page blocks automated checks; confirm price --> |
 | **Wordtune** | Sentence-level rewrites | No | No | No | Browser extension | Advanced $6.99/month, or $4.89/month billed annually[16] |
-| **ResearchCove** | Writing that cites real research | Yes: autocomplete cites the scholarly papers it draws on; Ask-a-PDF answers carry page numbers | 10,000+ CSL styles | Real-time co-editing, comments, suggestions, version history | Opens `.docx` and keeps its styles; exports Word, PDF and LaTeX | Plus $12/month ($96/year) |
+| **WriteGrid** | Writing that cites real research | Yes: autocomplete cites the scholarly papers it draws on; Ask-a-PDF answers carry page numbers | 10,000+ CSL styles | Real-time co-editing, comments, suggestions, version history | Opens `.docx` and keeps its styles; exports Word, PDF and LaTeX | Plus $12/month ($96/year) |
 
 ### Where each tool is strongest
 
@@ -128,9 +128,9 @@ Prices are list prices for one person, in US dollars, as of November 2026. They 
 - **Jasper** is built for marketing teams: brand voice, campaigns, many assets. It is the most expensive tool here for one writer, and sourcing is not what it is for.
 - **QuillBot and Wordtune** are rewriting tools. They are good at making a sentence shorter or clearer. They don't add facts, which also means they don't check them.
 
-## Where ResearchCove fits: citations to real papers, claim checks and questions to your PDFs
+## Where WriteGrid fits: citations to real papers, claim checks and questions to your PDFs
 
-ResearchCove is a web editor built for writing that has to cite real sources. It works in any browser, including on a phone, where it is the full editor rather than a read-only viewer.
+WriteGrid is a web editor built for writing that has to cite real sources. It works in any browser, including on a phone, where it is the full editor rather than a read-only viewer.
 
 What it does that the chat tools above don't:
 
@@ -141,7 +141,7 @@ What it does that the chat tools above don't:
 - **AI review as comments:** claim checks, source quality (flags retracted papers, preprints and wrong DOIs), proofreading and tone.
 - **Word in, Word out:** open a `.docx` with its styles; export Word, PDF or LaTeX. Plus co-editing, suggestions and version history.
 
-<!-- SCREENSHOT: ResearchCove editor mid-paragraph, showing an autocomplete suggestion in grey with two inline citations, and the citation popover open on one of them showing title, authors, year and DOI -->
+<!-- SCREENSHOT: WriteGrid editor mid-paragraph, showing an autocomplete suggestion in grey with two inline citations, and the citation popover open on one of them showing title, authors, year and DOI -->
 
 What it doesn't do: it is not a grammar checker that runs in every app, it has no browser extension or Word add-in, and it doesn't detect plagiarism or AI text. Many writers pair it with Grammarly for that reason.
 
@@ -192,7 +192,7 @@ A tool that fails test 1 or 2 can still be a fine rewriting tool. It just isn't 
 
 ### Is there a free AI writing assistant?
 
-Yes. Grammarly, ChatGPT, Claude, QuillBot, Wordtune and ResearchCove all have free plans with daily or monthly limits. Jasper has a 7-day trial instead of a free plan. Free plans are good for short pieces and testing. They run out quickly on long, sourced work, and their privacy defaults differ, so check the training settings before you paste a draft in.
+Yes. Grammarly, ChatGPT, Claude, QuillBot, Wordtune and WriteGrid all have free plans with daily or monthly limits. Jasper has a 7-day trial instead of a free plan. Free plans are good for short pieces and testing. They run out quickly on long, sourced work, and their privacy defaults differ, so check the training settings before you paste a draft in.
 
 ### Does Grammarly cite sources?
 
@@ -200,7 +200,7 @@ Partly. Grammarly's Citation Finder agent, which works in Grammarly's own docs e
 
 ### Can I use an AI writing assistant in Word?
 
-Yes. Grammarly works inside Microsoft Word through its desktop app, and Anthropic offers a Claude add-in for Word. Another route is to write in a web editor that opens .docx files and exports back to Word, which is how ResearchCove works. Check whether your organization allows add-ins before you install one.
+Yes. Grammarly works inside Microsoft Word through its desktop app, and Anthropic offers a Claude add-in for Word. Another route is to write in a web editor that opens .docx files and exports back to Word, which is how WriteGrid works. Check whether your organization allows add-ins before you install one.
 
 ### Which AI writing assistant is most accurate?
 

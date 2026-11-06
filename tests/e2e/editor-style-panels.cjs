@@ -24,9 +24,9 @@ const SAMPLE = [
 ];
 const now = Date.now();
 const COMMENTS = [
-  { id: crypto.randomUUID(), actorSessionId: 'ai', actorDisplayName: 'ResearchCove AI', kind: 'ai-review', severity: 'major', category: 'evidence', blockId: introId, createdAt: now - 120000, status: 'open', replies: [],
+  { id: crypto.randomUUID(), actorSessionId: 'ai', actorDisplayName: 'WriteGrid AI', kind: 'ai-review', severity: 'major', category: 'evidence', blockId: introId, createdAt: now - 120000, status: 'open', replies: [],
     selectedText: 'Slow-wave sleep in particular appears to promote the reactivation…', text: 'Most of this evidence comes from young adults in lab settings. Qualify the claim, or cite a study that includes older adults.' },
-  { id: crypto.randomUUID(), actorSessionId: 'ai', actorDisplayName: 'ResearchCove AI', kind: 'ai-review', severity: 'minor', category: 'clarity', blockId: introId, createdAt: now - 120000, status: 'open', replies: [],
+  { id: crypto.randomUUID(), actorSessionId: 'ai', actorDisplayName: 'WriteGrid AI', kind: 'ai-review', severity: 'minor', category: 'clarity', blockId: introId, createdAt: now - 120000, status: 'open', replies: [],
     selectedText: 'Over the past two decades…', text: 'Give a date range or a citation for this trend so the reader can check it.' },
   { id: crypto.randomUUID(), actorSessionId: 'joseph', actorDisplayName: 'Joseph N.', blockId: introId, createdAt: now - 3600000, status: 'open', replies: [],
     text: 'Could we add the meta-analysis we talked about on Tuesday here?' },
@@ -59,7 +59,7 @@ async function clickFirst(page, selectors) {
   for (const kind of views) {
     const options = kind === 'phone' ? devices['iPhone 13'] : { viewport: { width: 1440, height: 900 } };
     const context = await browser.newContext(options);
-    await context.addInitScript(([t, u]) => { localStorage.setItem('researchcove_token', JSON.stringify(t)); localStorage.setItem('researchcove_user', JSON.stringify(u)); }, [token, user]);
+    await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [token, user]);
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', (e) => errors.push(`pageerror ${e.message.slice(0, 200)}`));

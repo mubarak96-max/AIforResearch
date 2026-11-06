@@ -1,7 +1,7 @@
 ---
 title: "AI Literature Review Tools for Analysts and Policy Teams"
 slug: "ai-literature-review-tools"
-description: "AI literature review tools compared for work, not school: Elicit, Consensus, SciSpace, Scite and ResearchCove, plus a 6-step rapid review method you can defend."
+description: "AI literature review tools compared for work, not school: Elicit, Consensus, SciSpace, Scite and WriteGrid, plus a 6-step rapid review method you can defend."
 primary_keyword: "ai literature review"
 secondary_keywords: ["ai literature review tools", "ai literature review generator", "best ai literature review", "elicit ai literature review", "consensus ai literature review", "ai literature review from pdf"]
 cluster: "F. Research and citations"
@@ -15,7 +15,7 @@ faq:
   - q: "Is an AI literature review reliable?"
     a: "It is as reliable as its search and your checks. AI tools search one index each, miss grey literature such as agency and industry reports, and sometimes summarize a paper wrongly. Make it reliable by searching more than one source, recording your search, checking a sample of AI extractions against the papers, and reading the key studies yourself."
   - q: "What is the best AI literature review tool?"
-    a: "It depends on the job. Elicit is strongest for structured screening and data extraction tables. Consensus is fast for yes-or-no research questions. Scite shows whether later papers support or contrast a finding. SciSpace combines search with PDF chat. ResearchCove is built for the writing stage: drafting the report with cited autocomplete and checking claims."
+    a: "It depends on the job. Elicit is strongest for structured screening and data extraction tables. Consensus is fast for yes-or-no research questions. Scite shows whether later papers support or contrast a finding. SciSpace combines search with PDF chat. WriteGrid is built for the writing stage: drafting the report with cited autocomplete and checking claims."
   - q: "Can I do an AI literature review from PDFs I already have?"
     a: "Yes. Upload the PDFs to a tool that answers questions about a PDF with page numbers, then ask the same extraction questions of every study, one file at a time: sample, method, main finding, limits. Check each answer on the cited page. This works well for grey literature, which scholarly search tools often don't index."
   - q: "How long does a rapid evidence review take?"
@@ -122,7 +122,7 @@ All prices are as of November 2026 and change often. Check each tool's pricing p
 | **Consensus** | Quick answers to yes-or-no research questions; the Consensus Meter shows how much studies agree [4] | Says 400M+ papers [4] | Yes, with limited Pro and Deep searches <!-- VERIFY: current free-tier limits --> | Pro roughly $10 to $15/month <!-- VERIFY: Consensus Pro and Deep prices on consensus.app/pricing --> |
 | **SciSpace** | Search plus chat with PDF and an AI agent in one place | Reported as 280M+ papers <!-- VERIFY: SciSpace index size --> | Yes, limited <!-- VERIFY: SciSpace free plan --> | Premium about $12/month billed annually <!-- VERIFY: SciSpace pricing page --> |
 | **Scite** | Smart Citations: whether later studies support or contrast a paper's claims [5] | 1.6B+ citations, 300M+ sources [5] | 7-day trial | Basic $12/month billed yearly; Pro $40/month billed yearly [5] |
-| **ResearchCove** | Writing the review: cited autocomplete, Ask a PDF with page numbers, claim checks | 250M+ scholarly works | Yes, daily AI limits | Plus about $12/month; Pro about $29/month |
+| **WriteGrid** | Writing the review: cited autocomplete, Ask a PDF with page numbers, claim checks | 250M+ scholarly works | Yes, daily AI limits | Plus about $12/month; Pro about $29/month |
 
 ### Elicit
 
@@ -140,9 +140,9 @@ SciSpace combines search, a literature review table and chat with PDF, so you ca
 
 Scite answers a question the others don't: has this finding held up? Smart Citations classify how later papers cite a study, as supporting or contrasting it. [5] Use it on the five or six studies your conclusion depends on.
 
-### ResearchCove
+### WriteGrid
 
-ResearchCove covers the writing stage, which the search tools hand off. Find papers from 250M+ works inside the editor, add PDFs (including grey literature) to the Library, question each one with page-numbered answers, and write the report with autocomplete that cites its sources. See the product section below.
+WriteGrid covers the writing stage, which the search tools hand off. Find papers from 250M+ works inside the editor, add PDFs (including grey literature) to the Library, question each one with page-numbered answers, and write the report with autocomplete that cites its sources. See the product section below.
 
 **A practical stack:** search and extract in Elicit or Consensus, check key studies in Scite, then write and check the report in an editor that keeps citations live.
 
@@ -167,9 +167,9 @@ Many professional reviews start with a folder of reports, not a database search.
 
 See [chat with PDF](/blog/chat-with-pdf) for prompts and failure modes.
 
-## Write the review in ResearchCove
+## Write the review in WriteGrid
 
-ResearchCove is a web editor that keeps your sources and your draft in one place.
+WriteGrid is a web editor that keeps your sources and your draft in one place.
 
 - **Find papers** from 250M+ scholarly works in a side panel and add them to your Library.
 - **Upload PDFs** of reports, filings and studies to the Library, then use **Ask** to question one PDF at a time. Answers carry page numbers, so you can open the page and confirm.
@@ -198,7 +198,7 @@ It is as reliable as its search and your checks. AI tools search one index each,
 
 ### What is the best AI literature review tool?
 
-It depends on the job. Elicit is strongest for structured screening and data extraction tables. Consensus is fast for yes-or-no research questions. Scite shows whether later papers support or contrast a finding. SciSpace combines search with PDF chat. ResearchCove is built for the writing stage: drafting the report with cited autocomplete and checking claims.
+It depends on the job. Elicit is strongest for structured screening and data extraction tables. Consensus is fast for yes-or-no research questions. Scite shows whether later papers support or contrast a finding. SciSpace combines search with PDF chat. WriteGrid is built for the writing stage: drafting the report with cited autocomplete and checking claims.
 
 ### Can I do an AI literature review from PDFs I already have?
 

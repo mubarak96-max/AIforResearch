@@ -1,8 +1,8 @@
 /**
- * Copies a self-hosted ResearchCove (Postgres + files) into a Firebase project, following
+ * Copies a self-hosted WriteGrid (Postgres + files) into a Firebase project, following
  * docs/data-model.md. Run from the repository root:
  *
- *   DATABASE_URL=postgres://researchcove:…@host:5432/researchcove \
+ *   DATABASE_URL=postgres://writegrid:…@host:5432/writegrid \
  *   FILES_DIR=/path/to/files \
  *   FIREBASE_PROJECT_ID=your-project FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app \
  *   GOOGLE_APPLICATION_CREDENTIALS=./service-account.json \
@@ -310,7 +310,7 @@ async function migrateFiles() {
       const key = prefix ? `${prefix}/${entry.name}` : entry.name;
       const full = path.join(dir, entry.name);
       if (entry.isDirectory()) { await walk(full, key); continue; }
-      if (!entry.isFile() || key.startsWith('researchcove-check/')) continue;
+      if (!entry.isFile() || key.startsWith('writegrid-check/')) continue;
       const [exists] = dryRun ? [false] : await bucket.file(key).exists();
       if (exists) { skipped += 1; continue; }
       const info = await stat(full);

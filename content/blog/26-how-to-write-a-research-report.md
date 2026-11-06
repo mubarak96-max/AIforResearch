@@ -227,16 +227,16 @@ An **AI research report writer** is useful for some parts of the job and risky f
 
 The rule: AI can draft words, but the facts come from your data and your sources. A chatbot that writes a background section from memory can attach a real-sounding citation to a paper that doesn't exist. Use a tool that cites from a real index, and check.
 
-## Write and check your report in ResearchCove
+## Write and check your report in WriteGrid
 
-ResearchCove doesn't have a built-in research report template (its templates are Literature review, Research proposal and Essay). Paste the Markdown template above into a new document and you have the structure. Then:
+WriteGrid doesn't have a built-in research report template (its templates are Literature review, Research proposal and Essay). Paste the Markdown template above into a new document and you have the structure. Then:
 
 - **Draft with cited autocomplete.** Autocomplete suggests the next sentence and cites the scholarly papers it draws on. Type `@` to cite a specific paper from 250M+ works or from your Library, or add a custom citation for an agency report.
 - **Keep source PDFs next to the draft.** Upload studies and reports to the Library and use Ask on one PDF at a time; answers carry page numbers. For questions across your sources, AI Chat beside the draft can use your Library as a source and cites the papers it draws on.
 - **Review before sending.** AI review runs claim checks, flags retracted papers, preprints and wrong DOIs, and proofreads for tone. Results appear as comments in the text.
-- **Collaborate and export.** Colleagues co-edit and suggest changes (tracked changes), version history keeps earlier drafts, and you export to Word or PDF. If your organization sends a `.docx` template, ResearchCove opens it and keeps its styles.
+- **Collaborate and export.** Colleagues co-edit and suggest changes (tracked changes), version history keeps earlier drafts, and you export to Word or PDF. If your organization sends a `.docx` template, WriteGrid opens it and keeps its styles.
 
-<!-- SCREENSHOT: a report draft in ResearchCove with an autocomplete suggestion showing an inline citation, and the reference list in APA 7 below -->
+<!-- SCREENSHOT: a report draft in WriteGrid with an autocomplete suggestion showing an inline citation, and the reference list in APA 7 below -->
 
 The free plan includes the full editor, unlimited citations in every style and Word and PDF export, with daily AI limits. Check [pricing](/pricing) for current plans.
 

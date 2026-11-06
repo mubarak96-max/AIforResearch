@@ -75,7 +75,7 @@ async function payOnStripe(page, number, name) {
   const browser = await chromium.launch({ args: [`--unsafely-treat-insecure-origin-as-secure=${BASE}`] });
   const open = async (options, signedIn = true) => {
     const context = await browser.newContext(options);
-    if (signedIn) await context.addInitScript(([t, u]) => { localStorage.setItem('researchcove_token', JSON.stringify(t)); localStorage.setItem('researchcove_user', JSON.stringify(u)); }, [token, auth.user]);
+    if (signedIn) await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [token, auth.user]);
     // Stripe returns to PUBLIC_URL: keep it on the local address.
     if (PUBLIC !== BASE) await context.route(`${PUBLIC}/**`, (route) => route.fulfill({ status: 302, headers: { location: route.request().url().replace(PUBLIC, BASE) } }));
     const page = await context.newPage();

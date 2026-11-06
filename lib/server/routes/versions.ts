@@ -23,7 +23,7 @@ export function versionRoutes() {
     const { document, role } = await resolveAccess(c.req.param('id'), user);
     if (!EDIT_ROLES.includes(role)) throw new HTTPException(403, { message: 'Only editors can save versions' });
     const body = await c.req.json().catch(() => ({}));
-    // reason "ai": the writer accepted AI-written text (shown as ResearchCove AI in the history).
+    // reason "ai": the writer accepted AI-written text (shown as WriteGrid AI in the history).
     const reason = body?.reason === 'ai' ? 'ai' : 'manual';
     return c.json(versionSummary(await createVersion(document, user, reason, cleanLabel(body?.label))));
   });

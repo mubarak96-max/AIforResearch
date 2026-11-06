@@ -44,7 +44,7 @@ export type CheckRun = { running: boolean; error: string | null };
 /** Opens the comments filtered to one check (and optionally one category). */
 export type CommentFilter = { check: string; category?: string } | null;
 
-const key = (documentId: string) => `researchcove_review_${documentId}`;
+const key = (documentId: string) => `writegrid_review_${documentId}`;
 
 export function readReviewMemory(documentId: string): ReviewMemory {
   try {

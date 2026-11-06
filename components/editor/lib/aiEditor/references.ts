@@ -56,7 +56,7 @@ export async function addPaperToLibrary(paper: Paper) {
 }
 
 /** Open Library panels reload when a paper is saved or a file uploaded elsewhere. */
-export const LIBRARY_CHANGED_EVENT = 'researchcove:library-changed';
+export const LIBRARY_CHANGED_EVENT = 'writegrid:library-changed';
 export function notifyLibraryChanged() {
   window.dispatchEvent(new CustomEvent(LIBRARY_CHANGED_EVENT));
 }

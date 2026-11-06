@@ -93,7 +93,7 @@ export function gatewayRoutes(slots: Slots) {
     const header = c.req.header('authorization') || '';
     const key = header.toLowerCase().startsWith('bearer ') ? header.slice(7).trim() : '';
     const apiKey = key ? await findApiKey(key) : null;
-    if (!apiKey) throw new HTTPException(401, { message: 'Missing or invalid ResearchCove API key. Create one at /developers/keys.' });
+    if (!apiKey) throw new HTTPException(401, { message: 'Missing or invalid WriteGrid API key. Create one at /developers/keys.' });
     // Keys made while payments were in test mode stop working once real payments start.
     if (apiKey.mode !== billingMode()) throw new HTTPException(401, { message: `This is a ${apiKey.mode} key; create a new key for ${billingMode()} use.` });
     c.set('apiKey', apiKey);
@@ -171,7 +171,7 @@ export function gatewayRoutes(slots: Slots) {
     return new Response(stream, { status: upstream.status, headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' } });
   });
 
-  app.get('/models', (c) => c.json({ object: 'list', data: ['deepseek-chat', 'deepseek-reasoner'].map((id) => ({ id, object: 'model', owned_by: 'researchcove' })) }));
+  app.get('/models', (c) => c.json({ object: 'list', data: ['deepseek-chat', 'deepseek-reasoner'].map((id) => ({ id, object: 'model', owned_by: 'writegrid' })) }));
 
   // ---------------------------------------------------------------- Scholar: metadata and files
 
@@ -258,7 +258,7 @@ export function gatewayRoutes(slots: Slots) {
     if (Array.isArray(json.tools)) {
       json.tools = json.tools.filter((tool: { name: string }) => !ACCOUNT_TOOLS.has(tool.name));
       json.tool_count = json.tools.length;
-      json.name = 'ResearchCove research tools';
+      json.name = 'WriteGrid research tools';
     }
     return c.json(json, upstream.status as any);
   });
@@ -321,7 +321,7 @@ export function gatewayRoutes(slots: Slots) {
       if (message.method === 'tools/list' && Array.isArray(reply?.result?.tools)) {
         reply.result.tools = reply.result.tools.filter((tool: { name: string }) => !ACCOUNT_TOOLS.has(tool.name));
       }
-      if (message.method === 'initialize' && reply?.result?.serverInfo) reply.result.serverInfo = { ...reply.result.serverInfo, name: 'researchcove-research' };
+      if (message.method === 'initialize' && reply?.result?.serverInfo) reply.result.serverInfo = { ...reply.result.serverInfo, name: 'writegrid-research' };
       if (cost && upstream.ok && reply?.result && !reply.result.isError) {
         const charged = await bill(c, cost.service, cost.quantity, randomUUID(), { tool: name, via: 'mcp' });
         for (const [header, value] of Object.entries(creditHeaders(charged))) c.header(header, value);

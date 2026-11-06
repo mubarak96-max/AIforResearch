@@ -455,8 +455,8 @@ function hashText(text: string): string {
 
 // The reference list of a long document takes the CSL engine about a second; it is kept per
 // style and set of sources, in memory and in this browser, so reopening a document is instant.
-const BIBLIOGRAPHY_CACHE_PREFIX = 'researchcove-bib:';
-const BIBLIOGRAPHY_CACHE_INDEX = 'researchcove-bib-index';
+const BIBLIOGRAPHY_CACHE_PREFIX = 'writegrid-bib:';
+const BIBLIOGRAPHY_CACHE_INDEX = 'writegrid-bib-index';
 const bibliographyMemory = new Map<string, string>();
 
 function bibliographyKey(bibtexArray: string[], style: string) {

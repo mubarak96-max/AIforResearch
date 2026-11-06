@@ -70,7 +70,7 @@ Grammarly's style guide feature holds custom rules for "the proper use, spelling
 
 With a precise prompt, a chatbot catches most number, date and time errors. It also states rules that don't exist, applies rules that changed (the % sign in 2019, healthcare in 2026) and rewrites sentences you didn't ask it to touch.
 
-### ResearchCove proofreading
+### WriteGrid proofreading
 
 No AP rule engine. Its AI review covers proofreading and tone; for AP style, run the prompt below in the AI chat beside the document.
 
@@ -142,8 +142,8 @@ Count a catch only if the fix is the AP form ("10:00 AM" for "10:00 a.m." is a m
 | Grammarly (custom AP style guide) | | | | | | | |
 | ChatGPT with the AP prompt | | | | | | | |
 | Claude with the AP prompt | | | | | | | |
-| ResearchCove proofreading review | | | | | | | |
-| ResearchCove AI chat with the AP prompt | | | | | | | |
+| WriteGrid proofreading review | | | | | | | |
+| WriteGrid AI chat with the AP prompt | | | | | | | |
 
 ## Why no checker catches everything
 
@@ -161,7 +161,7 @@ Most AP rules are patterns a tool can match: ":00," "PM," a two-letter state cod
 
 ## A reusable AI prompt for AP style checking
 
-Paste this into any AI chat, then paste your text below it. It works in ChatGPT, Claude, Gemini or the AI chat beside a ResearchCove document. The recent-changes list is there because models often learned older AP rules.
+Paste this into any AI chat, then paste your text below it. It works in ChatGPT, Claude, Gemini or the AI chat beside a WriteGrid document. The recent-changes list is there because models often learned older AP rules.
 
 ```text
 You are an AP style copy editor. Check the text below against the current
@@ -221,9 +221,9 @@ Run this after any tool, on the printed page or a fresh screen.
 - [ ] Every percentage change says whether it's percent or percentage points.
 - [ ] House-style exceptions are applied.
 
-## Checking AP style in ResearchCove
+## Checking AP style in WriteGrid
 
-ResearchCove is a writing editor, not an AP checker. A reporter and editor use it for the AP pass like this:
+WriteGrid is a writing editor, not an AP checker. A reporter and editor use it for the AP pass like this:
 
 1. **Open the draft,** or the newsroom `.docx` (styles are kept).
 2. **Run the AP prompt in the AI chat** beside the document, so the error table sits next to the text.
@@ -231,7 +231,7 @@ ResearchCove is a writing editor, not an AP checker. A reporter and editor use i
 4. **Fix as suggestions (tracked changes),** so the writer can accept or reject "5 percent → 5%." Version history keeps the original.
 5. **Do the human checklist,** then export to Word or PDF.
 
-<!-- SCREENSHOT: ResearchCove editor with the test paragraph from this article open, the AI chat panel on the right showing the AP prompt's error table (rows for "Salem, OR" and "five percent"), and two tracked suggestions visible in the text. -->
+<!-- SCREENSHOT: WriteGrid editor with the test paragraph from this article open, the AI chat panel on the right showing the AP prompt's error table (rows for "Salem, OR" and "five percent"), and two tracked suggestions visible in the text. -->
 
 The free plan includes a few AI chat messages and review checks a day, enough to try this on one story. Check [pricing](/pricing) for current limits.
 

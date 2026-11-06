@@ -46,7 +46,7 @@ function textOf(node: any): string {
  */
 export function useAutocomplete({ editor, enabled, documentTitle, makeCitations, onOutOfCredits, onAccepted, onTitle, settings }: Options) {
   const [bar, setBar] = useState<GhostBar | null>(null);
-  /** Where "ResearchCove AI" is writing (the caret flag) while an asked-for suggestion loads. */
+  /** Where "WriteGrid AI" is writing (the caret flag) while an asked-for suggestion loads. */
   const [writingAt, setWritingAt] = useState<{ top: number; left: number } | null>(null);
   const resultRef = useRef<Map<number, GhostResult>>(new Map());
   const timerRef = useRef<number | null>(null);

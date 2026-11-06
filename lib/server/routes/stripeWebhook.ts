@@ -24,12 +24,12 @@ async function hasPlanSubscription(subscriptionId: string) {
   return !found.empty;
 }
 
-/** The plan subscription an event is about, if any (plan subscriptions carry researchcove_kind=plan). */
+/** The plan subscription an event is about, if any (plan subscriptions carry writegrid_kind=plan). */
 async function planSubscriptionOf(event: Stripe.Event): Promise<string | null> {
   const object = event.data.object as any;
   if (event.type.startsWith('customer.subscription.')) {
-    if (object.metadata?.researchcove_kind === 'plan') return object.id;
-    // Subscriptions carried over from the previous app have no ResearchCove metadata: known by their id.
+    if (object.metadata?.writegrid_kind === 'plan') return object.id;
+    // Subscriptions carried over from the previous app have no WriteGrid metadata: known by their id.
     return (await hasPlanSubscription(object.id)) ? object.id : null;
   }
   if (event.type === 'checkout.session.completed') return object.mode === 'subscription' ? customerOf(object.subscription) : null;
@@ -37,7 +37,7 @@ async function planSubscriptionOf(event: Stripe.Event): Promise<string | null> {
     const subscription = invoiceSubscription(object);
     if (!subscription) return null;
     // Invoices carry their subscription's metadata; the account check covers older invoices.
-    if (object.parent?.subscription_details?.metadata?.researchcove_kind === 'plan') return subscription;
+    if (object.parent?.subscription_details?.metadata?.writegrid_kind === 'plan') return subscription;
     return (await hasPlanSubscription(subscription)) ? subscription : null;
   }
   return null;

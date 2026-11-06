@@ -167,7 +167,7 @@ export function adminRoutes(slots: Slots) {
     if (existing) {
       await stripe.webhookEndpoints.update(existing.id, { enabled_events: [...WEBHOOK_EVENTS], disabled: false });
     } else {
-      const endpoint = await stripe.webhookEndpoints.create({ url, enabled_events: [...WEBHOOK_EVENTS], description: 'ResearchCove' });
+      const endpoint = await stripe.webhookEndpoints.create({ url, enabled_events: [...WEBHOOK_EVENTS], description: 'WriteGrid' });
       if (endpoint.secret) await saveSettings({ stripeWebhookSecret: endpoint.secret }, c.get('user')!.id);
       created = true;
     }

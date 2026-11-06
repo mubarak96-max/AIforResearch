@@ -1,4 +1,4 @@
-// Storage, email and newsletter end to end on staging, against throwaway services on researchcove-net:
+// Storage, email and newsletter end to end on staging, against throwaway services on writegrid-net:
 // an S3-compatible server (versitygw, path-style) and Mailpit (SMTP catcher). Puts every setting
 // back to how it was found (Storage: this server, Email and Newsletter off) and deletes its files.
 //   (node localproxy.cjs &) ; BASE=http://localhost:8080 DATABASE_URL=… S3_TEST_KEY=… S3_TEST_SECRET=… node integrations.cjs
@@ -8,9 +8,9 @@ const { AwsClient } = require('aws4fetch');
 
 const BASE = process.env.BASE || 'http://localhost:8080';
 const OUT = process.env.OUT || '/shots';
-const S3 = process.env.S3_TEST_URL || 'http://researchcove-test-s3:7070';
-const MAIL = process.env.MAILPIT_URL || 'http://researchcove-test-mailpit:8025';
-const BUCKET = 'researchcove-test';
+const S3 = process.env.S3_TEST_URL || 'http://writegrid-test-s3:7070';
+const MAIL = process.env.MAILPIT_URL || 'http://writegrid-test-mailpit:8025';
+const BUCKET = 'writegrid-test';
 const PREFIX = `e2e-${Date.now()}`;
 const PASSWORD = 'correct-horse-9';
 const results = [];
@@ -93,7 +93,7 @@ const RESET = {
   const browser = await chromium.launch({ args: [`--unsafely-treat-insecure-origin-as-secure=${BASE}`] });
   const shoot = async (path, name, options = { viewport: { width: 1440, height: 1000 } }, signedIn = true) => {
     const context = await browser.newContext(options);
-    if (signedIn) await context.addInitScript(([t, u]) => { localStorage.setItem('researchcove_token', JSON.stringify(t)); localStorage.setItem('researchcove_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+    if (signedIn) await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', (error) => errors.push(error.message.slice(0, 160)));
@@ -168,15 +168,15 @@ const RESET = {
     await fetch(`${MAIL}/api/v1/messages`, { method: 'DELETE' });
     const methodsOff = await call(null, '/api/auth/methods');
     check('Forgot password hidden while email is off', methodsOff.body.password_reset === false);
-    const mailSaved = await save(token, { mailProvider: 'smtp', mailFrom: 'ResearchCove Test <test@example.test>', smtpHost: 'researchcove-test-mailpit', smtpPort: '1025', smtpSecurity: 'none' });
+    const mailSaved = await save(token, { mailProvider: 'smtp', mailFrom: 'WriteGrid Test <test@example.test>', smtpHost: 'writegrid-test-mailpit', smtpPort: '1025', smtpSecurity: 'none' });
     check('SMTP saved', mailSaved.status === 200);
     const testMail = await call(token, '/api/admin/test/email', { method: 'POST' });
     check('test email sent', testMail.body.ok === true, JSON.stringify(testMail.body));
-    check('…and arrives', Boolean(await mailTo(auth.user.email, 'ResearchCove test email')));
+    check('…and arrives', Boolean(await mailTo(auth.user.email, 'WriteGrid test email')));
 
     const newcomer = `confirm-${Date.now()}@example.test`;
     const signup = await call(null, '/api/auth/register', { method: 'POST', body: JSON.stringify({ email: newcomer, password: PASSWORD, full_name: 'Cora Confirm' }) });
-    const confirmMail = signup.status === 201 ? await mailTo(newcomer, 'Confirm your email for ResearchCove') : null;
+    const confirmMail = signup.status === 201 ? await mailTo(newcomer, 'Confirm your email for WriteGrid') : null;
     check('password sign-up gets a confirmation email', Boolean(confirmMail), String(signup.status));
     const confirmLink = linkIn(confirmMail, '/confirm-email');
     if (confirmLink) {
@@ -215,7 +215,7 @@ const RESET = {
           await page.getByRole('button', { name: 'Send reset link' }).click();
           check('"Check your email" shown', await page.getByRole('heading', { name: 'Check your email' }).waitFor({ timeout: 10000 }).then(() => true, () => false));
           await page.screenshot({ path: `${OUT}/integrations-check-email.png` });
-          const resetMail = await mailTo(resetUser, 'Reset your ResearchCove password');
+          const resetMail = await mailTo(resetUser, 'Reset your WriteGrid password');
           const resetLink = linkIn(resetMail, '/reset-password');
           check('reset email arrives with a link', Boolean(resetLink));
           await page.goto(resetLink.replace(/^https?:\/\/[^/]+/, BASE), { waitUntil: 'domcontentloaded' });

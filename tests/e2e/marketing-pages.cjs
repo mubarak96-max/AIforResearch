@@ -22,8 +22,8 @@ const PAGES = [
     for (const state of ['out', 'in']) {
       const context = await browser.newContext(options);
       if (state === 'in') {
-        await context.addCookies([{ name: 'researchcove_signed_in', value: '1', url: BASE }]);
-        await context.addInitScript(([t, u]) => { localStorage.setItem('researchcove_token', JSON.stringify(t)); localStorage.setItem('researchcove_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+        await context.addCookies([{ name: 'writegrid_signed_in', value: '1', url: BASE }]);
+        await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
       }
       const page = await context.newPage();
       const errors = [];

@@ -1,6 +1,6 @@
 """PDF -> text per page with pypdfium2 (no OCR).
 
-Run as a subprocess (`python -m researchcove_convert.pdftext <file.pdf>`) so that a PDF which hangs
+Run as a subprocess (`python -m writegrid_convert.pdftext <file.pdf>`) so that a PDF which hangs
 or crashes PDFium can be timed out and killed like a LibreOffice conversion. Prints JSON on
 stdout; exit code 3 = password-protected, 2 = not a readable PDF.
 """

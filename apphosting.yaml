@@ -14,7 +14,7 @@ runConfig:
   # Reach services/convert, which runs with internal ingress (see services/convert/README.md).
   # vpcAccess:
   #   egress: PRIVATE_RANGES_ONLY
-  #   connector: projects/<project>/locations/us-central1/connectors/researchcove
+  #   connector: projects/<project>/locations/us-central1/connectors/writegrid
 
 env:
   # --- Browser (Firebase web app config: Project settings › Your apps) ---

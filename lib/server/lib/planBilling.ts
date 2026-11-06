@@ -38,9 +38,9 @@ export async function syncPlanToStripe(stripe: Stripe, planId: string) {
   if (plan.is_default || plan.checkout !== 'self_serve') return plan;
   let productId = plan.stripe_product_id;
   if (productId) {
-    await stripe.products.update(productId, { name: `ResearchCove ${plan.name}`, description: plan.tagline || undefined, active: true });
+    await stripe.products.update(productId, { name: `WriteGrid ${plan.name}`, description: plan.tagline || undefined, active: true });
   } else {
-    productId = (await stripe.products.create({ name: `ResearchCove ${plan.name}`, description: plan.tagline || undefined, metadata: { researchcove_plan: plan.id } })).id;
+    productId = (await stripe.products.create({ name: `WriteGrid ${plan.name}`, description: plan.tagline || undefined, metadata: { writegrid_plan: plan.id } })).id;
   }
   const ensurePrice = async (current: string | null, cents: number, interval: Interval) => {
     if (cents <= 0) {
@@ -54,7 +54,7 @@ export async function syncPlanToStripe(stripe: Stripe, planId: string) {
     }
     const created = await stripe.prices.create({
       product: productId!, currency: plan.currency, unit_amount: cents, recurring: { interval },
-      nickname: `${plan.name} ${interval === 'month' ? 'monthly' : 'yearly'}`, metadata: { researchcove_plan: plan.id, interval },
+      nickname: `${plan.name} ${interval === 'month' ? 'monthly' : 'yearly'}`, metadata: { writegrid_plan: plan.id, interval },
     });
     return created.id;
   };
@@ -74,7 +74,7 @@ export async function ensureCustomer(stripe: Stripe, accountId: string) {
   if (account.stripe_customer_id) return account.stripe_customer_id as string;
   const owner = await accountOwner(accountId);
   const customer = await stripe.customers.create({
-    email: owner?.email, name: owner?.full_name || account.name || undefined, metadata: { researchcove_account_id: accountId },
+    email: owner?.email, name: owner?.full_name || account.name || undefined, metadata: { writegrid_account_id: accountId },
   });
   // Another request may have created one at the same moment: keep the first.
   return db().runTransaction(async (tx) => {
@@ -107,7 +107,7 @@ export async function startPlanPurchase(stripe: Stripe, accountId: string, planI
         items: [{ id: item.id, price }],
         proration_behavior: 'always_invoice',
         cancel_at_period_end: false,
-        metadata: { ...subscription.metadata, researchcove_kind: 'plan', researchcove_plan: plan.id, researchcove_account_id: accountId },
+        metadata: { ...subscription.metadata, writegrid_kind: 'plan', writegrid_plan: plan.id, writegrid_account_id: accountId },
       });
       await syncPlanSubscription(stripe, updated);
       return { changed: true as const };
@@ -121,7 +121,7 @@ export async function startPlanPurchase(stripe: Stripe, accountId: string, planI
     allow_promotion_codes: true,
     client_reference_id: accountId,
     subscription_data: {
-      metadata: { researchcove_kind: 'plan', researchcove_plan: plan.id, researchcove_account_id: accountId },
+      metadata: { writegrid_kind: 'plan', writegrid_plan: plan.id, writegrid_account_id: accountId },
       ...(plan.trial_days > 0 ? { trial_period_days: plan.trial_days } : {}),
     },
     success_url: appUrl('/account?billing=success&session={CHECKOUT_SESSION_ID}'),
@@ -133,7 +133,7 @@ export async function startPlanPurchase(stripe: Stripe, accountId: string, planI
 /** Writes a plan subscription's state to its account (newer events win; others are ignored). */
 export async function syncPlanSubscription(stripe: Stripe, subscription: Stripe.Subscription, eventAt?: Date) {
   const customer = idOf(subscription.customer as any);
-  let accountId = subscription.metadata?.researchcove_account_id || null;
+  let accountId = subscription.metadata?.writegrid_account_id || null;
   if (!accountId && customer) {
     const owner = await col(C.accounts).where('stripe_customer_id', '==', customer).limit(1).get();
     accountId = owner.docs[0]?.id ?? null;
@@ -142,7 +142,7 @@ export async function syncPlanSubscription(stripe: Stripe, subscription: Stripe.
   const { plans } = await loadPlans();
   const item = subscription.items.data[0];
   const priceId = item?.price?.id;
-  const plan = plans.find((candidate) => candidate.id === subscription.metadata?.researchcove_plan)
+  const plan = plans.find((candidate) => candidate.id === subscription.metadata?.writegrid_plan)
     ?? plans.find((candidate) => candidate.stripe_monthly_price_id === priceId || candidate.stripe_yearly_price_id === priceId);
   if (!plan) return null;
   const interval = item?.price?.recurring?.interval === 'year' ? 'year' : 'month';
@@ -213,7 +213,7 @@ export async function listCards(stripe: Stripe, customer: string) {
     .sort((a, b) => Number(b.default) - Number(a.default));
 }
 
-/** Stripe's secure page for adding a card (no card numbers ever reach ResearchCove). */
+/** Stripe's secure page for adding a card (no card numbers ever reach WriteGrid). */
 export async function startAddCard(stripe: Stripe, accountId: string) {
   const customer = await ensureCustomer(stripe, accountId);
   const session = await stripe.checkout.sessions.create({
@@ -289,7 +289,7 @@ export async function renewPlan(stripe: Stripe, accountId: string) {
     try {
       const subscription = await stripe.subscriptions.create({
         customer, items: [{ price }], default_payment_method: card, payment_behavior: 'error_if_incomplete',
-        metadata: { researchcove_kind: 'plan', researchcove_plan: plan.id, researchcove_account_id: accountId },
+        metadata: { writegrid_kind: 'plan', writegrid_plan: plan.id, writegrid_account_id: accountId },
       });
       await syncPlanSubscription(stripe, subscription);
       return { renewed: true as const };

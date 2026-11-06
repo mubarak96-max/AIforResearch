@@ -1,5 +1,5 @@
 """Shared fixtures: the service under TestClient (with its real worker pool) and a small HTTP
-server standing in for the ResearchCove API's internal asset endpoint."""
+server standing in for the WriteGrid API's internal asset endpoint."""
 
 import shutil
 import threading
@@ -8,7 +8,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import pytest
 from fastapi.testclient import TestClient
 
-from researchcove_convert.app import app
+from writegrid_convert.app import app
 
 needs_libreoffice = pytest.mark.skipif(not shutil.which("soffice"), reason="LibreOffice is not installed here")
 

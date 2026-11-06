@@ -22,8 +22,8 @@ const SAMPLE = [
   const context = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await context.addInitScript(([t, u]) => {
-    localStorage.setItem('researchcove_token', JSON.stringify(t));
-    localStorage.setItem('researchcove_user', JSON.stringify(u));
+    localStorage.setItem('writegrid_token', JSON.stringify(t));
+    localStorage.setItem('writegrid_user', JSON.stringify(u));
     window.__printed = 0;
     window.print = () => { window.__printed += 1; };
   }, [auth.token, auth.user]);

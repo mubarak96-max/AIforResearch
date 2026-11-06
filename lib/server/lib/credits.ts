@@ -205,12 +205,12 @@ export async function startCreditCheckout(stripe: Stripe, accountId: string, pac
   const pack = packById(packId);
   if (!pack) throw new HTTPException(422, { message: 'Choose a credit pack.' });
   const customer = await ensureCustomer(stripe, accountId);
-  const metadata = { researchcove_kind: 'credits', researchcove_account_id: accountId, pack: pack.id };
+  const metadata = { writegrid_kind: 'credits', writegrid_account_id: accountId, pack: pack.id };
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
     customer,
     allowed_payment_method_types: ['card'],
-    line_items: [{ quantity: 1, price_data: { currency: 'usd', unit_amount: pack.cents, product_data: { name: `${pack.credits.toLocaleString('en-US')} ResearchCove credits` } } }],
+    line_items: [{ quantity: 1, price_data: { currency: 'usd', unit_amount: pack.cents, product_data: { name: `${pack.credits.toLocaleString('en-US')} WriteGrid credits` } } }],
     // The card is kept for automatic top-ups (only if the owner turns them on).
     payment_intent_data: { setup_future_usage: 'off_session', metadata },
     metadata,
@@ -225,8 +225,8 @@ const idOf = (value: string | { id: string } | null | undefined) => (typeof valu
 
 /** Credits for a paid Checkout session (from the webhook or the return page; whichever comes first). */
 export async function grantForSession(session: Stripe.Checkout.Session) {
-  if (session.metadata?.researchcove_kind !== 'credits' || session.payment_status !== 'paid') return { granted: false };
-  const accountId = session.metadata.researchcove_account_id;
+  if (session.metadata?.writegrid_kind !== 'credits' || session.payment_status !== 'paid') return { granted: false };
+  const accountId = session.metadata.writegrid_account_id;
   const pack = packById(session.metadata.pack ?? '');
   if (!accountId || !pack) return { granted: false };
   return grantCredits({ accountId, kind: 'purchase', credits: pack.credits, amountCents: session.amount_total, reference: `checkout:${session.id}`, note: `${pack.credits.toLocaleString('en-US')} credits` });
@@ -236,7 +236,7 @@ export async function grantForSession(session: Stripe.Checkout.Session) {
 export async function completeCreditCheckout(stripe: Stripe, accountId: string, sessionId: string) {
   const session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ['payment_intent'] });
   const account = (await accountRef(accountId).get()).data() as { stripe_customer_id?: string | null } | undefined;
-  if (!account?.stripe_customer_id || idOf(session.customer as any) !== account.stripe_customer_id || session.metadata?.researchcove_account_id !== accountId) {
+  if (!account?.stripe_customer_id || idOf(session.customer as any) !== account.stripe_customer_id || session.metadata?.writegrid_account_id !== accountId) {
     throw new HTTPException(403, { message: 'This payment belongs to another account.' });
   }
   if (session.payment_status !== 'paid') return { paid: false, ...(await wallet(accountId)) };
@@ -336,8 +336,8 @@ export async function topUp(accountId: string) {
     try {
       const intent = await stripe.paymentIntents.create({
         amount: pack.cents, currency: 'usd', customer: account.stripe_customer_id, payment_method: card,
-        off_session: true, confirm: true, description: `${pack.credits.toLocaleString('en-US')} ResearchCove credits (automatic top-up)`,
-        metadata: { researchcove_kind: 'credits_topup', researchcove_account_id: accountId, pack: pack.id },
+        off_session: true, confirm: true, description: `${pack.credits.toLocaleString('en-US')} WriteGrid credits (automatic top-up)`,
+        metadata: { writegrid_kind: 'credits_topup', writegrid_account_id: accountId, pack: pack.id },
       }, { idempotencyKey: `topup:${accountId}:${month.cents}:${Math.floor(Date.now() / 600_000)}` });
       if (intent.status === 'succeeded') {
         await grantCredits({ accountId, kind: 'topup', credits: pack.credits, amountCents: intent.amount, reference: `payment:${intent.id}`, note: 'Automatic top-up' });
@@ -356,9 +356,9 @@ export async function topUp(accountId: string) {
 
 /** Credits for a top-up payment the webhook reports (if the direct grant above was missed). */
 export async function grantForPayment(intent: Stripe.PaymentIntent) {
-  if (intent.metadata?.researchcove_kind !== 'credits_topup' || intent.status !== 'succeeded') return { granted: false };
+  if (intent.metadata?.writegrid_kind !== 'credits_topup' || intent.status !== 'succeeded') return { granted: false };
   const pack = packById(intent.metadata.pack ?? '');
-  const accountId = intent.metadata.researchcove_account_id;
+  const accountId = intent.metadata.writegrid_account_id;
   if (!pack || !accountId) return { granted: false };
   return grantCredits({ accountId, kind: 'topup', credits: pack.credits, amountCents: intent.amount, reference: `payment:${intent.id}`, note: 'Automatic top-up' });
 }

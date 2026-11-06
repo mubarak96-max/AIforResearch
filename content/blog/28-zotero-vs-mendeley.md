@@ -142,9 +142,9 @@ You don't lose your library by switching, but you can lose details. What travels
 
 A reference manager stores sources. Writing still happens somewhere else, and the gap between the two is where friction lives: plugin dialogs, sync errors, collaborators who don't use the same tool.
 
-ResearchCove is a web editor that imports both libraries, so you can keep your reference manager and cite from it while you write:
+WriteGrid is a web editor that imports both libraries, so you can keep your reference manager and cite from it while you write:
 
-- **Zotero import:** paste a Zotero API key and ResearchCove imports your library into the ResearchCove Library.
+- **Zotero import:** paste a Zotero API key and WriteGrid imports your library into the WriteGrid Library.
 - **Mendeley import:** sign in with Mendeley and import your library the same way.
 - **Cite while you write:** type `@` in any paragraph and the menu searches your imported Library and 250M+ scholarly works together. Pick one and the citation goes in.
 - **Use your PDFs:** upload a PDF and use Ask to question it, one PDF at a time; answers carry page numbers.
@@ -153,7 +153,7 @@ ResearchCove is a web editor that imports both libraries, so you can keep your r
 
 Zotero and Mendeley import are on the **Plus plan and up** (Plus is $12/month or $96/year as of November 2026). The free plan has the full editor, unlimited citations and a 10-PDF Library but no import. Check [pricing](/pricing) for current terms.
 
-<!-- SCREENSHOT: the ResearchCove Library import options for Zotero (API key field) and Mendeley (sign-in button), and an imported collection listed in the Library -->
+<!-- SCREENSHOT: the WriteGrid Library import options for Zotero (API key field) and Mendeley (sign-in button), and an imported collection listed in the Library -->
 
 ## FAQ
 

@@ -108,7 +108,7 @@ async function payOnStripe(page) {
   check('account-scoped tools refused', (await call('/v1/research/tools/create_review', { key, method: 'POST', body: { name: 'x', query_description: 'y' } })).status === 404);
 
   const init = await call('/v1/mcp', { key, method: 'POST', body: { jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-11-25', capabilities: {}, clientInfo: { name: 'e2e', version: '1' } } } });
-  check('MCP initialize', init.status === 200 && init.data.result?.serverInfo?.name === 'researchcove-research', JSON.stringify(init.data?.result?.serverInfo));
+  check('MCP initialize', init.status === 200 && init.data.result?.serverInfo?.name === 'writegrid-research', JSON.stringify(init.data?.result?.serverInfo));
   const mcpList = await call('/v1/mcp', { key, method: 'POST', body: { jsonrpc: '2.0', id: 2, method: 'tools/list' } });
   const mcpNames = (mcpList.data.result?.tools || []).map((tool) => tool.name);
   check('MCP tools/list hides review tools', mcpNames.length >= 10 && !mcpNames.includes('create_review'), `${mcpNames.length} tools`);
@@ -159,7 +159,7 @@ async function payOnStripe(page) {
   const browser = await chromium.launch({ args: [`--unsafely-treat-insecure-origin-as-secure=${BASE}`] });
   const open = async (options) => {
     const context = await browser.newContext(options);
-    await context.addInitScript(([t, u]) => { localStorage.setItem('researchcove_token', JSON.stringify(t)); localStorage.setItem('researchcove_user', JSON.stringify(u)); }, [token, auth.user]);
+    await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [token, auth.user]);
     if (PUBLIC !== BASE) await context.route(`${PUBLIC}/**`, (route) => route.fulfill({ status: 302, headers: { location: route.request().url().replace(PUBLIC, BASE) } }));
     const page = await context.newPage();
     page.errors = [];
@@ -215,7 +215,7 @@ async function payOnStripe(page) {
     const page = await context.newPage();
     await page.goto(`${BASE}/developers`, { waitUntil: 'networkidle' });
     const text = (await page.locator('main').innerText()).replace(/\s+/g, ' ');
-    check(`/developers ${label}: prices, packs, quick start, self-host, institutions`, /1,000 free credits/.test(text) && /\$29\.90/.test(text) && /Quick start/.test(text) && /Run ResearchCove yourself/.test(text) && /universities/i.test(text));
+    check(`/developers ${label}: prices, packs, quick start, self-host, institutions`, /1,000 free credits/.test(text) && /\$29\.90/.test(text) && /Quick start/.test(text) && /Run WriteGrid yourself/.test(text) && /universities/i.test(text));
     check(`/developers ${label}: no sideways scroll`, (await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)) <= 0);
     await page.screenshot({ path: `${OUT}/cloud-developers-${label}.png`, fullPage: true });
     await context.close();

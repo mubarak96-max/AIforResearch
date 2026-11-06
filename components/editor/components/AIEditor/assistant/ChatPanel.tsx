@@ -499,7 +499,7 @@ export default function ChatPanel({
             }}
             rows={1}
             placeholder={inDocument ? 'Ask about your document…' : 'Ask anything…'}
-            aria-label="Message ResearchCove AI"
+            aria-label="Message WriteGrid AI"
             className={`block max-h-40 min-h-[24px] w-full resize-none bg-transparent px-0.5 leading-[1.45] text-[#0f172a] outline-none placeholder:text-[#94a3b8] ${isMobile ? 'text-[16px]' : 'text-[14.5px]'}`}
           />
           <div className="@container/tools mt-1.5 flex items-center gap-0.5 text-[#64748b]">

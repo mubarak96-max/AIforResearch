@@ -133,9 +133,9 @@ Rules that apply in every newsroom, whatever its policy says:
 3. **Don't paste confidential material into consumer AI tools** unless your newsroom has approved them and you know the data terms.
 4. **Disclose material AI use** in the way your outlet's policy sets out.
 
-## How ResearchCove fits a reporter's workflow
+## How WriteGrid fits a reporter's workflow
 
-ResearchCove is a web editor that covers stages 1, 3, 4 and 5 in one place:
+WriteGrid is a web editor that covers stages 1, 3, 4 and 5 in one place:
 
 - **Ask a document, with page numbers.** Upload court filings, budgets or studies to the Library and use Ask on one PDF at a time. Every answer carries page numbers, so you can open the page and check the passage before you use it. For questions across sources, AI Chat beside your draft can use the web, your Library or the document, and cites real papers.
 - **Search 250M+ scholarly works** from inside the editor and type `@` to cite one, for science, health and policy stories.
@@ -144,7 +144,7 @@ ResearchCove is a web editor that covers stages 1, 3, 4 and 5 in one place:
 - **A full editor on your phone.** File from the field in a phone browser: it is the full editor, not a viewer.
 - **Word in and out**, for desks that still run on `.docx`.
 
-<!-- SCREENSHOT: ResearchCove Library "Ask" on a single PDF beside a draft, with the question "What did the city pay the contractor in 2024?" and an answer citing "p. 47" as a clickable page reference, the PDF open to that page -->
+<!-- SCREENSHOT: WriteGrid Library "Ask" on a single PDF beside a draft, with the question "What did the city pay the contractor in 2024?" and an answer citing "p. 47" as a clickable page reference, the PDF open to that page -->
 
 What it doesn't do: transcribe audio, check AP style rules, generate headlines with a dedicated tool, or run reverse image searches. Use the tools above for those. See [features](/features) and [pricing](/pricing).
 

@@ -42,7 +42,7 @@ export interface AIEditorComment {
   resolvedBySessionId?: string | null;
   resolvedByDisplayName?: string | null;
   replies?: AIEditorCommentReply[];
-  /** Set on review comments written by ResearchCove AI. */
+  /** Set on review comments written by WriteGrid AI. */
   kind?: 'ai-review';
   severity?: 'minor' | 'major';
   category?: string;
@@ -70,7 +70,7 @@ export interface AIEditorCommentReply {
   text: string;
   createdAt: number;
   updatedAt?: number;
-  /** A reply written by ResearchCove AI. */
+  /** A reply written by WriteGrid AI. */
   ai?: boolean;
 }
 

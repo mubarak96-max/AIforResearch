@@ -139,7 +139,7 @@ def export_job(request: dict, source: Optional[bytes]) -> Tuple[bytes, str, str,
             data = write_latex(request.get("blocks") or [], settings, title, author or None, loader)
         else:
             data = write_docx(request.get("blocks") or [], settings, request.get("comments"), title, source, loader,
-                              author or "ResearchCove")
+                              author or "WriteGrid")
         if fmt == "pdf":
             data = libreoffice_convert(data, "docx", "pdf", timeout=config.PDF_EXPORT_TIMEOUT)
     except LibreOfficeTimeout:
@@ -174,12 +174,12 @@ def docx_to_pdf_job(data: bytes, extension: str) -> bytes:
 def pdf_text_job(data: bytes) -> bytes:
     """PDF -> {"pages": [...], "page_count", "title", "metadata"} as JSON bytes, via a bounded subprocess."""
     started = time.monotonic()
-    with tempfile.TemporaryDirectory(prefix="researchcove-convert-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="writegrid-convert-") as tmp:
         path = os.path.join(tmp, "input.pdf")
         with open(path, "wb") as handle:
             handle.write(data)
         # -P: don't put the working directory on sys.path.
-        command = [sys.executable, "-P", "-m", "researchcove_convert.pdftext", path]
+        command = [sys.executable, "-P", "-m", "writegrid_convert.pdftext", path]
         nice = shutil.which("nice")
         if nice:
             command = [nice, "-n", "10", *command]

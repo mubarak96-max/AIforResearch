@@ -79,8 +79,8 @@ export async function signedUrl(key: string, minutes = 15): Promise<string> {
 /** Saves, reads back and deletes a small file (Admin › Storage "Test"). */
 export async function testStorage() {
   const started = Date.now();
-  const key = `researchcove-check/${randomUUID()}.txt`;
-  const body = new TextEncoder().encode(`ResearchCove storage check ${new Date().toISOString()}`);
+  const key = `writegrid-check/${randomUUID()}.txt`;
+  const body = new TextEncoder().encode(`WriteGrid storage check ${new Date().toISOString()}`);
   await saveFile(key, body, 'text/plain');
   const read = await readFileBytes(key);
   await deleteFile(key);

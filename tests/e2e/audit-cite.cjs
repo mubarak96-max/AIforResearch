@@ -11,7 +11,7 @@ const OUT = process.env.OUT || '/shots';
   await fetch(`${BASE}/api/ai-editor/documents`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${auth.token}` }, body: JSON.stringify({ id, title: 'Cite audit', blocks: [P('Sleep supports memory consolidation in students.'), P('Second paragraph for the indent check.')] }) });
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
-  await context.addInitScript(([t, u]) => { localStorage.setItem('researchcove_token', JSON.stringify(t)); localStorage.setItem('researchcove_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+  await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
   const page = await context.newPage();
   page.on('pageerror', (e) => console.log('pageerror', e.message.slice(0, 200)));
   await page.goto(`${BASE}/editor?doc=${id}`, { waitUntil: 'domcontentloaded' });

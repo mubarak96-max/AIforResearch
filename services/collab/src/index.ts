@@ -31,7 +31,7 @@ server.on('upgrade', (request, socket, head) => {
   socket.destroy();
 });
 
-server.listen(port, '0.0.0.0', () => console.log(`researchcove collab listening on :${port}`));
+server.listen(port, '0.0.0.0', () => console.log(`writegrid collab listening on :${port}`));
 
 // Cloud Run sends SIGTERM before stopping an instance: save open documents first.
 const shutdown = async () => {

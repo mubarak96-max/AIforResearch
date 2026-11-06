@@ -165,13 +165,13 @@ Switching takes an afternoon if you do it in this order:
 
 A formatter holds the script. It is not a good home for the treatment, the series bible, the research behind a fact-based story, or the coverage and notes a draft collects. Most writers end up with those spread across Google Docs, email and a downloads folder.
 
-ResearchCove is a web editor for that development work. It **does not format screenplays and does not open `.fdx` files**, so keep your script in whichever alternative you chose. Use ResearchCove beside it for:
+WriteGrid is a web editor for that development work. It **does not format screenplays and does not open `.fdx` files**, so keep your script in whichever alternative you chose. Use WriteGrid beside it for:
 
 - **Treatments and bibles** with real-time co-editing, comments, suggestions (tracked changes) and version history. It opens `.docx` files and keeps their styles, and exports Word and PDF.
 - **Research with sources:** search 250M+ scholarly works and type `@` to cite one.
 - **Your PDFs in the Library:** upload source documents, or your exported script PDF, and use Ask on one PDF at a time. Answers carry page numbers you can check.
 
-<!-- SCREENSHOT: A ResearchCove document "Treatment: [fictional title]" open beside the Library panel, where an Ask answer about one uploaded script PDF cites "p. 52". -->
+<!-- SCREENSHOT: A WriteGrid document "Treatment: [fictional title]" open beside the Library panel, where an Ask answer about one uploaded script PDF cites "p. 52". -->
 
 The free plan covers 10 PDFs and the full editor; see [pricing](/pricing) for current plans.
 

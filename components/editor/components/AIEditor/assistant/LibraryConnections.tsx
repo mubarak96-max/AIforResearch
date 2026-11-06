@@ -9,7 +9,7 @@ import {
 import { FindPdfs, ImportProgress, UpgradeCard, plural, useImportJob } from './LibraryImportParts';
 
 const NAMES: Record<ReferenceProvider, string> = { zotero: 'Zotero', mendeley: 'Mendeley' };
-const ZOTERO_NEW_KEY = 'https://www.zotero.org/settings/keys/new?name=ResearchCove&library_access=1&notes_access=0&write_access=0';
+const ZOTERO_NEW_KEY = 'https://www.zotero.org/settings/keys/new?name=WriteGrid&library_access=1&notes_access=0&write_access=0';
 
 type Props = {
   provider: ReferenceProvider;
@@ -66,7 +66,7 @@ function Connect({ provider, signIn, onConnected }: { provider: ReferenceProvide
     <div className="flex max-w-[520px] flex-col gap-4">
       <div>
         <p className="text-[16px] font-semibold text-[#0f172a]">Connect {name}</p>
-        <p className="mt-1 text-[14px] leading-relaxed text-[#64748b]">Import your {name} library or one collection, with its PDFs. ResearchCove only reads it and never changes anything there.</p>
+        <p className="mt-1 text-[14px] leading-relaxed text-[#64748b]">Import your {name} library or one collection, with its PDFs. WriteGrid only reads it and never changes anything there.</p>
       </div>
       {signIn && (
         <div><button type="button" className={primary} disabled={busy !== null} onClick={() => void startSignIn()}>{busy === 'sign-in' && <LuLoader className="h-4 w-4 animate-spin" />}Connect {name}</button></div>

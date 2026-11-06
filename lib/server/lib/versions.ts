@@ -8,7 +8,7 @@ import { documentRef } from './documents.js';
 import { deleteVersionBlocks, readVersionBlocks, writeVersionBlocks } from './documentStore.js';
 
 export type VersionReason = 'auto' | 'import' | 'manual' | 'before-restore' | 'restore' | 'ai';
-export const AI_AUTHOR = 'ResearchCove AI';
+export const AI_AUTHOR = 'WriteGrid AI';
 const AI_MERGE_MS = 5 * 60 * 1000;
 const AUTO_INTERVAL_MS = 10 * 60 * 1000;
 const KEEP_UNNAMED = 60;

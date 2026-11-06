@@ -45,7 +45,7 @@ export default async function PricingPage() {
               Simple pricing. Write more, worry less.
             </h1>
             <p className="mt-3.5 text-balance text-[16px] text-muted sm:text-[17px]">
-              Start free. Upgrade when ResearchCove is saving you hours.
+              Start free. Upgrade when WriteGrid is saving you hours.
             </p>
           </div>
           <PricingPlans initialPlans={plans} />

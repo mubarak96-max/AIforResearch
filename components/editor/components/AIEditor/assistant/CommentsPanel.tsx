@@ -113,7 +113,7 @@ function Avatar({ ai, name }: { ai: boolean; name: string }) {
   );
 }
 
-/** Comments beside the document, with ResearchCove AI review comments (Minor / Major). */
+/** Comments beside the document, with WriteGrid AI review comments (Minor / Major). */
 export default function CommentsPanel(props: Props) {
   const {
     comments,
@@ -185,7 +185,7 @@ export default function CommentsPanel(props: Props) {
     if (!text) return;
     props.onAddCommentReply(comment.id, text);
     setReplyDrafts((current) => ({ ...current, [comment.id]: '' }));
-    if (isAI(comment) || /@((citedevidence|researchcove)\s*)?ai\b/i.test(text)) {
+    if (isAI(comment) || /@((citedevidence|writegrid)\s*)?ai\b/i.test(text)) {
       setAsking(comment.id);
       try {
         await props.onAskAI(comment, text);
@@ -369,7 +369,7 @@ export default function CommentsPanel(props: Props) {
                 <button type="button" onClick={() => onActiveCommentChange?.(comment.id)} className="block w-full text-left">
                   <div className="mb-1.5 flex items-center gap-2 text-[13px] text-[#0f172a]">
                     <Avatar ai={ai} name={comment.actorDisplayName} />
-                    <b className="truncate font-semibold">{ai ? 'ResearchCove AI' : comment.actorDisplayName}</b>
+                    <b className="truncate font-semibold">{ai ? 'WriteGrid AI' : comment.actorDisplayName}</b>
                     {ai ? (
                       <span title={comment.severity === 'major' ? 'Major' : 'Minor'} className={`shrink-0 rounded-md px-1.5 py-px text-[11px] font-semibold ${comment.severity === 'major' ? 'bg-[#fef2f2] text-[#b91c1c]' : 'bg-[#f1f5f9] text-[#475569]'}`}>
                         {comment.check && comment.category && CATEGORY_LABELS[comment.category] ? CATEGORY_LABELS[comment.category] : comment.severity === 'major' ? 'Major' : 'Minor'}
@@ -413,7 +413,7 @@ export default function CommentsPanel(props: Props) {
                     {(comment.replies || []).map((reply) => (
                       <div key={reply.id}>
                         <div className="flex items-center gap-1.5 text-[12.5px]">
-                          <span className="font-semibold text-[#0f172a]">{reply.ai ? 'ResearchCove AI' : reply.actorDisplayName}</span>
+                          <span className="font-semibold text-[#0f172a]">{reply.ai ? 'WriteGrid AI' : reply.actorDisplayName}</span>
                           <span className="text-[12px] text-[#94a3b8]" title={timeLabel(reply.createdAt)}>{relativeTime(reply.createdAt)}</span>
                         </div>
                         <div className="whitespace-pre-wrap text-[13px] text-[#334155]">{reply.text}</div>
@@ -421,7 +421,7 @@ export default function CommentsPanel(props: Props) {
                     ))}
                   </div>
                 ) : null}
-                {asking === comment.id ? <div className="mt-1.5 text-[12.5px] text-[#64748b]">ResearchCove AI is replying…</div> : null}
+                {asking === comment.id ? <div className="mt-1.5 text-[12.5px] text-[#64748b]">WriteGrid AI is replying…</div> : null}
 
                 <div className="-mb-0.5 mt-1 flex items-center gap-0.5">
                   {ai && comment.suggestion && !resolved && canComment ? (
@@ -487,7 +487,7 @@ export default function CommentsPanel(props: Props) {
                           void submitReply(comment);
                         }
                       }}
-                      placeholder={ai ? 'Reply to ResearchCove AI…' : 'Reply…'}
+                      placeholder={ai ? 'Reply to WriteGrid AI…' : 'Reply…'}
                       aria-label="Reply"
                       className="h-9 w-full rounded-lg border border-[#e2e8f0] bg-white pl-2.5 pr-9 text-[13px] text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[var(--theme-primary,#2563eb)]"
                     />

@@ -41,7 +41,7 @@ function paragraph(i) {
   // First open builds the References list and saves it; then a brand-new browser opens it.
   {
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-    await context.addInitScript(([tk, u]) => { localStorage.setItem('researchcove_token', JSON.stringify(tk)); localStorage.setItem('researchcove_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+    await context.addInitScript(([tk, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(tk)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
     const page = await context.newPage();
     await page.goto(`${BASE}/editor?doc=${id}`, { waitUntil: 'domcontentloaded' });
     await page.locator('.bn-block-content', { hasText: 'Section 45' }).first().waitFor({ timeout: 120000 }).catch(() => {});
@@ -52,7 +52,7 @@ function paragraph(i) {
   }
   for (const run of ['new browser (cold)', 'same browser again (warm)']) {
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-    await context.addInitScript(([tk, u]) => { localStorage.setItem('researchcove_token', JSON.stringify(tk)); localStorage.setItem('researchcove_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+    await context.addInitScript(([tk, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(tk)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
     await context.addInitScript(() => {
       window.__long = [];
       try { new PerformanceObserver((list) => list.getEntries().forEach((e) => window.__long.push([Math.round(e.startTime), Math.round(e.duration)]))).observe({ type: 'longtask', buffered: true }); } catch {}

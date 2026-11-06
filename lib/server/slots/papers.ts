@@ -7,7 +7,7 @@
 import { env, USER_AGENT as USER_AGENT_BASE } from '../env.js';
 import type { Paper, PapersSlot } from './types.js';
 
-export type PapersProvider = 'openalex' | 'scholar' | 'researchcove';
+export type PapersProvider = 'openalex' | 'scholar' | 'writegrid';
 
 /** A Paper plus the details OpenAlex gives that the editor shows or puts in BibTeX. */
 export type RichPaper = Paper & {

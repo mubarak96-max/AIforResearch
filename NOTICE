@@ -1,6 +1,6 @@
-ResearchCove is proprietary software. Copyright © 2026 ResearchCove. All rights reserved.
+WriteGrid is proprietary software. Copyright © 2026 WriteGrid. All rights reserved.
 
-Parts of ResearchCove are derived from software released under the MIT License. That licence
+Parts of WriteGrid are derived from software released under the MIT License. That licence
 requires its notice to be kept with copies of the software:
 
 MIT License
@@ -27,7 +27,7 @@ SOFTWARE.
 
 ------------------------------------------------------------------------------------------
 
-ResearchCove includes third-party software under its own licences, among them:
+WriteGrid includes third-party software under its own licences, among them:
 
 - BlockNote (@blocknote/*) — MPL-2.0
 - citeproc-js (citeproc), via citation-js — CPAL-1.0 or AGPL-1.0, at the user's option.

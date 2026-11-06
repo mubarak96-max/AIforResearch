@@ -1,6 +1,6 @@
 {
-  "name": "ResearchCove",
-  "short_name": "ResearchCove",
+  "name": "WriteGrid",
+  "short_name": "WriteGrid",
   "description": "The AI editor for academic writing",
   "start_url": "/editor",
   "display": "standalone",

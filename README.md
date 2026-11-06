@@ -1,8 +1,8 @@
-# ResearchCove
+# WriteGrid
 
 **The AI editor for academic writing.** Autocomplete that cites real papers, @-cite from 250M+ scholarly works, chat with your PDFs, a careful AI reviewer, and Word, LaTeX and PDF in and out.
 
-![The ResearchCove editor](docs/images/editor.png)
+![The WriteGrid editor](docs/images/editor.png)
 
 - **Run it:** this repo deploys to your own Firebase project (App Hosting, Firestore, Storage, Authentication, Cloud Functions) plus two small Cloud Run services.
 - **Build on it:** the editor is a React package, and the [developer API](#developer-api) gives other apps papers, full text, research tools and AI through keys you issue.
@@ -46,12 +46,12 @@ More in [docs/architecture.md](docs/architecture.md) and [docs/data-model.md](do
 You need a Firebase project on the **Blaze** plan (App Hosting, Functions and Cloud Run need billing; small groups stay inside the free tier), the [Firebase CLI](https://firebase.google.com/docs/cli) and `gcloud`.
 
 1. **Create the project** and, in the Firebase console, turn on:
-   - **Authentication** › Sign-in method: Email/Password, and Google, Microsoft, Apple as you like (each provider's redirect URL is `https://<project>.firebaseapp.com/__/auth/handler`). Under **Templates**, set the action URL to `https://<your site>/auth/action` so reset and confirmation links open ResearchCove's own pages. Add your domain under **Authorized domains**.
+   - **Authentication** › Sign-in method: Email/Password, and Google, Microsoft, Apple as you like (each provider's redirect URL is `https://<project>.firebaseapp.com/__/auth/handler`). Under **Templates**, set the action URL to `https://<your site>/auth/action` so reset and confirmation links open WriteGrid's own pages. Add your domain under **Authorized domains**.
    - **Firestore** (Native mode) and **Storage**.
    - Optional: **App Check** with reCAPTCHA Enterprise, enforced for Authentication.
 2. **Rules, indexes and functions:**
    ```bash
-   git clone <your repository URL> && cd ResearchCove
+   git clone <your repository URL> && cd WriteGrid
    pnpm install:all                          # the app, functions/ and tools/migrate
    cp .firebaserc.example .firebaserc        # put your project id in it
    cp functions/.env.example functions/.env  # CONVERT_URL, PUBLIC_URL
@@ -127,7 +127,7 @@ Your deployment can offer its services to other apps at `/v1`: people create key
 - Optional automatic top-up with a monthly limit, and a monthly cap per key.
 
 ```bash
-curl -H "Authorization: Bearer $RESEARCHCOVE_API_KEY" \
+curl -H "Authorization: Bearer $WRITEGRID_API_KEY" \
   "https://<your site>/v1/oa/works?search=sleep%20memory&per_page=5"
 ```
 
@@ -153,7 +153,7 @@ The repository root is the Next.js app (Next.js 15, React 19, Tailwind 4, Fireba
 | --- | --- |
 | `app` | Pages, plus the API's two route handlers, `app/api/[[...route]]` and `app/v1/[[...route]]`. |
 | `components` | The site and app components. |
-| `components/editor` | The editor (BlockNote + Yjs), mounted with `<ResearchCoveEditorProvider config={…}>`. |
+| `components/editor` | The editor (BlockNote + Yjs), mounted with `<WriteGridEditorProvider config={…}>`. |
 | `lib` | Browser helpers (Firebase, session, sign-in). |
 | `lib/server` | The API (Hono) and data layer on Firestore and Storage: plans, credits, AI and papers slots, the developer API (/v1) and the background jobs. Server-only. |
 | `public` | Static files. |
@@ -169,6 +169,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) to send a change and [SECURITY.md](SECURI
 
 ## Licence
 
-Copyright © 2026 ResearchCove. All rights reserved. This is proprietary software; it is not licensed for use, copying or distribution without written permission.
+Copyright © 2026 WriteGrid. All rights reserved. This is proprietary software; it is not licensed for use, copying or distribution without written permission.
 
 Third-party software and the code this project is derived from are credited, with their licences, in [NOTICE](NOTICE).

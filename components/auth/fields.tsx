@@ -105,7 +105,7 @@ export const MIN_PASSWORD_LENGTH = 8;
 
 /** The server's message when there is one, a plain-language fallback otherwise. */
 export function errorMessage(error: unknown): string {
-  if (error instanceof TypeError) return 'We could not reach ResearchCove. Check your connection and try again.';
+  if (error instanceof TypeError) return 'We could not reach WriteGrid. Check your connection and try again.';
   const message = error instanceof Error ? error.message : '';
   if (!message || message.includes('[object Object]')) return 'Something went wrong. Please try again.';
   return message;

@@ -1,7 +1,7 @@
 /**
  * Citation API Service
  * 
- * Integrates with the ResearchCove Citation Wizard API to generate
+ * Integrates with the WriteGrid Citation Wizard API to generate
  * perfectly formatted citations from PDFs, URLs, DOIs, and more.
  * Supports 10,000+ citation styles via CSL (Citation Style Language).
  */

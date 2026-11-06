@@ -219,15 +219,15 @@ Answer-first writing is the inverted pyramid applied to the web:
 
 For blog posts, reports and explainers, use a 40 to 60 word direct answer under the headline, then detail, then background. This page does. Google's guidance still asks for people-first content with original value, not pages written to game rankings, so answer first and then earn the reader's time. [7]
 
-## Writing an inverted pyramid story in ResearchCove
+## Writing an inverted pyramid story in WriteGrid
 
-ResearchCove is an AI writing editor that works in any browser, including on a phone. It does not have a built-in news story template, so paste the template above into a new document and work from there.
+WriteGrid is an AI writing editor that works in any browser, including on a phone. It does not have a built-in news story template, so paste the template above into a new document and work from there.
 
 - **Autocomplete for the body.** Once the lead and first quote are in, autocomplete suggests the next sentence. Accept, refine or reject it. When a suggestion draws on published research, it cites the scholarly paper, so you can check it before keeping the line.
 - **Claim checks before you file.** AI review leaves claim checks, source-quality flags (retracted papers, preprints, wrong DOIs) and proofreading as comments on the exact sentences, so a claim in paragraph five gets the same scrutiny as the lead.
 - **Editor handoff.** Share the document. Your editor's trims appear as suggestions (tracked changes), and version history keeps the uncut draft.
 
-<!-- SCREENSHOT: a ResearchCove document with an inverted-pyramid draft about a public-health study, showing an AI review claim-check comment attached to a sentence in the body -->
+<!-- SCREENSHOT: a WriteGrid document with an inverted-pyramid draft about a public-health study, showing an AI review claim-check comment attached to a sentence in the body -->
 
 This is most useful when the story rests on research, such as a study, a report or a court filing: upload the PDF to the Library and use Ask to question that document; its answers carry page numbers you can check.
 

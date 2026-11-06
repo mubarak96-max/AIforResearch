@@ -7,7 +7,7 @@ const BASE = process.env.BASE || 'http://localhost:8080';
   const browser = await chromium.launch();
   for (const [kind, options] of [['desktop', { viewport: { width: 1440, height: 900 } }], ['phone', devices['iPhone 13']]]) {
     const context = await browser.newContext(options);
-    await context.addInitScript(([t, u]) => { localStorage.setItem('researchcove_token', JSON.stringify(t)); localStorage.setItem('researchcove_user', JSON.stringify(u)); }, [token, user]);
+    await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [token, user]);
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', (e) => errors.push(e.message.slice(0, 120)));

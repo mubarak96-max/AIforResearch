@@ -30,7 +30,7 @@ async function adminSession(db) {
   const sections = ['overview', 'plans', 'subscribers', 'activity', 'signin', 'ai', 'papers', 'billing', 'cloud'];
   for (const [size, options] of [['desktop', { viewport: { width: 1440, height: 1000 } }], ['phone', devices['iPhone 13']]]) {
     const context = await browser.newContext(options);
-    await context.addInitScript(([t, u]) => { localStorage.setItem('researchcove_token', JSON.stringify(t)); localStorage.setItem('researchcove_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+    await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', (error) => errors.push(error.message.slice(0, 160)));

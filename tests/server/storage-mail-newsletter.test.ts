@@ -34,7 +34,7 @@ describe('file keys', () => {
 });
 
 describe('email', () => {
-  const s = (overrides: Partial<typeof env>) => ({ ...base, mailFrom: 'ResearchCove <hello@example.test>', ...overrides });
+  const s = (overrides: Partial<typeof env>) => ({ ...base, mailFrom: 'WriteGrid <hello@example.test>', ...overrides });
 
   it('needs a provider, its settings and a From address', () => {
     expect(mailProvider(s({ mailProvider: '' }))).toBeNull();
@@ -53,7 +53,7 @@ describe('email', () => {
   it('sends through Resend with the key and reply-to', () => {
     const mail = passwordResetEmail('a@b.test', 'https://example.test/reset-password#token=x');
     expect(resendBody(mail, s({ mailReplyTo: 'support@example.test' }))).toEqual({
-      from: 'ResearchCove <hello@example.test>', to: ['a@b.test'], subject: 'Reset your ResearchCove password', html: mail.html, text: mail.text, reply_to: 'support@example.test',
+      from: 'WriteGrid <hello@example.test>', to: ['a@b.test'], subject: 'Reset your WriteGrid password', html: mail.html, text: mail.text, reply_to: 'support@example.test',
     });
   });
 
@@ -75,11 +75,11 @@ describe('MailCheap client', () => {
   it('sends the key, the newsletter and consent with imports', async () => {
     const seen: { url: string; init: RequestInit }[] = [];
     const fetcher = (async (url: URL, init: RequestInit) => { seen.push({ url: String(url), init }); return reply(200, { importId: 'imp_1' }); }) as unknown as typeof fetch;
-    const client = new MailCheap('mc_key', 'researchcove-news', fetcher, 'https://mc.test/api/v1', 1);
-    expect(await client.importContacts([{ email: 'a@b.test', status: 'active', tags: ['researchcove'] }])).toEqual({ importId: 'imp_1' });
+    const client = new MailCheap('mc_key', 'writegrid-news', fetcher, 'https://mc.test/api/v1', 1);
+    expect(await client.importContacts([{ email: 'a@b.test', status: 'active', tags: ['writegrid'] }])).toEqual({ importId: 'imp_1' });
     expect(seen[0].url).toBe('https://mc.test/api/v1/contacts/import');
     expect((seen[0].init.headers as Record<string, string>).Authorization).toBe('Bearer mc_key');
-    expect(JSON.parse(String(seen[0].init.body))).toEqual({ consent: true, contacts: [{ email: 'a@b.test', status: 'active', tags: ['researchcove'] }], newsletter: 'researchcove-news' });
+    expect(JSON.parse(String(seen[0].init.body))).toEqual({ consent: true, contacts: [{ email: 'a@b.test', status: 'active', tags: ['writegrid'] }], newsletter: 'writegrid-news' });
   });
 
   it('keeps + and @ in a contact address and only gives consent when subscribing', async () => {

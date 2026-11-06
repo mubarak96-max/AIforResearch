@@ -185,9 +185,9 @@ How to run a fair test:
 - **Measure more than clicks.** Look at time on page or scroll depth. A headline that wins clicks and loses readers in five seconds is a bad headline.
 - **Keep a log** of tests and results so the desk learns patterns over time.
 
-## Writing headlines in ResearchCove
+## Writing headlines in WriteGrid
 
-ResearchCove has no headline generator or headline-testing tool. What it gives you is the story and the AI next to each other, which is what Prompt 2 needs:
+WriteGrid has no headline generator or headline-testing tool. What it gives you is the story and the AI next to each other, which is what Prompt 2 needs:
 
 1. **Write or open the story** in the editor (paste it, or open a `.docx`).
 2. **Ask the AI chat beside the draft** for 10 headlines using Prompt 1. It reads the document, so you don't paste the story into a separate tool.
@@ -195,7 +195,7 @@ ResearchCove has no headline generator or headline-testing tool. What it gives y
 4. **Run the AI review's claim check** on the draft, headline included, to flag statements that need a source.
 5. **Send it to your editor** with comments or suggestions (tracked changes), so they can change the headline and leave a note on why.
 
-<!-- SCREENSHOT: A fictional news story open in ResearchCove with the AI chat panel showing 10 suggested AP-style headlines, and a second chat answer quoting the story sentence that supports the chosen headline. -->
+<!-- SCREENSHOT: A fictional news story open in WriteGrid with the AI chat panel showing 10 suggested AP-style headlines, and a second chat answer quoting the story sentence that supports the chosen headline. -->
 
 The free plan includes a few AI chat messages a day; see [pricing](/pricing) for current limits.
 

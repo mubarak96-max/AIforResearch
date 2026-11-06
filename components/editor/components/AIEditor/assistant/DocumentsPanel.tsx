@@ -10,7 +10,7 @@ import type { AIEditorDocumentSummary } from '../../../types/ai-editor';
 import { DocumentPreview, relativeTime } from '../documentPreview';
 
 type View = 'list' | 'grid';
-const VIEW_KEY = 'researchcove-docs-drawer-view';
+const VIEW_KEY = 'writegrid-docs-drawer-view';
 
 export type DocumentsPanelProps = {
   /** The open document (highlighted). */

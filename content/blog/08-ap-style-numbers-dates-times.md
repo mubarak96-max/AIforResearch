@@ -255,7 +255,7 @@ Scored 10 out of 10? Then test a full paragraph: our [AP style checker compariso
 
 ## Checking numbers in a draft
 
-Numbers are the easiest AP errors to find by search. Before filing, search the draft for `%`, "percent," `:00`, "AM," "PM," every month name, `st,` `nd,` `rd` and `th` after figures, and two-letter state codes. If you write in ResearchCove, the AI proofreading pass leaves issues as comments in the text and an editor can make AP fixes as tracked suggestions, but it has no dedicated AP rule engine, so this search pass still matters. See [pricing](/pricing) for what the free plan includes.
+Numbers are the easiest AP errors to find by search. Before filing, search the draft for `%`, "percent," `:00`, "AM," "PM," every month name, `st,` `nd,` `rd` and `th` after figures, and two-letter state codes. If you write in WriteGrid, the AI proofreading pass leaves issues as comments in the text and an editor can make AP fixes as tracked suggestions, but it has no dedicated AP rule engine, so this search pass still matters. See [pricing](/pricing) for what the free plan includes.
 
 ## FAQ
 

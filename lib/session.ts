@@ -10,8 +10,8 @@ import { firebaseAuth, firebaseCode, firebaseMessage } from '@/lib/firebase';
 /**
  * The signed-in person. Firebase Authentication keeps the sign-in (and refreshes the ID token
  * every hour); this module mirrors it for the app: the latest ID token for synchronous callers
- * (the editor's fetch helpers), the person's ResearchCove profile from /api/auth/me, and the
- * `researchcove_signed_in` cookie the server uses to render signed-in pages without a flash.
+ * (the editor's fetch helpers), the person's WriteGrid profile from /api/auth/me, and the
+ * `writegrid_signed_in` cookie the server uses to render signed-in pages without a flash.
  */
 
 /** The signed-in person, as returned by the API. */
@@ -19,8 +19,8 @@ export type SessionUser = {
   id: string; email: string; full_name: string | null; plan?: string; plan_name?: string; is_admin?: boolean; email_verified?: boolean;
 };
 
-const TOKEN_KEY = 'researchcove_token';
-const USER_KEY = 'researchcove_user';
+const TOKEN_KEY = 'writegrid_token';
+const USER_KEY = 'writegrid_user';
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((listener) => listener());
 
@@ -69,7 +69,7 @@ export function setSession(token: string, user: SessionUser) {
   memoryToken = token;
   write(TOKEN_KEY, token);
   write(USER_KEY, user);
-  try { document.cookie = 'researchcove_signed_in=1; path=/; max-age=2592000; samesite=lax'; } catch { /* ignore */ }
+  try { document.cookie = 'writegrid_signed_in=1; path=/; max-age=2592000; samesite=lax'; } catch { /* ignore */ }
   emit();
 }
 
@@ -77,7 +77,7 @@ function forget() {
   memoryToken = null;
   write(TOKEN_KEY, null);
   write(USER_KEY, null);
-  try { document.cookie = 'researchcove_signed_in=; path=/; max-age=0'; } catch { /* ignore */ }
+  try { document.cookie = 'writegrid_signed_in=; path=/; max-age=0'; } catch { /* ignore */ }
   emit();
 }
 
@@ -149,7 +149,7 @@ async function freshToken(force = false): Promise<string | null> {
   return token;
 }
 
-/** Calls the ResearchCove API with the ID token; throws an Error with the server's message. */
+/** Calls the WriteGrid API with the ID token; throws an Error with the server's message. */
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const send = async (token: string | null) => {
     const headers: Record<string, string> = { ...(init.headers as Record<string, string> | undefined) };

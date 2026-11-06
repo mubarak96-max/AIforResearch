@@ -1,19 +1,19 @@
 # The editor (components/editor)
 
-The ResearchCove academic editor: autocomplete with citations, @-cite, a Library with PDF chat, AI review, comments, suggestions, version history, real-time collaboration, and Word, LaTeX and PDF export. Built on BlockNote (ProseMirror) and Yjs.
+The WriteGrid academic editor: autocomplete with citations, @-cite, a Library with PDF chat, AI review, comments, suggestions, version history, real-time collaboration, and Word, LaTeX and PDF export. Built on BlockNote (ProseMirror) and Yjs.
 
-It is the user interface. It talks to a ResearchCove server (`lib/server` in this repo, which runs inside the web app's route handlers, or your own implementation of the same API) for documents, AI, papers and sync.
+It is the user interface. It talks to a WriteGrid server (`lib/server` in this repo, which runs inside the web app's route handlers, or your own implementation of the same API) for documents, AI, papers and sync.
 
 ## Mount it
 
 The app mounts it in `components/app/EditorHost.tsx` and `app/editor`. To mount it elsewhere in the app:
 
 ```tsx
-import { ResearchCoveEditor, ResearchCoveEditorProvider, type ResearchCoveEditorConfig } from '@/components/editor';
+import { WriteGridEditor, WriteGridEditorProvider, type WriteGridEditorConfig } from '@/components/editor';
 import '@/components/editor/styles.css';
 
-const config: ResearchCoveEditorConfig = {
-  apiBase: 'https://write.example.edu',      // your ResearchCove server ('' = same origin)
+const config: WriteGridEditorConfig = {
+  apiBase: 'https://write.example.edu',      // your WriteGrid server ('' = same origin)
   getToken: () => session.token,             // a token the server accepts, or null
   user: { id: 'u1', email: 'ada@example.edu', full_name: 'Ada Lovelace' },
   onRequireSignIn: () => router.push('/login'),
@@ -22,9 +22,9 @@ const config: ResearchCoveEditorConfig = {
 
 export function Writing() {
   return (
-    <ResearchCoveEditorProvider config={config}>
-      <ResearchCoveEditor />
-    </ResearchCoveEditorProvider>
+    <WriteGridEditorProvider config={config}>
+      <WriteGridEditor />
+    </WriteGridEditorProvider>
   );
 }
 ```

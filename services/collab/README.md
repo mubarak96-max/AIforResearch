@@ -45,6 +45,6 @@ gcloud run deploy collab \
 ```bash
 firebase emulators:start          # Firestore, Auth, Storage
 FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 \
-FIREBASE_STORAGE_EMULATOR_HOST=127.0.0.1:9199 FIREBASE_PROJECT_ID=demo-researchcove \
+FIREBASE_STORAGE_EMULATOR_HOST=127.0.0.1:9199 FIREBASE_PROJECT_ID=demo-writegrid \
   pnpm dev:collab   # listens on :4200 (run from the repository root)
 ```

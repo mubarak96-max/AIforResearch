@@ -23,7 +23,7 @@ const WALKER = '@article{walker2005,\n  title={Sleep, Memory, and Plasticity},\n
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await context.addInitScript(([t, u]) => { localStorage.setItem('researchcove_token', JSON.stringify(t)); localStorage.setItem('researchcove_user', JSON.stringify(u)); window.open = (...a) => { window.__opened = (window.__opened || []).concat(String(a[0])); return null; }; }, [auth.token, auth.user]);
+  await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); window.open = (...a) => { window.__opened = (window.__opened || []).concat(String(a[0])); return null; }; }, [auth.token, auth.user]);
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message.slice(0, 200)));

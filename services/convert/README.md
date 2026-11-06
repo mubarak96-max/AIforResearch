@@ -1,8 +1,8 @@
-# researchcove-convert
+# writegrid-convert
 
-A small, stateless HTTP service that converts between the ResearchCove editor's documents (BlockNote
+A small, stateless HTTP service that converts between the WriteGrid editor's documents (BlockNote
 blocks) and Word, PDF and LaTeX, and extracts text from PDFs. It listens on **port 4100** and is
-**internal only**: publish no host port. The ResearchCove API (`lib/server`, running in the web app on Firebase
+**internal only**: publish no host port. The WriteGrid API (`lib/server`, running in the web app on Firebase
 App Hosting, and Cloud Functions; `CONVERT_URL`) owns authentication, storage and the database, and
 calls this service.
 
@@ -13,7 +13,7 @@ calls this service.
   `warnings`, `stats` and `title` have the same shape the browser client
   (`components/editor/lib/aiEditor/wordApi.ts`) already expects, so the API server can pass
   them through unchanged.
-- **Engines.** The Word reader and writers are in `researchcove_convert/word/` (python-docx, lxml,
+- **Engines.** The Word reader and writers are in `writegrid_convert/word/` (python-docx, lxml,
   Pillow, latex2mathml). LibreOffice handles .doc/.odt/.rtf and PDF output, and pypdfium2
   handles PDF text. No AGPL code is used (PyMuPDF is not); licences are listed in `NOTICE`.
 
@@ -37,11 +37,11 @@ LibreOffice starts. (`--source` builds the default image, tests included, which 
 ## Run locally
 
 ```sh
-docker build -t researchcove-convert:dev services/convert            # WITH_TESTS=1 (default) includes pytest
-docker build --build-arg WITH_TESTS=0 -t researchcove-convert:prod services/convert   # lean image
+docker build -t writegrid-convert:dev services/convert            # WITH_TESTS=1 (default) includes pytest
+docker build --build-arg WITH_TESTS=0 -t writegrid-convert:prod services/convert   # lean image
 
-docker run -d --name researchcove-convert --network researchcove-net --restart unless-stopped \
-  --memory 2g --cpus 2 researchcove-convert:dev          # no -p: reachable only as http://researchcove-convert:4100
+docker run -d --name writegrid-convert --network writegrid-net --restart unless-stopped \
+  --memory 2g --cpus 2 writegrid-convert:dev          # no -p: reachable only as http://writegrid-convert:4100
 ```
 
 The image is based on `python:3.12-slim-bookworm`. It adds LibreOffice 7.4 (`libreoffice-writer-nogui`,
@@ -52,7 +52,7 @@ and DejaVu. The service runs as the non-root user `convert` (uid 10001).
 ### Tests
 
 ```sh
-docker run --rm --network researchcove-net researchcove-convert:dev python -m pytest -q
+docker run --rm --network writegrid-net writegrid-convert:dev python -m pytest -q
 ```
 
 On 2026-10-28 the result was 41 passed and 1 skipped. The skipped test compiles the LaTeX export
@@ -96,7 +96,7 @@ server can pass errors through unchanged.
 `200` `application/json`:
 
 ```json
-{"status": "ok", "service": "researchcove-convert", "version": "0.1.0", "libreoffice": true, "workers": 2, "busy": 0}
+{"status": "ok", "service": "writegrid-convert", "version": "0.1.0", "libreoffice": true, "workers": 2, "busy": 0}
 ```
 
 `busy` is the number of jobs running or waiting. The check is cheap and runs no conversion.
@@ -172,7 +172,7 @@ Export object (`snake_case`, the same field names the browser sends):
 | `comments` | `null` | Comment threads (as in the import response). Threads with a `blockId` become Word comments. |
 | `settings` | `null` | The **merged** WordSettings (stored settings overlaid with the browser's, minus `source`). |
 | `format` | `"docx"` | `docx` \| `pdf` \| `latex`. Any other value → `422`. |
-| `author` | `null` | Author for new tracked changes and comments (docx/pdf, default `"ResearchCove"`) and `\author{}` (LaTeX). Up to 200 characters. |
+| `author` | `null` | Author for new tracked changes and comments (docx/pdf, default `"WriteGrid"`) and `\author{}` (LaTeX). Up to 200 characters. |
 | `asset_url_prefix` | `/api/ai-editor/assets/` | Image URLs whose path ends in `<prefix path><name>` are editor assets... |
 | `asset_fetch_base` | `null` | ...fetched as `GET <asset_fetch_base><name>` (http/https; private addresses allowed, since the caller controls this value; must match `CONVERT_ASSET_FETCH_BASES` when that is set). |
 | `source_base64` | `null` | The template `.docx` as base64 (JSON form only; the `source` part wins in multipart). |
@@ -296,8 +296,8 @@ that case, rewrite the URLs in the blocks to match.
 
 ## Provenance
 
-`researchcove_convert/word/` started as an earlier Word converter. Imports are package-relative
-and it has no dependencies on that application: the default author is `ResearchCove`, OOXML part
+`writegrid_convert/word/` started as an earlier Word converter. Imports are package-relative
+and it has no dependencies on that application: the default author is `WriteGrid`, OOXML part
 and relationship ids use `rc`, and LaTeX uses `rcHighlight`. The block prop `ceRole` is unchanged
 because the editor uses it. The tests in `tests/test_word_compat.py` and
 `tests/test_word_latex.py` come from the same source. Their HTTP parts were rewritten for this

@@ -1,6 +1,6 @@
 # Architecture
 
-ResearchCove runs on one Firebase project. Each part, what it does and where it runs:
+WriteGrid runs on one Firebase project. Each part, what it does and where it runs:
 
 ```
                     ┌──────────────────────────── Firebase project ────────────────────────────┐

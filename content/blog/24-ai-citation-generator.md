@@ -13,7 +13,7 @@ faq:
   - q: "Can AI generate accurate citations?"
     a: "Yes, when the citation comes from a real index of published works rather than from the model's memory. Chatbots that write references from memory have been measured inventing many of them: one 2023 study found 55% of GPT-3.5 citations and 18% of GPT-4 citations were fabricated. Use a tool that retrieves the source, then open the source and confirm it says what you claim."
   - q: "Is there a free AI citation generator?"
-    a: "Yes. ZoteroBib, MyBib, QuillBot and Scribbr all format citations free of charge, and none of them invent the source because you supply it. ResearchCove's free plan includes unlimited citations in every style plus scholarly search and @-citing, with daily limits on AI autocomplete. Check each tool's pricing page, because free tiers change."
+    a: "Yes. ZoteroBib, MyBib, QuillBot and Scribbr all format citations free of charge, and none of them invent the source because you supply it. WriteGrid's free plan includes unlimited citations in every style plus scholarly search and @-citing, with daily limits on AI autocomplete. Check each tool's pricing page, because free tiers change."
   - q: "How do I cite a PDF?"
     a: "Cite the work the PDF contains, not the file. Look on the first page for a DOI, report number or publisher, and paste the DOI into a citation generator to pull clean metadata. If there is no DOI, cite it as a report or webpage: author or organization, year, title, publisher and the URL where readers can find it."
   - q: "What is the difference between an AI citation generator and a regular citation generator?"
@@ -41,7 +41,7 @@ This guide explains why AI-written citations go wrong, how a grounded citation g
 | You start with | A source you already found | A claim that needs support |
 | It does | Looks up metadata, applies a style | Searches an index, matches papers to the claim, formats the result |
 | Main risk | Wrong metadata (a missing author, the wrong year) | A real paper that doesn't support your claim, or, in chatbots, a paper that doesn't exist |
-| Examples | ZoteroBib, MyBib, Scribbr, QuillBot | Elicit, Consensus, Scite, ResearchCove |
+| Examples | ZoteroBib, MyBib, Scribbr, QuillBot | Elicit, Consensus, Scite, WriteGrid |
 
 A third option, asking a general chatbot to "add sources" to a draft, is the riskiest: the model may write references from memory, with no lookup at all.
 
@@ -94,9 +94,9 @@ Citing at the end of a draft is how wrong claims get through: by then you are ma
 4. **Pick the style once, at the end.** Switch the whole document to APA, MLA or your client's style; every citation updates together.
 5. **Run a source check before you send:** retracted papers, preprints presented as settled, DOIs that don't resolve. Then read the passage behind your two or three most important claims.
 
-## How ResearchCove cites as you write
+## How WriteGrid cites as you write
 
-ResearchCove is a web editor built around grounded citations. It works in a phone browser too.
+WriteGrid is a web editor built around grounded citations. It works in a phone browser too.
 
 - **Type `@` to cite.** The menu searches 250M+ scholarly works and your own Library at once, showing title, authors, year, journal and citation count. Pick one and the citation goes in with its metadata. For a government report or news article, choose "Add custom citation".
 - **Autocomplete that cites.** It suggests the next sentence and cites the papers it draws on. Accept, refine, or ask it to conclude the section. Every citation is a record you can open and check.
@@ -161,9 +161,9 @@ The four formatters below are all good at their job. None finds a source for a c
 | **MyBib** | Free to start, no ads or trackers | Projects for organizing citations by paper; cites from a title, URL or ISBN, including URLs to PDFs. [14] | No | 10,000+ |
 | **Scribbr** | Free citation generator | Clear APA, MLA and Chicago output and a large library of style guides. [15] <!-- VERIFY: confirm Scribbr's current input types (URL, DOI, ISBN, title) and whether the generator shows ads --> | No | APA, MLA, Chicago and more |
 | **QuillBot** | Free, no sign-in required for basic use | Citations in 1,000+ styles, 35+ source types, inside a wider writing toolkit. [16] | No | 1,000+ |
-| **ResearchCove** | Free plan; Plus about $12/month (as of November 2026) | Cite while you write: `@`-cite from 250M+ works, autocomplete that cites, source-quality flags, Word and PDF export | Yes, from a real index | 10,000+ CSL styles |
+| **WriteGrid** | Free plan; Plus about $12/month (as of November 2026) | Cite while you write: `@`-cite from 250M+ works, autocomplete that cites, source-quality flags, Word and PDF export | Yes, from a real index | 10,000+ CSL styles |
 
-How to choose: for a bibliography tonight from a list of DOIs, ZoteroBib. For citations built up over a project, MyBib or a full reference manager (see [Zotero vs. Mendeley](/blog/zotero-vs-mendeley)). To learn the rules as you cite, Scribbr's guides. To find evidence while drafting, a source finder such as ResearchCove, or Elicit or Consensus beside your editor (see [AI literature review tools](/blog/ai-literature-review-tools)).
+How to choose: for a bibliography tonight from a list of DOIs, ZoteroBib. For citations built up over a project, MyBib or a full reference manager (see [Zotero vs. Mendeley](/blog/zotero-vs-mendeley)). To learn the rules as you cite, Scribbr's guides. To find evidence while drafting, a source finder such as WriteGrid, or Elicit or Consensus beside your editor (see [AI literature review tools](/blog/ai-literature-review-tools)).
 
 **On "non-AI citation generators":** if your school or client bans AI tools, ZoteroBib and MyBib are metadata lookups, not language models. Check the specific rule; many policies ban AI-written text, not citation formatting.
 
@@ -197,7 +197,7 @@ Yes, when the citation comes from a real index of published works rather than fr
 
 ### Is there a free AI citation generator?
 
-Yes. ZoteroBib, MyBib, QuillBot and Scribbr all format citations free of charge, and none of them invent the source because you supply it. ResearchCove's free plan includes unlimited citations in every style plus scholarly search and @-citing, with daily limits on AI autocomplete. Check each tool's pricing page, because free tiers change.
+Yes. ZoteroBib, MyBib, QuillBot and Scribbr all format citations free of charge, and none of them invent the source because you supply it. WriteGrid's free plan includes unlimited citations in every style plus scholarly search and @-citing, with daily limits on AI autocomplete. Check each tool's pricing page, because free tiers change.
 
 ### How do I cite a PDF?
 
@@ -215,13 +215,13 @@ Usually not in APA or MLA format. Most blogs, news stories and business content 
 
 The rest of this research and citations series goes deeper on each step:
 
-- [AI literature review tools](/blog/ai-literature-review-tools): run a fast evidence review for work with Elicit, Consensus, SciSpace, Scite and ResearchCove.
+- [AI literature review tools](/blog/ai-literature-review-tools): run a fast evidence review for work with Elicit, Consensus, SciSpace, Scite and WriteGrid.
 - [How to write a research report](/blog/how-to-write-a-research-report): an 8-section outline, template and annotated example.
 - [How to write a white paper](/blog/how-to-write-a-white-paper): structure, research and AI drafting without invented claims.
 - [Zotero vs. Mendeley](/blog/zotero-vs-mendeley) and [Zotero alternatives](/blog/zotero-alternatives): choose a reference manager and connect it to your writing tool.
 - [Chat with PDF](/blog/chat-with-pdf): ask questions of long reports and check every answer against the page.
 
-If you want to try grounded citations in your own draft, [create a free ResearchCove account](/signup) and type `@` in any paragraph.
+If you want to try grounded citations in your own draft, [create a free WriteGrid account](/signup) and type `@` in any paragraph.
 
 ## Sources
 

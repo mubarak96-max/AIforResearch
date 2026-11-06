@@ -11,7 +11,7 @@ import type { Mark, MarkType, Node as PMNode } from '@tiptap/pm/model';
  * the opposite. Word files bring their tracked changes in this form and get them back on export.
  */
 
-export const AI_AUTHOR = 'ResearchCove AI';
+export const AI_AUTHOR = 'WriteGrid AI';
 
 export type Suggestion = {
   id: string;

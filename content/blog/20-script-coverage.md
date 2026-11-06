@@ -238,9 +238,9 @@ Typical paid coverage for a feature costs from about $100 to $450, depending on 
 
 For what AI tools can and cannot do here, see [AI script coverage: can AI give useful notes on your screenplay?](/blog/ai-script-coverage).
 
-## Writing coverage in ResearchCove
+## Writing coverage in WriteGrid
 
-ResearchCove does not format screenplays and does not read `.fdx` files, and it has no built-in coverage template. It is useful for the reading and writing around coverage:
+WriteGrid does not format screenplays and does not read `.fdx` files, and it has no built-in coverage template. It is useful for the reading and writing around coverage:
 
 1. **Upload the script PDF to the Library.** Export the script to PDF from any formatter, or use the PDF you were sent. The free plan holds 10 PDFs up to 10 MB each, which fits a feature script.
 2. **Ask the script questions while you write.** Open the script PDF in the Library and use Ask, which works on one PDF at a time: "On what page does Kirsty first decide to hide the death?" or "List every scene where Ross appears before page 40." Answers carry page numbers, so you can check them before they go into your comments.
@@ -248,7 +248,7 @@ ResearchCove does not format screenplays and does not read `.fdx` files, and it 
 4. **If the writer sent a Word file,** open the `.docx` (styles are kept) and leave comments and suggestions (tracked changes) directly in the text, for development notes.
 5. **Share with the producer or a second reader.** Real-time co-editing and comments let a producer add notes to your coverage, with version history if a rating changes. Run a proofreading pass with AI review, and export to Word or PDF.
 
-<!-- SCREENSHOT: ResearchCove with a coverage document (fictional "The Last Ferry to Holm") on the left and the Library Ask panel on the right for the script PDF, answering a question about the script with a citation to "p. 23". -->
+<!-- SCREENSHOT: WriteGrid with a coverage document (fictional "The Last Ferry to Holm") on the left and the Library Ask panel on the right for the script PDF, answering a question about the script with a citation to "p. 23". -->
 
 See [how it works](/how-it-works) or [pricing](/pricing) for current plan limits.
 

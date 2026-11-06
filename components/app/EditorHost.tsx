@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { ResearchCoveEditorProvider, type ResearchCoveEditorConfig } from '@/components/editor';
+import { WriteGridEditorProvider, type WriteGridEditorConfig } from '@/components/editor';
 import { getToken, useSession } from '@/lib/session';
 import { openPricing } from '@/lib/billing';
 
@@ -13,7 +13,7 @@ export function EditorHost({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const config = useMemo<ResearchCoveEditorConfig>(() => ({
+  const config = useMemo<WriteGridEditorConfig>(() => ({
     apiBase: '',
     // services/collab on Cloud Run, e.g. wss://collab-xyz.a.run.app/collab (live text and presence).
     realtimeUrl: process.env.NEXT_PUBLIC_REALTIME_URL || undefined,
@@ -28,5 +28,5 @@ export function EditorHost({ children }: { children: React.ReactNode }) {
     onEvent: () => {},
   }), [user, loading, pathname, searchParams, router]);
 
-  return <ResearchCoveEditorProvider config={config}>{children}</ResearchCoveEditorProvider>;
+  return <WriteGridEditorProvider config={config}>{children}</WriteGridEditorProvider>;
 }

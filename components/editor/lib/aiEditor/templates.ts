@@ -82,4 +82,4 @@ export function templateBlocks(template: DocumentTemplate): any[] {
 }
 
 /** Session key that carries the chosen template from the documents page to the new document. */
-export const PENDING_TEMPLATE_KEY = 'researchcove-pending-template';
+export const PENDING_TEMPLATE_KEY = 'writegrid-pending-template';

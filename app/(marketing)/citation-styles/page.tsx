@@ -4,7 +4,7 @@ import { container } from '@/components/marketing/styles';
 export const metadata = pageMetadata({
   title: 'Citation styles',
   path: '/citation-styles',
-  description: 'APA 7, MLA 9, Chicago, Harvard, IEEE, Vancouver, AMA and more: switch the citation style of a whole document in ResearchCove and every citation and reference updates.',
+  description: 'APA 7, MLA 9, Chicago, Harvard, IEEE, Vancouver, AMA and more: switch the citation style of a whole document in WriteGrid and every citation and reference updates.',
 });
 
 const STYLES: { name: string; kind: string; inText: string; field: string }[] = [

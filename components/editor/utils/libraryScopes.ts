@@ -1,6 +1,6 @@
 import { getFolders, type FolderResponse } from './libraryApi';
 
-/** ResearchCove has one personal Library per person; group libraries come later. */
+/** WriteGrid has one personal Library per person; group libraries come later. */
 export interface LibraryScope {
   id: string;
   label: string;

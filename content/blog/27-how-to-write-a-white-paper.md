@@ -157,9 +157,9 @@ A safe workflow:
 3. **Run a claim check** on the full draft. List every factual claim and confirm each against its source. See [AI fact checker](/blog/ai-fact-checker) for a method.
 4. **Have a subject expert review** the evidence and approach sections.
 
-## Draft and check a white paper in ResearchCove
+## Draft and check a white paper in WriteGrid
 
-ResearchCove is a web editor where the sources, the draft and the review live together.
+WriteGrid is a web editor where the sources, the draft and the review live together.
 
 - **Cited autocomplete.** Autocomplete suggests the next sentence and cites the scholarly papers it draws on. Type `@` to cite a specific paper from 250M+ works or from your Library, or add a custom citation for an agency report or dataset.
 - **Your sources, searchable.** Upload PDFs of reports and studies to the Library and use Ask to question one PDF at a time. Answers carry page numbers. AI Chat beside the draft can also draw on your whole Library and cites the papers it uses.
@@ -167,7 +167,7 @@ ResearchCove is a web editor where the sources, the draft and the review live to
 - **Team review.** Marketing, product and legal co-edit in real time and leave suggestions as tracked changes, with version history.
 - **Word and PDF export** in any of 10,000+ citation styles, or open your company's `.docx` template and keep its styles.
 
-ResearchCove doesn't have a built-in white paper template; paste the Markdown template above into a new document.
+WriteGrid doesn't have a built-in white paper template; paste the Markdown template above into a new document.
 
 <!-- SCREENSHOT: a white paper draft with an AI review comment on a statistic ("claim not found in cited source") and a tracked-change suggestion from a second editor -->
 

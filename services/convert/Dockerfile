@@ -1,4 +1,4 @@
-# researchcove-convert: Word/PDF/LaTeX converter for the ResearchCove editor (internal service, port 4100).
+# writegrid-convert: Word/PDF/LaTeX converter for the WriteGrid editor (internal service, port 4100).
 FROM python:3.12-slim-bookworm
 
 # 1 (default) also installs pytest so the test suite can run in the image; 0 for a lean image.
@@ -27,11 +27,11 @@ RUN pip install -r requirements.txt \
  && if [ "$WITH_TESTS" = "1" ]; then pip install -r requirements-dev.txt; fi
 
 COPY pytest.ini ./
-COPY researchcove_convert ./researchcove_convert
+COPY writegrid_convert ./writegrid_convert
 COPY tests ./tests
 
 USER convert
 EXPOSE 4100
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4100/health', timeout=4)"
-CMD ["uvicorn", "researchcove_convert.app:app", "--host", "0.0.0.0", "--port", "4100", "--timeout-graceful-shutdown", "30"]
+CMD ["uvicorn", "writegrid_convert.app:app", "--host", "0.0.0.0", "--port", "4100", "--timeout-graceful-shutdown", "30"]

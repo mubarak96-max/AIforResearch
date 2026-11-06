@@ -1,18 +1,18 @@
 import type { Metadata } from 'next';
 
-const SITE_NAME = 'ResearchCove';
+const SITE_NAME = 'WriteGrid';
 
 /** The editor screenshot doubles as the social preview image until a dedicated one exists. */
 const OG_IMAGE = {
   url: '/screenshots/editor.png',
   width: 2160,
   height: 1350,
-  alt: 'The ResearchCove editor: a paper with AI autocomplete suggesting a cited sentence, and AI chat beside it',
+  alt: 'The WriteGrid editor: a paper with AI autocomplete suggesting a cited sentence, and AI chat beside it',
 };
 
 /**
  * Title, description, canonical URL, Open Graph and Twitter tags for a public page.
- * `title` gets the " · ResearchCove" suffix from the root layout unless `absolute` is set.
+ * `title` gets the " · WriteGrid" suffix from the root layout unless `absolute` is set.
  */
 export function pageMetadata({
   title,

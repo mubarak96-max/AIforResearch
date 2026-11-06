@@ -270,18 +270,18 @@ This also covers releases about your own reports and white papers: link the repo
 | A study claim with no link | A claim they cannot check | DOI link and the study type |
 | A contact who doesn't answer | A story that runs without you | A named person, reachable all day |
 
-## Writing a research press release in ResearchCove
+## Writing a research press release in WriteGrid
 
-ResearchCove is an AI writing editor; it does not have a press release template, so paste the template above into a new document. Where it helps is the research release, the one most likely to go wrong.
+WriteGrid is an AI writing editor; it does not have a press release template, so paste the template above into a new document. Where it helps is the research release, the one most likely to go wrong.
 
 1. **Cite the paper while you write.** Search 250M+ scholarly works from inside the editor and type `@` to insert the study. The citation links to the real work, so you can copy a DOI that resolves.
 2. **Check the release against the study.** Upload the paper's PDF to the Library and use Ask on it, for example: "What was the sample size and how was sleep measured?" Answers carry page numbers, so you can confirm each figure in the release against the page.
 3. **Run AI review before sending.** Claim checks flag statements that go beyond the evidence, and source-quality checks flag retracted papers, preprints and wrong DOIs. Results appear as comments on the exact sentences, and proofreading and tone review catch the "thrilled to announce" lines.
 4. **Get sign-off.** Share the document with the researcher and your communications lead; their edits come back as suggestions (tracked changes).
 
-<!-- SCREENSHOT: a ResearchCove document with the research-findings release, an @-citation to the study in the body, and a claim-check comment on the lead sentence -->
+<!-- SCREENSHOT: a WriteGrid document with the research-findings release, an @-citation to the study in the body, and a claim-check comment on the lead sentence -->
 
-ResearchCove does not enforce AP style rules, so keep the table above beside you. Export to Word or PDF to send. The free plan covers this workflow at low volume; see [pricing](/pricing) for current limits.
+WriteGrid does not enforce AP style rules, so keep the table above beside you. Export to Word or PDF to send. The free plan covers this workflow at low volume; see [pricing](/pricing) for current limits.
 
 ## FAQ
 

@@ -1,7 +1,7 @@
 ---
 title: "Best Zotero Alternatives (2026): Reference Managers Compared"
 slug: "zotero-alternatives"
-description: "The best Zotero alternatives in 2026: Mendeley, EndNote, Paperpile, ReadCube, JabRef, Citavi and ResearchCove, compared on price, Word plugins, AI and self-hosting."
+description: "The best Zotero alternatives in 2026: Mendeley, EndNote, Paperpile, ReadCube, JabRef, Citavi and WriteGrid, compared on price, Word plugins, AI and self-hosting."
 primary_keyword: "zotero alternative"
 secondary_keywords: ["self hosted zotero alternative", "reddit zotero alternative", "mendeley alternative", "open source reference manager"]
 cluster: "F. Research and citations"
@@ -13,13 +13,13 @@ faq:
   - q: "What is the best free alternative to Zotero?"
     a: "For a free, open-source desktop tool, JabRef is the strongest alternative, especially if you write in LaTeX, because it stores your library as a plain BibTeX file. Mendeley is free with 2 GB of cloud storage but is owned by Elsevier and is not open source. ZoteroBib is free for one-off bibliographies without an account."
   - q: "Is there a self-hosted Zotero alternative?"
-    a: "JabRef keeps your library as a local BibTeX file you can store anywhere, including a private Git repository or shared drive. Zotero itself can sync attachments to your own WebDAV server. For a writing tool, ResearchCove can be deployed to your own Firebase or Google Cloud project, so documents and imported libraries stay in your own cloud account."
+    a: "JabRef keeps your library as a local BibTeX file you can store anywhere, including a private Git repository or shared drive. Zotero itself can sync attachments to your own WebDAV server. For a writing tool, WriteGrid can be deployed to your own Firebase or Google Cloud project, so documents and imported libraries stay in your own cloud account."
   - q: "What is a good Mendeley alternative?"
     a: "Zotero is the most common Mendeley alternative: free, open source, and it can import a Mendeley library directly. Paperpile suits people who write in Google Docs, ReadCube Papers suits people who read and annotate heavily, and EndNote suits institutions that license it. Export a backup from Mendeley in RIS or BibTeX before you switch."
   - q: "Which reference manager has AI features?"
-    a: "Several now do. ReadCube Papers includes AI chat with PDFs, Citavi offers AI summaries and paper search, and JabRef has added opt-in AI chat for entries with PDFs in its 6.0 releases. ResearchCove adds AI to the writing side: autocomplete that cites papers, PDF questions answered with page numbers, and claim checks on your draft."
-  - q: "Do I have to stop using Zotero to use ResearchCove?"
-    a: "No. On the Plus plan and up, you paste a Zotero API key and ResearchCove imports your library into its Library. You keep collecting sources in Zotero and cite them while you write in ResearchCove by typing @. The free plan doesn't include Zotero or Mendeley import."
+    a: "Several now do. ReadCube Papers includes AI chat with PDFs, Citavi offers AI summaries and paper search, and JabRef has added opt-in AI chat for entries with PDFs in its 6.0 releases. WriteGrid adds AI to the writing side: autocomplete that cites papers, PDF questions answered with page numbers, and claim checks on your draft."
+  - q: "Do I have to stop using Zotero to use WriteGrid?"
+    a: "No. On the Plus plan and up, you paste a Zotero API key and WriteGrid imports your library into its Library. You keep collecting sources in Zotero and cite them while you write in WriteGrid by typing @. The free plan doesn't include Zotero or Mendeley import."
 ---
 
 # Best Zotero alternatives: reference managers that help you write
@@ -42,7 +42,7 @@ Prices are as of November 2026; check each vendor's pricing page.
 | **ReadCube Papers** | Essentials about $10/month ($95/year); Plus about $20/month; 40% academic discount [4] | No | Word, Google Docs (SmartCite) | AI chat with PDFs | Heavy readers and annotators |
 | **JabRef** | Free | Yes | Word, LibreOffice [5] | Opt-in AI chat and summaries in 6.0 releases [6] | LaTeX users, plain-text libraries |
 | **Citavi** | Not listed publicly; many universities license it [7] | No | Word add-in | AI key insights, passage summaries, paper search [7] | Organizing quotes, ideas and tasks around a project |
-| **ResearchCove** | Free plan; Plus $12/month; import on Plus and up | No | Opens and exports Word; exports PDF and LaTeX | Cited autocomplete, Ask a PDF, claim checks | Writing with your library, alongside Zotero or instead of it |
+| **WriteGrid** | Free plan; Plus $12/month; import on Plus and up | No | Opens and exports Word; exports PDF and LaTeX | Cited autocomplete, Ask a PDF, claim checks | Writing with your library, alongside Zotero or instead of it |
 
 ## Why people look for a Zotero alternative
 
@@ -81,11 +81,11 @@ JabRef is a free, open-source reference manager that stores your library as a Bi
 
 Citavi, now from Lumivero, combines reference management with knowledge organization: quotations, categories, outlines and a task planner around each project. It comes as Citavi Web and Citavi Desktop, with a Word add-in, and has added AI key insights, passage summaries and AI paper search. [7] Prices aren't listed publicly, and many universities in Germany, Austria and Switzerland provide site licenses. <!-- VERIFY: Citavi Desktop platform support (historically Windows only) and whether the DACH site-license claim holds --> Pick it if you organize ideas and quotes as much as references.
 
-### ResearchCove
+### WriteGrid
 
-ResearchCove is not a standalone reference manager. It is a web editor with a Library built in, so it closes the gap between sources and draft:
+WriteGrid is not a standalone reference manager. It is a web editor with a Library built in, so it closes the gap between sources and draft:
 
-- **Import instead of rebuilding.** Paste a Zotero API key, or sign in with Mendeley, and your library comes into the ResearchCove Library. Import is on the **Plus plan and up**.
+- **Import instead of rebuilding.** Paste a Zotero API key, or sign in with Mendeley, and your library comes into the WriteGrid Library. Import is on the **Plus plan and up**.
 - **Cite with `@`.** Type `@` and the menu searches your Library and 250M+ scholarly works together.
 - **Ask your PDFs.** Use Ask on one PDF at a time; answers carry page numbers. AI Chat beside the document can use your whole Library as a source and cites the papers it draws on.
 - **Write with cited autocomplete,** with sources you can limit to a Library folder, a year range or a minimum citation count.
@@ -100,24 +100,24 @@ If the reason you're leaving is data control, your options are:
 | --- | --- | --- |
 | **Zotero with WebDAV** | Attachments sync to your own WebDAV server; the library database is local | Metadata still syncs through zotero.org if you use sync |
 | **JabRef with a BibTeX file** | Everything: the library is a text file you store wherever you like, such as a private Git repository | No built-in cloud sync or web library |
-| **ResearchCove in your own cloud** | ResearchCove can be deployed to your own Firebase / Google Cloud project, so documents and imported libraries stay in your own cloud account <!-- VERIFY: confirm self-hosting is offered publicly before publishing --> | You run and pay for the cloud project |
+| **WriteGrid in your own cloud** | WriteGrid can be deployed to your own Firebase / Google Cloud project, so documents and imported libraries stay in your own cloud account <!-- VERIFY: confirm self-hosting is offered publicly before publishing --> | You run and pay for the cloud project |
 
-**An open-source reference manager is one whose code is published under a license that lets anyone read, modify and redistribute it.** Zotero (AGPL) and JabRef qualify. Mendeley, EndNote, Paperpile, ReadCube, Citavi and ResearchCove do not.
+**An open-source reference manager is one whose code is published under a license that lets anyone read, modify and redistribute it.** Zotero (AGPL) and JabRef qualify. Mendeley, EndNote, Paperpile, ReadCube, Citavi and WriteGrid do not.
 
 ## Keep Zotero and add a writing layer
 
 Most people who search for a Zotero alternative don't dislike Zotero. They dislike the step between Zotero and the draft. If that's you, don't migrate. Keep Zotero as the place you collect and organize, and add a writing tool that reads from it.
 
-How that works in ResearchCove:
+How that works in WriteGrid:
 
 1. **Create a Zotero API key** in your Zotero account settings with read access to your library.
-2. **In ResearchCove, open the Library, add from Zotero and paste the key.** (Plus plan and up.)
-3. **Pick what to import:** the whole Zotero library or one collection. A collection arrives as a Library collection with the same name, and you can ask ResearchCove to look for the PDFs.
+2. **In WriteGrid, open the Library, add from Zotero and paste the key.** (Plus plan and up.)
+3. **Pick what to import:** the whole Zotero library or one collection. A collection arrives as a Library collection with the same name, and you can ask WriteGrid to look for the PDFs.
 4. **Write.** Type `@` in any paragraph and pick from your imported items or from 250M+ scholarly works.
 5. **Switch styles** for the whole document when you're done, and export to Word or PDF.
 6. **Keep collecting in Zotero** and import again when you add sources. Items already in your Library are skipped, so a re-import doesn't create duplicates.
 
-<!-- SCREENSHOT: the ResearchCove @ menu in a draft showing imported Zotero items under "Your Library" above scholarly search results under "Papers" -->
+<!-- SCREENSHOT: the WriteGrid @ menu in a draft showing imported Zotero items under "Your Library" above scholarly search results under "Papers" -->
 
 The free plan includes the full editor, unlimited citations in every style and a 10-PDF Library, but not Zotero or Mendeley import. Plus is $12/month ($96/year) as of November 2026. Check [pricing](/pricing).
 
@@ -130,7 +130,7 @@ For a free, open-source desktop tool, JabRef is the strongest alternative, espec
 ### Is there a self-hosted Zotero alternative?
 
 <!-- VERIFY: confirm self-hosting is offered publicly before publishing -->
-JabRef keeps your library as a local BibTeX file you can store anywhere, including a private Git repository or shared drive. Zotero itself can sync attachments to your own WebDAV server. For a writing tool, ResearchCove can be deployed to your own Firebase or Google Cloud project, so documents and imported libraries stay in your own cloud account.
+JabRef keeps your library as a local BibTeX file you can store anywhere, including a private Git repository or shared drive. Zotero itself can sync attachments to your own WebDAV server. For a writing tool, WriteGrid can be deployed to your own Firebase or Google Cloud project, so documents and imported libraries stay in your own cloud account.
 
 ### What is a good Mendeley alternative?
 
@@ -138,11 +138,11 @@ Zotero is the most common Mendeley alternative: free, open source, and it can im
 
 ### Which reference manager has AI features?
 
-Several now do. ReadCube Papers includes AI chat with PDFs, Citavi offers AI summaries and paper search, and JabRef has added opt-in AI chat for entries with PDFs in its 6.0 releases. ResearchCove adds AI to the writing side: autocomplete that cites papers, PDF questions answered with page numbers, and claim checks on your draft.
+Several now do. ReadCube Papers includes AI chat with PDFs, Citavi offers AI summaries and paper search, and JabRef has added opt-in AI chat for entries with PDFs in its 6.0 releases. WriteGrid adds AI to the writing side: autocomplete that cites papers, PDF questions answered with page numbers, and claim checks on your draft.
 
-### Do I have to stop using Zotero to use ResearchCove?
+### Do I have to stop using Zotero to use WriteGrid?
 
-No. On the Plus plan and up, you paste a Zotero API key and ResearchCove imports your library into its Library. You keep collecting sources in Zotero and cite them while you write in ResearchCove by typing @. The free plan doesn't include Zotero or Mendeley import.
+No. On the Plus plan and up, you paste a Zotero API key and WriteGrid imports your library into its Library. You keep collecting sources in Zotero and cite them while you write in WriteGrid by typing @. The free plan doesn't include Zotero or Mendeley import.
 
 ## Next steps
 
