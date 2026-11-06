@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /** Article, FAQ and breadcrumb structured data. `<` is escaped so the text can't close the script tag. */
 function structuredData(post: BlogPost) {
   const url = `${SITE_URL}/blog/${post.slug}`;
-  const publisher = { '@type': 'Organization', name: 'WriteOrbit', url: SITE_URL, logo: { '@type': 'ImageObject', url: `${SITE_URL}/icon.svg` } };
+  const publisher = { '@type': 'Organization', name: 'WriteOrbit', url: SITE_URL, logo: { '@type': 'ImageObject', url: `${SITE_URL}/icon-512.png` } };
   const graph = [
     {
       '@type': 'BlogPosting',
