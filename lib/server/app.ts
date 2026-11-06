@@ -24,7 +24,7 @@ import { PlanLimitError } from './lib/plans.js';
 import { ready } from './ready.js';
 
 /**
- * The WriteGrid HTTP API. It runs inside the Next.js app (app/api/[[...route]] and
+ * The WriteOrbit HTTP API. It runs inside the Next.js app (app/api/[[...route]] and
  * app/v1/[[...route]]) on Firebase App Hosting; the URLs are the ones the editor
  * package has always called, so the editor did not change.
  */

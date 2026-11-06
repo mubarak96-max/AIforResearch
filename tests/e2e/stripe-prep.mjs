@@ -1,5 +1,5 @@
 // Stripe TEST mode set-up for billing-plans-2.cjs, run inside the staging server container:
-//   docker exec -i -e ACCOUNT=<account id> -w /app writegrid-server node --input-type=module < stripe-prep.mjs
+//   docker exec -i -e ACCOUNT=<account id> -w /app writeorbit-server node --input-type=module < stripe-prep.mjs
 // Ends the account's plan subscription now (as if it lapsed) and leaves one open $5 invoice.
 const { loadSettings } = await import('/app/dist/lib/settings.js');
 await loadSettings();

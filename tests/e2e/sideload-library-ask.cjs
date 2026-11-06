@@ -2,13 +2,13 @@
 // the AI Chat opens on the right with the source attached. Writes /shots/side-lib-*.png.
 const { chromium } = require('playwright');
 const { signIn } = require('./e2e-auth.cjs');
-const BASE = process.env.BASE || 'http://writegrid-router:8080';
+const BASE = process.env.BASE || 'http://writeorbit-router:8080';
 const OUT = process.env.OUT || '/shots';
 (async () => {
   const auth = await signIn(BASE, 'lib');
   const browser = await chromium.launch({ args: [`--unsafely-treat-insecure-origin-as-secure=${BASE}`] });
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+  await context.addInitScript(([t, u]) => { localStorage.setItem('writeorbit_token', JSON.stringify(t)); localStorage.setItem('writeorbit_user', JSON.stringify(u)); }, [auth.token, auth.user]);
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message.slice(0, 200)));

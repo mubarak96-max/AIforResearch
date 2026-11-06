@@ -1641,7 +1641,7 @@ const backgroundColorStyleSpec = createStyleSpec(
   },
 );
 
-// Mantine's global styles set the page font; keep the host's UI font (Inter in the WriteGrid app).
+// Mantine's global styles set the page font; keep the host's UI font (Inter in the WriteOrbit app).
 const mantineTheme = { fontFamily: 'var(--font-sans, Inter, ui-sans-serif, system-ui, sans-serif)' };
 
 const fontFamilyStyleSpec = createStyleSpec(
@@ -3314,7 +3314,7 @@ export default function AIEditorWorkspace() {
   useEffect(() => {
     if (!documentId) return undefined;
     const previous = document.title;
-    document.title = `${documentTitle.trim() || 'Untitled document'} · WriteGrid`;
+    document.title = `${documentTitle.trim() || 'Untitled document'} · WriteOrbit`;
     return () => {
       document.title = previous;
     };
@@ -3325,11 +3325,11 @@ export default function AIEditorWorkspace() {
   // The left app nav folds away (remembered), giving the page and the side rail's tools room.
   const [isNavCollapsed, setIsNavCollapsed] = useState(false);
   useEffect(() => {
-    try { setIsNavCollapsed(window.localStorage.getItem('writegrid_nav_collapsed') === '1'); } catch { /* storage blocked */ }
+    try { setIsNavCollapsed(window.localStorage.getItem('writeorbit_nav_collapsed') === '1'); } catch { /* storage blocked */ }
   }, []);
   const toggleNavCollapsed = useCallback(() => {
     setIsNavCollapsed((current) => {
-      try { window.localStorage.setItem('writegrid_nav_collapsed', current ? '0' : '1'); } catch { /* storage blocked */ }
+      try { window.localStorage.setItem('writeorbit_nav_collapsed', current ? '0' : '1'); } catch { /* storage blocked */ }
       return !current;
     });
   }, []);
@@ -4656,7 +4656,7 @@ export default function AIEditorWorkspace() {
     [addAIReviewComments, collectReviewBlocks, documentTitle],
   );
 
-  // Accepted AI text goes into the version history as WriteGrid AI (after the copy is saved).
+  // Accepted AI text goes into the version history as WriteOrbit AI (after the copy is saved).
   const recordAIEdit = useCallback(() => {
     if (!documentId || !canEdit) return;
     window.setTimeout(() => {
@@ -4860,7 +4860,7 @@ export default function AIEditorWorkspace() {
         window.dispatchEvent(new CustomEvent('credits-updated'));
       } catch (error) {
         if (error instanceof AssistError && error.outOfCredits) setReviewRun((current) => ({ ...current, outOfCredits: true }));
-        else toast.error((error as Error).message || 'WriteGrid AI could not reply.');
+        else toast.error((error as Error).message || 'WriteOrbit AI could not reply.');
       }
     },
     [addAIReply, documentTitle, editor],
@@ -4940,7 +4940,7 @@ export default function AIEditorWorkspace() {
   const [autocompleteSettings, setAutocompleteSettings] = useState<AutocompleteSettings>(DEFAULT_AUTOCOMPLETE_SETTINGS);
   useEffect(() => {
     try {
-      const saved = JSON.parse(window.localStorage.getItem('writegrid_autocomplete_settings') || 'null');
+      const saved = JSON.parse(window.localStorage.getItem('writeorbit_autocomplete_settings') || 'null');
       if (saved && typeof saved === 'object') setAutocompleteSettings({ ...DEFAULT_AUTOCOMPLETE_SETTINGS, ...saved });
     } catch {
       // Defaults.
@@ -4948,7 +4948,7 @@ export default function AIEditorWorkspace() {
   }, []);
   const changeAutocompleteSettings = useCallback((next: AutocompleteSettings) => {
     setAutocompleteSettings(next);
-    try { window.localStorage.setItem('writegrid_autocomplete_settings', JSON.stringify(next)); } catch { /* storage blocked */ }
+    try { window.localStorage.setItem('writeorbit_autocomplete_settings', JSON.stringify(next)); } catch { /* storage blocked */ }
   }, []);
 
   const autocompleteState = useAutocomplete({
@@ -6074,7 +6074,7 @@ export default function AIEditorWorkspace() {
           <div className="w-full max-w-[460px] rounded-[16px] border border-[#e5e7eb] bg-white px-6 py-8 text-center shadow-[0_22px_50px_-18px_rgba(15,23,42,.25)]">
             <div className="text-[18px] font-bold text-[#0f172a]">Sign in to open this document</div>
             <p className="mt-2 text-[14px] leading-[1.6] text-[#64748b]">
-              Documents are saved to your WriteGrid account. Sign in, or create a free account, to write, cite and review with AI.
+              Documents are saved to your WriteOrbit account. Sign in, or create a free account, to write, cite and review with AI.
             </p>
             <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
               <button type="button" onClick={() => setAuthPrompt('login')} className="h-[42px] rounded-[11px] bg-[var(--theme-primary)] px-[18px] text-[15px] font-semibold text-white shadow-[0_6px_16px_-6px_rgba(37,99,235,.7)] hover:bg-[var(--theme-primary-dark)]">Sign in</button>
@@ -6901,9 +6901,9 @@ export default function AIEditorWorkspace() {
       />
 
       {autocompleteState.writingAt ? (
-        // "WriteGrid AI" writes at the cursor until the grey text appears.
+        // "WriteOrbit AI" writes at the cursor until the grey text appears.
         <div className="pointer-events-none fixed z-[11500]" style={{ top: autocompleteState.writingAt.top - 20, left: autocompleteState.writingAt.left - 1 }} aria-live="polite">
-          <span className="block w-fit rounded-[5px] rounded-bl-none bg-[var(--theme-primary)] px-1.5 py-[2px] text-[11px] font-semibold leading-none text-white">WriteGrid AI</span>
+          <span className="block w-fit rounded-[5px] rounded-bl-none bg-[var(--theme-primary)] px-1.5 py-[2px] text-[11px] font-semibold leading-none text-white">WriteOrbit AI</span>
           <span className="block h-[22px] w-[2px] animate-pulse bg-[var(--theme-primary)]" />
         </div>
       ) : null}

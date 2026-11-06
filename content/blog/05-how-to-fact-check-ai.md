@@ -160,18 +160,18 @@ The paragraph below is **a fictional example we wrote** in the style chatbots of
 
 Two sentences survive out of four. That ratio is not unusual.
 
-## How WriteGrid makes these checks faster
+## How WriteOrbit makes these checks faster
 
-Steps 2 and 3 take most of the time with AI output. WriteGrid is built to shorten them:
+Steps 2 and 3 take most of the time with AI output. WriteOrbit is built to shorten them:
 
 - **Citations come from a real index.** Autocomplete cites the scholarly papers it draws on, and `@`-cite searches 250M+ scholarly works. Each citation links to a real work, so step 2 becomes "open it" rather than "find out if it exists." You still do step 3: read the paper.
 - **Ask-a-PDF answers carry page numbers.** Upload a report or study to the Library and use Ask to question that one PDF. Each answer cites the page, so you can check the passage in seconds.
 - **Source-quality checks** flag retracted papers, preprints and wrong DOIs among your citations, as comments in the draft.
 - **Claim checks** run on the whole draft and leave a comment per claim, which works as the step 7 log.
 
-<!-- SCREENSHOT: WriteGrid Library "Ask" on a single PDF answering "What fabrication rate does this paper report for GPT-4?" with "18% (p. 1, abstract)" and the PDF open to the abstract with the sentence highlighted -->
+<!-- SCREENSHOT: WriteOrbit Library "Ask" on a single PDF answering "What fabrication rate does this paper report for GPT-4?" with "18% (p. 1, abstract)" and the PDF open to the abstract with the sentence highlighted -->
 
-WriteGrid doesn't check quotes from interviews or claims about recent events beyond what its sources contain; steps 5 and 6 stay with you. The free plan includes 3 review checks a day; see [pricing](/pricing).
+WriteOrbit doesn't check quotes from interviews or claims about recent events beyond what its sources contain; steps 5 and 6 stay with you. The free plan includes 3 review checks a day; see [pricing](/pricing).
 
 ## FAQ
 

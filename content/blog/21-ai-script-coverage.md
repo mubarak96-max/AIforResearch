@@ -59,7 +59,7 @@ We are running a side-by-side test of human and AI coverage. The method and ever
 
 1. **Pick the script.** One feature-length spec (90 to 120 pages) that has not been widely circulated, so no model has seen discussions of it. Use a script you own or have permission to share with each service.
 2. **Get human coverage.** Order standard coverage (logline, synopsis, comments, grid, verdict) from one paid human reader. Do not tell the reader about the test.
-3. **Get AI coverage.** Run the same script through: one dedicated AI coverage service, ChatGPT, Claude, and WriteGrid AI review plus chat. Use the coverage prompt below, unchanged, for the general chatbots.
+3. **Get AI coverage.** Run the same script through: one dedicated AI coverage service, ChatGPT, Claude, and WriteOrbit AI review plus chat. Use the coverage prompt below, unchanged, for the general chatbots.
 4. **Blind the reports.** Strip tool names and format differences so a second reader scores them without knowing the source.
 5. **Score with the rubric.** Two scorers, each working alone, score every report on the eight criteria below. Average the two.
 6. **Count errors.** For every factual claim about the script (a character's action, a plot event, a page reference), check it against the script. Record wrong claims as errors.
@@ -87,7 +87,7 @@ Score each criterion from 1 (useless) to 5 (as good as a strong professional rea
 | Dedicated AI coverage service | | | | | | |
 | ChatGPT (coverage prompt) | | | | | | |
 | Claude (coverage prompt) | | | | | | |
-| WriteGrid AI review + chat | | | | | | |
+| WriteOrbit AI review + chat | | | | | | |
 
 ### What to look for when you run it yourself
 
@@ -181,7 +181,7 @@ The last instruction in prompt 7 is deliberate. Ask the model to diagnose, not t
 | --- | --- | --- | --- | --- |
 | Dedicated AI coverage service | ScriptReader.ai, Greenlight Coverage | Coverage-shaped report, grid and verdict without prompting; follow-up chat | Fixed format; same model limits on taste and market | ScriptReader.ai: about $9.99 per analysis for spec scripts, $15.55 for its Deep Focus tier. Greenlight Coverage: subscription and token pricing, see its site <!-- VERIFY: Greenlight Coverage current price --> |
 | General chatbots | ChatGPT, Claude, Gemini | Flexible; you control the prompt; free tiers exist | You write the prompts; consumer plans may train on chats unless you opt out | Free tiers plus paid plans |
-| AI review in a writing editor | WriteGrid | Notes appear as comments on the script text; chat with the script PDF with page-numbered answers | No screenplay formatting, no `.fdx` support; the review is general, not a coverage grid | Free plan, then from $12/month (see [pricing](/pricing)) |
+| AI review in a writing editor | WriteOrbit | Notes appear as comments on the script text; chat with the script PDF with page-numbered answers | No screenplay formatting, no `.fdx` support; the review is general, not a coverage grid | Free plan, then from $12/month (see [pricing](/pricing)) |
 | Human reader | Contest and coverage services, studio readers | Taste, market knowledge, a verdict that means something | Slower and more expensive | Varies by service |
 
 Fair notes on the dedicated services: ScriptReader.ai's pricing page says it runs several independent AI reads and then combines them, and both ScriptReader.ai and Greenlight Coverage state that they do not train AI models on uploaded scripts. Those are the vendors' own statements; read their terms for retention details.
@@ -206,17 +206,17 @@ A script that is out with producers is also a document you may need to prove you
 4. **Look for agreement.** If AI and a human reader flag the same scene, fix that scene first.
 5. **Never paste AI rewrites into the script.** Under the WGA's 2023 agreement, AI-generated text is not literary material, and passages a machine wrote raise authorship questions if you later sell or register the script. See [what AI can and shouldn't do for screenwriters](/blog/ai-screenplay-writer).
 
-## Getting notes on a script in WriteGrid
+## Getting notes on a script in WriteOrbit
 
-WriteGrid is not a screenplay formatter and does not open `.fdx` files. It is useful on the notes side of the process.
+WriteOrbit is not a screenplay formatter and does not open `.fdx` files. It is useful on the notes side of the process.
 
-1. **Export the draft as Word from your screenwriting app** and open the `.docx` in WriteGrid. It keeps the document's styles.
+1. **Export the draft as Word from your screenwriting app** and open the `.docx` in WriteOrbit. It keeps the document's styles.
 2. **Run AI review.** Peer-review style notes, proofreading and tone notes appear as comments on the exact lines they refer to, so you read the note next to the scene.
 3. **Upload the PDF to the Library and chat with it.** Ask "where does the midpoint land?" or "on which pages does Maya mention her brother?" Answers carry page numbers you can click and check.
 4. **Share with a writing partner or producer.** Comments and suggestions (tracked changes) keep your notes and theirs in one place, with version history.
 5. **Make the fixes in your formatter.** Keep the script master in Final Draft, Fade In or whichever app you use.
 
-<!-- SCREENSHOT: a screenplay .docx open in WriteGrid with two AI review comments in the margin (one on a scene's purpose, one on a continuity error), and the Library chat panel showing an answer about the midpoint with a page-number citation -->
+<!-- SCREENSHOT: a screenplay .docx open in WriteOrbit with two AI review comments in the margin (one on a scene's purpose, one on a continuity error), and the Library chat panel showing an answer about the midpoint with a page-number citation -->
 
 The free plan includes three review checks and five chat messages a day, enough to test this on one script. Check [/pricing](/pricing) for current limits.
 

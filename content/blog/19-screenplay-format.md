@@ -326,9 +326,9 @@ The page number (`2.`) sits top right. Page 1 carries no number.
 
 ## Where to keep the treatment and outline
 
-A screenplay is the last document in a long chain: notes, research, a treatment, an outline. WriteGrid **does not format screenplays and does not read `.fdx` files**, so it is not where the script itself goes. It is a good place for the documents before it: write the treatment and scene outline in a shared document with comments, suggestions and version history, and open an existing Word treatment with its styles intact (WriteGrid imports `.docx` and exports Word and PDF). When you have a draft, export the script to PDF from your formatter and upload it to the Library and use Ask to question that PDF, with answers that cite page numbers.
+A screenplay is the last document in a long chain: notes, research, a treatment, an outline. WriteOrbit **does not format screenplays and does not read `.fdx` files**, so it is not where the script itself goes. It is a good place for the documents before it: write the treatment and scene outline in a shared document with comments, suggestions and version history, and open an existing Word treatment with its styles intact (WriteOrbit imports `.docx` and exports Word and PDF). When you have a draft, export the script to PDF from your formatter and upload it to the Library and use Ask to question that PDF, with answers that cite page numbers.
 
-<!-- SCREENSHOT: A WriteGrid document with a scene-by-scene outline (fictional "The Night Harbor") in a numbered list, with a co-writer's suggestion shown as a tracked change. -->
+<!-- SCREENSHOT: A WriteOrbit document with a scene-by-scene outline (fictional "The Night Harbor") in a numbered list, with a co-writer's suggestion shown as a tracked change. -->
 
 See [how it works](/how-it-works) or start on the [free plan](/signup).
 

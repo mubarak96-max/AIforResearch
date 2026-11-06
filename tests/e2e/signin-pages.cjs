@@ -40,7 +40,7 @@ const check = (name, ok, extra = '') => { results.push(ok); console.log(`${ok ? 
       await page.getByLabel('Email address').waitFor({ timeout: 20000 });
       await page.waitForTimeout(600);
       const name = path.slice(1);
-      check(`${name} ${label}: one first step`, (await heading(page)) === 'Welcome to WriteGrid' && await page.getByText('Sign in or create an account.').isVisible(), await heading(page));
+      check(`${name} ${label}: one first step`, (await heading(page)) === 'Welcome to WriteOrbit' && await page.getByText('Sign in or create an account.').isVisible(), await heading(page));
       check(`${name} ${label}: no separate sign-up link`, (await page.getByText(/Create a free account|Already have an account/).count()) === 0);
       check(`${name} ${label}: no sideways scroll`, (await overflow(page)) <= 0);
       await page.screenshot({ path: `${OUT}/signin-${name}-${label}.png` });

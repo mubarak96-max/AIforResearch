@@ -16,7 +16,7 @@ const block = (type, content = [], props = {}) => ({ id: crypto.randomUUID(), ty
   await fetch(`${BASE}/api/ai-editor/documents`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${auth.token}` }, body: JSON.stringify({ id, title: 'Print audit', blocks: [block('heading', [text('Print audit')], { level: 1 }), ...paragraphs, block('paragraph', [text('With a note'), { type: 'footnote', props: { text: 'A printed footnote.', kind: 'footnote' } }, text('.')])] }) });
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+  await context.addInitScript(([t, u]) => { localStorage.setItem('writeorbit_token', JSON.stringify(t)); localStorage.setItem('writeorbit_user', JSON.stringify(u)); }, [auth.token, auth.user]);
   const page = await context.newPage();
   await page.goto(`${BASE}/editor?doc=${id}`, { waitUntil: 'domcontentloaded' });
   await page.locator('.bn-editor').waitFor({ timeout: 30000 });

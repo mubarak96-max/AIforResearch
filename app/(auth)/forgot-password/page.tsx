@@ -4,7 +4,7 @@ import { pageMetadata } from '@/components/marketing/seo';
 export const metadata = pageMetadata({
   title: 'Reset your password',
   path: '/forgot-password',
-  description: 'Get a link to choose a new password for your WriteGrid account.',
+  description: 'Get a link to choose a new password for your WriteOrbit account.',
   index: false,
 });
 

@@ -944,7 +944,7 @@ class LatexWriter:
             ("left", "left"), ("right", "right")))
         pdf_title = re.sub(r"\\\\\[0\.5em\]\\large ", ": ", title) if title else ""
         lines = [
-            "% Exported from the WriteGrid editor.",
+            "% Exported from the WriteOrbit editor.",
             "% Compile with pdfLaTeX and BibTeX (Overleaf's defaults).",
             "\\documentclass[12pt]{article}",
             "\\usepackage[utf8]{inputenc}",

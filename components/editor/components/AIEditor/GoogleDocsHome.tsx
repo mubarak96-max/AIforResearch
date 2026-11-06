@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import { navLink, useEditorConfig } from '../../runtime';
 import { isPaidPlan, useEditorAccount } from '../../lib/aiEditor/account';
 import { DOCUMENT_TEMPLATES } from '../../lib/aiEditor/templates';
-import { WriteGridLogo } from './EditorAppNav';
+import { WriteOrbitLogo } from './EditorAppNav';
 import { DocumentPreview, relativeTime } from './documentPreview';
 
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -156,7 +156,7 @@ export default function GoogleDocsHome({
   const [query, setQuery] = useState('');
   const [view, setView] = useState<DocsHomeView>(() => {
     try {
-      return window.localStorage.getItem('writegrid-docs-view') === 'list' ? 'list' : 'grid';
+      return window.localStorage.getItem('writeorbit-docs-view') === 'list' ? 'list' : 'grid';
     } catch {
       return 'grid';
     }
@@ -218,7 +218,7 @@ export default function GoogleDocsHome({
   const changeView = (next: DocsHomeView) => {
     setView(next);
     try {
-      window.localStorage.setItem('writegrid-docs-view', next);
+      window.localStorage.setItem('writeorbit-docs-view', next);
     } catch {
       /* private mode */
     }
@@ -468,7 +468,7 @@ export default function GoogleDocsHome({
         // Phones: the mockup's app bar (logo, Upgrade, account).
         <div className="flex h-14 items-center gap-2 pl-[18px] pr-3.5">
           <span className="flex-1">
-            <WriteGridLogo size={30} />
+            <WriteOrbitLogo size={30} />
           </span>
           {showUpgrade ? (
             <button type="button" onClick={upgrade} className="flex h-[34px] items-center gap-1 rounded-full bg-[var(--theme-primary)] px-3 text-[13px] font-bold text-white shadow-[0_4px_12px_-4px_rgba(37,99,235,.7)]">

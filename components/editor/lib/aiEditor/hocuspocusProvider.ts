@@ -52,7 +52,7 @@ export class AIEditorCRDTSocketProvider {
 
     // A cached copy with content can be shown at once. An empty cache must wait for the
     // server: reporting "empty" early would make the editor seed a second copy of the text.
-    this.local = typeof indexedDB !== 'undefined' ? new IndexeddbPersistence(`writegrid-doc-${options.documentId}`, this.doc) : null;
+    this.local = typeof indexedDB !== 'undefined' ? new IndexeddbPersistence(`writeorbit-doc-${options.documentId}`, this.doc) : null;
     this.local?.once('synced', () => {
       if (!this.initialised && !fragmentIsEmpty(this.doc)) this.init(false);
     });

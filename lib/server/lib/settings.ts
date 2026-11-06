@@ -35,7 +35,7 @@ export const SETTING_FIELDS = [
   { key: 'signinMicrosoft', group: 'signin', label: 'Microsoft', secret: false, kind: 'toggle', default: 'on' },
   { key: 'signinApple', group: 'signin', label: 'Apple', secret: false, kind: 'toggle', default: 'on' },
   { key: 'mailProvider', group: 'email', label: 'Send emails with', secret: false, options: ['', 'smtp', 'resend'], labels: { '': 'Off', smtp: 'SMTP', resend: 'Resend' } },
-  { key: 'mailFrom', group: 'email', label: 'From', secret: false, placeholder: 'WriteGrid <hello@example.com>', showWhen: { mailProvider: ['smtp', 'resend'] } },
+  { key: 'mailFrom', group: 'email', label: 'From', secret: false, placeholder: 'WriteOrbit <hello@example.com>', showWhen: { mailProvider: ['smtp', 'resend'] } },
   { key: 'mailReplyTo', group: 'email', label: 'Reply-to (optional)', secret: false, placeholder: 'support@example.com', showWhen: { mailProvider: ['smtp', 'resend'] } },
   { key: 'smtpHost', group: 'email', label: 'SMTP host', secret: false, placeholder: 'smtp.example.com', showWhen: { mailProvider: ['smtp'] } },
   { key: 'smtpPort', group: 'email', label: 'Port', secret: false, placeholder: '587', showWhen: { mailProvider: ['smtp'] } },
@@ -62,7 +62,7 @@ function cipherKey() {
   // their JWT_SECRET instead: keep it in the environment and those values still open.
   const secret = env.settingsKey || (process.env.JWT_SECRET ?? '').trim();
   if (!secret) throw new Error('SETTINGS_KEY must be set to save or read admin settings.');
-  return createHash('sha256').update(`writegrid-settings:${secret}`).digest();
+  return createHash('sha256').update(`writeorbit-settings:${secret}`).digest();
 }
 
 function encrypt(value: string) {

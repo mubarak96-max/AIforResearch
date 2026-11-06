@@ -30,7 +30,7 @@ const P = (t) => ({ id: crypto.randomUUID(), type: 'paragraph', props: {}, conte
   await fetch(`${BASE}/api/ai-editor/documents`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${auth.token}` }, body: JSON.stringify({ id, title: 'Library audit', blocks: [P('Sleep matters for students.')] }) });
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+  await context.addInitScript(([t, u]) => { localStorage.setItem('writeorbit_token', JSON.stringify(t)); localStorage.setItem('writeorbit_user', JSON.stringify(u)); }, [auth.token, auth.user]);
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message.slice(0, 200)));

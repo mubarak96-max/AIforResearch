@@ -1,5 +1,5 @@
-"""writegrid-convert HTTP service (port 4100, internal only). Stateless: no auth, no database, no
-storage. The WriteGrid API server owns those and calls this service. Contract: README.md."""
+"""writeorbit-convert HTTP service (port 4100, internal only). Stateless: no auth, no database, no
+storage. The WriteOrbit API server owns those and calls this service. Contract: README.md."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ from .process import ConvertError, soffice_path
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 # httpx logs every URL it fetches; asset_fetch_base URLs may carry a signed token.
 logging.getLogger("httpx").setLevel(logging.WARNING)
-logger = logging.getLogger("writegrid_convert")
+logger = logging.getLogger("writeorbit_convert")
 
 OLE_MAGIC = b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"  # encrypted .docx files are OLE containers
 ASSET_URL_PREFIX = re.compile(r"^(/|https?://)[^\s\"'<>\\]*$")
@@ -165,7 +165,7 @@ async def lifespan(_app: FastAPI):
     _reset_pool()
 
 
-app = FastAPI(title="writegrid-convert", version=__version__, docs_url=None, redoc_url=None, lifespan=lifespan)
+app = FastAPI(title="writeorbit-convert", version=__version__, docs_url=None, redoc_url=None, lifespan=lifespan)
 app.add_middleware(BodySizeLimit)
 
 
@@ -182,7 +182,7 @@ async def unexpected_error(_request: Request, exc: Exception):
 async def health() -> Dict[str, Any]:
     return {
         "status": "ok",
-        "service": "writegrid-convert",
+        "service": "writeorbit-convert",
         "version": __version__,
         "libreoffice": soffice_path() is not None,
         "workers": config.WORKERS,

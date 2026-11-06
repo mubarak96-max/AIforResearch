@@ -24,7 +24,7 @@ async function api(token, path, init = {}) {
   const browser = await chromium.launch({ args: [`--unsafely-treat-insecure-origin-as-secure=${BASE}`] });
   const open = async (auth, options = { viewport: { width: 1440, height: 1000 } }) => {
     const context = await browser.newContext(options);
-    await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+    await context.addInitScript(([t, u]) => { localStorage.setItem('writeorbit_token', JSON.stringify(t)); localStorage.setItem('writeorbit_user', JSON.stringify(u)); }, [auth.token, auth.user]);
     const page = await context.newPage();
     page.errors = [];
     page.on('pageerror', (error) => page.errors.push(error.message.slice(0, 200)));
@@ -170,7 +170,7 @@ async function api(token, path, init = {}) {
     const { context, page } = await open(free);
     await page.goto(`${BASE}/account`, { waitUntil: 'networkidle' });
     await page.locator('aside').getByRole('button', { name: 'AI Chat' }).click();
-    const box = page.getByRole('textbox', { name: 'Message WriteGrid AI' });
+    const box = page.getByRole('textbox', { name: 'Message WriteOrbit AI' });
     await box.waitFor({ timeout: 20000 });
     await box.fill('What does sleep do for memory?');
     await page.getByRole('button', { name: 'Send' }).click();

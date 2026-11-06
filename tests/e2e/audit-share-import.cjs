@@ -22,7 +22,7 @@ const P = (t) => ({ id: crypto.randomUUID(), type: 'paragraph', props: {}, conte
   const as = async (who) => {
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-    await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [who.token, who.user]);
+    await context.addInitScript(([t, u]) => { localStorage.setItem('writeorbit_token', JSON.stringify(t)); localStorage.setItem('writeorbit_user', JSON.stringify(u)); }, [who.token, who.user]);
     const page = await context.newPage();
     page.on('pageerror', (e) => errors.push(e.message.slice(0, 200)));
     return { context, page };

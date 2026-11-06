@@ -1,7 +1,7 @@
 // Layout check for an open document: menu bar, one-row toolbar with the ⋮ overflow, the
 // side rail and its panels, the status bar, the folded app nav and the first paragraph's
 // handles. Writes /shots/layout-*.png and prints overlaps and console errors.
-// Runs in the Playwright container: BASE=http://writegrid-router:8080 node editor-layout-shots.cjs
+// Runs in the Playwright container: BASE=http://writeorbit-router:8080 node editor-layout-shots.cjs
 const { chromium } = require('playwright');
 const { signIn } = require('./e2e-auth.cjs');
 const crypto = require('crypto');
@@ -37,7 +37,7 @@ async function overlaps(page, a, b) {
   const browser = await chromium.launch({ args: [`--unsafely-treat-insecure-origin-as-secure=${BASE}`] });
   for (const width of [1440, 1280, 1024]) {
     const context = await browser.newContext({ viewport: { width, height: 900 } });
-    await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [token, user]);
+    await context.addInitScript(([t, u]) => { localStorage.setItem('writeorbit_token', JSON.stringify(t)); localStorage.setItem('writeorbit_user', JSON.stringify(u)); }, [token, user]);
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', (e) => errors.push(`pageerror ${e.message.slice(0, 200)}`));

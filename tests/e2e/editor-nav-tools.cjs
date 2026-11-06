@@ -1,11 +1,11 @@
 // Left menu tools open beside the page (no navigation): Library/Find papers in a left drawer, AI
 // Chat on the right; the rail under the header, the Library's Collections, and the autocomplete
 // Library limit picker. Writes /shots/nav-*.png.
-//   BASE=http://writegrid-router:8080 node editor-nav-tools.cjs
+//   BASE=http://writeorbit-router:8080 node editor-nav-tools.cjs
 const { chromium } = require('playwright');
 const { signIn } = require('./e2e-auth.cjs');
 const crypto = require('crypto');
-const BASE = process.env.BASE || 'http://writegrid-router:8080';
+const BASE = process.env.BASE || 'http://writeorbit-router:8080';
 const OUT = process.env.OUT || '/shots';
 (async () => {
   const auth = await signIn(BASE, 'nav');
@@ -15,7 +15,7 @@ const OUT = process.env.OUT || '/shots';
   await fetch(`${BASE}/api/ai-editor/documents`, { method: 'POST', headers, body: JSON.stringify({ id, title: 'Malaria in pregnancy', blocks: [{ id: crypto.randomUUID(), type: 'paragraph', props: {}, content: [{ type: 'text', text: 'Malaria in pregnancy remains a major public health problem in Uganda.', styles: {} }], children: [] }] }) });
   const browser = await chromium.launch({ args: [`--unsafely-treat-insecure-origin-as-secure=${BASE}`] });
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+  await context.addInitScript(([t, u]) => { localStorage.setItem('writeorbit_token', JSON.stringify(t)); localStorage.setItem('writeorbit_user', JSON.stringify(u)); }, [auth.token, auth.user]);
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(`pageerror ${e.message.slice(0, 200)}`));

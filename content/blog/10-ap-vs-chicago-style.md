@@ -205,9 +205,9 @@ Writers who move between journalism and books often need both styles on the same
 
 For steps 2 to 6, the AI prompt in our [AP style checker comparison](/blog/ap-style-checker) works as a converter: ask it to list every change in a table so you can approve each one.
 
-## How WriteGrid handles the citation half
+## How WriteOrbit handles the citation half
 
-WriteGrid manages citations, not AP prose rules. What it does:
+WriteOrbit manages citations, not AP prose rules. What it does:
 
 - **10,000+ citation styles**, including Chicago notes and bibliography, Chicago author-date, APA, MLA, IEEE and Harvard, through the [CSL citation styles](/citation-styles) library.
 - **Switch a document's citation style in one step.** Every in-text citation and the reference list reformat together, so a report drafted in APA can go to a Chicago publisher without retyping.
@@ -216,9 +216,9 @@ WriteGrid manages citations, not AP prose rules. What it does:
 
 What it doesn't do: change "5%" to "5 percent," add serial commas or italicize titles in your prose. Switching the citation style only changes citations. Use the converter prompt in the AI chat beside the document for the prose, and make those edits as tracked suggestions so an editor can review them.
 
-<!-- SCREENSHOT: The citation style dropdown in a WriteGrid document, switching from "Chicago Manual of Style 18th edition (author-date)" to "Chicago Manual of Style 18th edition (note)", with the reference list visibly reformatted. -->
+<!-- SCREENSHOT: The citation style dropdown in a WriteOrbit document, switching from "Chicago Manual of Style 18th edition (author-date)" to "Chicago Manual of Style 18th edition (note)", with the reference list visibly reformatted. -->
 
-<!-- VERIFY: confirm the exact names of the Chicago 18th edition styles in the WriteGrid style picker before taking the screenshot -->
+<!-- VERIFY: confirm the exact names of the Chicago 18th edition styles in the WriteOrbit style picker before taking the screenshot -->
 
 Citations work in every style on the free plan; see [pricing](/pricing) for current limits.
 

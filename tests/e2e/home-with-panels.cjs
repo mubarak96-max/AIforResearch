@@ -39,7 +39,7 @@ const check = (name, ok, extra = '') => { results.push(ok); console.log(`${ok ? 
 
   async function open(viewport, { drawer = false, menu = false, chat = false, chatFirst = false } = {}) {
     const context = await browser.newContext({ viewport });
-    await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+    await context.addInitScript(([t, u]) => { localStorage.setItem('writeorbit_token', JSON.stringify(t)); localStorage.setItem('writeorbit_user', JSON.stringify(u)); }, [auth.token, auth.user]);
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', (error) => errors.push(error.message.slice(0, 160)));
@@ -100,7 +100,7 @@ const check = (name, ok, extra = '') => { results.push(ok); console.log(`${ok ? 
 
   // Phones keep their own layout.
   const phone = await browser.newContext(devices['iPhone 13']);
-  await phone.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+  await phone.addInitScript(([t, u]) => { localStorage.setItem('writeorbit_token', JSON.stringify(t)); localStorage.setItem('writeorbit_user', JSON.stringify(u)); }, [auth.token, auth.user]);
   const phonePage = await phone.newPage();
   await phonePage.goto(`${BASE}/editor`, { waitUntil: 'domcontentloaded' });
   await phonePage.getByText('Start something new').first().waitFor({ timeout: 20000 });
@@ -114,7 +114,7 @@ const check = (name, ok, extra = '') => { results.push(ok); console.log(`${ok ? 
   const first = (Array.isArray(docs) ? docs : docs.documents || [])[0];
   if (first) {
     const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
-    await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+    await context.addInitScript(([t, u]) => { localStorage.setItem('writeorbit_token', JSON.stringify(t)); localStorage.setItem('writeorbit_user', JSON.stringify(u)); }, [auth.token, auth.user]);
     const page = await context.newPage();
     await page.goto(`${BASE}/editor?doc=${first.id}`, { waitUntil: 'domcontentloaded' });
     await page.locator('[contenteditable="true"]').first().waitFor({ timeout: 30000 });

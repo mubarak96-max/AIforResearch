@@ -11,13 +11,13 @@ published: "2026-11-06"
 updated: "2026-11-06"
 faq:
   - q: "Is there a free AI fact checker?"
-    a: "Yes. Google Fact Check Explorer is free and searches fact checks already published by fact-checking organizations. Originality.ai's free plan includes its fact checker with limited credits, Facticity.AI lets you start for free, and WriteGrid's free plan includes three AI review checks a day, including claim checks. Free tiers are enough for occasional drafts, not a daily newsroom load."
+    a: "Yes. Google Fact Check Explorer is free and searches fact checks already published by fact-checking organizations. Originality.ai's free plan includes its fact checker with limited credits, Facticity.AI lets you start for free, and WriteOrbit's free plan includes three AI review checks a day, including claim checks. Free tiers are enough for occasional drafts, not a daily newsroom load."
   - q: "Can AI fact check itself?"
     a: "Not reliably. Asking the same chatbot that wrote a claim whether it is true often gets the same error repeated with more confidence. A useful check needs an outside source: retrieval from a real index of papers, web pages or your own documents, and then a human who opens that source. Treat a model's self-check as a hint about what to verify."
   - q: "How accurate are AI fact checkers?"
     a: "There is no independent, standard benchmark for AI fact checkers yet, and vendors' accuracy figures come from their own tests. Accuracy depends on the claim type: they do well on published numbers, dates and scientific findings with good sources, and poorly on local facts, recent events, anonymous sourcing and context. Use them to find what to check, not to decide."
   - q: "What is the best AI fact checker?"
-    a: "It depends on what you check. For a viral claim, start with Google Fact Check Explorer. For a whole draft, use a tool that extracts each claim and shows the source it matched, such as WriteGrid's claim check or Originality.ai's Fact and Hallucination Checker. For research-heavy writing, pick one that also checks source quality, such as retracted papers and preprints."
+    a: "It depends on what you check. For a viral claim, start with Google Fact Check Explorer. For a whole draft, use a tool that extracts each claim and shows the source it matched, such as WriteOrbit's claim check or Originality.ai's Fact and Hallucination Checker. For research-heavy writing, pick one that also checks source quality, such as retracted papers and preprints."
   - q: "Can an AI fact checker detect AI hallucinations?"
     a: "It can catch many of them, especially invented citations and numbers that don't match any source. It catches them by failing to find support, so it can't distinguish an invented fact from a real one it simply couldn't find. A claim marked 'no source found' needs a human to search further before you cut it or keep it."
 ---
@@ -99,7 +99,7 @@ Keep a fact sheet: claim, source, status, who checked it. Here is a fictional ex
 
 Our [editor's fact-checking checklist](/blog/how-to-fact-check-an-article) has a full fact-sheet template.
 
-<!-- SCREENSHOT: WriteGrid draft with the AI review panel open after a claim check, showing three comments in the margin: one "Supported" with a linked paper, one "Partly supported: source reports 62%, draft says doubled", and one "No source found" -->
+<!-- SCREENSHOT: WriteOrbit draft with the AI review panel open after a claim check, showing three comments in the margin: one "Supported" with a linked paper, one "Partly supported: source reports 62%, draft says doubled", and one "No source found" -->
 
 ## Source quality matters as much as the claim: retracted papers, preprints, wrong DOIs
 
@@ -120,7 +120,7 @@ Prices as of November 2026, from each vendor's site. Check before you buy.
 | **Perplexity** | One question or claim at a time | Answer with numbered web citations | No | Free plan with limited advanced searches | Pro about $20/month <!-- VERIFY: confirm Perplexity Pro price on perplexity.ai --> |
 | **Google Fact Check Explorer** | One claim or topic at a time | Lists published fact checks from fact-checking organizations[7] | No | Free | Free |
 | **Grammarly Citation Finder** | Claims in a Grammarly doc | Flags claims that may need a source, suggests sources, inserts citations (APA, MLA, Chicago)[8] | No | Up to 5 citations a day | With Grammarly Pro |
-| **WriteGrid** AI review | Your whole draft, in the editor | Claim checks and source-quality checks left as comments in the text | Yes: flags retracted papers, preprints and wrong DOIs | 3 review checks a day | Plus $12/month (30 checks a month) |
+| **WriteOrbit** AI review | Your whole draft, in the editor | Claim checks and source-quality checks left as comments in the text | Yes: flags retracted papers, preprints and wrong DOIs | 3 review checks a day | Plus $12/month (30 checks a month) |
 
 **Notes on each:**
 
@@ -130,11 +130,11 @@ Prices as of November 2026, from each vendor's site. Check before you buy.
 - **Google Fact Check Explorer** only finds claims someone has already checked, using the ClaimReview markup that fact-checkers add to their articles. For viral claims, it's the right first stop. For your own original reporting, it will usually return nothing.[7]
 - **Grammarly Citation Finder** is a good fit if your team already writes in Grammarly docs and wants sources suggested as you go.
 
-## Run a claim check in WriteGrid
+## Run a claim check in WriteOrbit
 
-WriteGrid's AI review checks the draft where you write it. Run a claim check and each claim gets a comment in the margin with what the tool found and the source it matched. Run a source-quality check and it flags citations to retracted papers, preprints and DOIs that don't match the paper. Because results are ordinary comments, your editor sees them, replies to them and resolves them, so the comment thread becomes your fact-check log.
+WriteOrbit's AI review checks the draft where you write it. Run a claim check and each claim gets a comment in the margin with what the tool found and the source it matched. Run a source-quality check and it flags citations to retracted papers, preprints and DOIs that don't match the paper. Because results are ordinary comments, your editor sees them, replies to them and resolves them, so the comment thread becomes your fact-check log.
 
-It works best for drafts that cite research: science and health stories, reports, white papers. Citations in WriteGrid come from an index of 250M+ scholarly works, so each one points to a real paper. If your sources are documents rather than papers, upload them to the Library and use Ask on each PDF; answers carry page numbers you can check.
+It works best for drafts that cite research: science and health stories, reports, white papers. Citations in WriteOrbit come from an index of 250M+ scholarly works, so each one points to a real paper. If your sources are documents rather than papers, upload them to the Library and use Ask on each PDF; answers carry page numbers you can check.
 
 What it doesn't do: verify quotes from your interviews, check images, or search published fact checks. Use the recording, a reverse image search and Google Fact Check Explorer for those. The free plan includes 3 review checks a day; see [pricing](/pricing) and [how it works](/how-it-works).
 
@@ -156,7 +156,7 @@ The CNET case is the reminder: an audit found errors in 41 of 77 AI-assisted exp
 
 ### Is there a free AI fact checker?
 
-Yes. Google Fact Check Explorer is free and searches fact checks already published by fact-checking organizations. Originality.ai's free plan includes its fact checker with limited credits, Facticity.AI lets you start for free, and WriteGrid's free plan includes three AI review checks a day, including claim checks. Free tiers are enough for occasional drafts, not a daily newsroom load.
+Yes. Google Fact Check Explorer is free and searches fact checks already published by fact-checking organizations. Originality.ai's free plan includes its fact checker with limited credits, Facticity.AI lets you start for free, and WriteOrbit's free plan includes three AI review checks a day, including claim checks. Free tiers are enough for occasional drafts, not a daily newsroom load.
 
 ### Can AI fact check itself?
 
@@ -168,7 +168,7 @@ There is no independent, standard benchmark for AI fact checkers yet, and vendor
 
 ### What is the best AI fact checker?
 
-It depends on what you check. For a viral claim, start with Google Fact Check Explorer. For a whole draft, use a tool that extracts each claim and shows the source it matched, such as WriteGrid's claim check or Originality.ai's Fact and Hallucination Checker. For research-heavy writing, pick one that also checks source quality, such as retracted papers and preprints.
+It depends on what you check. For a viral claim, start with Google Fact Check Explorer. For a whole draft, use a tool that extracts each claim and shows the source it matched, such as WriteOrbit's claim check or Originality.ai's Fact and Hallucination Checker. For research-heavy writing, pick one that also checks source quality, such as retracted papers and preprints.
 
 ### Can an AI fact checker detect AI hallucinations?
 

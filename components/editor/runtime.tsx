@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useSyncExternalStore } from 'react';
 
 /** The signed-in person as the host app knows them. */
-export type WriteGridUser = {
+export type WriteOrbitUser = {
   id: string;
   email: string;
   full_name?: string | null;
@@ -14,14 +14,14 @@ export type WriteGridUser = {
  * Everything the editor needs from the app it runs in. The editor never talks to
  * accounts, plans or billing directly: the host decides through these hooks.
  */
-export type WriteGridEditorConfig = {
+export type WriteOrbitEditorConfig = {
   /** Base URL of the editor API; '' means the same origin as the page. */
   apiBase: string;
   /** WebSocket URL of the real-time sync server; defaults to `${origin}/collab`. */
   realtimeUrl?: string;
   /** Returns a short-lived token for the current person, or null when signed out. */
   getToken: () => string | null;
-  user: WriteGridUser | null;
+  user: WriteOrbitUser | null;
   userLoading?: boolean;
   /** A signed-out visitor tried an action that needs an account. */
   onRequireSignIn?: (reason?: string) => void;
@@ -41,42 +41,42 @@ export type WriteGridEditorConfig = {
 };
 
 /** Host route for one of the built-in navigation links. */
-export function navLink(name: keyof NonNullable<WriteGridEditorConfig['navLinks']>): string {
+export function navLink(name: keyof NonNullable<WriteOrbitEditorConfig['navLinks']>): string {
   const defaults = { home: '/', library: '/library', papers: '/papers', chat: '/chat', account: '/account', help: '/help', pricing: '/pricing', admin: '/admin' };
   return currentConfig.navLinks?.[name] || defaults[name];
 }
 
-const fallbackConfig: WriteGridEditorConfig = { apiBase: '', getToken: () => null, user: null };
-let currentConfig: WriteGridEditorConfig = fallbackConfig;
+const fallbackConfig: WriteOrbitEditorConfig = { apiBase: '', getToken: () => null, user: null };
+let currentConfig: WriteOrbitEditorConfig = fallbackConfig;
 const listeners = new Set<() => void>();
 
 /** Module-level access for non-React helpers (fetch wrappers, providers). */
-export function getEditorConfig(): WriteGridEditorConfig {
+export function getEditorConfig(): WriteOrbitEditorConfig {
   return currentConfig;
 }
 
-function setEditorConfig(next: WriteGridEditorConfig) {
+function setEditorConfig(next: WriteOrbitEditorConfig) {
   if (next === currentConfig) return;
   currentConfig = next;
   listeners.forEach((listener) => listener());
 }
 
-const ConfigContext = createContext<WriteGridEditorConfig>(fallbackConfig);
+const ConfigContext = createContext<WriteOrbitEditorConfig>(fallbackConfig);
 
 /** Wrap the editor (or the whole app) once; updates flow to every editor helper. */
-export function WriteGridEditorProvider({ config, children }: { config: WriteGridEditorConfig; children: React.ReactNode }) {
+export function WriteOrbitEditorProvider({ config, children }: { config: WriteOrbitEditorConfig; children: React.ReactNode }) {
   // Set synchronously so helpers called during the first render see the config.
   if (typeof window !== 'undefined') currentConfig = config;
   useEffect(() => { setEditorConfig(config); }, [config]);
   return <ConfigContext.Provider value={config}>{children}</ConfigContext.Provider>;
 }
 
-export function useEditorConfig(): WriteGridEditorConfig {
+export function useEditorConfig(): WriteOrbitEditorConfig {
   return useContext(ConfigContext);
 }
 
 /** Subscribe to config changes outside React context (rarely needed). */
-export function useEditorConfigSnapshot(): WriteGridEditorConfig {
+export function useEditorConfigSnapshot(): WriteOrbitEditorConfig {
   return useSyncExternalStore(
     (listener) => { listeners.add(listener); return () => { listeners.delete(listener); }; },
     () => currentConfig,

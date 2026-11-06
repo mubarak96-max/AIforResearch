@@ -16,7 +16,7 @@ const OUT = process.env.OUT || '/shots';
   await fetch(`${BASE}/api/ai-editor/documents/${id}/versions`, { method: 'POST', headers, body: JSON.stringify({ reason: 'ai' }) });
   const browser = await chromium.launch({ args: [`--unsafely-treat-insecure-origin-as-secure=${BASE}`] });
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+  await context.addInitScript(([t, u]) => { localStorage.setItem('writeorbit_token', JSON.stringify(t)); localStorage.setItem('writeorbit_user', JSON.stringify(u)); }, [auth.token, auth.user]);
   const page = await context.newPage();
   await page.goto(`${BASE}/editor?doc=${id}`, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(6000);

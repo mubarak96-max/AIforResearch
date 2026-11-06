@@ -11,7 +11,7 @@ const root = resolve(__dirname, '../..');
 
 beforeAll(async () => {
   env = await initializeTestEnvironment({
-    projectId: 'writegrid-rules-test',
+    projectId: 'writeorbit-rules-test',
     firestore: { rules: readFileSync(resolve(root, 'firestore.rules'), 'utf8') },
   });
 });

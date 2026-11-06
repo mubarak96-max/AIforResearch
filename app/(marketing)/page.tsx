@@ -14,7 +14,7 @@ const DESCRIPTION =
 
 export const revalidate = 300;
 
-export const metadata = pageMetadata({ title: 'WriteGrid — the AI editor for academic writing', absolute: true, path: '/', description: DESCRIPTION });
+export const metadata = pageMetadata({ title: 'WriteOrbit — the AI editor for academic writing', absolute: true, path: '/', description: DESCRIPTION });
 
 // Rendered per request (signed-in visitors see Dashboard); the plans themselves are cached for 5 minutes.
 export const dynamic = 'force-dynamic';
@@ -28,11 +28,11 @@ const FACTS = [
 const FAQ = [
   { q: 'Is it free to start?', a: 'Yes. The free plan includes the full editor and a daily AI allowance. Upgrade when you need more.' },
   { q: 'Are the citations real?', a: 'Yes. Papers come from scholarly databases, not the AI’s memory. Click any citation to open the paper.' },
-  { q: 'Will my writing be used to train AI?', a: 'WriteGrid does not train AI on your documents. They stay private to you and the people you share them with.' },
-  { q: "Can I use my university's Word template?", a: 'Yes. Open the .docx and WriteGrid keeps its styles, headers and page setup when you export.' },
+  { q: 'Will my writing be used to train AI?', a: 'WriteOrbit does not train AI on your documents. They stay private to you and the people you share them with.' },
+  { q: "Can I use my university's Word template?", a: 'Yes. Open the .docx and WriteOrbit keeps its styles, headers and page setup when you export.' },
   { q: 'Which citation styles are there?', a: 'APA, MLA, Chicago, Harvard, IEEE, Vancouver and over 10,000 more journal styles.' },
   { q: 'Can I cancel any time?', a: 'Yes. Cancel from your account; your plan stays until the end of the period you paid for.' },
-  { q: 'Does it work on my phone?', a: 'Yes. WriteGrid runs in the browser on phones, tablets and computers, with your work synced.' },
+  { q: 'Does it work on my phone?', a: 'Yes. WriteOrbit runs in the browser on phones, tablets and computers, with your work synced.' },
   { q: 'Can I write with others?', a: 'Yes. Share a document by link and write together in real time, with comments.' },
 ];
 
@@ -41,7 +41,7 @@ const STRUCTURED_DATA = [
   {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'WriteGrid',
+    name: 'WriteOrbit',
     applicationCategory: 'EducationalApplication',
     operatingSystem: 'Web, iOS, Android, Windows, macOS',
     description: DESCRIPTION,
@@ -89,7 +89,7 @@ export default async function LandingPage() {
               <div className="aspect-[3/2] overflow-hidden md:aspect-auto">
                 <Image
                   src="/screenshots/editor.png"
-                  alt="The WriteGrid editor: a paper on sleep and memory with an autocomplete suggestion that already cites Diekelmann & Born (2010), and AI chat beside it listing two well-cited studies to add."
+                  alt="The WriteOrbit editor: a paper on sleep and memory with an autocomplete suggestion that already cites Diekelmann & Born (2010), and AI chat beside it listing two well-cited studies to add."
                   width={2160}
                   height={1350}
                   priority
@@ -114,7 +114,7 @@ export default async function LandingPage() {
       </section>
 
       {/* Facts */}
-      <section aria-label="WriteGrid at a glance" className={`${container} pt-14 md:pt-20`}>
+      <section aria-label="WriteOrbit at a glance" className={`${container} pt-14 md:pt-20`}>
         <ul className="mx-auto grid max-w-[840px] grid-cols-3 rounded-[20px] border border-line bg-white py-6 shadow-[0_20px_40px_-32px_rgba(15,23,42,.35)] md:py-9">
           {FACTS.map((fact, index) => (
             <li key={fact.label} className={`px-2 text-center ${index ? 'border-l border-line-2' : ''}`}>

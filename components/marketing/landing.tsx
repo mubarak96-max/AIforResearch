@@ -23,7 +23,7 @@ const cta = `${btnPrimary} h-11 rounded-[10px] px-5 text-[15px]`;
 
 /** Set by the app at sign-in (not a secret): the first render already knows who is signed in. */
 export async function isSignedIn() {
-  return (await cookies()).get('writegrid_signed_in')?.value === '1';
+  return (await cookies()).get('writeorbit_signed_in')?.value === '1';
 }
 
 /** "Start writing free", or "Open your documents" for someone signed in. */
@@ -171,24 +171,24 @@ export function Points({ items }: { items: string[] }) {
   );
 }
 
-/** "Not another AI chatbot": what WriteGrid does that a general AI chat does not. */
+/** "Not another AI chatbot": what WriteOrbit does that a general AI chat does not. */
 export function ComparisonBand() {
   return (
     <section aria-labelledby="compare-title" className="px-4 pt-24 sm:px-6 md:pt-32">
       <div className="mx-auto max-w-[1184px] rounded-[28px] bg-ink px-5 py-14 text-white sm:px-10 md:py-20">
         <h2 id="compare-title" className="mx-auto max-w-[620px] text-balance text-center text-[30px] font-semibold leading-[1.12] tracking-[-0.03em] md:text-[40px]">Not another AI chatbot</h2>
-        <p className="mx-auto mt-4 max-w-[480px] text-balance text-center text-[16px] leading-[1.6] text-slate-400">General AI chat can make up sources. WriteGrid cites real papers, in your document.</p>
+        <p className="mx-auto mt-4 max-w-[480px] text-balance text-center text-[16px] leading-[1.6] text-slate-400">General AI chat can make up sources. WriteOrbit cites real papers, in your document.</p>
         <div className="mx-auto mt-10 max-w-[760px]">
           <div className="hidden grid-cols-[1fr_1.3fr_1.3fr] gap-4 border-b border-white/10 pb-3 text-[13px] md:grid">
             <span />
-            <span className="font-semibold text-white">WriteGrid</span>
+            <span className="font-semibold text-white">WriteOrbit</span>
             <span className="text-slate-400">General AI chat</span>
           </div>
           <ul>
             {COMPARISON_ROWS.map((row) => (
               <li key={row.label} className="grid gap-1.5 border-b border-white/10 py-4 text-[15px] md:grid-cols-[1fr_1.3fr_1.3fr] md:gap-4">
                 <span className="font-medium text-white">{row.label}</span>
-                <span className="flex gap-2 text-slate-200"><LuCheck className="mt-[3px] h-4 w-4 shrink-0 text-green-400" aria-hidden="true" /><span><span className="sr-only">WriteGrid: </span>{row.writegrid}</span></span>
+                <span className="flex gap-2 text-slate-200"><LuCheck className="mt-[3px] h-4 w-4 shrink-0 text-green-400" aria-hidden="true" /><span><span className="sr-only">WriteOrbit: </span>{row.writeorbit}</span></span>
                 <span className="flex gap-2 text-slate-400"><span className="mt-[3px]"><CloseMark /></span><span><span className="sr-only">General AI chat: </span>{row.chatbot}</span></span>
               </li>
             ))}
@@ -219,7 +219,7 @@ export function FinalCta({ signedIn }: { signedIn: boolean }) {
   return (
     <section aria-labelledby="cta-title" className={`${container} pb-20 pt-28 text-center md:pb-28 md:pt-36`}>
       <h2 id="cta-title" className="mx-auto max-w-[640px] text-balance text-[32px] font-semibold leading-[1.08] tracking-[-0.035em] text-ink md:text-[48px]">Your next draft starts here</h2>
-      <p className={`mx-auto mt-4 max-w-[440px] ${lead}`}>Free to start. Upgrade when WriteGrid is saving you hours.</p>
+      <p className={`mx-auto mt-4 max-w-[440px] ${lead}`}>Free to start. Upgrade when WriteOrbit is saving you hours.</p>
       <div className="mt-7 flex flex-wrap justify-center gap-3">
         <StartButton signedIn={signedIn} />
         <Link href="/pricing" className={`${btnGhost} h-11 rounded-[10px] px-5 text-[15px]`}>See pricing</Link>

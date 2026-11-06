@@ -1,11 +1,11 @@
 /**
  * components/editor — an academic writing editor with citations, AI assistance and
- * real-time collaboration. Wrap it in <WriteGridEditorProvider config={...}> and render
- * <WriteGridEditor />; the provider config connects it to your API, accounts and billing.
+ * real-time collaboration. Wrap it in <WriteOrbitEditorProvider config={...}> and render
+ * <WriteOrbitEditor />; the provider config connects it to your API, accounts and billing.
  */
-export { default as WriteGridEditor } from './components/AIEditor/AIEditorWorkspace';
-export { WriteGridEditorProvider, useEditorConfig, getEditorConfig } from './runtime';
-export type { WriteGridEditorConfig, WriteGridUser } from './runtime';
+export { default as WriteOrbitEditor } from './components/AIEditor/AIEditorWorkspace';
+export { WriteOrbitEditorProvider, useEditorConfig, getEditorConfig } from './runtime';
+export type { WriteOrbitEditorConfig, WriteOrbitUser } from './runtime';
 export { useMobileTabBarHidden } from './lib/mobileShell';
 export { AppToolDrawer, AppChatSideload } from './components/AIEditor/AppSideloads';
 export { default as EditorToaster } from './components/AIEditor/EditorToaster';

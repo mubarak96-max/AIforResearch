@@ -1,4 +1,4 @@
-# WriteGrid developer API
+# WriteOrbit developer API
 
 One key for scholarly papers, full text, research tools, AI, peer review and document conversion. Base URL `https://<your site>/v1`. Every request sends the key as a Bearer token:
 
@@ -6,7 +6,7 @@ One key for scholarly papers, full text, research tools, AI, peer review and doc
 Authorization: Bearer vm_live_…
 ```
 
-Create keys and buy credits at `https://<your site>/developers/keys`. Every WriteGrid deployment runs the same gateway at `<your PUBLIC_URL>/v1`.
+Create keys and buy credits at `https://<your site>/developers/keys`. Every WriteOrbit deployment runs the same gateway at `<your PUBLIC_URL>/v1`.
 
 ## Credits
 
@@ -48,10 +48,10 @@ You are charged only for successful calls.
 Scholarly metadata in the [OpenAlex](https://docs.openalex.org) shape, from CitedEvidence Scholar: works, authors, sources (journals), institutions, topics, publishers and funders, with OpenAlex's filters, sorting, paging and `cursor`. **1 credit per request, free daily.**
 
 ```bash
-curl -H "Authorization: Bearer $WRITEGRID_API_KEY" \
+curl -H "Authorization: Bearer $WRITEORBIT_API_KEY" \
   "https://<your site>/v1/oa/works?search=sleep%20memory&filter=publication_year:>2015&per_page=5"
 
-curl -H "Authorization: Bearer $WRITEGRID_API_KEY" "https://<your site>/v1/oa/works/doi:10.1038/nrn2762"
+curl -H "Authorization: Bearer $WRITEORBIT_API_KEY" "https://<your site>/v1/oa/works/doi:10.1038/nrn2762"
 ```
 
 `POST /v1/oa/works/bulk` with `{"ids": ["W2741809807", "doi:10.7717/peerj.4375"]}` looks up several works in one request.
@@ -93,7 +93,7 @@ Fourteen tools for literature work, as JSON or over MCP. **1 credit per call, fr
 `GET /v1/research/tools` returns each tool's input schema. Call a tool with its arguments as the JSON body:
 
 ```bash
-curl -X POST -H "Authorization: Bearer $WRITEGRID_API_KEY" -H "Content-Type: application/json" \
+curl -X POST -H "Authorization: Bearer $WRITEORBIT_API_KEY" -H "Content-Type: application/json" \
   -d '{"identifiers": ["10.1038/nrn2762", "PMID:23589831"]}' \
   "https://<your site>/v1/research/tools/validate_citations"
 ```
@@ -105,9 +105,9 @@ The answer has `content`, often `structuredContent`, and `isError`: check `isErr
 ```json
 {
   "mcpServers": {
-    "writegrid-research": {
+    "writeorbit-research": {
       "url": "https://<your site>/v1/mcp",
-      "headers": { "Authorization": "Bearer YOUR_WRITEGRID_API_KEY" }
+      "headers": { "Authorization": "Bearer YOUR_WRITEORBIT_API_KEY" }
     }
   }
 }
@@ -122,7 +122,7 @@ OpenAI-compatible chat completions on DeepSeek, streaming included. Models: `dee
 ```python
 from openai import OpenAI
 
-client = OpenAI(base_url="https://<your site>/v1", api_key=WRITEGRID_API_KEY)
+client = OpenAI(base_url="https://<your site>/v1", api_key=WRITEORBIT_API_KEY)
 reply = client.chat.completions.create(model="deepseek-chat", messages=[{"role": "user", "content": "Hello"}])
 ```
 

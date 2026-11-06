@@ -15,11 +15,11 @@ import pytest
 
 import word_fixtures as fixtures
 from conftest import walk
-from writegrid_convert.images import make_image_loader
-from writegrid_convert.jobs import DOCX_MIME
-from writegrid_convert.word.math import latex_to_omml, omml_to_latex
-from writegrid_convert.word.reader import read_docx
-from writegrid_convert.word.writer import write_docx
+from writeorbit_convert.images import make_image_loader
+from writeorbit_convert.jobs import DOCX_MIME
+from writeorbit_convert.word.math import latex_to_omml, omml_to_latex
+from writeorbit_convert.word.reader import read_docx
+from writeorbit_convert.word.writer import write_docx
 
 
 def facts_of(data: bytes, facts) -> dict:
@@ -244,14 +244,14 @@ def test_exported_images_are_only_fetched_from_safe_places(asset_server):
     assert load("/api/ai-editor/assets/..%2Fsecret.png") is None
     assert load("/api/ai-editor/assets/../secret.png") is None
     assert load("/api/ai-editor/assets/ok.png") == (fixtures.png(), "image/png")
-    assert load("https://writegrid.example/api/ai-editor/assets/ok.png") == (fixtures.png(), "image/png")
+    assert load("https://writeorbit.example/api/ai-editor/assets/ok.png") == (fixtures.png(), "image/png")
     assert asset_server.requests == ["/assets/ok.png", "/assets/ok.png"]
 
 
 def test_paragraph_and_run_properties_are_in_word_schema_order():
     """Word refuses (or offers to repair) files whose w:pPr / w:rPr children are out of order."""
     from lxml import etree
-    from writegrid_convert.word.ooxml import PPR_ORDER, RPR_ORDER, W, local
+    from writeorbit_convert.word.ooxml import PPR_ORDER, RPR_ORDER, W, local
 
     blocks = [
         {"id": "c", "type": "codeBlock", "props": {"language": "r"},
@@ -274,7 +274,7 @@ def test_paragraph_and_run_properties_are_in_word_schema_order():
 
 def test_sum_and_integral_bodies_sit_inside_the_operator():
     """Word shows an empty placeholder box when the summand follows m:nary instead of filling m:e."""
-    from writegrid_convert.word.ooxml import M
+    from writeorbit_convert.word.ooxml import M
 
     def body_text(latex):
         nary = latex_to_omml(latex).find(".//" + M + "nary")

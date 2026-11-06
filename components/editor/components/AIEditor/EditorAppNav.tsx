@@ -23,8 +23,8 @@ export const NAV_ICONS = {
   help: icon(<><circle cx="12" cy="12" r="9" /><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6M12 17h.01" /></>),
 };
 
-/** The WriteGrid wordmark (same as the host app's logo). */
-export function WriteGridLogo({ size = 32 }: { size?: number }) {
+/** The WriteOrbit wordmark (same as the host app's logo). */
+export function WriteOrbitLogo({ size = 32 }: { size?: number }) {
   return (
     <span className="inline-flex items-center gap-2.5 text-[#0f172a]">
       <span
@@ -97,8 +97,8 @@ export default function EditorAppNav({ recentDocuments, activeDocumentId, onCrea
       className={`ai-editor-print-hidden h-full w-[232px] shrink-0 flex-col overflow-y-auto border-r border-[#e5e7eb] bg-[#f8fafc] px-3 pb-3 pt-4 ${className}`}
     >
       <div className="flex items-start justify-between pb-[18px] pl-2">
-        <a href={navLink('home')} className="block" aria-label="WriteGrid home">
-          <WriteGridLogo size={32} />
+        <a href={navLink('home')} className="block" aria-label="WriteOrbit home">
+          <WriteOrbitLogo size={32} />
         </a>
         {onCollapse ? (
           <button type="button" onClick={onCollapse} aria-label="Hide menu" title="Hide menu" className="grid h-8 w-8 place-items-center rounded-lg text-[#94a3b8] transition-colors hover:bg-white hover:text-[#0f172a]">

@@ -414,7 +414,7 @@ export function saveNamedVersion(documentId: string, label?: string) {
   return request<DocumentVersion>(versionsPath(documentId), { method: 'POST', json: { label: label || undefined } }, 'The version could not be saved.');
 }
 
-/** Accepted AI text, kept in the version history under WriteGrid AI (the server groups bursts). */
+/** Accepted AI text, kept in the version history under WriteOrbit AI (the server groups bursts). */
 export function saveAIVersion(documentId: string) {
   return request<DocumentVersion>(versionsPath(documentId), { method: 'POST', json: { reason: 'ai' } }, 'The version could not be saved.');
 }

@@ -40,7 +40,7 @@ describe('Stripe webhook', () => {
 
   const paidCheckout = (id: string) => event('checkout.session.completed', {
     id, object: 'checkout.session', mode: 'payment', payment_status: 'paid', amount_total: 2990,
-    metadata: { writegrid_kind: 'credits', writegrid_account_id: 'acc_1', pack: 'credits_2000' },
+    metadata: { writeorbit_kind: 'credits', writeorbit_account_id: 'acc_1', pack: 'credits_2000' },
   });
 
   it('adds the credits of a paid credit pack', async () => {
@@ -68,13 +68,13 @@ describe('Stripe webhook', () => {
   });
 
   it('adds an automatic top-up the direct grant missed', async () => {
-    await send(event('payment_intent.succeeded', { id: 'pi_1', status: 'succeeded', amount: 11900, metadata: { writegrid_kind: 'credits_topup', writegrid_account_id: 'acc_2', pack: 'credits_10000' } }));
+    await send(event('payment_intent.succeeded', { id: 'pi_1', status: 'succeeded', amount: 11900, metadata: { writeorbit_kind: 'credits_topup', writeorbit_account_id: 'acc_2', pack: 'credits_10000' } }));
     expect(ledger()[0]).toMatchObject({ account: 'acc_2', kind: 'topup', credits_milli: 10_000_000, amount_cents: 11900, reference: 'payment:pi_1' });
   });
 
-  it('ignores payments that are not WriteGrid credits', async () => {
+  it('ignores payments that are not WriteOrbit credits', async () => {
     await send(event('payment_intent.succeeded', { id: 'pi_2', status: 'succeeded', amount: 500, metadata: {} }));
-    await send(event('checkout.session.completed', { id: 'cs_4', mode: 'payment', payment_status: 'unpaid', metadata: { writegrid_kind: 'credits', writegrid_account_id: 'acc_3', pack: 'credits_2000' } }));
+    await send(event('checkout.session.completed', { id: 'cs_4', mode: 'payment', payment_status: 'unpaid', metadata: { writeorbit_kind: 'credits', writeorbit_account_id: 'acc_3', pack: 'credits_2000' } }));
     expect(ledger()).toHaveLength(0);
   });
 

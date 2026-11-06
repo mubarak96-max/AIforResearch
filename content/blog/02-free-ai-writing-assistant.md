@@ -11,13 +11,13 @@ published: "2026-11-06"
 updated: "2026-11-06"
 faq:
   - q: "Is there a free AI writing assistant with no sign-up?"
-    a: "A few tools work without an account, with tighter limits. OpenAI's help center describes settings for signed-out ChatGPT users, so basic chat works logged out. Most other tools, including Claude, Grammarly and WriteGrid, need a free account. An account also gives you saved history and privacy settings you can control, which matters more than skipping a sign-up form."
+    a: "A few tools work without an account, with tighter limits. OpenAI's help center describes settings for signed-out ChatGPT users, so basic chat works logged out. Most other tools, including Claude, Grammarly and WriteOrbit, need a free account. An account also gives you saved history and privacy settings you can control, which matters more than skipping a sign-up form."
   - q: "Is ChatGPT free for writing?"
     a: "Yes. ChatGPT has a free plan that you can use for drafting, outlining and rewriting, with limits on advanced models, uploads and research features. It doesn't format citations or keep tracked changes. Turn off 'Improve the model for everyone' in Data controls if you don't want your drafts used for training, and check every fact or source it gives you."
   - q: "Is there a free AI writing assistant for Word?"
-    a: "Yes. Grammarly's free plan works inside Microsoft Word through the free Grammarly desktop app on Windows and Mac. It covers grammar, spelling and a monthly allowance of AI prompts. Another free route is a web editor that opens .docx files and exports them back to Word, such as WriteGrid's free plan, which includes Word export."
+    a: "Yes. Grammarly's free plan works inside Microsoft Word through the free Grammarly desktop app on Windows and Mac. It covers grammar, spelling and a monthly allowance of AI prompts. Another free route is a web editor that opens .docx files and exports them back to Word, such as WriteOrbit's free plan, which includes Word export."
   - q: "What is the best free AI writing assistant?"
-    a: "It depends on the job. For grammar and clarity everywhere you type, Grammarly Free. For drafting and brainstorming, the free plans of ChatGPT or Claude. For quick sentence rewrites, Wordtune or QuillBot. For writing that has to cite real research, WriteGrid Free, which includes unlimited citations in every style. Many writers combine two."
+    a: "It depends on the job. For grammar and clarity everywhere you type, Grammarly Free. For drafting and brainstorming, the free plans of ChatGPT or Claude. For quick sentence rewrites, Wordtune or QuillBot. For writing that has to cite real research, WriteOrbit Free, which includes unlimited citations in every style. Many writers combine two."
   - q: "Do free AI writing assistants use my writing for training?"
     a: "Some do by default. ChatGPT consumer accounts and Grammarly individual accounts both have settings that let you opt out of training. Claude asks consumer users to choose. Read each tool's data settings before you paste confidential material, and assume anything pasted into a free tool could be stored by the vendor."
 ---
@@ -26,7 +26,7 @@ faq:
 
 *Last updated: 6 November 2026*
 
-You can get a capable free AI writing assistant today: Grammarly Free for grammar, ChatGPT or Claude Free for drafting, Wordtune or QuillBot for rewrites, and WriteGrid Free for cited writing. Each stops somewhere: daily caps, no citation styles, no version history, or privacy defaults you need to change. Here is exactly where.
+You can get a capable free AI writing assistant today: Grammarly Free for grammar, ChatGPT or Claude Free for drafting, Wordtune or QuillBot for rewrites, and WriteOrbit Free for cited writing. Each stops somewhere: daily caps, no citation styles, no version history, or privacy defaults you need to change. Here is exactly where.
 
 This is part of our guide to the [best AI writing assistant for writers who need real sources](/blog/best-ai-writing-assistant). That page compares paid plans. This one covers only what you get without paying.
 
@@ -38,7 +38,7 @@ This is part of our guide to the [best AI writing assistant for writers who need
 | Draft, outline and brainstorm | ChatGPT Free or Claude Free | Caps on advanced models, uploads and research; no citation styles |
 | Rewrite one sentence ten ways | Wordtune Free | 10 rewrites and AI suggestions a day |
 | Paraphrase or summarize a passage | QuillBot Free | 125 words per paraphrase; two modes |
-| Write with citations to real papers | WriteGrid Free | 10 AI autocompletes a day; 10 PDFs; no LaTeX export |
+| Write with citations to real papers | WriteOrbit Free | 10 AI autocompletes a day; 10 PDFs; no LaTeX export |
 | Marketing copy with brand voice | None free: Jasper offers a 7-day trial | Trial ends; Pro starts at $59/month billed yearly |
 
 ## Free-tier limits by tool
@@ -53,7 +53,7 @@ Limits as of November 2026, from each vendor's plan page. Vendors change these o
 | **QuillBot Free** | 125 words per paraphrase; Standard and Fluency modes <!-- VERIFY: QuillBot help pages block automated checks; confirm limits --> | Separate citation formatter | Copy and paste | No | Premium removes the word cap |
 | **Wordtune Basic** | 10 rewrites and AI suggestions a day[6] | No | Copy and paste | No | Advanced plan: 30 a day |
 | **Jasper** | No free plan; 7-day free trial of Pro[7] | No | Copy and paste | Trial only | Pro is $69/seat/month, or $59 billed yearly |
-| **WriteGrid Free** | 10 AI autocompletes, 5 chat messages, 3 AI edits, 3 review checks, 1 "Write with AI" draft a day | Unlimited citations in 10,000+ styles; 250M+ scholarly works to cite from | Word and PDF | Real-time co-editing, comments, suggestions, version history | 10 PDFs up to 10 MB each; no LaTeX export or Zotero/Mendeley import on Free |
+| **WriteOrbit Free** | 10 AI autocompletes, 5 chat messages, 3 AI edits, 3 review checks, 1 "Write with AI" draft a day | Unlimited citations in 10,000+ styles; 250M+ scholarly works to cite from | Word and PDF | Real-time co-editing, comments, suggestions, version history | 10 PDFs up to 10 MB each; no LaTeX export or Zotero/Mendeley import on Free |
 
 "Unlimited" on a free plan almost always means "unlimited basic use." The useful part, the better model, the long upload, the research mode, is the part that's metered.
 
@@ -99,11 +99,11 @@ What to check in any tool's terms:
 This uses only free plans. It takes longer than a paid workflow, mostly in step 4.
 
 1. **Outline in a free chatbot.** Ask ChatGPT or Claude: "Outline a 1,500-word article on [topic] for [audience]. List the claims each section will need to support." Keep the claims list.
-2. **Find sources before you draft.** For each claim, find a primary source: the study, the dataset, the official report. In WriteGrid Free, search 250M+ scholarly works and save the papers. On the open web, use Google Scholar and the publisher's page. Note the DOI or URL.
-3. **Draft in a document editor, not a chat window.** Write the article yourself, or use a few daily AI autocompletes for transitions. Cite as you go (in WriteGrid, type `@` to cite a paper).
+2. **Find sources before you draft.** For each claim, find a primary source: the study, the dataset, the official report. In WriteOrbit Free, search 250M+ scholarly works and save the papers. On the open web, use Google Scholar and the publisher's page. Note the DOI or URL.
+3. **Draft in a document editor, not a chat window.** Write the article yourself, or use a few daily AI autocompletes for transitions. Cite as you go (in WriteOrbit, type `@` to cite a paper).
 4. **Check every claim.** Open each source and confirm it says what your sentence says. Treat any number, quote or study that came from the chatbot as unconfirmed until you've seen it in the source.
 5. **Polish with a rewriter.** Run tight paragraphs through Wordtune or QuillBot, or let Grammarly Free fix grammar. Re-read any rewritten sentence that contains a fact: rewrites can change meaning.
-6. **Run one review pass.** WriteGrid Free includes 3 review checks a day: use one for a claim check on the finished draft. Results appear as comments next to each claim.
+6. **Run one review pass.** WriteOrbit Free includes 3 review checks a day: use one for a claim check on the finished draft. Results appear as comments next to each claim.
 7. **Export.** Download Word or PDF.
 
 The free-tier bottleneck is daily caps. Five chat messages or ten rewrites go quickly on a long piece, so plan to spread the work over a couple of days or combine tools.
@@ -119,15 +119,15 @@ Pay when one of these is true, not before:
 - **You need a format the free plan doesn't export**, such as LaTeX.
 - **Your work is confidential** and you need contractual privacy terms, which usually come with business plans.
 
-On WriteGrid, Plus ($12/month or $96/year) raises the allowance to 5,000 autocompletes, 500 AI edits and 500 chat messages a month, 30 review checks and 20 drafts, with unlimited PDFs up to 50 MB, Zotero and Mendeley import, and LaTeX export. Check [/pricing](/pricing) for current limits.
+On WriteOrbit, Plus ($12/month or $96/year) raises the allowance to 5,000 autocompletes, 500 AI edits and 500 chat messages a month, 30 review checks and 20 drafts, with unlimited PDFs up to 50 MB, Zotero and Mendeley import, and LaTeX export. Check [/pricing](/pricing) for current limits.
 
 ## The low-cost alternative to a subscription: run it in your own cloud
 
-If you're on a team that already pays for Google Cloud, there's another route. WriteGrid can be deployed to your own Firebase / Google Cloud project, so documents stay in your own cloud account and you pay your cloud provider's usage costs rather than a per-seat subscription. It suits teams with someone technical who can manage a deployment. <!-- VERIFY: confirm self-hosting is offered publicly before publishing -->
+If you're on a team that already pays for Google Cloud, there's another route. WriteOrbit can be deployed to your own Firebase / Google Cloud project, so documents stay in your own cloud account and you pay your cloud provider's usage costs rather than a per-seat subscription. It suits teams with someone technical who can manage a deployment. <!-- VERIFY: confirm self-hosting is offered publicly before publishing -->
 
-## The WriteGrid free plan: the full editor, with citations
+## The WriteOrbit free plan: the full editor, with citations
 
-WriteGrid's free plan gives you the whole editor on any device, including your phone. You get:
+WriteOrbit's free plan gives you the whole editor on any device, including your phone. You get:
 
 - 10 AI autocompletes a day, each citing the scholarly papers it draws on
 - Unlimited citations in every style (10,000+ CSL styles, APA to IEEE)
@@ -137,7 +137,7 @@ WriteGrid's free plan gives you the whole editor on any device, including your p
 - A Library for 10 PDFs up to 10 MB each; use Ask to question one PDF at a time (answers carry page numbers)
 - Word and PDF export, and real-time co-editing with comments and suggestions
 
-<!-- SCREENSHOT: WriteGrid Free account, citation style dropdown open on a document with APA 7 selected and the search box showing "Chicago", plus the usage meter showing "7 of 10 autocompletes left today" -->
+<!-- SCREENSHOT: WriteOrbit Free account, citation style dropdown open on a document with APA 7 selected and the search box showing "Chicago", plus the usage meter showing "7 of 10 autocompletes left today" -->
 
 What the free plan doesn't include: LaTeX export and Zotero or Mendeley import. [Create a free account](/signup) or see [how it works](/how-it-works).
 
@@ -145,7 +145,7 @@ What the free plan doesn't include: LaTeX export and Zotero or Mendeley import. 
 
 ### Is there a free AI writing assistant with no sign-up?
 
-A few tools work without an account, with tighter limits. OpenAI's help center describes settings for signed-out ChatGPT users, so basic chat works logged out. Most other tools, including Claude, Grammarly and WriteGrid, need a free account. An account also gives you saved history and privacy settings you can control, which matters more than skipping a sign-up form.
+A few tools work without an account, with tighter limits. OpenAI's help center describes settings for signed-out ChatGPT users, so basic chat works logged out. Most other tools, including Claude, Grammarly and WriteOrbit, need a free account. An account also gives you saved history and privacy settings you can control, which matters more than skipping a sign-up form.
 
 ### Is ChatGPT free for writing?
 
@@ -153,11 +153,11 @@ Yes. ChatGPT has a free plan that you can use for drafting, outlining and rewrit
 
 ### Is there a free AI writing assistant for Word?
 
-Yes. Grammarly's free plan works inside Microsoft Word through the free Grammarly desktop app on Windows and Mac. It covers grammar, spelling and a monthly allowance of AI prompts. Another free route is a web editor that opens .docx files and exports them back to Word, such as WriteGrid's free plan, which includes Word export.
+Yes. Grammarly's free plan works inside Microsoft Word through the free Grammarly desktop app on Windows and Mac. It covers grammar, spelling and a monthly allowance of AI prompts. Another free route is a web editor that opens .docx files and exports them back to Word, such as WriteOrbit's free plan, which includes Word export.
 
 ### What is the best free AI writing assistant?
 
-It depends on the job. For grammar and clarity everywhere you type, Grammarly Free. For drafting and brainstorming, the free plans of ChatGPT or Claude. For quick sentence rewrites, Wordtune or QuillBot. For writing that has to cite real research, WriteGrid Free, which includes unlimited citations in every style. Many writers combine two.
+It depends on the job. For grammar and clarity everywhere you type, Grammarly Free. For drafting and brainstorming, the free plans of ChatGPT or Claude. For quick sentence rewrites, Wordtune or QuillBot. For writing that has to cite real research, WriteOrbit Free, which includes unlimited citations in every style. Many writers combine two.
 
 ### Do free AI writing assistants use my writing for training?
 

@@ -32,7 +32,7 @@ const check = (name, ok, extra = '') => { results.push(ok); console.log(`${ok ? 
     await page.waitForURL(/\/account/, { timeout: 20000 });
   };
   const signOut = async () => {
-    await page.evaluate(() => { localStorage.removeItem('writegrid_token'); localStorage.removeItem('writegrid_user'); document.cookie = 'writegrid_signed_in=; path=/; max-age=0'; });
+    await page.evaluate(() => { localStorage.removeItem('writeorbit_token'); localStorage.removeItem('writeorbit_user'); document.cookie = 'writeorbit_signed_in=; path=/; max-age=0'; });
   };
 
   // 1. First sign-in: the card appears on the next page, not on /login.

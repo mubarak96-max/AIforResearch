@@ -191,9 +191,9 @@ The SPJ Code of Ethics asks journalists to verify information before releasing i
 - [ ] Each quote is attributed to the right speaker.
 - [ ] Nothing comes from an off-the-record section.
 
-## Writing from transcripts in WriteGrid
+## Writing from transcripts in WriteOrbit
 
-WriteGrid does not transcribe audio. Get the transcript from a transcription tool or service first (our [interview transcription guide](/blog/interview-transcription) compares them), then use WriteGrid for steps 3 to 5.
+WriteOrbit does not transcribe audio. Get the transcript from a transcription tool or service first (our [interview transcription guide](/blog/interview-transcription) compares them), then use WriteOrbit for steps 3 to 5.
 
 1. **Upload each transcript as a PDF to the Library**, named as in step 1.
 2. **Use Ask on one transcript at a time.** Ask answers questions about a single PDF, and its answers carry page numbers. Ask "Where does Reyes talk about staffing?", open the cited page, find the timestamp, and check the audio. To compare speakers, ask the same question of each transcript in turn.
@@ -201,7 +201,7 @@ WriteGrid does not transcribe audio. Get the transcript from a transcription too
 4. **Write the story or report beside the transcripts.** Open a new document or a `.docx` draft; Word files keep their styles.
 5. **Review and hand off.** AI review leaves claim checks, proofreading and tone notes as comments. Share with your editor or co-researcher, whose edits come back as suggestions (tracked changes), with version history underneath.
 
-<!-- SCREENSHOT: the WriteGrid Library with a fictional transcript PDF open, Ask answering "Where does Reyes talk about staffing?" with a page-number citation, and the draft story beside it -->
+<!-- SCREENSHOT: the WriteOrbit Library with a fictional transcript PDF open, Ask answering "Where does Reyes talk about staffing?" with a page-number citation, and the draft story beside it -->
 
 The free plan holds 10 PDFs up to 10 MB each, which covers a small project; Plus ($12/month or $96/year) allows unlimited PDFs up to 50 MB. Check [pricing](/pricing) for current limits.
 

@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /** Article, FAQ and breadcrumb structured data. `<` is escaped so the text can't close the script tag. */
 function structuredData(post: BlogPost) {
   const url = `${SITE_URL}/blog/${post.slug}`;
-  const publisher = { '@type': 'Organization', name: 'WriteGrid', url: SITE_URL, logo: { '@type': 'ImageObject', url: `${SITE_URL}/icon.svg` } };
+  const publisher = { '@type': 'Organization', name: 'WriteOrbit', url: SITE_URL, logo: { '@type': 'ImageObject', url: `${SITE_URL}/icon.svg` } };
   const graph = [
     {
       '@type': 'BlogPosting',
@@ -115,10 +115,10 @@ export default async function BlogPostPage({ params }: Props) {
 
           <BlogMarkdown markdown={post.rest} />
 
-          <aside aria-label="Try WriteGrid" className="mt-16 rounded-2xl border border-line bg-gradient-to-br from-brand-50 to-white p-7 sm:p-8">
+          <aside aria-label="Try WriteOrbit" className="mt-16 rounded-2xl border border-line bg-gradient-to-br from-brand-50 to-white p-7 sm:p-8">
             <h2 className="text-[22px] font-bold tracking-[-0.02em] text-ink">Write with sources you can check</h2>
             <p className="mt-2 max-w-[560px] text-[16px] leading-relaxed text-ink-2">
-              WriteGrid cites real papers as you write, answers questions about your PDFs with page numbers, and checks claims and sources before you publish.
+              WriteOrbit cites real papers as you write, answers questions about your PDFs with page numbers, and checks claims and sources before you publish.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <Link href="/signup" className={`${btnPrimary} h-11 px-5 text-[15px]`}>Start writing free</Link>

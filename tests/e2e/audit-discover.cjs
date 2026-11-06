@@ -1,10 +1,10 @@
 // Lists every control in an open document (menu bar menus and their items, toolbar, ⋮ overflow,
 // header ⋯ menu, rail, status bar, slash menu, block side menu) as JSON for the button audit.
-//   BASE=http://writegrid-router:8080 node audit-discover.cjs > /shots/controls.json
+//   BASE=http://writeorbit-router:8080 node audit-discover.cjs > /shots/controls.json
 const { chromium } = require('playwright');
 const { signIn } = require('./e2e-auth.cjs');
 const crypto = require('crypto');
-const BASE = process.env.BASE || 'http://writegrid-router:8080';
+const BASE = process.env.BASE || 'http://writeorbit-router:8080';
 
 const text = (t) => ({ type: 'text', text: t, styles: {} });
 const block = (type, content, props = {}) => ({ id: crypto.randomUUID(), type, props, content, children: [] });
@@ -15,7 +15,7 @@ const block = (type, content, props = {}) => ({ id: crypto.randomUUID(), type, p
   await fetch(`${BASE}/api/ai-editor/documents`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${auth.token}` }, body: JSON.stringify({ id, title: 'Audit', blocks: [block('heading', [text('Audit')], { level: 1 }), block('paragraph', [text('First paragraph of the audit document.')])] }) });
   const browser = await chromium.launch({ args: [`--unsafely-treat-insecure-origin-as-secure=${BASE}`] });
   const context = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
-  await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+  await context.addInitScript(([t, u]) => { localStorage.setItem('writeorbit_token', JSON.stringify(t)); localStorage.setItem('writeorbit_user', JSON.stringify(u)); }, [auth.token, auth.user]);
   const page = await context.newPage();
   await page.goto(`${BASE}/editor?doc=${id}`, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(7000);

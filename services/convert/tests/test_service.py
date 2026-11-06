@@ -12,9 +12,9 @@ import pytest
 
 import word_fixtures as fixtures
 from conftest import needs_libreoffice, walk
-from writegrid_convert import config
-from writegrid_convert.jobs import DOCX_MIME, check_package
-from writegrid_convert.process import ConvertError, libreoffice_convert, run_bounded_process
+from writeorbit_convert import config
+from writeorbit_convert.jobs import DOCX_MIME, check_package
+from writeorbit_convert.process import ConvertError, libreoffice_convert, run_bounded_process
 
 
 @pytest.fixture(scope="module")
@@ -122,7 +122,7 @@ def test_health(client):
     response = client.get("/health")
     assert response.status_code == 200
     body = response.json()
-    assert body["status"] == "ok" and body["service"] == "writegrid-convert" and body["version"]
+    assert body["status"] == "ok" and body["service"] == "writeorbit-convert" and body["version"]
     assert set(body) == {"status", "service", "version", "libreoffice", "workers", "busy"}
 
 
@@ -230,7 +230,7 @@ def test_pdf_text_of_a_real_document(client, compat):
 def test_pdf_text_refuses_password_protected_pdfs(client, compat):
     options = json.dumps({"EncryptFile": {"type": "boolean", "value": "true"},
                           "DocumentOpenPassword": {"type": "string", "value": "secret"}})
-    import writegrid_convert.process as process
+    import writeorbit_convert.process as process
 
     original = process.FILTERS["pdf"]
     process.FILTERS["pdf"] = "pdf:writer_pdf_Export:" + options
@@ -304,10 +304,10 @@ def test_export_validation(client, monkeypatch):
     assert client.post("/word/export", json={"source_base64": "***"}).status_code == 400
     assert client.post("/word/export", json={"asset_fetch_base": "ftp://x/"}).status_code == 400
     assert client.post("/word/export", data={"other": "x"}, files={"source": ("s.docx", b"x", DOCX_MIME)}).status_code == 400
-    monkeypatch.setattr(config, "ASSET_FETCH_BASES", ["http://writegrid-api:4000/internal/assets/"])
+    monkeypatch.setattr(config, "ASSET_FETCH_BASES", ["http://writeorbit-api:4000/internal/assets/"])
     refused = client.post("/word/export", json={"asset_fetch_base": "http://elsewhere:80/"})
     assert refused.status_code == 400 and refused.json()["detail"] == "asset_fetch_base is not allowed here"
-    allowed = client.post("/word/export", json={"asset_fetch_base": "http://writegrid-api:4000/internal/assets/", "blocks": []})
+    allowed = client.post("/word/export", json={"asset_fetch_base": "http://writeorbit-api:4000/internal/assets/", "blocks": []})
     assert allowed.status_code == 200
 
 

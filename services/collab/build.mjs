@@ -31,7 +31,7 @@ await build({
   logLevel: 'info',
 });
 await writeFile(join(dist, 'package.json'), JSON.stringify({
-  name: 'writegrid-collab', private: true, type: 'module', main: 'index.js', engines: { node: '22' },
+  name: 'writeorbit-collab', private: true, type: 'module', main: 'index.js', engines: { node: '22' },
   scripts: { start: 'node index.js' },
   dependencies: Object.fromEntries(external.map((name) => [name, app.dependencies[name]])),
 }, null, 2) + '\n');

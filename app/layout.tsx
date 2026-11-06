@@ -8,10 +8,10 @@ const serif = Source_Serif_4({ subsets: ['latin'], variable: '--font-serif', dis
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://app.example.com'),
-  title: { default: 'WriteGrid — the AI editor for academic writing', template: '%s · WriteGrid' },
+  title: { default: 'WriteOrbit — the AI editor for academic writing', template: '%s · WriteOrbit' },
   description:
     'Write your paper faster, with citations you can trust. Autocomplete with real references, 250M+ papers, AI review, Word and LaTeX export.',
-  applicationName: 'WriteGrid',
+  applicationName: 'WriteOrbit',
   manifest: '/manifest.webmanifest',
 };
 

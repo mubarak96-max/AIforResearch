@@ -4,7 +4,7 @@ import { container, focusRing } from './styles';
 
 /** Who runs this site, set when the web app is built (NEXT_PUBLIC_COMPANY_*); empty parts are left out. */
 const COMPANY = {
-  name: process.env.NEXT_PUBLIC_COMPANY_NAME || 'WriteGrid',
+  name: process.env.NEXT_PUBLIC_COMPANY_NAME || 'WriteOrbit',
   address: process.env.NEXT_PUBLIC_COMPANY_ADDRESS || '',
   phone: process.env.NEXT_PUBLIC_COMPANY_PHONE || '',
   email: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || '',
@@ -51,7 +51,7 @@ export function SiteFooter() {
         <div>
           <Link href="/" className={`inline-block rounded-lg ${focusRing}`}>
             <Logo size={24} />
-            <span className="sr-only">WriteGrid home</span>
+            <span className="sr-only">WriteOrbit home</span>
           </Link>
           <p className="mt-3 max-w-[280px] text-[14px] leading-relaxed text-muted">The AI editor for academic writing, with citations you can trust.</p>
         </div>

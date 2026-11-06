@@ -1,6 +1,6 @@
 # Architecture
 
-WriteGrid runs on one Firebase project. Each part, what it does and where it runs:
+WriteOrbit runs on one Firebase project. Each part, what it does and where it runs:
 
 ```
                     ┌──────────────────────────── Firebase project ────────────────────────────┐

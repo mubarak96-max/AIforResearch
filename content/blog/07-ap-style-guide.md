@@ -216,15 +216,15 @@ No spellchecker knows these rules. Use three passes:
 
 Headlines follow their own AP rules (sentence case, numerals, single quotes). See [how to write a headline](/blog/how-to-write-a-headline).
 
-## Using WriteGrid as your second pass
+## Using WriteOrbit as your second pass
 
-WriteGrid doesn't have an AP style rule engine, and it won't flag "Jan. 15" against "January 15" on its own. What it does give a reporter and copy editor:
+WriteOrbit doesn't have an AP style rule engine, and it won't flag "Jan. 15" against "January 15" on its own. What it does give a reporter and copy editor:
 
 - **Proofreading and tone review.** The AI review checks grammar, consistency and tone and leaves each issue as a comment in the text, so you accept or reject it line by line.
 - **Suggestions (tracked changes) between writer and editor.** The copy editor makes AP fixes as suggestions; the writer sees each change and why. Version history keeps the filed draft.
 - **AI chat beside the draft.** Paste the AP checking prompt from our [checker comparison](/blog/ap-style-checker) into the chat and ask it to list every AP issue with the rule it breaks. Treat the list as a set of leads to check against the Stylebook, not as rulings.
 
-<!-- SCREENSHOT: A news draft in WriteGrid with two copy-editor suggestions visible ("Jan. 15" replacing "January 15", "5%" replacing "5 percent") and the AI chat panel open on the right showing an AP style checklist answer. -->
+<!-- SCREENSHOT: A news draft in WriteOrbit with two copy-editor suggestions visible ("Jan. 15" replacing "January 15", "5%" replacing "5 percent") and the AI chat panel open on the right showing an AP style checklist answer. -->
 
 The free plan includes the full editor and a few AI review checks a day; see [pricing](/pricing) for current limits.
 

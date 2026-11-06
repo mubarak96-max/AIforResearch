@@ -1,6 +1,6 @@
 /**
  * Product visuals for the landing page, drawn in HTML/CSS (no images, no client JS). They show
- * real WriteGrid behaviour: cited autocomplete, Find papers, chat with sources, review comments,
+ * real WriteOrbit behaviour: cited autocomplete, Find papers, chat with sources, review comments,
  * Word/LaTeX export and the phone editor. Decorative: each frame is labelled for screen readers.
  */
 import type { ReactNode } from 'react';
@@ -212,7 +212,7 @@ export function ExportVisual() {
 
 export function PhoneVisual() {
   return (
-    <div className="flex justify-center" role="img" aria-label="The WriteGrid editor on a phone">
+    <div className="flex justify-center" role="img" aria-label="The WriteOrbit editor on a phone">
       <div aria-hidden="true" className="w-[240px] rounded-[36px] border border-line bg-ink p-2.5 shadow-[0_30px_60px_-30px_rgba(15,23,42,.5)]">
         <div className="overflow-hidden rounded-[30px] bg-white">
           <div className="flex items-center justify-between px-5 pt-3 text-[11px] font-semibold text-ink">
@@ -245,13 +245,13 @@ export function PhoneVisual() {
   );
 }
 
-/** "Not another chatbot": what WriteGrid does that a general AI chat does not. */
-export const COMPARISON_ROWS: { label: string; writegrid: string; chatbot: string }[] = [
-  { label: 'References', writegrid: 'Real papers you can open', chatbot: 'Can be made up' },
-  { label: 'Where you write', writegrid: 'In your document', chatbot: 'Copy and paste' },
-  { label: 'Citation style', writegrid: 'APA, MLA and 10,000+ more', chatbot: 'Formatted by hand' },
-  { label: 'Your PDFs', writegrid: 'Answers with page numbers', chatbot: 'No page references' },
-  { label: 'Word and LaTeX', writegrid: 'Export with the reference list', chatbot: 'Not available' },
+/** "Not another chatbot": what WriteOrbit does that a general AI chat does not. */
+export const COMPARISON_ROWS: { label: string; writeorbit: string; chatbot: string }[] = [
+  { label: 'References', writeorbit: 'Real papers you can open', chatbot: 'Can be made up' },
+  { label: 'Where you write', writeorbit: 'In your document', chatbot: 'Copy and paste' },
+  { label: 'Citation style', writeorbit: 'APA, MLA and 10,000+ more', chatbot: 'Formatted by hand' },
+  { label: 'Your PDFs', writeorbit: 'Answers with page numbers', chatbot: 'No page references' },
+  { label: 'Word and LaTeX', writeorbit: 'Export with the reference list', chatbot: 'Not available' },
 ];
 
 export function CloseMark() {

@@ -1,5 +1,5 @@
 // End-to-end smoke test: sign up, create a document, type, reload (persistence), second browser (live sync).
-// Runs in the Playwright container on the writegrid-net network: BASE=http://localhost:8080 node editor-smoke.cjs
+// Runs in the Playwright container on the writeorbit-net network: BASE=http://localhost:8080 node editor-smoke.cjs
 const { chromium, devices } = require('playwright');
 const BASE = process.env.BASE || 'http://localhost:8080';
 const OUT = process.env.OUT || '/shots';
@@ -13,7 +13,7 @@ const email = `smoke-${Date.now()}@example.test`;
   const browser = await chromium.launch({ args: [`--unsafely-treat-insecure-origin-as-secure=${BASE}`] });
   const open = async (opts = {}) => {
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, ...opts });
-    await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [token, user]);
+    await context.addInitScript(([t, u]) => { localStorage.setItem('writeorbit_token', JSON.stringify(t)); localStorage.setItem('writeorbit_user', JSON.stringify(u)); }, [token, user]);
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', (e) => errors.push(`${e.message.slice(0, 160)} @ ${(e.stack || '').split('\n').slice(1, 4).join(' | ').slice(0, 400)}`));

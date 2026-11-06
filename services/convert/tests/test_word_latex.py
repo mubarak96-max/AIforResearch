@@ -12,7 +12,7 @@ import zipfile
 
 import pytest
 
-from writegrid_convert.word.latex import escape, escape_url, write_latex
+from writeorbit_convert.word.latex import escape, escape_url, write_latex
 
 # ------------------------------------------------------------------ a representative document
 
@@ -333,7 +333,7 @@ def test_export_api_returns_a_latex_zip(client):
         assert sorted(package.namelist()) == ["main.tex", "references.bib"]
         main = package.read("main.tex").decode()
     assert r"Hello \citep{Smith2020}" in main and "paperwidth=612pt" in main and r"\author{Ada Writer}" in main
-    assert "% Exported from the WriteGrid editor." in main
+    assert "% Exported from the WriteOrbit editor." in main
     assert client.post("/word/export", json={"format": "tex", "blocks": []}).status_code == 422
 
 

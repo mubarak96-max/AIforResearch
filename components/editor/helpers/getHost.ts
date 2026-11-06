@@ -1,5 +1,5 @@
 import { getApiBase } from '../utils/auth/api';
 
-/** Where API calls go. The host app sets it through WriteGridEditorProvider. */
+/** Where API calls go. The host app sets it through WriteOrbitEditorProvider. */
 export const getHost = (_params: { purpose?: string } = {}): string => getApiBase();
 export const browserApiBase = (): string => getApiBase();

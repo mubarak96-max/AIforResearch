@@ -59,7 +59,7 @@ Secondary sources give you the shape of a story fast, but they also carry the au
 | Records not yet released | Agency documents | Freedom of Information Act requests (foia.gov) |
 | Archived websites and documents | Pages and files that have since changed or vanished | Internet Archive and its Wayback Machine (archive.org) |
 | Oral histories | How people spoke, what they remember | Library of Congress collections; university oral history programs |
-| Scholarly research | Medicine, science, economics and social history, with evidence | Journals, Google Scholar, PubMed; scholarly search in WriteGrid |
+| Scholarly research | Medicine, science, economics and social history, with evidence | Journals, Google Scholar, PubMed; scholarly search in WriteOrbit |
 | Memoirs and letters | Voice, private reactions | Published memoirs; university special collections |
 
 ### How to read a court file for a script
@@ -191,9 +191,9 @@ These are general descriptions, not legal advice. Laws differ by state and count
 
 For the US basics, the Digital Media Law Project's legal guide (no longer updated, so check current law) covers defamation, false light and privacy in plain language. Practitioner guides on life rights, such as those listed in the sources, explain how releases work in California and the UK.
 
-## Building a cited research bible in WriteGrid
+## Building a cited research bible in WriteOrbit
 
-WriteGrid fits the research and development side of a script, not the formatting.
+WriteOrbit fits the research and development side of a script, not the formatting.
 
 1. **Search scholarly sources from the editor.** Search 250M+ scholarly works, then type `@` to cite one in your bible. Each citation links to a real work, and you can pick any of 10,000+ citation styles.
 2. **Chat with archive PDFs.** Upload court transcripts, reports or scanned records to the Library and ask, "On which pages does the witness describe the car?" Answers carry page numbers, so you can open the page and confirm the quote.
@@ -201,7 +201,7 @@ WriteGrid fits the research and development side of a script, not the formatting
 4. **Share with the writers' room.** Real-time co-editing, comments, suggestions and version history keep one bible for everyone.
 5. **Export for the producer.** Export Word or PDF for the clearance lawyer.
 
-<!-- SCREENSHOT: a research bible in WriteGrid with the Timeline table, an @-citation to a scholarly paper, and the Library chat panel answering a question about a court transcript with a page-number citation -->
+<!-- SCREENSHOT: a research bible in WriteOrbit with the Timeline table, an @-citation to a scholarly paper, and the Library chat panel answering a question about a court transcript with a page-number citation -->
 
 The free plan holds 10 PDFs up to 10 MB each; larger archives need a paid plan. See [/pricing](/pricing) for current limits.
 

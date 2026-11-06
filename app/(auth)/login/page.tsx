@@ -4,7 +4,7 @@ import { pageMetadata } from '@/components/marketing/seo';
 export const metadata = pageMetadata({
   title: 'Sign in',
   path: '/login',
-  description: 'Sign in to WriteGrid, the AI editor for academic writing.',
+  description: 'Sign in to WriteOrbit, the AI editor for academic writing.',
 });
 
 export default function LoginPage() {

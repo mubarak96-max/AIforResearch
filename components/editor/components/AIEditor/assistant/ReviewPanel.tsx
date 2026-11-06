@@ -54,7 +54,7 @@ export default function ReviewPanel({
   onShowComments: (check: string, category?: string) => void;
   hasSelection: boolean;
   canEdit: boolean;
-  /** WriteGrid AI's tracked changes now in the text. */
+  /** WriteOrbit AI's tracked changes now in the text. */
   aiChangeCount: number;
   onShowInText: (check: string) => number;
   onResolveAIChanges: (accept: boolean) => void;

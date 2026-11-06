@@ -43,7 +43,7 @@ describe('LLM provider selection', () => {
 
   it('knows each provider endpoint', () => {
     expect(resolveLlmConfig(llmSettings({ llmProvider: 'anthropic', llmApiKey: 'k' })).baseURL).toBe('https://api.anthropic.com/v1');
-    expect(resolveLlmConfig(llmSettings({ llmProvider: 'openrouter', llmApiKey: 'k' }))).toMatchObject({ baseURL: 'https://openrouter.ai/api/v1', headers: { 'X-Title': 'WriteGrid' } });
+    expect(resolveLlmConfig(llmSettings({ llmProvider: 'openrouter', llmApiKey: 'k' }))).toMatchObject({ baseURL: 'https://openrouter.ai/api/v1', headers: { 'X-Title': 'WriteOrbit' } });
     const ollama = resolveLlmConfig(llmSettings({ llmProvider: 'ollama' }));
     expect(ollama).toMatchObject({ baseURL: 'http://localhost:11434/v1', unavailable: null });
     expect(resolveLlmConfig(llmSettings({ llmProvider: 'ollama', llmBaseUrl: 'http://gpu:11434/v1/' })).baseURL).toBe('http://gpu:11434/v1');

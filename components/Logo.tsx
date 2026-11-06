@@ -1,4 +1,4 @@
-/** The WriteGrid wordmark: a blue tile with an open book, and the name beside it. */
+/** The WriteOrbit wordmark: a blue tile with an open book, and the name beside it. */
 export function Logo({ size = 32, showName = true }: { size?: number; showName?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2.5 text-ink">

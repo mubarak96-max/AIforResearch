@@ -186,7 +186,7 @@ export function AuthEntry() {
   const title = step === 'signup' ? 'Create your account'
     : step === 'setpassword' ? 'Set your password'
     : step === 'password' ? 'Welcome back'
-    : 'Welcome to WriteGrid';
+    : 'Welcome to WriteOrbit';
   // The provider buttons stay on top while creating an account too.
   const topOptions = step === 'email' || step === 'signup' ? options() : null;
   const planName = plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : '';
@@ -245,7 +245,7 @@ export function AuthEntry() {
                 <button type="submit" disabled={busy !== null} className={`${btnPrimary} h-12 w-full text-base`}>{submitLabel('Sign in', 'Signing in…')}</button>
             </form>
             <p className="mt-5 text-center text-[14.5px] text-ink-2">
-              New to WriteGrid?{' '}
+              New to WriteOrbit?{' '}
               <button type="button" onClick={startSignUp} className={`rounded font-semibold text-brand hover:text-brand-600 ${focusRing}`}>Create an account</button>
             </p>
           </>

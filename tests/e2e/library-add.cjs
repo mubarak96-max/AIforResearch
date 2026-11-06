@@ -45,7 +45,7 @@ const file = (name, buffer, mimeType = 'application/pdf') => ({ name, mimeType, 
   const browser = await chromium.launch({ args: [`--unsafely-treat-insecure-origin-as-secure=${BASE}`] });
   const open = async (options) => {
     const context = await browser.newContext(options);
-    await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+    await context.addInitScript(([t, u]) => { localStorage.setItem('writeorbit_token', JSON.stringify(t)); localStorage.setItem('writeorbit_user', JSON.stringify(u)); }, [auth.token, auth.user]);
     const page = await context.newPage();
     page.errors = [];
     page.on('pageerror', (error) => page.errors.push(error.message.slice(0, 200)));

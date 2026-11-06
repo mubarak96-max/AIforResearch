@@ -28,7 +28,7 @@ const GROUPS: Record<string, { title: string; nav: string; subtitle: string; ico
   ai: { title: 'AI', nav: 'AI', subtitle: 'DeepSeek by default. Changes apply at once.', icon: LuSparkles, test: 'ai' },
   papers: { title: 'Papers', nav: 'Papers', subtitle: 'Scholar works without a key; a free key adds full text and research tools.', icon: LuBookOpen, test: 'papers' },
   billing: { title: 'Billing', nav: 'Billing', subtitle: 'Stripe, test mode for now.', icon: LuCreditCard, test: 'stripe' },
-  cloud: { title: 'Cloud', nav: 'Cloud', subtitle: 'A WriteGrid key for this install, and the gateway this server runs.', icon: LuCloud },
+  cloud: { title: 'Cloud', nav: 'Cloud', subtitle: 'A WriteOrbit key for this install, and the gateway this server runs.', icon: LuCloud },
 };
 const MANAGE: { id: string; nav: string; icon: IconType }[] = [
   { id: 'overview', nav: 'Overview', icon: LuLayoutDashboard },
@@ -148,7 +148,7 @@ export default function AdminPage() {
   }, [settings]);
 
   if (!loading && user && !user.is_admin) {
-    return <AppFrame title="Admin"><Card className="p-6 text-[14px] text-muted">This page is for WriteGrid admins.</Card></AppFrame>;
+    return <AppFrame title="Admin"><Card className="p-6 text-[14px] text-muted">This page is for WriteOrbit admins.</Card></AppFrame>;
   }
 
   const group = groups.find((item) => item.id === section);

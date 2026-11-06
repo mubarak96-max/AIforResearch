@@ -25,7 +25,7 @@ function FreePlanStrip() {
 /** Free-plan strip, then logo with the links beside it and sign-in (or Dashboard) on the right. */
 export async function SiteHeader() {
   // Set by the app at sign-in (not a secret): lets the first render show Dashboard without a flash.
-  const signedIn = (await cookies()).get('writegrid_signed_in')?.value === '1';
+  const signedIn = (await cookies()).get('writeorbit_signed_in')?.value === '1';
   return (
     <>
       <AuthAware initial={signedIn} signedIn={null} signedOut={<FreePlanStrip />} />
@@ -33,7 +33,7 @@ export async function SiteHeader() {
         <div className={`${container} flex h-14 items-center md:h-16`}>
           <Link href="/" className={`shrink-0 rounded-lg ${focusRing}`}>
             <Logo size={26} />
-            <span className="sr-only">WriteGrid home</span>
+            <span className="sr-only">WriteOrbit home</span>
           </Link>
           <SiteNav signedIn={signedIn} />
         </div>

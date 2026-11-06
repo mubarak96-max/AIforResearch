@@ -5,7 +5,7 @@ import { container, focusRing } from '@/components/marketing/styles';
 export const metadata = pageMetadata({
   title: 'Help center',
   path: '/help',
-  description: 'How to write, cite, review and export with WriteGrid: autocomplete, citations, Library, AI Chat, review checks, Word/PDF/LaTeX export and shortcuts.',
+  description: 'How to write, cite, review and export with WriteOrbit: autocomplete, citations, Library, AI Chat, review checks, Word/PDF/LaTeX export and shortcuts.',
 });
 
 type Topic = { id: string; title: string; items: [string, React.ReactNode][] };
@@ -95,7 +95,7 @@ export default function HelpPage() {
     <div className={container}>
       <div className="pb-6 pt-10 md:pt-[46px]">
         <h1 className="text-[34px] font-bold tracking-[-0.03em] text-ink sm:text-[42px]">Help center</h1>
-        <p className="mt-2 text-[17px] text-ink-2">How to write, cite, review and export with WriteGrid.</p>
+        <p className="mt-2 text-[17px] text-ink-2">How to write, cite, review and export with WriteOrbit.</p>
       </div>
       <div className="grid gap-10 pb-20 md:grid-cols-[200px_minmax(0,1fr)] md:gap-14">
         <nav aria-label="Topics" className="hidden md:block">

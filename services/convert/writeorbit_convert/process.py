@@ -109,7 +109,7 @@ def libreoffice_convert(data: bytes, source_ext: str, target: str, timeout: floa
     if not soffice:
         raise LibreOfficeFailed("LibreOffice is not installed")
     source_ext = "".join(ch for ch in source_ext.lower() if ch.isalnum())[:8] or "bin"
-    with tempfile.TemporaryDirectory(prefix="writegrid-convert-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="writeorbit-convert-") as tmp:
         source = os.path.join(tmp, f"input.{source_ext}")
         with open(source, "wb") as handle:
             handle.write(data)

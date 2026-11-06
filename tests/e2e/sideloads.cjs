@@ -1,11 +1,11 @@
 // Library, Find papers and AI Chat from the app menu open as side panels everywhere (never the
 // old pages): left drawer in place of the menu (with "Show menu"), chat on the right, phones
 // full screen, old /library /papers /chat links open the panels. Writes /shots/side-*.png.
-//   BASE=http://writegrid-router:8080 node sideloads.cjs
+//   BASE=http://writeorbit-router:8080 node sideloads.cjs
 const { chromium } = require('playwright');
 const { signIn } = require('./e2e-auth.cjs');
 const crypto = require('crypto');
-const BASE = process.env.BASE || 'http://writegrid-router:8080';
+const BASE = process.env.BASE || 'http://writeorbit-router:8080';
 const OUT = process.env.OUT || '/shots';
 
 const text = (t) => ({ type: 'text', text: t, styles: {} });
@@ -24,7 +24,7 @@ const SAMPLE = [
   const open = async (width, height) => {
     const context = await browser.newContext({ viewport: { width, height } });
     await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: BASE });
-    await context.addInitScript(([t, u]) => { localStorage.setItem('writegrid_token', JSON.stringify(t)); localStorage.setItem('writegrid_user', JSON.stringify(u)); }, [auth.token, auth.user]);
+    await context.addInitScript(([t, u]) => { localStorage.setItem('writeorbit_token', JSON.stringify(t)); localStorage.setItem('writeorbit_user', JSON.stringify(u)); }, [auth.token, auth.user]);
     const page = await context.newPage();
     page.errors = [];
     page.on('pageerror', (e) => page.errors.push(`pageerror ${e.message.slice(0, 200)}`));

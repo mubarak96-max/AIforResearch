@@ -1,4 +1,4 @@
-# Moving a self-hosted WriteGrid to Firebase
+# Moving a self-hosted WriteOrbit to Firebase
 
 `migrate.ts` reads the old PostgreSQL database and files folder and writes Firestore, Cloud
 Storage and Firebase Authentication as described in [docs/data-model.md](../../docs/data-model.md).
@@ -16,7 +16,7 @@ Storage and Firebase Authentication as described in [docs/data-model.md](../../d
 ## Run
 
 ```bash
-DATABASE_URL=postgres://writegrid:PASSWORD@localhost:5432/writegrid \
+DATABASE_URL=postgres://writeorbit:PASSWORD@localhost:5432/writeorbit \
 FILES_DIR=./files \
 FIREBASE_PROJECT_ID=your-project \
 FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app \
