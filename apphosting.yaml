@@ -41,6 +41,11 @@ env:
     value: ""
     availability: [BUILD, RUNTIME]
   # services/collab on Cloud Run.
+  # The public domain of the site (canonical URLs, sitemap, robots.txt, Open Graph). REPLACE the
+  # placeholder with the real domain before launch, or search engines index example.com.
+  - variable: NEXT_PUBLIC_SITE_URL
+    value: https://app.example.com
+    availability: [BUILD, RUNTIME]
   - variable: NEXT_PUBLIC_REALTIME_URL
     value: wss://collab-xxxxx.a.run.app/collab
     availability: [BUILD, RUNTIME]

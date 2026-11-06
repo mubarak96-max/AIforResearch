@@ -6,7 +6,7 @@ primary_keyword: "ai tools for journalists"
 secondary_keywords: ["ai writing assistant for journalists", "ai news writer", "ai fact checker", "interview transcription software"]
 cluster: "A. AI writing assistant"
 pillar: "/blog/best-ai-writing-assistant"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

@@ -6,7 +6,7 @@ primary_keyword: "how to write a press release"
 secondary_keywords: ["news release format ap style", "ap style news release format", "format for press release ap style", "ap style news release example", "how to write a press release for an event", "dateline press release ap style"]
 cluster: "C. AP style and news writing"
 pillar: "/blog/ap-style-guide"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

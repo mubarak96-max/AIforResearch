@@ -6,7 +6,7 @@ primary_keyword: "ap style"
 secondary_keywords: ["ap style guide", "what is ap style", "writing in ap style", "ap style rules", "ap style cheat sheet", "ap style oxford comma", "ap style artificial intelligence"]
 cluster: "C. AP style and news writing"
 pillar: "/blog/ap-style-guide"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

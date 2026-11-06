@@ -6,7 +6,7 @@ primary_keyword: "zotero vs mendeley"
 secondary_keywords: ["endnote vs zotero vs mendeley", "mendeley alternative", "zotero vs mendeley reference manager", "paperpile vs zotero vs mendeley"]
 cluster: "F. Research and citations"
 pillar: "/blog/ai-citation-generator"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

@@ -6,7 +6,7 @@ primary_keyword: "how to fact check ai"
 secondary_keywords: ["how to fact check ai content", "how to fact check chatgpt", "how to fact check ai generated content", "how to fact check ai responses"]
 cluster: "B. Fact-checking"
 pillar: "/blog/ai-fact-checker"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

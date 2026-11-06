@@ -1,12 +1,12 @@
 ---
 title: "Interview Transcription: Formats, Examples and Tools (2026)"
 slug: "interview-transcription"
-description: "Interview transcription explained: verbatim, intelligent verbatim and edited formats with examples, a template, recording-consent rules and a fair comparison of tools."
+description: "Interview transcription explained: verbatim, intelligent verbatim and edited formats with examples, a template, consent rules and a fair look at tools."
 primary_keyword: "interview transcription"
 secondary_keywords: ["interview transcription example", "interview transcription format", "how to transcribe interview", "transcribe interview format", "what is an interview transcription", "software for interview transcription", "interview transcription software"]
 cluster: "D. Interviews and transcripts"
 pillar: "/blog/interview-transcription"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

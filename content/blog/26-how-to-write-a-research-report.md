@@ -1,12 +1,12 @@
 ---
 title: "How to Write a Research Report: Outline, Template, Example"
 slug: "how-to-write-a-research-report"
-description: "How to write a research report outline for business, policy or technical work: an 8-section template, executive summary tips, an annotated example and AI checks."
+description: "How to write a research report for business, policy or technical work: an 8-section outline, executive summary tips, an annotated example and AI checks."
 primary_keyword: "how to write a research report outline"
 secondary_keywords: ["how to write a research report", "how to write a research report example", "ai research report writer", "how to write a research report using ai", "how to write a research report for business problems"]
 cluster: "F. Research and citations"
 pillar: "/blog/ai-citation-generator"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

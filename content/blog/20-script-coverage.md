@@ -1,12 +1,12 @@
 ---
 title: "Script Coverage: What It Is, a Free Template and 2 Examples"
 slug: "script-coverage"
-description: "Script coverage explained: what readers write, Pass, Consider or Recommend, a free coverage template, two full script coverage examples, and what paid services cost."
+description: "Script coverage explained: what readers write, Pass, Consider or Recommend, a free template, two full coverage examples, and what paid services cost."
 primary_keyword: "script coverage"
 secondary_keywords: ["script coverage examples", "script coverage example", "what is script coverage", "script coverage form", "how to write script coverage", "script coverage meaning", "script coverage services"]
 cluster: "E. Screenwriting"
 pillar: "/blog/screenwriting-software"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

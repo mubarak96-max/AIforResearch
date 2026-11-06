@@ -6,7 +6,7 @@ primary_keyword: "ai literature review"
 secondary_keywords: ["ai literature review tools", "ai literature review generator", "best ai literature review", "elicit ai literature review", "consensus ai literature review", "ai literature review from pdf"]
 cluster: "F. Research and citations"
 pillar: "/blog/ai-citation-generator"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

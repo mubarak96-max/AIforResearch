@@ -6,7 +6,7 @@ primary_keyword: "ai fact checker"
 secondary_keywords: ["ai fact checker free", "best ai fact checker", "ai fact checker tool", "ai fact checker for every claim in a draft"]
 cluster: "B. Fact-checking"
 pillar: "/blog/ai-fact-checker"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

@@ -3,10 +3,10 @@ import { pageMetadata } from '@/components/marketing/seo';
 import { btnPrimary, container } from '@/components/marketing/styles';
 
 export const metadata = pageMetadata({
-  title: 'Free citation generator: APA, MLA, Chicago, AMA, ACS and more',
+  title: 'Free citation generator: APA, MLA, Chicago, AMA',
   path: '/citation-styles',
   description:
-    'Free citation generator for APA 7, MLA 9 works cited, Chicago, Harvard, AMA, ACS, Turabian, Bluebook and 10,000+ styles. Find the source, cite it, and your reference list builds itself.',
+    'Free citation generator for APA 7, MLA 9, Chicago, Harvard, AMA, ACS, Bluebook and 10,000+ styles. Find the source, cite it, and your reference list is done.',
 });
 
 const STYLES: { name: string; kind: string; inText: string; field: string }[] = [

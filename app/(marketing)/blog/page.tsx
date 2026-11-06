@@ -14,9 +14,9 @@ export default function BlogIndexPage() {
   return (
     <div className={container}>
       <div className="max-w-[760px] pb-4 pt-10 md:pt-[46px]">
-        <h1 className="text-balance text-[34px] font-bold tracking-[-0.03em] text-ink sm:text-[42px]">Blog</h1>
+        <h1 className="text-balance text-[34px] font-bold tracking-[-0.03em] text-ink sm:text-[42px]">Guides for writers who work with sources</h1>
         <p className="mt-3 text-[17px] leading-relaxed text-ink-2">
-          Guides for people who write with sources: reporters, editors, analysts, screenwriters and researchers. Every claim links to where it comes from.
+          For reporters, editors, analysts, screenwriters and researchers. Every claim links to where it comes from.
         </p>
       </div>
 

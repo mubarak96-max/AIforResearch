@@ -6,7 +6,7 @@ primary_keyword: "free ai writing assistant"
 secondary_keywords: ["ai writing assistant free", "ai writing assistant free online", "best free ai writing assistant", "what is the best free ai writing assistant"]
 cluster: "A. AI writing assistant"
 pillar: "/blog/best-ai-writing-assistant"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

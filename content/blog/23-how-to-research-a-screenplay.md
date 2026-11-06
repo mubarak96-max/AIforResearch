@@ -6,7 +6,7 @@ primary_keyword: "research for a screenplay"
 secondary_keywords: ["how to research for a script", "screenplay research", "writing a period drama research", "based on a true story research"]
 cluster: "E. Screenwriting"
 pillar: "/blog/screenwriting-software"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

@@ -46,5 +46,5 @@ export function pricingSummary(plans: PublicPlan[] | null) {
   if (!paid.length) return 'Start free with the full editor and citation generator. Upgrade for more AI writing, claim checks and LaTeX export.';
   const cheapest = paid.reduce((low, plan) => (plan.monthly_cents < low.monthly_cents ? plan : low));
   const perMonthYearly = cheapest.yearly_cents ? usd(Math.round(cheapest.yearly_cents / 12)) : null;
-  return `Start free with the full editor and citation generator. ${cheapest.name} is ${usd(cheapest.monthly_cents)}/month${perMonthYearly ? ` or ${perMonthYearly}/month billed yearly` : ''}, with more AI writing, claim checks and LaTeX export.`;
+  return `Start free with the full editor and citation generator. ${cheapest.name} is ${usd(cheapest.monthly_cents)}/month${perMonthYearly ? ` or ${perMonthYearly}/month billed yearly` : ''}, for more AI, claim checks and LaTeX export.`;
 }

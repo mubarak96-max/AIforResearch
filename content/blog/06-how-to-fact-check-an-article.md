@@ -1,12 +1,12 @@
 ---
-title: "How to Fact-Check an Article: Editor's Checklist + Free Tools"
+title: "How to Fact-Check an Article: Checklist + Free Tools"
 slug: "how-to-fact-check-an-article"
 description: "How to fact-check an article like a magazine checker: a 10-point checklist, a fact-sheet template, free fact checking tools and a corrections policy."
 primary_keyword: "how to fact check an article"
 secondary_keywords: ["fact checking tools", "how to fact check", "how to fact check news", "how to fact check a source", "how to fact check statistics"]
 cluster: "B. Fact-checking"
 pillar: "/blog/ai-fact-checker"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

@@ -32,7 +32,7 @@ function isCurrent(pathname: string, href: string) {
 }
 
 /** Desktop links next to the logo (≥768px) and the phone menu button + full-screen sheet (<768px). */
-export function SiteNav({ signedIn }: { signedIn: boolean }) {
+export function SiteNav() {
   const pathname = usePathname() || '/';
   const [open, setOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -77,7 +77,6 @@ export function SiteNav({ signedIn }: { signedIn: boolean }) {
       </nav>
       <div className="ml-auto hidden items-center gap-2 md:flex">
         <AuthAware
-          initial={signedIn}
           signedIn={<Link href="/editor" className={`${btnPrimary} h-9 rounded-[9px] px-3.5 text-[14px]`}>Dashboard</Link>}
           signedOut={(
             <>
@@ -150,7 +149,6 @@ export function SiteNav({ signedIn }: { signedIn: boolean }) {
           </nav>
           <div className="mt-auto grid gap-2.5 px-4 pt-4 pb-[max(16px,env(safe-area-inset-bottom))]">
             <AuthAware
-              initial={signedIn}
               signedIn={<Link href="/editor" onClick={() => setOpen(false)} className={`${btnPrimary} h-12 rounded-xl text-base`}>Dashboard</Link>}
               signedOut={(
                 <>

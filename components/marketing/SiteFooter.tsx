@@ -1,16 +1,8 @@
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
+import { COMPANY } from '@/lib/site';
 import { container, focusRing } from './styles';
 
-/** Who runs this site, set when the web app is built (NEXT_PUBLIC_COMPANY_*); empty parts are left out. */
-const COMPANY = {
-  name: process.env.NEXT_PUBLIC_COMPANY_NAME || 'WriteOrbit',
-  address: process.env.NEXT_PUBLIC_COMPANY_ADDRESS || '',
-  phone: process.env.NEXT_PUBLIC_COMPANY_PHONE || '',
-  email: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || '',
-};
-
-// Only pages that exist. Privacy and Terms come back once their text is written (no page yet).
 const COLUMNS = [
   {
     title: 'Product',
@@ -42,12 +34,19 @@ const COLUMNS = [
       { label: 'Create account', href: '/signup' },
     ],
   },
+  {
+    title: 'Legal',
+    links: [
+      { label: 'Privacy', href: '/privacy' },
+      { label: 'Terms', href: '/terms' },
+    ],
+  },
 ];
 
 export function SiteFooter() {
   return (
     <footer className="border-t border-line">
-      <div className={`${container} grid gap-x-10 gap-y-10 pb-12 pt-14 md:grid-cols-[1.6fr_repeat(4,1fr)]`}>
+      <div className={`${container} grid gap-x-10 gap-y-10 pb-12 pt-14 md:grid-cols-[1.6fr_repeat(5,1fr)]`}>
         <div>
           <Link href="/" className={`inline-block rounded-lg ${focusRing}`}>
             <Logo size={24} />
@@ -55,7 +54,7 @@ export function SiteFooter() {
           </Link>
           <p className="mt-3 max-w-[280px] text-[14px] leading-relaxed text-muted">The AI writing editor that cites real sources. For students, researchers and academics.</p>
         </div>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-4 md:contents">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:contents">
           {COLUMNS.map((column) => (
             <nav key={column.title} aria-labelledby={`footer-${column.title}`}>
               <h2 id={`footer-${column.title}`} className="mb-3 text-[11px] font-medium uppercase tracking-[.12em] text-subtle">{column.title}</h2>

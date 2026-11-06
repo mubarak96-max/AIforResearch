@@ -1,12 +1,12 @@
 ---
-title: "Screenplay Format: Rules, Template and Example (Docs and Word)"
+title: "Screenplay Format: Rules, Template and Example (Word, Docs)"
 slug: "screenplay-format"
-description: "Screenplay format explained: margins, fonts and every element with examples, a title page, montages and intercuts, plus how to format a script in Google Docs and Word."
+description: "Screenplay format explained: margins, fonts and every element with examples, a title page, montages and intercuts, and how to format it in Google Docs and Word."
 primary_keyword: "screenplay format"
 secondary_keywords: ["screenplay format google docs", "screenplay format template", "writing screenplay format", "example screenplay format", "how to screenplay format", "screenplay format word", "screenplay format title page", "montage screenplay format"]
 cluster: "E. Screenwriting"
 pillar: "/blog/screenwriting-software"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

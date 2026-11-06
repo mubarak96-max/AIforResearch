@@ -5,7 +5,6 @@
  */
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { cookies } from 'next/headers';
 import {
   LuArrowRight, LuBookOpen, LuCheck, LuClipboardCheck, LuFileInput, LuFileOutput, LuFlaskConical, LuGraduationCap,
   LuLandmark, LuLibrary, LuMessagesSquare, LuMic, LuNewspaper, LuPenLine, LuSearch, LuSmartphone, LuSparkles, LuSquarePen,
@@ -14,23 +13,22 @@ import {
   AutocompleteVisual, ChatVisual, CloseMark, COMPARISON_ROWS, ExportVisual, FindPapersVisual, ImportVisual, PhoneVisual, ReviewVisual,
 } from './LandingVisuals';
 import { AuthAware } from './AuthAware';
+import { PenCircle, SectionMark } from './Marginalia';
 import { btnGhost, btnPrimary, container } from './styles';
 
 export const h1 = 'text-balance font-serif text-[34px] font-semibold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[44px] md:text-[52px]';
-export const h2 = 'text-balance text-[30px] font-semibold leading-[1.12] tracking-[-0.03em] text-ink md:text-[40px]';
+export const h2 = 'text-balance font-serif text-[30px] font-semibold leading-[1.12] tracking-[-0.02em] text-ink md:text-[40px]';
+/** Feature and step titles on /features and /how-it-works. */
+export const h2Item = 'text-balance font-serif text-[25px] font-semibold leading-[1.2] tracking-[-0.015em] text-ink md:text-[32px]';
+/** The tinted backdrop behind a product visual. */
+export const visualPanel = 'min-w-0 rounded-[24px] bg-panel p-4 ring-1 ring-line-2 sm:p-7';
 export const lead = 'text-balance text-[16px] leading-[1.6] text-muted md:text-[17px]';
 const cta = `${btnPrimary} h-11 rounded-[10px] px-5 text-[15px]`;
 
-/** Set by the app at sign-in (not a secret): the first render already knows who is signed in. */
-export async function isSignedIn() {
-  return (await cookies()).get('writeorbit_signed_in')?.value === '1';
-}
-
 /** "Start writing free", or "Open your documents" for someone signed in. */
-export function StartButton({ signedIn, label = 'Start writing free' }: { signedIn: boolean; label?: string }) {
+export function StartButton({ label = 'Start writing free' }: { label?: string }) {
   return (
     <AuthAware
-      initial={signedIn}
       signedIn={<Link href="/editor" className={cta}>Open your documents <LuArrowRight className="h-4 w-4" aria-hidden="true" /></Link>}
       signedOut={<Link href="/signup" className={cta}>{label} <LuArrowRight className="h-4 w-4" aria-hidden="true" /></Link>}
     />
@@ -172,11 +170,13 @@ export function Points({ items }: { items: string[] }) {
 }
 
 /** "Not another AI chatbot": what WriteOrbit does that a general AI chat does not. */
-export function ComparisonBand() {
+/** Always dark, in both themes (it is a deliberate contrast band, so it does not follow --color-ink). */
+export function ComparisonBand({ mark }: { mark?: number }) {
   return (
     <section aria-labelledby="compare-title" className="px-4 pt-24 sm:px-6 md:pt-32">
-      <div className="mx-auto max-w-[1184px] rounded-[28px] bg-ink px-5 py-14 text-on-ink sm:px-10 md:py-20">
-        <h2 id="compare-title" className="mx-auto max-w-[620px] text-balance text-center text-[30px] font-semibold leading-[1.12] tracking-[-0.03em] md:text-[40px]">Not another AI chatbot</h2>
+      <div className="wo-reveal mx-auto max-w-[1184px] rounded-[28px] bg-[#1c1917] px-5 py-14 text-white ring-1 ring-white/10 sm:px-10 md:py-20">
+        <SectionMark n={mark} className="text-center !text-[#f0a77a]">Why not a chatbot</SectionMark>
+        <h2 id="compare-title" className="mx-auto max-w-[620px] text-balance text-center font-serif text-[30px] font-semibold leading-[1.12] tracking-[-0.02em] md:text-[40px]">Not <em>another</em> AI chatbot</h2>
         <p className="mx-auto mt-4 max-w-[480px] text-balance text-center text-[16px] leading-[1.6] text-slate-400">General AI chat can invent sources. WriteOrbit cites real papers, inside your document.</p>
         <div className="mx-auto mt-10 max-w-[760px]">
           <div className="hidden grid-cols-[1fr_1.3fr_1.3fr] gap-4 border-b border-white/10 pb-3 text-[13px] md:grid">
@@ -215,13 +215,13 @@ export function AudienceSection() {
   );
 }
 
-export function FinalCta({ signedIn }: { signedIn: boolean }) {
+export function FinalCta() {
   return (
     <section aria-labelledby="cta-title" className={`${container} pb-20 pt-28 text-center md:pb-28 md:pt-36`}>
-      <h2 id="cta-title" className="mx-auto max-w-[640px] text-balance text-[32px] font-semibold leading-[1.08] tracking-[-0.035em] text-ink md:text-[48px]">Write your next paper with real sources</h2>
+      <h2 id="cta-title" className="mx-auto max-w-[640px] text-balance font-serif text-[32px] font-semibold leading-[1.1] tracking-[-0.02em] text-ink md:text-[48px]">Write your next paper with <PenCircle>real</PenCircle> sources</h2>
       <p className={`mx-auto mt-4 max-w-[440px] ${lead}`}>Free to start, no credit card needed. Upgrade when you need more AI.</p>
       <div className="mt-7 flex flex-wrap justify-center gap-3">
-        <StartButton signedIn={signedIn} />
+        <StartButton />
         <Link href="/pricing" className={`${btnGhost} h-11 rounded-[10px] px-5 text-[15px]`}>See pricing</Link>
       </div>
     </section>

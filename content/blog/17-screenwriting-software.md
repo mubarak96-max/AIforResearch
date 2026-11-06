@@ -6,7 +6,7 @@ primary_keyword: "screenwriting software"
 secondary_keywords: ["best screenwriting software", "good screenwriting software", "best screenwriting software free", "screenwriting software online", "cloud based screenwriting software", "screenwriting software comparison", "collaborative screenwriting software"]
 cluster: "E. Screenwriting"
 pillar: "/blog/screenwriting-software"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

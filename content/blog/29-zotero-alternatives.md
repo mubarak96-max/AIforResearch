@@ -1,12 +1,12 @@
 ---
 title: "Best Zotero Alternatives (2026): Reference Managers Compared"
 slug: "zotero-alternatives"
-description: "The best Zotero alternatives in 2026: Mendeley, EndNote, Paperpile, ReadCube, JabRef, Citavi and WriteOrbit, compared on price, Word plugins, AI and self-hosting."
+description: "The best Zotero alternatives in 2026: Mendeley, EndNote, Paperpile, ReadCube, JabRef, Citavi and WriteOrbit, compared on price, Word plugins and AI."
 primary_keyword: "zotero alternative"
 secondary_keywords: ["self hosted zotero alternative", "reddit zotero alternative", "mendeley alternative", "open source reference manager"]
 cluster: "F. Research and citations"
 pillar: "/blog/ai-citation-generator"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

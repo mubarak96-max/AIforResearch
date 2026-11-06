@@ -1,29 +1,35 @@
-import Image from 'next/image';
 import Link from 'next/link';
-import { LuArrowRight, LuBriefcase, LuCheck, LuFlaskConical, LuGraduationCap, LuNewspaper, LuPlus, LuShieldCheck, LuSparkles, LuSquarePen } from 'react-icons/lu';
-import { AutocompleteVisual } from '@/components/marketing/LandingVisuals';
+import { LuArrowRight, LuBriefcase, LuFlaskConical, LuGraduationCap, LuNewspaper, LuPlus, LuSparkles } from 'react-icons/lu';
+import { HeroDemo, HeroDemoSteps } from '@/components/marketing/HeroDemo';
+import { FeatureMini } from '@/components/marketing/FeatureMinis';
 import { AuthAware } from '@/components/marketing/AuthAware';
 import { PricingTeaser } from '@/components/marketing/PricingTeaser';
 import { loadPublicPlans } from '@/components/marketing/plans';
 import { pageMetadata } from '@/components/marketing/seo';
 import { container, focusRing } from '@/components/marketing/styles';
-import { FEATURES, FinalCta, STEPS, StartButton, h2, isSignedIn, lead } from '@/components/marketing/landing';
+import { ComparisonBand, FEATURES, FinalCta, STEPS, StartButton, h2, lead } from '@/components/marketing/landing';
+import { SITE_NAME, SITE_URL } from '@/lib/site';
+import { Footnote, PageReferences, PenTick, PenUnderline, SectionMark, type ReferenceId } from '@/components/marketing/Marginalia';
 
 const DESCRIPTION =
   'Write faster with AI that cites real papers. Generate APA, MLA, Chicago and AMA citations, check every claim and export to Word or LaTeX. Free to start.';
 
-export const revalidate = 300;
-
 export const metadata = pageMetadata({ title: 'WriteOrbit — AI writing editor and citation generator', absolute: true, path: '/', description: DESCRIPTION });
 
-// Rendered per request (signed-in visitors see Dashboard); the plans themselves are cached for 5 minutes.
-export const dynamic = 'force-dynamic';
+// Static, rebuilt every 5 minutes so the plans in the pricing teaser stay current.
+export const revalidate = 300;
 
-const FACTS = [
-  { value: '250M+', label: 'Scholarly works to cite' },
-  { value: '10,000+', label: 'Citation styles' },
+const FACTS: { value: string; label: string; source?: ReferenceId }[] = [
+  { value: '250M+', label: 'Scholarly works to cite', source: 'openalex' },
+  { value: '10,000+', label: 'Citation styles', source: 'csl' },
   { value: '$0', label: 'To start, no card needed' },
 ];
+
+/** The audience cards sit like index cards pinned to a board (wide screens only). */
+const TILT = ['lg:-rotate-[1.2deg]', 'lg:rotate-[0.8deg]', 'lg:-rotate-[0.5deg]', 'lg:rotate-[1.1deg]'];
+
+/** Feature tiles that take two columns on wide screens: rows of 2+1, 1+2, 2+1. */
+const WIDE = new Set([0, 3, 4]);
 
 const AUDIENCES = [
   {
@@ -66,11 +72,33 @@ const FAQ = [
 ];
 
 
+const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || '';
+
 const STRUCTURED_DATA = [
   {
     '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${SITE_URL}/#organization`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: `${SITE_URL}/icon-512.png`,
+    ...(SUPPORT_EMAIL ? { email: SUPPORT_EMAIL, contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: SUPPORT_EMAIL } } : {}),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    publisher: { '@id': `${SITE_URL}/#organization` },
+    inLanguage: 'en-US',
+  },
+  {
+    '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'WriteOrbit',
+    name: SITE_NAME,
+    url: SITE_URL,
+    publisher: { '@id': `${SITE_URL}/#organization` },
     applicationCategory: 'EducationalApplication',
     operatingSystem: 'Web, iOS, Android, Windows, macOS',
     description: DESCRIPTION,
@@ -86,130 +114,133 @@ const STRUCTURED_DATA = [
 const more = `inline-flex items-center gap-1.5 rounded text-[14.5px] font-medium text-brand hover:text-brand-600 ${focusRing}`;
 
 export default async function LandingPage() {
-  const [plans, signedIn] = await Promise.all([loadPublicPlans(), isSignedIn()]);
+  const plans = await loadPublicPlans();
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA).replace(/</g, '\\u003c') }} />
 
       {/* Hero */}
-      <section aria-labelledby="hero-title" className="pt-14 text-center md:pt-20" style={{ background: 'radial-gradient(900px 380px at 50% -8%, var(--color-brand-50) 0%, transparent 70%)' }}>
+      <section aria-labelledby="hero-title" className="relative isolate pt-14 text-center md:pt-20" style={{ background: 'radial-gradient(900px 380px at 50% -8%, var(--color-brand-50) 0%, transparent 70%)' }}>
+        <div aria-hidden="true" className="wo-ruled absolute inset-x-0 top-0 -z-10 h-[640px]" />
         <div className={container}>
           <p className="inline-flex h-7 items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-[12.5px] font-medium text-ink-2">
             <LuSparkles className="h-3.5 w-3.5 text-brand" aria-hidden="true" /> For students, researchers and academics
           </p>
           <h1 id="hero-title" className="mx-auto mt-5 max-w-[760px] text-balance font-serif text-[34px] font-semibold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[44px] md:text-[52px]">
-            Write faster, with{' '}
-            <span className="bg-[linear-gradient(transparent_62%,var(--color-brand-100)_62%)] px-1">a real source for every claim</span>
+            Write faster, with a <PenUnderline>real source</PenUnderline> for <em className="font-medium">every</em> claim
           </h1>
           <p className={`mx-auto mt-5 max-w-[520px] text-balance ${lead}`}>
             AI that writes with real citations, a citation generator for APA, MLA, Chicago and 10,000+ styles, and a claim check before you submit.
           </p>
-          <div className="mt-7 flex justify-center"><StartButton signedIn={signedIn} /></div>
-          <AuthAware initial={signedIn} signedIn={null} signedOut={<p className="mt-3 text-[13px] text-subtle">Free plan · No credit card</p>} />
-          <div className="relative mx-auto mt-12 max-w-[1000px] md:mt-14">
-            <div className="overflow-hidden rounded-t-[12px] border border-b-0 border-line bg-surface shadow-[0_40px_80px_-44px_rgba(15,23,42,.45)] md:rounded-t-[16px]">
-              <div className="flex h-8 items-center gap-[7px] border-b border-line bg-line-2 px-3 md:h-9" aria-hidden="true">
-                <i className="size-2 rounded-full bg-slate-300 md:size-2.5" />
-                <i className="size-2 rounded-full bg-slate-300 md:size-2.5" />
-                <i className="size-2 rounded-full bg-slate-300 md:size-2.5" />
-                <span className="mx-auto flex h-5 min-w-0 items-center rounded-[6px] bg-surface px-2.5 font-mono text-[10.5px] text-muted md:text-[11.5px]">app.example.com/editor</span>
-              </div>
-              {/* Phones and small tablets: crop to the document so the autocomplete is readable; full editor from 768px. */}
-              <div className="aspect-[3/2] overflow-hidden md:aspect-auto">
-                <Image
-                  src="/screenshots/editor.png"
-                  alt="The WriteOrbit editor: a paper on sleep and memory with an autocomplete suggestion that already cites Diekelmann & Born (2010), and AI chat beside it listing two well-cited studies to add."
-                  width={2160}
-                  height={1350}
-                  priority
-                  sizes="(min-width: 1048px) 1000px, (min-width: 768px) calc(100vw - 48px), calc(189vw - 60px)"
-                  className="-ml-[32%] -mt-[15.5%] block h-auto w-[189%] max-w-none md:m-0 md:w-full md:max-w-full"
-                />
-              </div>
-            </div>
-            {/* Floating callouts on wide screens. */}
-            <div aria-hidden="true" className="absolute -left-14 top-[54%] hidden w-[220px] rounded-xl border border-line bg-surface p-3 text-left shadow-[0_24px_50px_-24px_rgba(15,23,42,.45)] xl:block">
-              <p className="flex items-center gap-1.5 text-[11.5px] font-semibold text-green-700"><LuShieldCheck className="h-3.5 w-3.5" /> Citation checked</p>
-              <p className="mt-1 text-[12.5px] font-semibold text-ink">The memory function of sleep</p>
-              <p className="text-[11.5px] text-muted">Diekelmann &amp; Born · 2010</p>
-            </div>
-            <div aria-hidden="true" className="absolute -right-14 top-[46%] hidden w-[205px] rounded-xl border border-line bg-surface p-3 text-left shadow-[0_24px_50px_-24px_rgba(15,23,42,.45)] xl:block">
-              <p className="flex items-center gap-1.5 text-[11.5px] font-semibold text-brand-600"><LuSquarePen className="h-3.5 w-3.5" /> AI review</p>
-              <p className="mt-1.5 text-[12px] leading-snug text-ink-2"><span className="rounded bg-red-50 px-1.5 py-0.5 text-[10.5px] font-bold text-red-700">Major</span> Claim needs a source</p>
-              <p className="mt-1.5 text-[12px] leading-snug text-ink-2"><span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10.5px] font-bold text-amber-800">Minor</span> Split this sentence</p>
-            </div>
+          <div className="mt-7 flex justify-center"><StartButton /></div>
+          <AuthAware signedIn={null} signedOut={<p className="mt-3 text-[13px] text-subtle">Free plan · No credit card</p>} />
+          {/* The product, playing: write → cite → check → export (CSS animation, see HeroDemo). */}
+          <div className="relative mx-auto mt-12 max-w-[1080px] md:mt-14">
+            <HeroDemo />
+            <HeroDemoSteps />
           </div>
         </div>
       </section>
 
       {/* Facts */}
       <section aria-label="WriteOrbit at a glance" className={`${container} pt-14 md:pt-20`}>
-        <ul className="mx-auto grid max-w-[840px] grid-cols-3 rounded-[20px] border border-line bg-surface py-6 shadow-[0_20px_40px_-32px_rgba(15,23,42,.35)] md:py-9">
+        <div className="relative mx-auto max-w-[840px]">
+        <ul className="grid grid-cols-3 rounded-[20px] border border-line bg-surface py-6 shadow-[0_20px_40px_-32px_rgba(15,23,42,.35)] md:py-9">
           {FACTS.map((fact, index) => (
             <li key={fact.label} className={`px-2 text-center ${index ? 'border-l border-line-2' : ''}`}>
-              <p className="whitespace-nowrap text-[18px] font-semibold tracking-[-0.03em] text-ink sm:text-[28px] md:text-[40px]">{fact.value}</p>
-              <p className="mt-1 text-balance text-[12px] text-muted sm:text-[13.5px]">{fact.label}</p>
+              <p className="whitespace-nowrap font-serif text-[22px] font-semibold tracking-[-0.01em] text-ink [font-variant-numeric:oldstyle-nums] sm:text-[32px] md:text-[46px]">{fact.value}</p>
+              <p className="mt-1 text-balance text-[12px] text-muted sm:text-[13.5px]">{fact.label}{fact.source && <Footnote id={fact.source} />}</p>
             </li>
           ))}
         </ul>
+        {/* A note in the margin, as on a marked-up draft. */}
+        <p aria-hidden="true" className="absolute left-[calc(100%+22px)] top-3 hidden w-[132px] rotate-[2deg] text-left font-serif text-[13.5px] italic leading-snug text-accent xl:block">
+          <span className="not-italic">↙</span> Even our numbers come with sources. See the foot of the page.
+        </p>
+        </div>
       </section>
 
       {/* Features: a short overview; the full tour is on /features. */}
       <section aria-labelledby="features-title" className={`${container} pt-24 md:pt-32`}>
-        <div className="grid items-center gap-10 md:grid-cols-[1fr_1.1fr] md:gap-14">
+        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between md:gap-10">
           <div>
-            <h2 id="features-title" className={h2}>Write, cite and check in one editor</h2>
-            <p className={`mt-4 max-w-[440px] ${lead}`}>Each suggestion comes with a real reference, and each reference opens the paper behind it. No made-up sources.</p>
-            <Link href="/features" className={`mt-6 ${more}`}>See all features <LuArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
+            <SectionMark n={1}>The editor</SectionMark>
+            <h2 id="features-title" className={`max-w-[560px] ${h2}`}>Write, cite and <em>check</em> in one editor</h2>
+            <p className={`mt-4 max-w-[480px] ${lead}`}>Each suggestion comes with a real reference, and each reference opens the paper behind it. No made-up sources.</p>
           </div>
-          <div className="min-w-0 rounded-[24px] bg-[#f4f5f7] p-4 sm:p-7"><AutocompleteVisual /></div>
+          <Link href="/features" className={`shrink-0 md:mb-1.5 ${more}`}>See all features <LuArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
         </div>
-        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((feature) => (
-            <li key={feature.id}>
-              <Link href={`/features#${feature.id}`} className={`group flex h-full flex-col rounded-[20px] border border-line bg-surface p-5 transition-shadow hover:shadow-[0_20px_40px_-30px_rgba(15,23,42,.45)] ${focusRing}`}>
-                <span className="grid size-10 place-items-center rounded-xl bg-brand-50 text-brand" aria-hidden="true">{feature.icon}</span>
-                <h3 className="mt-4 text-[16px] font-semibold text-ink">{feature.name}</h3>
-                <p className="mt-1 text-[14.5px] leading-[1.55] text-muted">{feature.short}</p>
-                <span className="mt-auto inline-flex items-center gap-1 pt-4 text-[13.5px] font-medium text-brand">Learn more <LuArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" /></span>
+        <ul className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mt-12 lg:grid-cols-3">
+          {FEATURES.map((feature, index) => {
+            const wide = WIDE.has(index);
+            return (
+            <li key={feature.id} className={`wo-reveal min-w-0 ${wide ? 'lg:col-span-2' : ''}`}>
+              <Link href={`/features#${feature.id}`} className={`group flex h-full flex-col gap-5 rounded-[20px] border border-line bg-surface p-4 transition-[box-shadow,border-color] hover:border-line-3 hover:shadow-[0_20px_40px_-30px_rgba(15,23,42,.45)] sm:p-5 ${wide ? 'lg:grid lg:grid-cols-[1fr_1.1fr] lg:items-stretch lg:gap-7 lg:p-6' : ''} ${focusRing}`}>
+                <FeatureMini id={feature.id} className={wide ? 'lg:order-2 lg:h-full lg:min-h-[184px]' : ''} />
+                <div className="flex flex-1 flex-col px-1">
+                  <span className="flex items-center gap-2">
+                    <span className="text-brand [&>svg]:h-4 [&>svg]:w-4" aria-hidden="true">{feature.icon}</span>
+                    <h3 className="text-[16px] font-semibold text-ink">{feature.name}</h3>
+                    <span className="ml-auto font-serif text-[13px] italic text-subtle" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                  </span>
+                  {wide && <p className="mt-2 hidden text-balance font-serif text-[22px] font-semibold leading-[1.2] tracking-[-0.01em] text-ink lg:block">{feature.title}</p>}
+                  <p className={`mt-1.5 text-[14.5px] leading-[1.55] text-muted ${wide ? 'lg:mt-2' : ''}`}>
+                    {wide ? <><span className="lg:hidden">{feature.short}</span><span className="hidden lg:inline">{feature.body}</span></> : feature.short}
+                  </p>
+                  <span className="mt-auto inline-flex items-center gap-1 pt-4 text-[13.5px] font-medium text-brand">Learn more <LuArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" /></span>
+                </div>
               </Link>
             </li>
-          ))}
+            );
+          })}
         </ul>
       </section>
 
       {/* Who it is for: the main audiences, academic first. */}
-      <section aria-labelledby="audience-title" className={`${container} pt-24 md:pt-32`}>
+      <section aria-labelledby="audience-title" className="mt-24 border-y border-line-2 bg-panel py-20 md:mt-32 md:py-24">
+        <div className={container}>
         <div className="text-center">
+          <SectionMark n={2}>Who it’s for</SectionMark>
           <h2 id="audience-title" className={`mx-auto max-w-[620px] ${h2}`}>Who is WriteOrbit for?</h2>
           <p className={`mx-auto mt-4 max-w-[520px] ${lead}`}>Anyone who writes with sources. It is built first for students, researchers and academics.</p>
         </div>
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 md:mt-12">
-          {AUDIENCES.map((audience) => (
-            <li key={audience.title} className="flex flex-col rounded-[20px] border border-line bg-surface p-5">
-              <span className="grid size-10 place-items-center rounded-xl bg-brand-50 text-brand" aria-hidden="true">{audience.icon}</span>
-              <h3 className="mt-4 text-[16px] font-semibold text-ink">{audience.title}</h3>
-              <p className="mt-1 text-[14.5px] leading-[1.55] text-muted">{audience.text}</p>
-              <ul className="mt-4 flex flex-col gap-2 border-t border-line-2 pt-4 text-[14px] text-ink-2">
-                {audience.points.map((point) => (
-                  <li key={point} className="flex gap-2">
-                    <LuCheck className="mt-[3px] h-4 w-4 shrink-0 text-green-600" aria-hidden="true" />{point}
-                  </li>
-                ))}
-              </ul>
+        <ul className="mt-10 grid gap-5 sm:grid-cols-2 md:mt-14 lg:grid-cols-4 lg:gap-6">
+          {AUDIENCES.map((audience, index) => (
+            <li key={audience.title} className="wo-reveal">
+              {/* An index card: a red rule under the heading, faint lines below. */}
+              <div className={`flex h-full flex-col rounded-[6px] bg-surface shadow-[0_1px_2px_rgb(28_25_23/.06),0_18px_36px_-26px_rgb(28_25_23/.45)] ring-1 ring-line transition-[rotate,translate] duration-300 hover:-translate-y-1 hover:rotate-0 ${TILT[index]}`}>
+                <div className="flex items-center gap-3 border-b-2 border-accent/45 px-5 pb-3 pt-5">
+                  <span className="text-brand" aria-hidden="true">{audience.icon}</span>
+                  <h3 className="font-serif text-[18px] font-semibold text-ink">{audience.title}</h3>
+                </div>
+                <div className="flex-1 bg-[repeating-linear-gradient(to_bottom,transparent_0_27px,var(--color-line-2)_27px_28px)] px-5 pb-5 pt-[2px] text-[14px] leading-[28px]">
+                  <p className="text-muted">{audience.text}</p>
+                  <ul className="mt-[28px] flex flex-col text-ink-2">
+                    {audience.points.map((point) => (
+                      <li key={point} className="flex gap-2">
+                        <PenTick className="mt-[6px]" />{point}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </li>
           ))}
         </ul>
+        </div>
       </section>
+
+      <ComparisonBand mark={3} />
 
       {/* How it works: three steps; details on /how-it-works. */}
       <section aria-labelledby="how-title" className={`${container} pt-24 text-center md:pt-32`}>
-        <h2 id="how-title" className={`mx-auto max-w-[620px] ${h2}`}>From blank page to finished paper</h2>
+        <SectionMark n={4}>Method</SectionMark>
+        <h2 id="how-title" className={`mx-auto max-w-[620px] ${h2}`}>From blank page to <em>finished</em> paper</h2>
         <ol className="mx-auto mt-10 grid max-w-[920px] gap-8 md:mt-12 md:grid-cols-3 md:gap-10">
           {STEPS.map((step, index) => (
-            <li key={step.id}>
+            <li key={step.id} className="wo-reveal">
               <span className="mx-auto grid size-11 place-items-center rounded-full border border-line bg-surface text-brand shadow-[0_8px_20px_-14px_rgba(15,23,42,.4)]" aria-hidden="true">{step.icon}</span>
-              <h3 className="mt-4 text-[16px] font-semibold text-ink"><span className="text-subtle">{index + 1}. </span>{step.title}</h3>
+              <h3 className="mt-4 text-[16px] font-semibold text-ink"><span className="font-serif italic text-accent">{index + 1}. </span>{step.title}</h3>
               <p className="mx-auto mt-1.5 max-w-[260px] text-[15px] leading-[1.6] text-muted">{step.short}</p>
             </li>
           ))}
@@ -217,12 +248,13 @@ export default async function LandingPage() {
         <Link href="/how-it-works" className={`mt-9 ${more}`}>See how it works <LuArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
       </section>
 
-      <PricingTeaser plans={plans} />
+      <PricingTeaser plans={plans} mark={5} />
 
       {/* FAQ */}
       <section id="faq" aria-labelledby="faq-title" className={`${container} scroll-mt-6 pt-24 md:pt-36`}>
         <div className="grid gap-8 md:grid-cols-[1fr_1.6fr] md:gap-16">
           <div>
+            <SectionMark n={6}>Questions</SectionMark>
             <h2 id="faq-title" className={h2}>Common questions</h2>
             <p className="mt-3 text-[15px] text-muted">
               More in the <Link href="/help" className="text-ink underline underline-offset-4 hover:text-brand">help center</Link>.
@@ -242,7 +274,12 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <FinalCta signedIn={signedIn} />
+      <FinalCta />
+
+      {/* The sources for the numbers above (the footnotes link here). */}
+      <div className={`${container} pb-16`}>
+        <PageReferences className="mx-auto max-w-[760px]" />
+      </div>
     </>
   );
 }

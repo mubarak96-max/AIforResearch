@@ -1,12 +1,12 @@
 ---
-title: "Best AI Writing Assistant for Writers Who Need Real Sources (2026)"
+title: "Best AI Writing Assistant With Real Sources (2026)"
 slug: "best-ai-writing-assistant"
 description: "The best AI writing assistant for your job, ranked by whether its facts and citations can be checked. Grammarly, ChatGPT, Claude, Jasper and more compared."
 primary_keyword: "ai writing assistant"
 secondary_keywords: ["best ai writing assistant", "what is the best ai writing assistant", "ai writing assistant for word", "claude ai writing assistant", "ai writing assistant with citation generator"]
 cluster: "A. AI writing assistant"
 pillar: "/blog/best-ai-writing-assistant"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

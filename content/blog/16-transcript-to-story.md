@@ -1,12 +1,12 @@
 ---
 title: "From Transcript to Story: Find, Quote and Check Interviews"
 slug: "transcript-to-story"
-description: "After you transcribe an interview: a 5-step workflow to organize transcripts, find the best quotes, apply AP quote rules, code themes for research and check accuracy."
+description: "After you transcribe an interview: a 5-step workflow to organize transcripts, find the best quotes, apply AP quote rules, code themes and check accuracy."
 primary_keyword: "transcribe interview"
 secondary_keywords: ["ap style quote attribution", "quotes in ap style", "qualitative research interview transcription", "interview transcription for researchers", "how to transcribe interview for thematic analysis"]
 cluster: "D. Interviews and transcripts"
 pillar: "/blog/interview-transcription"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

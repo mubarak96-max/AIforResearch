@@ -3,7 +3,7 @@ import { pageMetadata } from '@/components/marketing/seo';
 import { container, focusRing } from '@/components/marketing/styles';
 
 export const metadata = pageMetadata({
-  title: 'Help center',
+  title: 'Help center: writing, citations and export',
   path: '/help',
   description: 'How to write, cite, check and export in WriteOrbit: autocomplete, citations, Library, AI Chat, Claim check, Word, PDF and LaTeX export, and keyboard shortcuts.',
 });

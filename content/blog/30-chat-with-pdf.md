@@ -6,7 +6,7 @@ primary_keyword: "chat with pdf"
 secondary_keywords: ["chat with pdf ai", "ai chat with pdf", "chat with pdf free", "chat with pdf multiple files", "chat with pdf for research", "chat with pdf privacy"]
 cluster: "F. Research and citations"
 pillar: "/blog/ai-citation-generator"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

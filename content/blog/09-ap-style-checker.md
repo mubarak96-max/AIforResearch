@@ -6,7 +6,7 @@ primary_keyword: "ap style checker"
 secondary_keywords: ["check ap style", "free ap style checker", "ap style checker online free", "ai ap style", "ap style converter"]
 cluster: "C. AP style and news writing"
 pillar: "/blog/ap-style-guide"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

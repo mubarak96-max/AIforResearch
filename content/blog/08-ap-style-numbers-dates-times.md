@@ -6,7 +6,7 @@ primary_keyword: "ap style numbers"
 secondary_keywords: ["ap style dates", "date ap style", "numbers ap style", "time ap style", "percent in ap style", "age ap style", "ap style am pm", "months in ap style", "ap style money", "ap style state abbreviation"]
 cluster: "C. AP style and news writing"
 pillar: "/blog/ap-style-guide"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

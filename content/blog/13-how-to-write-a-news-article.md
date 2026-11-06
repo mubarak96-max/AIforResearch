@@ -6,7 +6,7 @@ primary_keyword: "how to write a news article"
 secondary_keywords: ["how to write a news article format", "how to write a news article example", "how to write a news article for students", "dateline ap style", "ap style quote attribution"]
 cluster: "C. AP style and news writing"
 pillar: "/blog/ap-style-guide"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

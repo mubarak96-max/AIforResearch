@@ -1,12 +1,12 @@
 ---
-title: "AP vs. Chicago Style: Differences, Examples, When to Use Each"
+title: "AP vs. Chicago Style: Differences, Examples, When to Use"
 slug: "ap-vs-chicago-style"
 description: "Chicago vs. AP style side by side: commas, numbers, dates, titles, book titles and citations, checked against the AP Stylebook and Chicago Manual 18th edition."
 primary_keyword: "chicago vs ap style"
 secondary_keywords: ["vs ap style", "ap style vs chicago", "how to cite in ap style", "ap style in text citation", "book title ap style"]
 cluster: "C. AP style and news writing"
 pillar: "/blog/ap-style-guide"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

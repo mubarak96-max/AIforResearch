@@ -6,7 +6,7 @@ primary_keyword: "ai screenplay writer"
 secondary_keywords: ["best ai for screenwriting", "ai screenwriting software", "ai for screenwriting", "best ai screenwriting software"]
 cluster: "E. Screenwriting"
 pillar: "/blog/screenwriting-software"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

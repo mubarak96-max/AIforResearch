@@ -5,8 +5,7 @@ import { BlogMarkdown } from '@/components/marketing/BlogMarkdown';
 import { pageMetadata } from '@/components/marketing/seo';
 import { btnGhost, btnPrimary, container, focusRing } from '@/components/marketing/styles';
 import { allPosts, formatDate, getPost, relatedPosts, type BlogPost } from '@/lib/blog';
-
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://app.example.com').replace(/\/+$/, '');
+import { SITE_URL } from '@/lib/site';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -20,7 +19,8 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = getPost((await params).slug);
   if (!post) return {};
-  const base = pageMetadata({ title: post.title, description: post.description, path: `/blog/${post.slug}`, absolute: true });
+  // The preview image comes from ./opengraph-image.tsx.
+  const base = pageMetadata({ title: post.title, description: post.description, path: `/blog/${post.slug}`, absolute: true, image: false });
   return {
     ...base,
     keywords: [post.primaryKeyword, ...post.secondaryKeywords],

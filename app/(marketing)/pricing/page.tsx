@@ -8,7 +8,7 @@ import { container } from '@/components/marketing/styles';
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata() {
-  return pageMetadata({ title: 'Pricing', path: '/pricing', description: pricingSummary(await loadPublicPlans()) });
+  return pageMetadata({ title: 'Pricing: free AI writing and citation plans', path: '/pricing', description: pricingSummary(await loadPublicPlans()) });
 }
 
 function Cell({ value }: { value: CompareValue }) {

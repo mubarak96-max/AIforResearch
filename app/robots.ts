@@ -1,10 +1,11 @@
 import type { MetadataRoute } from 'next';
+import { SITE_URL } from '@/lib/site';
 
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://app.example.com').replace(/\/+$/, '');
-
+// App screens (/account, /admin, /developers/keys, sign-in pages) are kept out with a noindex
+// meta tag instead: a Disallow here would stop crawlers from ever reading it.
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [{ userAgent: '*', allow: '/', disallow: ['/editor', '/api'] }],
+    rules: [{ userAgent: '*', allow: '/', disallow: ['/editor', '/api/', '/v1/'] }],
     sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

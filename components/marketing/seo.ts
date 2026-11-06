@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-
-const SITE_NAME = 'WriteOrbit';
+import { SITE_NAME } from '@/lib/site';
 
 /** The editor screenshot doubles as the social preview image until a dedicated one exists. */
 const OG_IMAGE = {
@@ -13,6 +12,8 @@ const OG_IMAGE = {
 /**
  * Title, description, canonical URL, Open Graph and Twitter tags for a public page.
  * `title` gets the " · WriteOrbit" suffix from the root layout unless `absolute` is set.
+ * `image: false` leaves the preview image to an opengraph-image file next to the page
+ * (X falls back to og:image when there is no twitter:image).
  */
 export function pageMetadata({
   title,
@@ -20,12 +21,14 @@ export function pageMetadata({
   path,
   absolute = false,
   index = true,
+  image = true,
 }: {
   title: string;
   description: string;
   path: string;
   absolute?: boolean;
   index?: boolean;
+  image?: boolean;
 }): Metadata {
   const fullTitle = absolute ? title : `${title} · ${SITE_NAME}`;
   return {
@@ -40,8 +43,8 @@ export function pageMetadata({
       url: path,
       title: fullTitle,
       description,
-      images: [OG_IMAGE],
+      ...(image ? { images: [OG_IMAGE] } : {}),
     },
-    twitter: { card: 'summary_large_image', title: fullTitle, description, images: [OG_IMAGE.url] },
+    twitter: { card: 'summary_large_image', title: fullTitle, description, ...(image ? { images: [OG_IMAGE.url] } : {}) },
   };
 }

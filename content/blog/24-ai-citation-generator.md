@@ -1,12 +1,12 @@
 ---
 title: "AI Citation Generator: Citations That Point to Real Sources"
 slug: "ai-citation-generator"
-description: "An AI citation generator should find real sources, not invent them. Compare formatters and source finders, see why AI citations fail, and check any citation fast."
+description: "An AI citation generator should find real sources, not invent them. Compare formatters and source finders, see why AI citations fail, and check any citation."
 primary_keyword: "ai citation generator"
 secondary_keywords: ["ai citation generator apa", "mla ai citation generator", "free ai citation generator", "non ai citation generator", "ai citation generator from pdf", "ai citation generator for blog posts"]
 cluster: "F. Research and citations"
 pillar: "/blog/ai-citation-generator"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

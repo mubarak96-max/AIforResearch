@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { cookies } from 'next/headers';
 import { LuArrowRight } from 'react-icons/lu';
 import { Logo } from '@/components/Logo';
 import { AuthAware } from './AuthAware';
@@ -23,19 +22,18 @@ function FreePlanStrip() {
 }
 
 /** Free-plan strip, then logo with the links beside it and sign-in (or Dashboard) on the right. */
-export async function SiteHeader() {
-  // Set by the app at sign-in (not a secret): lets the first render show Dashboard without a flash.
-  const signedIn = (await cookies()).get('writeorbit_signed_in')?.value === '1';
+export function SiteHeader() {
   return (
     <>
-      <AuthAware initial={signedIn} signedIn={null} signedOut={<FreePlanStrip />} />
-      <header className="border-b border-line bg-surface">
+      <AuthAware signedIn={null} signedOut={<FreePlanStrip />} />
+      {/* Sticks to the top on scroll (the free-plan strip above scrolls away); see .wo-site-header in globals.css. */}
+      <header className="wo-site-header sticky top-0 z-40 border-b border-line bg-surface/85 backdrop-blur-md">
         <div className={`${container} flex h-14 items-center md:h-16`}>
           <Link href="/" className={`shrink-0 rounded-lg ${focusRing}`}>
             <Logo size={26} />
             <span className="sr-only">WriteOrbit home</span>
           </Link>
-          <SiteNav signedIn={signedIn} />
+          <SiteNav />
         </div>
       </header>
     </>

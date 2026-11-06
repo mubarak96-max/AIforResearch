@@ -6,7 +6,7 @@ primary_keyword: "ai script coverage"
 secondary_keywords: ["best ai script coverage", "script coverage ai", "ai script coverage free", "can ai do script coverage", "using chatgpt for script coverage", "script coverage ai prompt"]
 cluster: "E. Screenwriting"
 pillar: "/blog/screenwriting-software"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

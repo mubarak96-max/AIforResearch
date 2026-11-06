@@ -6,7 +6,7 @@ primary_keyword: "final draft alternative"
 secondary_keywords: ["free final draft alternative", "best final draft alternative", "free screenwriting software compatible with final draft", "screenwriting software one time purchase", "screenwriting software no subscription"]
 cluster: "E. Screenwriting"
 pillar: "/blog/screenwriting-software"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

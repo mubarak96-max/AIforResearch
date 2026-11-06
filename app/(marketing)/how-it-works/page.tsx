@@ -1,24 +1,21 @@
 import Link from 'next/link';
 import { pageMetadata } from '@/components/marketing/seo';
 import { container } from '@/components/marketing/styles';
-import { FinalCta, PageIntro, Points, STEPS, StartButton, isSignedIn } from '@/components/marketing/landing';
+import { FinalCta, PageIntro, Points, STEPS, StartButton, h2Item, visualPanel } from '@/components/marketing/landing';
+import { FigCaption } from '@/components/marketing/Marginalia';
 
 export const metadata = pageMetadata({
-  title: 'How it works',
+  title: 'How to write a research paper with AI',
   path: '/how-it-works',
   description:
-    'Write a research paper with AI in three steps: start or open your Word file, write with AI that cites real papers, then check your claims and export to Word, PDF or LaTeX.',
+    'Write a research paper with AI in three steps: open your Word file, write with AI that cites real papers, then check your claims and export to Word or LaTeX.',
 });
 
-// Signed-in visitors see "Open your documents".
-export const dynamic = 'force-dynamic';
-
-export default async function HowItWorksPage() {
-  const signedIn = await isSignedIn();
+export default function HowItWorksPage() {
   return (
     <>
       <PageIntro title="From blank page to cited paper" intro="Three steps in one editor. Start from your own file, write with AI that cites real papers, then check your claims and export.">
-        <StartButton signedIn={signedIn} />
+        <StartButton />
       </PageIntro>
 
       <ol className={`${container} flex flex-col gap-20 pt-16 md:gap-28 md:pt-24`}>
@@ -29,13 +26,16 @@ export default async function HowItWorksPage() {
                 <span className="grid size-10 place-items-center rounded-full bg-ink text-[15px] font-semibold text-on-ink" aria-hidden="true">{index + 1}</span>
                 <span className="grid size-10 place-items-center rounded-xl bg-brand-50 text-brand" aria-hidden="true">{step.icon}</span>
               </p>
-              <h2 id={`${step.id}-title`} className="mt-4 text-balance text-[24px] font-semibold leading-[1.2] tracking-[-0.02em] text-ink md:text-[30px]">
+              <h2 id={`${step.id}-title`} className={`mt-4 ${h2Item}`}>
                 <span className="sr-only">Step {index + 1}: </span>{step.title}
               </h2>
               <p className="mt-3 max-w-[480px] text-[15px] leading-[1.6] text-muted md:text-[16px]">{step.body}</p>
               <Points items={step.points} />
             </div>
-            <div className={`min-w-0 rounded-[24px] bg-[#f4f5f7] p-4 sm:p-7 ${index % 2 ? 'md:order-1' : ''}`}>{step.visual}</div>
+            <div className={`min-w-0 ${index % 2 ? 'md:order-1' : ''}`}>
+              <div className={visualPanel}>{step.visual}</div>
+              <FigCaption n={index + 1}>{step.short}</FigCaption>
+            </div>
           </li>
         ))}
       </ol>
@@ -44,7 +44,7 @@ export default async function HowItWorksPage() {
         More about each tool on <Link href="/features" className="text-ink underline underline-offset-4 hover:text-brand">Features</Link>; shortcuts and tips in the <Link href="/help" className="text-ink underline underline-offset-4 hover:text-brand">help center</Link>.
       </p>
 
-      <FinalCta signedIn={signedIn} />
+      <FinalCta />
     </>
   );
 }

@@ -6,7 +6,7 @@ primary_keyword: "white paper writing"
 secondary_keywords: ["what is white paper writing", "white paper writing service", "white paper writing guide", "white paper writing template", "best ai tool for white paper writing", "white paper writing ai"]
 cluster: "F. Research and citations"
 pillar: "/blog/ai-citation-generator"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

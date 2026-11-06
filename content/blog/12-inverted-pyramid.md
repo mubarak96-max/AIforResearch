@@ -1,12 +1,12 @@
 ---
-title: "Inverted Pyramid in Journalism: Structure, Examples, Template"
+title: "Inverted Pyramid in Journalism: Structure and Examples"
 slug: "inverted-pyramid"
 description: "The inverted pyramid puts the most important facts first. Learn the structure, its real history, an annotated example story and a fill-in template."
 primary_keyword: "inverted pyramid"
 secondary_keywords: ["inverted pyramid journalism", "inverted pyramid style", "inverted pyramid structure", "what is the inverted pyramid in journalism", "inverted pyramid example", "inverted pyramid template", "inverted pyramid news release"]
 cluster: "C. AP style and news writing"
 pillar: "/blog/ap-style-guide"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

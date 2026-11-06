@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { LuArrowRight, LuCheck } from 'react-icons/lu';
 import type { PublicPlan } from '@/lib/billing';
+import { SectionMark } from './Marginalia';
 import { btnGhost, btnPrimary, container } from './styles';
 
 const dollars = (cents: number) => `$${(cents / 100).toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
@@ -14,11 +15,12 @@ function price(plan: PublicPlan) {
 }
 
 /** Pricing on the landing page: the live plans from Admin › Plans, three highlights each. */
-export function PricingTeaser({ plans }: { plans: PublicPlan[] | null }) {
+export function PricingTeaser({ plans, mark }: { plans: PublicPlan[] | null; mark?: number }) {
   return (
     <section id="pricing" aria-labelledby="pricing-title" className={`${container} scroll-mt-6 pt-24 md:pt-36`}>
-      <h2 id="pricing-title" className="mx-auto max-w-[620px] text-balance text-center text-[30px] font-semibold leading-[1.12] tracking-[-0.03em] text-ink md:text-[40px]">
-        Start free. Upgrade when you need more.
+      <SectionMark n={mark} className="text-center">Pricing</SectionMark>
+      <h2 id="pricing-title" className="mx-auto max-w-[620px] text-balance text-center font-serif text-[30px] font-semibold leading-[1.12] tracking-[-0.02em] text-ink md:text-[40px]">
+        Start free. Upgrade <em>when</em> you need more.
       </h2>
       <p className="mx-auto mt-4 max-w-[460px] text-balance text-center text-[16px] leading-[1.6] text-muted md:text-[17px]">The full editor and citation generator are free, with a daily AI allowance. Paid plans raise the limits.</p>
       {plans && plans.length > 0 && (
@@ -26,7 +28,7 @@ export function PricingTeaser({ plans }: { plans: PublicPlan[] | null }) {
           {plans.map((plan) => {
             const line = price(plan);
             return (
-              <li key={plan.id} className={`relative flex flex-col rounded-[20px] bg-surface p-5 ${plan.featured ? 'border-2 border-brand shadow-[0_24px_50px_-34px_rgba(var(--brand-rgb),.55)]' : 'border border-line'}`}>
+              <li key={plan.id} className={`wo-reveal relative flex flex-col rounded-[20px] bg-surface p-5 ${plan.featured ? 'border-2 border-brand shadow-[0_24px_50px_-34px_rgba(var(--brand-rgb),.55)]' : 'border border-line'}`}>
                 {plan.featured && <span className="absolute -top-2.5 left-5 rounded-full bg-brand px-2 py-0.5 text-[11.5px] font-semibold text-on-brand">Most popular</span>}
                 <h3 className="text-[15px] font-semibold text-ink">{plan.name}</h3>
                 <p className="mt-2.5 flex items-baseline gap-1.5">

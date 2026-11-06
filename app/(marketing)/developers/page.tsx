@@ -33,7 +33,7 @@ async function loadPrices(): Promise<Prices | null> {
 
 export async function generateMetadata() {
   return pageMetadata({
-    title: 'Developers',
+    title: 'Developers: scholarly papers and AI API',
     path: '/developers',
     description: 'One WriteOrbit API key for scholarly papers, full text, research tools, reference checks, AI review and Word export. Pay only for what you use.',
   });

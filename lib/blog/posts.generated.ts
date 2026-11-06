@@ -5,7 +5,7 @@ export const POSTS: BlogPostSource[] = [
   {
     "number": 1,
     "slug": "best-ai-writing-assistant",
-    "title": "Best AI Writing Assistant for Writers Who Need Real Sources (2026)",
+    "title": "Best AI Writing Assistant With Real Sources (2026)",
     "heading": "The best AI writing assistant for writers who need real sources (2026)",
     "description": "The best AI writing assistant for your job, ranked by whether its facts and citations can be checked. Grammarly, ChatGPT, Claude, Jasper and more compared.",
     "primaryKeyword": "ai writing assistant",
@@ -18,7 +18,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "A. AI writing assistant",
     "pillar": "/blog/best-ai-writing-assistant",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -60,7 +60,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "A. AI writing assistant",
     "pillar": "/blog/best-ai-writing-assistant",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -102,7 +102,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "A. AI writing assistant",
     "pillar": "/blog/best-ai-writing-assistant",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -144,7 +144,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "B. Fact-checking",
     "pillar": "/blog/ai-fact-checker",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -186,7 +186,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "B. Fact-checking",
     "pillar": "/blog/ai-fact-checker",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -216,7 +216,7 @@ export const POSTS: BlogPostSource[] = [
   {
     "number": 6,
     "slug": "how-to-fact-check-an-article",
-    "title": "How to Fact-Check an Article: Editor's Checklist + Free Tools",
+    "title": "How to Fact-Check an Article: Checklist + Free Tools",
     "heading": "How to fact-check an article: an editor's checklist (with free tools)",
     "description": "How to fact-check an article like a magazine checker: a 10-point checklist, a fact-sheet template, free fact checking tools and a corrections policy.",
     "primaryKeyword": "how to fact check an article",
@@ -229,7 +229,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "B. Fact-checking",
     "pillar": "/blog/ai-fact-checker",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -274,7 +274,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "C. AP style and news writing",
     "pillar": "/blog/ap-style-guide",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -322,7 +322,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "C. AP style and news writing",
     "pillar": "/blog/ap-style-guide",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -365,7 +365,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "C. AP style and news writing",
     "pillar": "/blog/ap-style-guide",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -395,7 +395,7 @@ export const POSTS: BlogPostSource[] = [
   {
     "number": 10,
     "slug": "ap-vs-chicago-style",
-    "title": "AP vs. Chicago Style: Differences, Examples, When to Use Each",
+    "title": "AP vs. Chicago Style: Differences, Examples, When to Use",
     "heading": "AP vs. Chicago style: differences, examples and when to use each",
     "description": "Chicago vs. AP style side by side: commas, numbers, dates, titles, book titles and citations, checked against the AP Stylebook and Chicago Manual 18th edition.",
     "primaryKeyword": "chicago vs ap style",
@@ -408,7 +408,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "C. AP style and news writing",
     "pillar": "/blog/ap-style-guide",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -453,7 +453,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "C. AP style and news writing",
     "pillar": "/blog/ap-style-guide",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -483,7 +483,7 @@ export const POSTS: BlogPostSource[] = [
   {
     "number": 12,
     "slug": "inverted-pyramid",
-    "title": "Inverted Pyramid in Journalism: Structure, Examples, Template",
+    "title": "Inverted Pyramid in Journalism: Structure and Examples",
     "heading": "The inverted pyramid in journalism: structure, examples and a template",
     "description": "The inverted pyramid puts the most important facts first. Learn the structure, its real history, an annotated example story and a fill-in template.",
     "primaryKeyword": "inverted pyramid",
@@ -498,7 +498,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "C. AP style and news writing",
     "pillar": "/blog/ap-style-guide",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -541,7 +541,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "C. AP style and news writing",
     "pillar": "/blog/ap-style-guide",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -585,7 +585,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "C. AP style and news writing",
     "pillar": "/blog/ap-style-guide",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -617,7 +617,7 @@ export const POSTS: BlogPostSource[] = [
     "slug": "interview-transcription",
     "title": "Interview Transcription: Formats, Examples and Tools (2026)",
     "heading": "Interview transcription: formats, examples and how to do it fast",
-    "description": "Interview transcription explained: verbatim, intelligent verbatim and edited formats with examples, a template, recording-consent rules and a fair comparison of tools.",
+    "description": "Interview transcription explained: verbatim, intelligent verbatim and edited formats with examples, a template, consent rules and a fair look at tools.",
     "primaryKeyword": "interview transcription",
     "secondaryKeywords": [
       "interview transcription example",
@@ -630,7 +630,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "D. Interviews and transcripts",
     "pillar": "/blog/interview-transcription",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -662,7 +662,7 @@ export const POSTS: BlogPostSource[] = [
     "slug": "transcript-to-story",
     "title": "From Transcript to Story: Find, Quote and Check Interviews",
     "heading": "From transcript to story: how to find, quote and check interview material",
-    "description": "After you transcribe an interview: a 5-step workflow to organize transcripts, find the best quotes, apply AP quote rules, code themes for research and check accuracy.",
+    "description": "After you transcribe an interview: a 5-step workflow to organize transcripts, find the best quotes, apply AP quote rules, code themes and check accuracy.",
     "primaryKeyword": "transcribe interview",
     "secondaryKeywords": [
       "ap style quote attribution",
@@ -673,7 +673,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "D. Interviews and transcripts",
     "pillar": "/blog/interview-transcription",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -718,7 +718,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "E. Screenwriting",
     "pillar": "/blog/screenwriting-software",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -761,7 +761,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "E. Screenwriting",
     "pillar": "/blog/screenwriting-software",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -791,9 +791,9 @@ export const POSTS: BlogPostSource[] = [
   {
     "number": 19,
     "slug": "screenplay-format",
-    "title": "Screenplay Format: Rules, Template and Example (Docs and Word)",
+    "title": "Screenplay Format: Rules, Template and Example (Word, Docs)",
     "heading": "Screenplay format: rules, template and annotated example",
-    "description": "Screenplay format explained: margins, fonts and every element with examples, a title page, montages and intercuts, plus how to format a script in Google Docs and Word.",
+    "description": "Screenplay format explained: margins, fonts and every element with examples, a title page, montages and intercuts, and how to format it in Google Docs and Word.",
     "primaryKeyword": "screenplay format",
     "secondaryKeywords": [
       "screenplay format google docs",
@@ -807,7 +807,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "E. Screenwriting",
     "pillar": "/blog/screenwriting-software",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -839,7 +839,7 @@ export const POSTS: BlogPostSource[] = [
     "slug": "script-coverage",
     "title": "Script Coverage: What It Is, a Free Template and 2 Examples",
     "heading": "Script coverage: what it is, a free template and two full examples",
-    "description": "Script coverage explained: what readers write, Pass, Consider or Recommend, a free coverage template, two full script coverage examples, and what paid services cost.",
+    "description": "Script coverage explained: what readers write, Pass, Consider or Recommend, a free template, two full coverage examples, and what paid services cost.",
     "primaryKeyword": "script coverage",
     "secondaryKeywords": [
       "script coverage examples",
@@ -852,7 +852,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "E. Screenwriting",
     "pillar": "/blog/screenwriting-software",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -896,7 +896,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "E. Screenwriting",
     "pillar": "/blog/screenwriting-software",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -938,7 +938,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "E. Screenwriting",
     "pillar": "/blog/screenwriting-software",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -980,7 +980,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "E. Screenwriting",
     "pillar": "/blog/screenwriting-software",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -1012,7 +1012,7 @@ export const POSTS: BlogPostSource[] = [
     "slug": "ai-citation-generator",
     "title": "AI Citation Generator: Citations That Point to Real Sources",
     "heading": "AI citation generator: get citations that point to real sources",
-    "description": "An AI citation generator should find real sources, not invent them. Compare formatters and source finders, see why AI citations fail, and check any citation fast.",
+    "description": "An AI citation generator should find real sources, not invent them. Compare formatters and source finders, see why AI citations fail, and check any citation.",
     "primaryKeyword": "ai citation generator",
     "secondaryKeywords": [
       "ai citation generator apa",
@@ -1024,7 +1024,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "F. Research and citations",
     "pillar": "/blog/ai-citation-generator",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -1068,7 +1068,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "F. Research and citations",
     "pillar": "/blog/ai-citation-generator",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -1100,7 +1100,7 @@ export const POSTS: BlogPostSource[] = [
     "slug": "how-to-write-a-research-report",
     "title": "How to Write a Research Report: Outline, Template, Example",
     "heading": "How to write a research report: outline, structure and example",
-    "description": "How to write a research report outline for business, policy or technical work: an 8-section template, executive summary tips, an annotated example and AI checks.",
+    "description": "How to write a research report for business, policy or technical work: an 8-section outline, executive summary tips, an annotated example and AI checks.",
     "primaryKeyword": "how to write a research report outline",
     "secondaryKeywords": [
       "how to write a research report",
@@ -1111,7 +1111,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "F. Research and citations",
     "pillar": "/blog/ai-citation-generator",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -1155,7 +1155,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "F. Research and citations",
     "pillar": "/blog/ai-citation-generator",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -1197,7 +1197,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "F. Research and citations",
     "pillar": "/blog/ai-citation-generator",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -1229,7 +1229,7 @@ export const POSTS: BlogPostSource[] = [
     "slug": "zotero-alternatives",
     "title": "Best Zotero Alternatives (2026): Reference Managers Compared",
     "heading": "Best Zotero alternatives: reference managers that help you write",
-    "description": "The best Zotero alternatives in 2026: Mendeley, EndNote, Paperpile, ReadCube, JabRef, Citavi and WriteOrbit, compared on price, Word plugins, AI and self-hosting.",
+    "description": "The best Zotero alternatives in 2026: Mendeley, EndNote, Paperpile, ReadCube, JabRef, Citavi and WriteOrbit, compared on price, Word plugins and AI.",
     "primaryKeyword": "zotero alternative",
     "secondaryKeywords": [
       "self hosted zotero alternative",
@@ -1239,7 +1239,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "F. Research and citations",
     "pillar": "/blog/ai-citation-generator",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [
@@ -1283,7 +1283,7 @@ export const POSTS: BlogPostSource[] = [
     ],
     "cluster": "F. Research and citations",
     "pillar": "/blog/ai-citation-generator",
-    "author": "[AUTHOR NAME]",
+    "author": "Mubarak",
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "faq": [

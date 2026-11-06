@@ -6,7 +6,7 @@ primary_keyword: "headline generator"
 secondary_keywords: ["news headline generator", "newspaper headline generator", "ai headline generator", "ap style headline", "headline capitalization ap style", "seo headline generator", "press release headline generator"]
 cluster: "C. AP style and news writing"
 pillar: "/blog/ap-style-guide"
-author: "[AUTHOR NAME]"
+author: "Mubarak"
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:
