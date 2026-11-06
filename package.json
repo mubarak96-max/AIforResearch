@@ -23,7 +23,8 @@
     "dev:vinext": "node scripts/build-blog.mjs && vite dev --port 3001",
     "build:vinext": "node scripts/build-blog.mjs && vite build",
     "start:vinext": "vite preview",
-    "deploy:vinext": "vinext-cloudflare deploy --warm-cache",
+    "deploy:vinext": "vinext-cloudflare deploy",
+    "deploy:vinext:warm": "vinext-cloudflare deploy --warm-cache",
     "build:blog": "node scripts/build-blog.mjs"
   },
   "dependencies": {
