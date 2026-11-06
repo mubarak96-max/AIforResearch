@@ -243,8 +243,8 @@ const CitationStyleSelector: React.FC<CitationStyleSelectorProps> = ({
         onClick={() => setIsOpen(!isOpen)}
         onKeyDown={handleKeyDown}
         disabled={isLoadingStyle}
-        className={`flex items-center gap-1.5 px-2 py-1.5 md:px-3 md:py-1.5 bg-white border border-[#e5e7eb] rounded-lg 
-                   hover:bg-[#f8fafc] hover:border-[#cbd5e1] transition-all duration-200
+        className={`flex items-center gap-1.5 px-2 py-1.5 md:px-3 md:py-1.5 bg-surface border border-line rounded-lg 
+                   hover:bg-soft hover:border-line-3 transition-all duration-200
                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
                    ${isLoadingStyle ? 'opacity-70 cursor-wait' : ''} ${triggerClassName}`}
         aria-haspopup="listbox"
@@ -252,29 +252,29 @@ const CitationStyleSelector: React.FC<CitationStyleSelectorProps> = ({
         aria-label="Select citation style"
       >
         {isLoadingStyle ? (
-          <svg className="animate-spin w-3 h-3 md:w-4 md:h-4 text-[#64748b] flex-shrink-0" viewBox="0 0 24 24">
+          <svg className="animate-spin w-3 h-3 md:w-4 md:h-4 text-muted flex-shrink-0" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>
         ) : (
-        <svg className="w-3 h-3 md:w-4 md:h-4 text-[#64748b] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-3 h-3 md:w-4 md:h-4 text-muted flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                 d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
         </svg>
         )}
         
-        <span className="text-xs md:text-sm font-medium text-[#334155] truncate flex-1 min-w-0 max-w-[120px] md:max-w-[180px]">
+        <span className="text-xs md:text-sm font-medium text-ink-2 truncate flex-1 min-w-0 max-w-[120px] md:max-w-[180px]">
           {selectedStyleInfo.shortTitle || selectedStyleInfo.title}
         </span>
         
         {!hideExample ? (
-          <span className="text-xs text-[#94a3b8] hidden md:inline flex-shrink-0">
+          <span className="text-xs text-subtle hidden md:inline flex-shrink-0">
             {getExampleCitation(selectedStyleInfo)}
           </span>
         ) : null}
         
         <motion.svg
-          className="w-3 h-3 md:w-4 md:h-4 text-[#94a3b8] flex-shrink-0"
+          className="w-3 h-3 md:w-4 md:h-4 text-subtle flex-shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -293,12 +293,12 @@ const CitationStyleSelector: React.FC<CitationStyleSelectorProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className={`absolute top-full right-0 mt-1 w-[260px] bg-white rounded-lg shadow-xl 
-                       border border-[#e5e7eb] overflow-hidden z-[1300] ${dropdownClassName}`}
+            className={`absolute top-full right-0 mt-1 w-[260px] bg-surface rounded-lg shadow-xl 
+                       border border-line overflow-hidden z-[1300] ${dropdownClassName}`}
             role="listbox"
           >
             {/* Search Input */}
-            <div className="p-2 border-b border-[#f1f5f9]">
+            <div className="p-2 border-b border-line-2">
               <div className="relative">
                 {isSearching ? (
                   <svg className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-primary-500 animate-spin" viewBox="0 0 24 24">
@@ -307,7 +307,7 @@ const CitationStyleSelector: React.FC<CitationStyleSelectorProps> = ({
                   </svg>
                 ) : (
                 <svg 
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-[#94a3b8]"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-subtle"
                   fill="none" 
                   viewBox="0 0 24 24" 
                   stroke="currentColor"
@@ -326,20 +326,20 @@ const CitationStyleSelector: React.FC<CitationStyleSelectorProps> = ({
                     setFocusedIndex(0);
                   }}
                   onKeyDown={handleKeyDown}
-                  className="w-full pl-8 pr-3 py-1.5 text-xs border border-[#e5e7eb] rounded-md
+                  className="w-full pl-8 pr-3 py-1.5 text-xs border border-line rounded-md
                              focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500
-                             placeholder-[#94a3b8]"
+                             placeholder-subtle"
                 />
               </div>
               
               {/* Toggle for searching all styles */}
               <div className="flex items-center justify-between mt-1.5">
-                <label className="flex items-center gap-1.5 cursor-pointer text-[10px] text-[#64748b]">
+                <label className="flex items-center gap-1.5 cursor-pointer text-[10px] text-muted">
                   <input
                     type="checkbox"
                     checked={showAllStyles}
                     onChange={(e) => setShowAllStyles(e.target.checked)}
-                    className="rounded border-[#e5e7eb] text-primary-600 focus:ring-primary-500 w-3 h-3"
+                    className="rounded border-line text-primary-600 focus:ring-primary-500 w-3 h-3"
                   />
                   <span>Search all CSL styles</span>
                 </label>
@@ -351,7 +351,7 @@ const CitationStyleSelector: React.FC<CitationStyleSelectorProps> = ({
 
             {/* Quick Category Filters */}
             {!searchQuery && (
-              <div className="px-2 py-1.5 border-b border-[#f1f5f9] flex gap-1 flex-wrap">
+              <div className="px-2 py-1.5 border-b border-line-2 flex gap-1 flex-wrap">
                 {['all', 'author-date', 'numeric', 'note', 'label'].map((cat) => (
                   <button
                     key={cat}
@@ -365,7 +365,7 @@ const CitationStyleSelector: React.FC<CitationStyleSelectorProps> = ({
                     className={`px-1.5 py-0.5 text-[10px] rounded-full transition-colors ${
                       (cat === 'all' && !searchQuery) 
                         ? 'bg-primary-100 text-primary-700 font-medium'
-                        : 'bg-[#f1f5f9] text-[#64748b] hover:bg-[#e2e8f0]'
+                        : 'bg-line-2 text-muted hover:bg-line'
                     }`}
                   >
                     {cat === 'all' ? 'All' : getCategoryLabel(cat as CslStyleInfo['category'])}
@@ -383,11 +383,11 @@ const CitationStyleSelector: React.FC<CitationStyleSelectorProps> = ({
               {Object.entries(groupedStyles).map(([category, styles]) => (
                 <li key={category}>
                   {/* Category Header */}
-                  <div className="px-2 py-1.5 bg-[#f8fafc] sticky top-0 z-10">
-                    <div className="flex items-center gap-1.5 text-[10px] font-semibold text-[#64748b] uppercase tracking-wider">
+                  <div className="px-2 py-1.5 bg-soft sticky top-0 z-10">
+                    <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted uppercase tracking-wider">
                       {getCategoryIcon(category)}
                       {getCategoryLabel(category as CslStyleInfo['category'])}
-                      <span className="text-[#94a3b8] font-normal">({styles.length})</span>
+                      <span className="text-subtle font-normal">({styles.length})</span>
                     </div>
                   </div>
                   
@@ -406,8 +406,8 @@ const CitationStyleSelector: React.FC<CitationStyleSelectorProps> = ({
                           className={`
                             px-2 py-1.5 cursor-pointer transition-colors duration-100
                             ${isSelected ? 'bg-primary-50' : ''}
-                            ${isFocused ? 'bg-[#f1f5f9]' : ''}
-                            ${!isSelected && !isFocused ? 'hover:bg-[#f8fafc]' : ''}
+                            ${isFocused ? 'bg-line-2' : ''}
+                            ${!isSelected && !isFocused ? 'hover:bg-soft' : ''}
                           `}
                           role="option"
                           aria-selected={isSelected}
@@ -415,7 +415,7 @@ const CitationStyleSelector: React.FC<CitationStyleSelectorProps> = ({
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <span className={`text-xs font-medium truncate ${isSelected ? 'text-[#1d4ed8]' : 'text-[#0f172a]'}`}>
+                                <span className={`text-xs font-medium truncate ${isSelected ? 'text-brand-600' : 'text-ink'}`}>
                                   {style.title}
                                 </span>
                                 {isSelected && (
@@ -430,13 +430,13 @@ const CitationStyleSelector: React.FC<CitationStyleSelectorProps> = ({
                                 )}
                               </div>
                               {style.fields && style.fields.length > 0 && (
-                                <p className="text-[10px] text-[#64748b] mt-0.5 truncate">
+                                <p className="text-[10px] text-muted mt-0.5 truncate">
                                   {style.fields.slice(0, 3).map(f => f.replace(/-/g, ' ')).join(', ')}
                               </p>
                               )}
                             </div>
                             {!hideExample ? (
-                              <span className="text-[10px] font-mono text-[#94a3b8] bg-[#f1f5f9] px-1 py-0.5 rounded flex-shrink-0">
+                              <span className="text-[10px] font-mono text-subtle bg-line-2 px-1 py-0.5 rounded flex-shrink-0">
                                 {getExampleCitation(style)}
                               </span>
                             ) : null}
@@ -457,16 +457,16 @@ const CitationStyleSelector: React.FC<CitationStyleSelectorProps> = ({
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
-                      <p className="text-xs text-[#64748b]">Searching styles...</p>
+                      <p className="text-xs text-muted">Searching styles...</p>
                     </>
                   ) : (
                     <>
-                  <svg className="w-8 h-8 mx-auto text-[#cbd5e1] mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-8 h-8 mx-auto text-line-3 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
                           d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <p className="text-xs text-[#64748b]">No citation styles found</p>
-                      <p className="text-[10px] text-[#94a3b8] mt-1">
+                  <p className="text-xs text-muted">No citation styles found</p>
+                      <p className="text-[10px] text-subtle mt-1">
                         Try enabling &quot;Search all CSL styles&quot; above
                       </p>
                     </>
@@ -476,9 +476,9 @@ const CitationStyleSelector: React.FC<CitationStyleSelectorProps> = ({
             </ul>
 
             {/* Footer */}
-            <div className="px-2 py-1.5 bg-[#f8fafc] border-t border-[#f1f5f9]">
+            <div className="px-2 py-1.5 bg-soft border-t border-line-2">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] text-[#94a3b8]">
+                <p className="text-[10px] text-subtle">
                   {displayStyles.length} style{displayStyles.length !== 1 ? 's' : ''} shown
                 </p>
                 <a 

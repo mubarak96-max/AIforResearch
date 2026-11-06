@@ -26,7 +26,7 @@ export default async function FeaturesPage() {
         <ul className="mx-auto flex max-w-[860px] flex-wrap justify-center gap-2">
           {FEATURES.map((feature) => (
             <li key={feature.id}>
-              <a href={`#${feature.id}`} className={`inline-flex h-9 items-center gap-2 rounded-full border border-line bg-white px-3.5 text-[13.5px] text-ink-2 hover:border-brand-100 hover:text-brand ${focusRing}`}>
+              <a href={`#${feature.id}`} className={`inline-flex h-9 items-center gap-2 rounded-full border border-line bg-surface px-3.5 text-[13.5px] text-ink-2 hover:border-brand-100 hover:text-brand ${focusRing}`}>
                 <span className="text-brand [&>svg]:h-4 [&>svg]:w-4" aria-hidden="true">{feature.icon}</span>{feature.name}
               </a>
             </li>

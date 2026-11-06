@@ -14,7 +14,7 @@ function FreePlanStrip() {
         <span className="font-semibold text-white">Free plan</span>
         <span className="size-[3px] rounded-full bg-slate-500" aria-hidden="true" />
         <span>No <span className="max-[379px]:hidden">credit </span>card required</span>
-        <Link href="/signup" className={`inline-flex items-center gap-1 rounded font-semibold text-blue-300 transition-colors hover:text-blue-200 ${focusRing}`}>
+        <Link href="/signup" className={`inline-flex items-center gap-1 rounded font-semibold text-accent-300 transition-colors hover:text-accent-100 ${focusRing}`}>
           Start writing <LuArrowRight className="size-3.5" aria-hidden="true" />
         </Link>
       </div>
@@ -29,7 +29,7 @@ export async function SiteHeader() {
   return (
     <>
       <AuthAware initial={signedIn} signedIn={null} signedOut={<FreePlanStrip />} />
-      <header className="border-b border-line bg-white">
+      <header className="border-b border-line bg-surface">
         <div className={`${container} flex h-14 items-center md:h-16`}>
           <Link href="/" className={`shrink-0 rounded-lg ${focusRing}`}>
             <Logo size={26} />

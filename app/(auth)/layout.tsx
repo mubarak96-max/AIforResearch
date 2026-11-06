@@ -11,7 +11,7 @@ const HIGHLIGHTS = ['Autocomplete that cites real papers', '250M+ papers to find
  */
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid min-h-dvh bg-white text-ink lg:grid-cols-2">
+    <div className="grid min-h-dvh bg-surface text-ink lg:grid-cols-2">
       <aside className="flex items-center justify-between border-b border-line bg-soft px-5 py-3 lg:flex-col lg:items-stretch lg:justify-between lg:border-b-0 lg:border-r lg:px-10 lg:py-8">
         <Link href="/" className={`rounded-lg ${focusRing}`}>
           <Logo size={30} />

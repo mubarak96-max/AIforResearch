@@ -48,12 +48,12 @@ export default function GoogleDocsOutlineSidebar({
   const list = (
     <>
       <div className="flex items-center justify-between px-2.5 pb-1.5 pt-1">
-        <span className="text-[12px] font-semibold uppercase tracking-[0.06em] text-[#94a3b8]">Outline</span>
+        <span className="text-[12px] font-semibold uppercase tracking-[0.06em] text-subtle">Outline</span>
         <button
           type="button"
           onClick={onHidePanel}
           aria-label="Hide document outline"
-          className="inline-flex h-7 w-7 items-center justify-center rounded-[8px] text-[#94a3b8] hover:bg-[#f1f5f9] hover:text-[#0f172a]"
+          className="inline-flex h-7 w-7 items-center justify-center rounded-[8px] text-subtle hover:bg-line-2 hover:text-ink"
         >
           <LuX className="h-4 w-4" />
         </button>
@@ -72,10 +72,10 @@ export default function GoogleDocsOutlineSidebar({
                     aria-current={isActive ? 'location' : undefined}
                     className={`flex w-full items-center rounded-[8px] py-1.5 pr-2.5 text-left text-[13.5px] leading-5 transition-colors ${
                       isActive
-                        ? 'bg-[#eff6ff] font-medium text-[var(--theme-primary-dark)]'
+                        ? 'bg-brand-50 font-medium text-[var(--theme-primary-dark)]'
                         : item.level <= 1
-                          ? 'font-medium text-[#0f172a] hover:bg-[#f8fafc]'
-                          : 'text-[#475569] hover:bg-[#f8fafc] hover:text-[#0f172a]'
+                          ? 'font-medium text-ink hover:bg-soft'
+                          : 'text-ink-3 hover:bg-soft hover:text-ink'
                     }`}
                     style={{ paddingLeft: `${10 + Math.max(item.level - 1, 0) * 14}px` }}
                   >
@@ -88,7 +88,7 @@ export default function GoogleDocsOutlineSidebar({
 
           {bookmarkItems.length > 0 ? (
             <div>
-              <div className="px-2.5 pb-1 text-[12px] font-semibold uppercase tracking-[0.06em] text-[#94a3b8]">Bookmarks</div>
+              <div className="px-2.5 pb-1 text-[12px] font-semibold uppercase tracking-[0.06em] text-subtle">Bookmarks</div>
               <div className="space-y-px">
                 {bookmarkItems.map((item) => {
                   const isActive = item.id === activeOutlineId;
@@ -98,10 +98,10 @@ export default function GoogleDocsOutlineSidebar({
                       type="button"
                       onClick={() => onSelectOutlineItem(item.id)}
                       className={`flex w-full items-center gap-2 rounded-[8px] px-2.5 py-1.5 text-left text-[13.5px] transition-colors ${
-                        isActive ? 'bg-[#eff6ff] text-[var(--theme-primary-dark)]' : 'text-[#475569] hover:bg-[#f8fafc] hover:text-[#0f172a]'
+                        isActive ? 'bg-brand-50 text-[var(--theme-primary-dark)]' : 'text-ink-3 hover:bg-soft hover:text-ink'
                       }`}
                     >
-                      <LuBookmark className="h-4 w-4 shrink-0 text-[#94a3b8]" />
+                      <LuBookmark className="h-4 w-4 shrink-0 text-subtle" />
                       <span className="truncate">{item.title}</span>
                     </button>
                   );
@@ -111,7 +111,7 @@ export default function GoogleDocsOutlineSidebar({
           ) : null}
         </div>
       ) : (
-        <p className="px-2.5 pb-2 pt-1 text-[13px] leading-5 text-[#64748b]">
+        <p className="px-2.5 pb-2 pt-1 text-[13px] leading-5 text-muted">
           Headings and bookmarks you add to the document appear here.
         </p>
       )}
@@ -123,8 +123,8 @@ export default function GoogleDocsOutlineSidebar({
     return createPortal(
       <div className="fixed inset-0 z-[12600]" role="dialog" aria-modal="true" aria-label="Document outline">
         <button type="button" aria-label="Close outline" className="absolute inset-0 h-full w-full cursor-default bg-[rgba(15,23,42,.35)]" onClick={onHidePanel} />
-        <div className="absolute inset-x-0 bottom-0 max-h-[70vh] overflow-y-auto rounded-t-[24px] bg-white px-3 pb-[calc(16px+env(safe-area-inset-bottom))] pt-2 shadow-[0_-10px_30px_-10px_rgba(15,23,42,.3)]">
-          <div className="mx-auto mb-2 h-[5px] w-[42px] rounded-full bg-[#cbd5e1]" />
+        <div className="absolute inset-x-0 bottom-0 max-h-[70vh] overflow-y-auto rounded-t-[24px] bg-surface px-3 pb-[calc(16px+env(safe-area-inset-bottom))] pt-2 shadow-[0_-10px_30px_-10px_rgba(15,23,42,.3)]">
+          <div className="mx-auto mb-2 h-[5px] w-[42px] rounded-full bg-line-3" />
           {list}
         </div>
       </div>,
@@ -135,7 +135,7 @@ export default function GoogleDocsOutlineSidebar({
   // Desktop: the side rail's Outline button opens this card over the page's left margin.
   if (!isPanelVisible) return null;
   return (
-    <aside className="ai-editor-print-hidden absolute left-4 top-4 z-30 max-h-[calc(100%-32px)] w-[264px] overflow-y-auto rounded-[14px] border border-[#e5e7eb] bg-white p-1.5 shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
+    <aside className="ai-editor-print-hidden absolute left-4 top-4 z-30 max-h-[calc(100%-32px)] w-[264px] overflow-y-auto rounded-[14px] border border-line bg-surface p-1.5 shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
       {list}
     </aside>
   );

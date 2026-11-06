@@ -26,7 +26,7 @@ export default async function HowItWorksPage() {
           <li key={step.id} id={step.id} aria-labelledby={`${step.id}-title`} className="grid scroll-mt-8 items-center gap-8 md:grid-cols-2 md:gap-14">
             <div className={index % 2 ? 'md:order-2' : ''}>
               <p className="flex items-center gap-3">
-                <span className="grid size-10 place-items-center rounded-full bg-ink text-[15px] font-semibold text-white" aria-hidden="true">{index + 1}</span>
+                <span className="grid size-10 place-items-center rounded-full bg-ink text-[15px] font-semibold text-on-ink" aria-hidden="true">{index + 1}</span>
                 <span className="grid size-10 place-items-center rounded-xl bg-brand-50 text-brand" aria-hidden="true">{step.icon}</span>
               </p>
               <h2 id={`${step.id}-title`} className="mt-4 text-balance text-[24px] font-semibold leading-[1.2] tracking-[-0.02em] text-ink md:text-[30px]">

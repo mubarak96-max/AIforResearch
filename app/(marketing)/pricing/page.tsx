@@ -38,10 +38,10 @@ export default async function PricingPage() {
   const plans = await loadPublicPlans();
   return (
     <>
-      <div style={{ background: 'radial-gradient(900px 400px at 50% -50px, #dbeafe 0%, rgba(219,234,254,0) 70%)' }}>
+      <div style={{ background: 'radial-gradient(900px 400px at 50% -50px, var(--color-brand-100) 0%, transparent 70%)' }}>
         <div className={container}>
           <div className="pt-10 text-center md:pt-[46px]">
-            <h1 className="text-balance text-[34px] font-semibold leading-[1.08] tracking-[-0.035em] text-ink sm:text-[44px] lg:text-[52px]">
+            <h1 className="text-balance font-serif text-[34px] font-semibold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[44px] lg:text-[52px]">
               Simple pricing. Write more, worry less.
             </h1>
             <p className="mt-3.5 text-balance text-[16px] text-muted sm:text-[17px]">

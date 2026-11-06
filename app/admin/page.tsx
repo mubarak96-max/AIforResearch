@@ -157,7 +157,7 @@ export default function AdminPage() {
     return (
       <button key={id} type="button" onClick={() => open(id)} aria-current={active ? 'page' : undefined}
         className={`flex h-9 shrink-0 items-center gap-2.5 rounded-[10px] px-2.5 text-left text-[14px] font-medium transition-colors lg:w-full ${
-          active ? 'bg-brand-50 text-brand' : 'text-ink-2 hover:bg-soft'} max-lg:border max-lg:bg-white max-lg:px-3 ${active ? 'max-lg:border-brand-100 max-lg:bg-brand-50' : 'max-lg:border-line'}`}>
+          active ? 'bg-brand-50 text-brand' : 'text-ink-2 hover:bg-soft'} max-lg:border max-lg:bg-surface max-lg:px-3 ${active ? 'max-lg:border-brand-100 max-lg:bg-brand-50' : 'max-lg:border-line'}`}>
         <Icon size={16} className="shrink-0" />
         <span className="flex-1 whitespace-nowrap">{label}</span>
         {dot && <span className={`h-2 w-2 shrink-0 rounded-full ${dot}`} aria-hidden="true" />}
@@ -246,7 +246,7 @@ export default function AdminPage() {
       {notice && (
         <div role={notice.tone === 'error' ? 'alert' : 'status'}
           className={`fixed bottom-24 left-1/2 z-[70] flex max-w-[calc(100vw-32px)] -translate-x-1/2 items-center gap-2.5 rounded-xl px-4 py-3 text-[14px] shadow-[0_18px_40px_-16px_rgba(15,23,42,.5)] md:bottom-6 ${
-            notice.tone === 'ok' ? 'bg-ink text-white' : 'border border-red-200 bg-red-50 text-red-800'}`}>
+            notice.tone === 'ok' ? 'bg-ink text-on-ink' : 'border border-red-200 bg-red-50 text-red-800'}`}>
           {notice.tone === 'ok' ? <LuCircleCheck size={17} className="shrink-0 text-green-400" /> : <LuCircleAlert size={17} className="shrink-0" />}
           <span className="min-w-0">{notice.text}</span>
           <button type="button" aria-label="Dismiss" onClick={() => setNotice(null)} className="ml-1 shrink-0 opacity-70 hover:opacity-100"><LuX size={15} /></button>

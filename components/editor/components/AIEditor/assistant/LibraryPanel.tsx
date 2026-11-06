@@ -118,20 +118,20 @@ export default function LibraryPanel({ onCite, onAsk, citing, visible = true }: 
     }
   }, []);
 
-  const smallButton = 'inline-flex h-7 items-center gap-1 rounded-lg px-2 text-[12.5px] font-medium text-[#475569] transition-colors hover:bg-[#f1f5f9] hover:text-[#0f172a] disabled:opacity-60';
+  const smallButton = 'inline-flex h-7 items-center gap-1 rounded-lg px-2 text-[12.5px] font-medium text-ink-3 transition-colors hover:bg-line-2 hover:text-ink disabled:opacity-60';
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-white">
+    <div className="flex h-full min-h-0 flex-col bg-surface">
       <div className="px-3 pt-3">
         <div className="flex items-center gap-1.5">
           <div className="group relative min-w-0 flex-1">
-            <LuSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94a3b8] group-focus-within:text-[var(--theme-primary,#2563eb)]" />
+            <LuSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle group-focus-within:text-[var(--theme-primary,var(--color-brand))]" />
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={total ? `Search ${total} source${total === 1 ? '' : 's'}` : 'Search Library'}
               aria-label="Search your Library"
-              className="h-9 w-full rounded-[10px] border border-[#e2e8f0] bg-white pl-9 pr-3 text-[14px] text-[#0f172a] outline-none transition-[border,box-shadow] placeholder:text-[#94a3b8] focus:border-[var(--theme-primary,#2563eb)] focus:shadow-[0_0_0_3px_#eff6ff]"
+              className="h-9 w-full rounded-[10px] border border-line bg-surface pl-9 pr-3 text-[14px] text-ink outline-none transition-[border,box-shadow] placeholder:text-subtle focus:border-[var(--theme-primary,var(--color-brand))] focus:shadow-[0_0_0_3px_var(--color-brand-50)]"
             />
           </div>
           <button
@@ -139,28 +139,28 @@ export default function LibraryPanel({ onCite, onAsk, citing, visible = true }: 
             onClick={() => setAdding('pdfs')}
             aria-label="Add to Library"
             title="Upload PDFs, or import from Zotero, Mendeley, .bib/.ris or IDs"
-            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-[10px] bg-[#eff6ff] px-3 text-[13px] font-semibold text-[#1d4ed8] transition-colors hover:bg-[#dbeafe]"
+            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-[10px] bg-brand-50 px-3 text-[13px] font-semibold text-brand-600 transition-colors hover:bg-brand-100"
           >
             <LuUpload className="h-4 w-4" />
             Add
           </button>
         </div>
         {/* Sources and Collections (folders). */}
-        <div className="mt-2 flex items-center gap-4 border-b border-[#f1f5f9] px-1">
+        <div className="mt-2 flex items-center gap-4 border-b border-line-2 px-1">
           {(['sources', 'collections'] as const).map((value) => (
             <button
               key={value}
               type="button"
               aria-pressed={view === value}
               onClick={() => setView(value)}
-              className={`-mb-px h-9 border-b-2 text-[13.5px] transition-colors ${view === value ? 'border-[var(--theme-primary,#2563eb)] font-semibold text-[#0f172a]' : 'border-transparent font-medium text-[#64748b] hover:text-[#0f172a]'}`}
+              className={`-mb-px h-9 border-b-2 text-[13.5px] transition-colors ${view === value ? 'border-[var(--theme-primary,var(--color-brand))] font-semibold text-ink' : 'border-transparent font-medium text-muted hover:text-ink'}`}
             >
               {value === 'sources' ? 'Sources' : 'Collections'}
-              <span className="ml-1.5 font-normal text-[#94a3b8]">{value === 'sources' ? total || '' : folders.length || ''}</span>
+              <span className="ml-1.5 font-normal text-subtle">{value === 'sources' ? total || '' : folders.length || ''}</span>
             </button>
           ))}
           {folderId ? (
-            <span className="ml-auto inline-flex max-w-[50%] items-center gap-1 rounded-md bg-[#eff6ff] px-1.5 py-0.5 text-[12px] text-[#1d4ed8]">
+            <span className="ml-auto inline-flex max-w-[50%] items-center gap-1 rounded-md bg-brand-50 px-1.5 py-0.5 text-[12px] text-brand-600">
               <LuFolder className="h-3 w-3 shrink-0" />
               <span className="truncate">{folders.find((folder) => folder.id === folderId)?.name || 'Folder'}</span>
               <button type="button" aria-label="All sources" onClick={() => setFolderId('')}><LuX className="h-3 w-3" /></button>
@@ -171,7 +171,7 @@ export default function LibraryPanel({ onCite, onAsk, citing, visible = true }: 
 
       {view === 'collections' ? (
         <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-4 pt-2">
-          {folders.length === 0 ? <p className="py-8 text-center text-[13px] text-[#94a3b8]">No collections yet</p> : null}
+          {folders.length === 0 ? <p className="py-8 text-center text-[13px] text-subtle">No collections yet</p> : null}
           {folders.map((folder) => (
             <button
               key={folder.id}
@@ -180,14 +180,14 @@ export default function LibraryPanel({ onCite, onAsk, citing, visible = true }: 
                 setFolderId(folder.id);
                 setView('sources');
               }}
-              className="flex w-full items-center gap-2.5 rounded-[10px] px-2.5 py-2 text-left hover:bg-[#f8fafc]"
+              className="flex w-full items-center gap-2.5 rounded-[10px] px-2.5 py-2 text-left hover:bg-soft"
             >
-              <LuFolder className="h-[18px] w-[18px] shrink-0 text-[var(--theme-primary,#2563eb)]" />
+              <LuFolder className="h-[18px] w-[18px] shrink-0 text-[var(--theme-primary,var(--color-brand))]" />
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-[13.5px] font-medium text-[#0f172a]">{folder.name}</span>
-                <span className="block text-[12px] text-[#64748b]">{folder.document_count} source{folder.document_count === 1 ? '' : 's'}</span>
+                <span className="block truncate text-[13.5px] font-medium text-ink">{folder.name}</span>
+                <span className="block text-[12px] text-muted">{folder.document_count} source{folder.document_count === 1 ? '' : 's'}</span>
               </span>
-              <LuChevronRight className="h-4 w-4 text-[#cbd5e1]" />
+              <LuChevronRight className="h-4 w-4 text-line-3" />
             </button>
           ))}
         </div>
@@ -196,13 +196,13 @@ export default function LibraryPanel({ onCite, onAsk, citing, visible = true }: 
         {error ? <div className="mt-2 rounded-[12px] border border-[#fecaca] bg-[#fef2f2] px-3 py-2 text-[13px] text-[#991b1b]">{error}</div> : null}
         {!loading && !error && documents.length === 0 ? (
           query ? (
-            <p className="py-8 text-center text-[13px] text-[#94a3b8]">No matches</p>
+            <p className="py-8 text-center text-[13px] text-subtle">No matches</p>
           ) : (
             <div className="flex flex-col items-center px-6 pt-14 text-center">
-              <span className="grid h-11 w-11 place-items-center rounded-full bg-[#f1f5f9] text-[#94a3b8]"><LuLibrary className="h-5 w-5" /></span>
-              <p className="mt-3 text-[14px] font-semibold text-[#0f172a]">Your Library is empty</p>
-              <p className="mt-1 text-[13px] text-[#64748b]">Add PDFs, or import from Zotero, Mendeley or a .bib file.</p>
-              <button type="button" onClick={() => setAdding('pdfs')} className="mt-4 inline-flex h-8 items-center gap-1.5 rounded-lg bg-[#eff6ff] px-3 text-[13px] font-semibold text-[#1d4ed8] transition-colors hover:bg-[#dbeafe]">
+              <span className="grid h-11 w-11 place-items-center rounded-full bg-line-2 text-subtle"><LuLibrary className="h-5 w-5" /></span>
+              <p className="mt-3 text-[14px] font-semibold text-ink">Your Library is empty</p>
+              <p className="mt-1 text-[13px] text-muted">Add PDFs, or import from Zotero, Mendeley or a .bib file.</p>
+              <button type="button" onClick={() => setAdding('pdfs')} className="mt-4 inline-flex h-8 items-center gap-1.5 rounded-lg bg-brand-50 px-3 text-[13px] font-semibold text-brand-600 transition-colors hover:bg-brand-100">
                 <LuUpload className="h-4 w-4" />Add to Library
               </button>
             </div>
@@ -225,17 +225,17 @@ export default function LibraryPanel({ onCite, onAsk, citing, visible = true }: 
                 : authors.map(surname).join(' & ')
               : 'Unknown authors';
             return (
-              <article key={document.id} className="group flex gap-2.5 rounded-[12px] px-2 py-2.5 transition-colors hover:bg-[#f8fafc]">
+              <article key={document.id} className="group flex gap-2.5 rounded-[12px] px-2 py-2.5 transition-colors hover:bg-soft">
                 <span
-                  className={`mt-0.5 grid h-10 w-8 shrink-0 place-items-center rounded-md text-[9.5px] font-bold ${isPdf ? 'bg-[#fef2f2] text-[#dc2626]' : 'bg-[#f1f5f9] text-[#94a3b8]'}`}
+                  className={`mt-0.5 grid h-10 w-8 shrink-0 place-items-center rounded-md text-[9.5px] font-bold ${isPdf ? 'bg-[#fef2f2] text-[#dc2626]' : 'bg-line-2 text-subtle'}`}
                   aria-hidden="true"
                 >
                   {isPdf ? 'PDF' : <LuFileText className="h-4 w-4" />}
                 </span>
                 <div className="min-w-0 flex-1">
                   <button type="button" onClick={() => setExpandedId(expanded ? null : document.id)} aria-expanded={expanded} className="block w-full text-left">
-                    <h4 className={`text-[13.5px] font-semibold leading-[1.35] text-[#0f172a] ${expanded ? '' : 'line-clamp-2'}`}>{document.title || document.filename}</h4>
-                    <p className="mt-0.5 truncate text-[12.5px] text-[#64748b]">
+                    <h4 className={`text-[13.5px] font-semibold leading-[1.35] text-ink ${expanded ? '' : 'line-clamp-2'}`}>{document.title || document.filename}</h4>
+                    <p className="mt-0.5 truncate text-[12.5px] text-muted">
                       {authorLabel}
                       {year ? ` · ${year}` : ''}
                       {document.publisher && !expanded ? <span className="italic"> · {document.publisher}</span> : null}
@@ -248,21 +248,21 @@ export default function LibraryPanel({ onCite, onAsk, citing, visible = true }: 
                       <span className="mt-1 inline-flex rounded-md bg-[#fef2f2] px-1.5 py-0.5 text-[11.5px] font-medium text-[#b91c1c]">Could not read</span>
                     ) : null}
                     {(document as { folder_id?: string | null }).folder_id && !folderId ? (
-                      <span className="mt-1 inline-flex max-w-full items-center gap-1 rounded-md border border-[#e5e7eb] px-1.5 py-0.5 text-[11.5px] text-[#475569]">
-                        <LuFolder className="h-3 w-3 shrink-0 text-[var(--theme-primary,#2563eb)]" />
+                      <span className="mt-1 inline-flex max-w-full items-center gap-1 rounded-md border border-line px-1.5 py-0.5 text-[11.5px] text-ink-3">
+                        <LuFolder className="h-3 w-3 shrink-0 text-[var(--theme-primary,var(--color-brand))]" />
                         <span className="truncate">{folders.find((folder) => folder.id === (document as { folder_id?: string | null }).folder_id)?.name || 'Folder'}</span>
                       </span>
                     ) : null}
                   </button>
                   {expanded ? (
-                    <div className="mt-2 space-y-1.5 text-[13px] text-[#334155]">
-                      {document.publisher ? <p className="text-[12.5px] italic text-[#64748b]">{document.publisher}</p> : null}
-                      {document.abstract ? <p className="leading-[1.5]">{document.abstract}</p> : <p className="text-[#64748b]">No abstract.</p>}
+                    <div className="mt-2 space-y-1.5 text-[13px] text-ink-2">
+                      {document.publisher ? <p className="text-[12.5px] italic text-muted">{document.publisher}</p> : null}
+                      {document.abstract ? <p className="leading-[1.5]">{document.abstract}</p> : <p className="text-muted">No abstract.</p>}
                       {document.doi ? (
                         <button
                           type="button"
                           onClick={() => void navigator.clipboard?.writeText(String(document.doi)).then(() => toast.success('DOI copied')).catch(() => undefined)}
-                          className="inline-flex items-center gap-1 text-[12.5px] text-[#64748b] hover:text-[#0f172a]"
+                          className="inline-flex items-center gap-1 text-[12.5px] text-muted hover:text-ink"
                         >
                           <LuCopy className="h-3.5 w-3.5" /> {document.doi}
                         </button>
@@ -274,7 +274,7 @@ export default function LibraryPanel({ onCite, onAsk, citing, visible = true }: 
                       type="button"
                       disabled={citing}
                       onClick={() => cite(document)}
-                      className="mr-1 inline-flex h-7 items-center gap-1 rounded-lg bg-[var(--theme-primary,#2563eb)] px-2.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-[#1d4ed8] disabled:opacity-60"
+                      className="mr-1 inline-flex h-7 items-center gap-1 rounded-lg bg-[var(--theme-primary,var(--color-brand))] px-2.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-brand-600 disabled:opacity-60"
                     >
                       {onCite ? <><LuQuote className="h-3.5 w-3.5" />Cite</> : <><LuCopy className="h-3.5 w-3.5" />Copy</>}
                     </button>
@@ -294,7 +294,7 @@ export default function LibraryPanel({ onCite, onAsk, citing, visible = true }: 
         </div>
         {loading ? (
           <div className="space-y-3 pt-3">
-            {[0, 1, 2].map((index) => <div key={index} className="h-[72px] animate-pulse rounded-[12px] bg-[#f8fafc]" />)}
+            {[0, 1, 2].map((index) => <div key={index} className="h-[72px] animate-pulse rounded-[12px] bg-soft" />)}
           </div>
         ) : null}
       </div>

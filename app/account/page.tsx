@@ -7,6 +7,7 @@ import { Button, ButtonLink, Card, CardHeader } from '@/components/app/ui';
 import { BillingSection } from '@/components/billing/BillingSection';
 import { SignInMethodsCard } from '@/components/auth/SignInMethodsCard';
 import { EmailCard } from '@/components/auth/EmailCard';
+import { ThemeChooser } from '@/components/theme/theme';
 import { api, clearSession, useSession } from '@/lib/session';
 
 type Wallet = { balance: number; free_left: number; free_per_day: number };
@@ -54,6 +55,14 @@ export default function AccountPage() {
             <dt className="text-muted">Name</dt><dd>{user?.full_name || '—'}</dd>
             <dt className="text-muted">Email</dt><dd className="break-all">{user?.email}</dd>
           </dl>
+        </Card>
+
+        <Card>
+          <CardHeader
+            title="Appearance"
+            description="Dark is easier on the eyes for late-night writing. Printed and exported documents always use light paper."
+            actions={<ThemeChooser />}
+          />
         </Card>
 
         {user && <SignInMethodsCard />}

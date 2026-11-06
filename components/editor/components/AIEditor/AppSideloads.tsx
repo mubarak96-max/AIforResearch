@@ -45,7 +45,7 @@ function useOpenedOnce(open: boolean) {
   return opened || open;
 }
 
-const iconButton = 'grid h-8 w-8 shrink-0 place-items-center rounded-lg text-[#94a3b8] transition-colors hover:bg-[#f1f5f9] hover:text-[#0f172a]';
+const iconButton = 'grid h-8 w-8 shrink-0 place-items-center rounded-lg text-subtle transition-colors hover:bg-line-2 hover:text-ink';
 const backdrop = 'fixed inset-0 z-[12990] hidden h-full w-full cursor-default bg-[rgba(15,23,42,.35)] sm:block lg:hidden';
 
 type ToolDrawerProps = {
@@ -88,9 +88,9 @@ export function AppToolDrawer({ className = 'lg:relative lg:h-full', documents, 
       {drawer ? <button type="button" aria-label="Close panel" className={backdrop} onClick={closeSideloadDrawer} /> : null}
       <aside
         aria-label={DRAWERS.find((item) => item.id === drawer)?.label ?? 'Library'}
-        className={`ce-tool-drawer ai-editor-print-hidden fixed inset-0 z-[13000] flex-col bg-white sm:right-auto sm:w-[380px] sm:shadow-[16px_0_40px_-24px_rgba(15,23,42,.35)] lg:z-auto lg:w-[clamp(300px,26vw,360px)] lg:shrink-0 lg:border-r lg:border-[#e5e7eb] lg:shadow-none ${className} ${drawer ? 'flex' : 'hidden'}`}
+        className={`ce-tool-drawer ai-editor-print-hidden fixed inset-0 z-[13000] flex-col bg-surface sm:right-auto sm:w-[380px] sm:shadow-[16px_0_40px_-24px_rgba(15,23,42,.35)] lg:z-auto lg:w-[clamp(300px,26vw,360px)] lg:shrink-0 lg:border-r lg:border-line lg:shadow-none ${className} ${drawer ? 'flex' : 'hidden'}`}
       >
-        <div className="flex h-[52px] shrink-0 items-center gap-1 border-b border-[#f1f5f9] px-2">
+        <div className="flex h-[52px] shrink-0 items-center gap-1 border-b border-line-2 px-2">
           <button
             type="button"
             onClick={() => setSideloadMenu(!menu)}
@@ -109,7 +109,7 @@ export function AppToolDrawer({ className = 'lg:relative lg:h-full', documents, 
                 aria-selected={drawer === item.id}
                 onClick={() => showSideload(item.id)}
                 className={`h-8 shrink-0 whitespace-nowrap rounded-lg px-2 text-[14px] transition-colors ${
-                  drawer === item.id ? 'bg-[#eff6ff] font-semibold text-[var(--theme-primary-dark,#1d4ed8)]' : 'font-medium text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a]'
+                  drawer === item.id ? 'bg-brand-50 font-semibold text-[var(--theme-primary-dark,var(--color-brand-600))]' : 'font-medium text-muted hover:bg-soft hover:text-ink'
                 }`}
               >
                 {item.label}
@@ -154,7 +154,7 @@ export function AppChatSideload({ className = 'lg:relative lg:h-full' }: { class
       {chat ? <button type="button" aria-label="Close chat" className={backdrop} onClick={closeSideloadChat} /> : null}
       <aside
         aria-label="AI Chat"
-        className={`ce-chat-sideload ai-editor-print-hidden fixed inset-0 z-[13000] flex-col bg-white sm:left-auto sm:w-[400px] sm:shadow-[-16px_0_40px_-24px_rgba(15,23,42,.35)] lg:z-auto lg:w-[clamp(320px,28vw,400px)] lg:shrink-0 lg:border-l lg:border-[#e5e7eb] lg:shadow-none ${className} ${chat ? 'flex' : 'hidden'}`}
+        className={`ce-chat-sideload ai-editor-print-hidden fixed inset-0 z-[13000] flex-col bg-surface sm:left-auto sm:w-[400px] sm:shadow-[-16px_0_40px_-24px_rgba(15,23,42,.35)] lg:z-auto lg:w-[clamp(320px,28vw,400px)] lg:shrink-0 lg:border-l lg:border-line lg:shadow-none ${className} ${chat ? 'flex' : 'hidden'}`}
       >
         <ChatPanel documentId={null} mentions={mentions} onMentionsChange={setSideloadMentions} onClose={closeSideloadChat} isMobile={isPhone} />
       </aside>

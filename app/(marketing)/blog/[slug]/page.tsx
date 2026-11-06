@@ -82,7 +82,7 @@ export default async function BlogPostPage({ params }: Props) {
     <div className={container}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredData(post) }} />
 
-      <div className="grid gap-12 pb-20 pt-8 md:pt-10 lg:grid-cols-[minmax(0,1fr)_240px] lg:gap-16">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-12 pb-20 pt-8 md:pt-10 lg:grid-cols-[minmax(0,1fr)_240px] lg:gap-16">
         <article className="min-w-0 max-w-[740px]">
           <nav aria-label="Breadcrumb" className="mb-6 text-[13.5px] text-muted">
             <ol className="flex flex-wrap items-center gap-1.5">

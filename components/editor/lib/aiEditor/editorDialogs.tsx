@@ -85,7 +85,7 @@ function Host() {
         role="dialog"
         aria-modal="true"
         aria-label={options.title}
-        className="w-full max-w-[440px] rounded-t-[24px] border border-[#e5e7eb] bg-white p-5 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)] sm:rounded-[16px]"
+        className="w-full max-w-[440px] rounded-t-[24px] border border-line bg-surface p-5 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)] sm:rounded-[16px]"
         onSubmit={(event) => {
           event.preventDefault();
           finish(true);
@@ -98,17 +98,17 @@ function Host() {
           }
         }}
       >
-        <h2 className="text-[18px] font-bold tracking-[-0.01em] text-[#0f172a]">{options.title}</h2>
-        {options.message ? <p className="mt-1.5 text-[14px] leading-[1.55] text-[#334155]">{options.message}</p> : null}
+        <h2 className="text-[18px] font-bold tracking-[-0.01em] text-ink">{options.title}</h2>
+        {options.message ? <p className="mt-1.5 text-[14px] leading-[1.55] text-ink-2">{options.message}</p> : null}
         {request.kind === 'prompt' ? (
-          <label className="mt-3 block text-[13px] font-medium text-[#334155]">
+          <label className="mt-3 block text-[13px] font-medium text-ink-2">
             {request.options.label}
             {request.options.options ? (
               <select
                 ref={(node) => { inputRef.current = node; }}
                 value={value}
                 onChange={(event) => setValue(event.target.value)}
-                className="mt-1.5 h-10 w-full rounded-[10px] border border-[#e5e7eb] bg-white px-3 text-[14px] text-[#0f172a] outline-none transition-shadow focus:border-[var(--theme-primary,#2563eb)] focus:shadow-[0_0_0_4px_#eff6ff]"
+                className="mt-1.5 h-10 w-full rounded-[10px] border border-line bg-surface px-3 text-[14px] text-ink outline-none transition-shadow focus:border-[var(--theme-primary,var(--color-brand))] focus:shadow-[0_0_0_4px_var(--color-brand-50)]"
               >
                 {request.options.options.map((option) => (
                   <option key={option.value} value={option.value}>{option.label}</option>
@@ -120,18 +120,18 @@ function Host() {
                 value={value}
                 onChange={(event) => setValue(event.target.value)}
                 placeholder={request.options.placeholder}
-                className="mt-1.5 h-10 w-full rounded-[10px] border border-[#e5e7eb] px-3 text-[14px] text-[#0f172a] outline-none transition-shadow focus:border-[var(--theme-primary,#2563eb)] focus:shadow-[0_0_0_4px_#eff6ff]"
+                className="mt-1.5 h-10 w-full rounded-[10px] border border-line px-3 text-[14px] text-ink outline-none transition-shadow focus:border-[var(--theme-primary,var(--color-brand))] focus:shadow-[0_0_0_4px_var(--color-brand-50)]"
               />
             )}
           </label>
         ) : null}
         <div className="mt-5 flex justify-end gap-2">
-          <button type="button" onClick={() => finish(false)} className="h-10 rounded-[10px] border border-[#e5e7eb] bg-white px-4 text-[14px] font-semibold text-[#0f172a] hover:bg-[#f8fafc]">
+          <button type="button" onClick={() => finish(false)} className="h-10 rounded-[10px] border border-line bg-surface px-4 text-[14px] font-semibold text-ink hover:bg-soft">
             Cancel
           </button>
           <button
             type="submit"
-            className={`h-10 rounded-[10px] px-[18px] text-[14px] font-semibold text-white ${danger ? 'bg-[#dc2626] shadow-[0_6px_16px_-6px_rgba(220,38,38,0.6)] hover:bg-[#b91c1c]' : 'bg-[var(--theme-primary,#2563eb)] shadow-[0_6px_16px_-6px_rgba(37,99,235,0.7)] hover:bg-[#1d4ed8]'}`}
+            className={`h-10 rounded-[10px] px-[18px] text-[14px] font-semibold text-white ${danger ? 'bg-[#dc2626] shadow-[0_6px_16px_-6px_rgba(220,38,38,0.6)] hover:bg-[#b91c1c]' : 'bg-[var(--theme-primary,var(--color-brand))] shadow-[0_6px_16px_-6px_rgba(var(--brand-rgb),0.7)] hover:bg-brand-600'}`}
           >
             {options.okLabel || 'OK'}
           </button>

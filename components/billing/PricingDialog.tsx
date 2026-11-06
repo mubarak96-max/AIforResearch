@@ -31,7 +31,7 @@ function PricingDialogBody({ reason }: { reason: string | null }) {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[20000] flex items-end justify-center bg-ink/45 sm:items-center sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget) closePricing(); }}>
+    <div className="fixed inset-0 z-[20000] flex items-end justify-center bg-black/45 sm:items-center sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget) closePricing(); }}>
       <div ref={panel} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="pricing-title"
         className="max-h-[94dvh] w-full max-w-[1180px] overflow-y-auto rounded-t-[22px] bg-soft outline-none sm:rounded-[22px]">
         <div className="sticky top-0 z-10 flex items-start gap-3 bg-soft/95 px-5 pt-5 pb-3 backdrop-blur sm:px-8 sm:pt-7">
@@ -43,7 +43,7 @@ function PricingDialogBody({ reason }: { reason: string | null }) {
               </p>
             )}
           </div>
-          <button type="button" onClick={closePricing} aria-label="Close" className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-muted hover:bg-white hover:text-ink">
+          <button type="button" onClick={closePricing} aria-label="Close" className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-muted hover:bg-surface hover:text-ink">
             <LuX className="h-5 w-5" />
           </button>
         </div>
@@ -52,7 +52,7 @@ function PricingDialogBody({ reason }: { reason: string | null }) {
             <div className="flex flex-col items-center py-14 text-center">
               <p className="text-[20px] font-bold text-ink">You&apos;re on {changed} now</p>
               <p className="mt-1 text-[14.5px] text-muted">The new limits apply straight away.</p>
-              <button type="button" onClick={closePricing} className="mt-5 h-11 rounded-[11px] bg-brand px-6 text-[15px] font-semibold text-white shadow-brand hover:bg-brand-600">Done</button>
+              <button type="button" onClick={closePricing} className="mt-5 h-11 rounded-[11px] bg-brand px-6 text-[15px] font-semibold text-on-brand shadow-brand hover:bg-brand-600">Done</button>
             </div>
           ) : (
             <>
@@ -65,7 +65,7 @@ function PricingDialogBody({ reason }: { reason: string | null }) {
                 <PlanCards plans={plans} interval={interval} actionFor={actionFor} currentId={currentId} compact />
               ) : !loadError && (
                 <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4" aria-busy="true">
-                  {[0, 1, 2, 3].map((index) => <div key={index} className="h-[420px] animate-pulse rounded-[20px] bg-white" />)}
+                  {[0, 1, 2, 3].map((index) => <div key={index} className="h-[420px] animate-pulse rounded-[20px] bg-surface" />)}
                 </div>
               )}
               <p className="mt-5 text-center text-[13px] text-subtle">Secure payment by Stripe · Cancel any time</p>

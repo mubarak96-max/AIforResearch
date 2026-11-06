@@ -45,23 +45,23 @@ function AtMenuList({ items, selectedIndex, onItemClick, loadingState }: Suggest
 
   let lastGroup = '';
   return (
-    <div ref={listRef} className="ce-at-menu w-[min(440px,calc(100vw-24px))] overflow-y-auto rounded-[14px] border border-[#e5e7eb] bg-white p-1 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]" style={{ maxHeight: 420 }}>
+    <div ref={listRef} className="ce-at-menu w-[min(440px,calc(100vw-24px))] overflow-y-auto rounded-[14px] border border-line bg-surface p-1 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]" style={{ maxHeight: 420 }}>
       {items.map((item, index) => {
         const group = GROUP_LABEL[item.kind];
         const header = group && group !== lastGroup ? group : '';
         lastGroup = group || lastGroup;
         const selected = index === selectedIndex;
-        const base = `flex w-full items-start gap-2.5 rounded-[9px] px-2.5 py-2 text-left ${selected ? 'bg-[#eff6ff]' : 'hover:bg-[#f8fafc]'}`;
+        const base = `flex w-full items-start gap-2.5 rounded-[9px] px-2.5 py-2 text-left ${selected ? 'bg-brand-50' : 'hover:bg-soft'}`;
         return (
           <React.Fragment key={item.key}>
-            {header ? <div className="px-2.5 pb-1 pt-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-[#94a3b8]">{header}</div> : null}
+            {header ? <div className="px-2.5 pb-1 pt-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-subtle">{header}</div> : null}
             <button type="button" data-index={index} className={base} onMouseDown={(event) => event.preventDefault()} onClick={() => onItemClick?.(item)}>
               {item.kind === 'paper' ? (
                 <>
-                  <LuGlobe className="mt-0.5 h-4 w-4 shrink-0 text-[#64748b]" />
+                  <LuGlobe className="mt-0.5 h-4 w-4 shrink-0 text-muted" />
                   <span className="min-w-0">
-                    <span className="line-clamp-2 text-[13.5px] font-semibold leading-snug text-[#0f172a]">{item.paper.title}</span>
-                    <span className="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-[12px] text-[#64748b]">
+                    <span className="line-clamp-2 text-[13.5px] font-semibold leading-snug text-ink">{item.paper.title}</span>
+                    <span className="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-[12px] text-muted">
                       <span>{paperAuthorsLabel(item.paper, 2)}{item.paper.year ? ` · ${item.paper.year}` : ''}</span>
                       {item.paper.source_name ? <span className="max-w-[180px] truncate italic">{item.paper.source_name}</span> : null}
                       {item.paper.cited_by_count ? <span>Cited by {formatCount(item.paper.cited_by_count)}</span> : null}
@@ -73,8 +73,8 @@ function AtMenuList({ items, selectedIndex, onItemClick, loadingState }: Suggest
                 <>
                   <LuLibrary className="mt-0.5 h-4 w-4 shrink-0 text-[var(--theme-primary)]" />
                   <span className="min-w-0">
-                    <span className="line-clamp-2 text-[13.5px] font-semibold leading-snug text-[#0f172a]">{item.document.title || item.document.filename}</span>
-                    <span className="mt-0.5 block truncate text-[12px] text-[#64748b]">
+                    <span className="line-clamp-2 text-[13.5px] font-semibold leading-snug text-ink">{item.document.title || item.document.filename}</span>
+                    <span className="mt-0.5 block truncate text-[12px] text-muted">
                       {(item.document.authors || []).slice(0, 2).join(', ') || 'Unknown authors'}
                       {libraryDocumentYear(item.document) ? ` · ${libraryDocumentYear(item.document)}` : ''}
                     </span>
@@ -82,20 +82,20 @@ function AtMenuList({ items, selectedIndex, onItemClick, loadingState }: Suggest
                 </>
               ) : item.kind === 'person' ? (
                 <>
-                  <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#2563eb] text-[9px] font-semibold text-white">
+                  <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand text-[9px] font-semibold text-on-brand">
                     {(item.member.displayName || item.member.email).slice(0, 1).toUpperCase()}
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate text-[13px] text-[#0f172a]">{item.member.displayName}</span>
-                    <span className="block truncate text-[12px] text-[#64748b]">{item.member.email}</span>
+                    <span className="block truncate text-[13px] text-ink">{item.member.displayName}</span>
+                    <span className="block truncate text-[12px] text-muted">{item.member.email}</span>
                   </span>
                 </>
               ) : item.kind === 'more' ? (
                 <span className="text-[12.5px] font-medium text-[var(--theme-primary)]">Search more papers for “{item.query}”…</span>
               ) : (
                 <>
-                  <LuPlus className="mt-0.5 h-4 w-4 shrink-0 text-[#64748b]" />
-                  <span className="text-[13px] text-[#0f172a]">Add custom citation…</span>
+                  <LuPlus className="mt-0.5 h-4 w-4 shrink-0 text-muted" />
+                  <span className="text-[13px] text-ink">Add custom citation…</span>
                 </>
               )}
             </button>
@@ -103,8 +103,8 @@ function AtMenuList({ items, selectedIndex, onItemClick, loadingState }: Suggest
         );
       })}
       {loadingState !== 'loaded' ? (
-        <div className="flex items-center gap-2 px-3.5 py-2 text-[12px] text-[#64748b]">
-          <span className="h-3 w-3 animate-spin rounded-full border-2 border-[#e5e7eb] border-t-[var(--theme-primary)]" /> Searching papers…
+        <div className="flex items-center gap-2 px-3.5 py-2 text-[12px] text-muted">
+          <span className="h-3 w-3 animate-spin rounded-full border-2 border-line border-t-[var(--theme-primary)]" /> Searching papers…
         </div>
       ) : null}
     </div>

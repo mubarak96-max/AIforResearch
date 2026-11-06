@@ -20,7 +20,7 @@ export function PricingPlans({ initialPlans }: { initialPlans: PublicPlan[] | nu
         <PlanCards plans={plans} interval={interval} actionFor={actionFor} currentId={currentId} />
       ) : (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4" aria-busy="true">
-          {[0, 1, 2, 3].map((index) => <div key={index} className="h-[460px] animate-pulse rounded-[20px] bg-white/70" />)}
+          {[0, 1, 2, 3].map((index) => <div key={index} className="h-[460px] animate-pulse rounded-[20px] bg-surface/70" />)}
         </div>
       )}
     </>

@@ -71,7 +71,7 @@ export function EquationEditor({
     <div
       ref={ref}
       style={{ position: 'fixed', top, left, width, zIndex: 12700 }}
-      className="rounded-[14px] border border-[#e5e7eb] bg-white p-3 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]"
+      className="rounded-[14px] border border-line bg-surface p-3 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]"
       onKeyDown={(event) => {
         if (event.key === 'Escape') {
           event.preventDefault();
@@ -82,7 +82,7 @@ export function EquationEditor({
         }
       }}
     >
-      <div className="mb-1.5 text-[12px] font-semibold text-[#334155]">{displayMode ? 'Equation' : 'Inline equation'} (TeX)</div>
+      <div className="mb-1.5 text-[12px] font-semibold text-ink-2">{displayMode ? 'Equation' : 'Inline equation'} (TeX)</div>
       <textarea
         ref={inputRef}
         value={value}
@@ -91,7 +91,7 @@ export function EquationEditor({
         spellCheck={false}
         aria-label="TeX"
         placeholder="E = mc^2"
-        className="block w-full resize-none rounded-[10px] border border-[#e5e7eb] px-3 py-2 font-mono text-[13px] outline-none focus:border-[var(--theme-primary,#2563eb)] focus:shadow-[0_0_0_4px_#eff6ff]"
+        className="block w-full resize-none rounded-[10px] border border-line px-3 py-2 font-mono text-[13px] outline-none focus:border-[var(--theme-primary,var(--color-brand))] focus:shadow-[0_0_0_4px_var(--color-brand-50)]"
       />
       <div className="mt-1.5 flex flex-wrap gap-1">
         {SNIPPETS.map((snippet) => (
@@ -102,20 +102,20 @@ export function EquationEditor({
               setValue((current) => `${current}${current && !current.endsWith(' ') ? ' ' : ''}${snippet}`);
               inputRef.current?.focus();
             }}
-            className="rounded-md bg-[#f1f5f9] px-1.5 py-0.5 font-mono text-[11px] text-[#334155] hover:bg-[#e2e8f0]"
+            className="rounded-md bg-line-2 px-1.5 py-0.5 font-mono text-[11px] text-ink-2 hover:bg-line"
           >
             {snippet}
           </button>
         ))}
       </div>
-      <div className="mt-2 min-h-[44px] overflow-x-auto rounded-xl bg-[#f8fafc] px-3 py-2 text-center" dangerouslySetInnerHTML={{ __html: preview || '<span style="color:#94a3b8;font-size:12px">Preview</span>' }} />
+      <div className="mt-2 min-h-[44px] overflow-x-auto rounded-xl bg-soft px-3 py-2 text-center" dangerouslySetInnerHTML={{ __html: preview || '<span style="color:var(--color-subtle);font-size:12px">Preview</span>' }} />
       <div className="mt-2.5 flex items-center justify-between">
         {onRemove ? (
           <button type="button" onClick={onRemove} className="h-8 rounded-[9px] px-3 text-[12.5px] font-semibold text-[#b91c1c] hover:bg-[#fef2f2]">Remove</button>
         ) : <span />}
         <div className="flex gap-1.5">
-          <button type="button" onClick={onCancel} className="h-8 rounded-[9px] border border-[#e5e7eb] bg-white px-3 text-[12.5px] font-semibold text-[#334155] hover:bg-[#f8fafc]">Cancel</button>
-          <button type="button" onClick={() => onSave(value.trim())} className="h-8 rounded-[10px] bg-[var(--theme-primary,#2563eb)] shadow-[0_6px_16px_-8px_rgba(37,99,235,0.8)] px-4 text-[12.5px] font-semibold text-white">Done</button>
+          <button type="button" onClick={onCancel} className="h-8 rounded-[9px] border border-line bg-surface px-3 text-[12.5px] font-semibold text-ink-2 hover:bg-soft">Cancel</button>
+          <button type="button" onClick={() => onSave(value.trim())} className="h-8 rounded-[10px] bg-[var(--theme-primary,var(--color-brand))] shadow-[0_6px_16px_-8px_rgba(var(--brand-rgb),0.8)] px-4 text-[12.5px] font-semibold text-white">Done</button>
         </div>
       </div>
     </div>,
@@ -159,7 +159,7 @@ function EquationBlockView({ block, editor }: { block: any; editor: any }) {
         }
       }}
     >
-      {html ? <span dangerouslySetInnerHTML={{ __html: html }} /> : <span className="text-[13px] text-[#94a3b8]">Click to add an equation</span>}
+      {html ? <span dangerouslySetInnerHTML={{ __html: html }} /> : <span className="text-[13px] text-subtle">Click to add an equation</span>}
       {anchor ? (
         <EquationEditor
           initial={latex}
@@ -194,8 +194,8 @@ export const equationBlockSpec = createReactBlockSpec(
 export const EQUATION_CSS = `
   .ce-equation-block { display: block; width: 100%; padding: 10px 8px; margin: 4px 0; text-align: center; border-radius: 8px; overflow-x: auto; }
   [contenteditable="true"] .ce-equation-block { cursor: pointer; }
-  [contenteditable="true"] .ce-equation-block:hover { background: #f8fafc; }
+  [contenteditable="true"] .ce-equation-block:hover { background: var(--color-soft); }
   .ce-equation-block .katex-display { margin: 0; }
   [data-inline-content-type="aiMath"] { cursor: pointer; border-radius: 4px; }
-  [data-inline-content-type="aiMath"]:hover { background: #f1f5f9; }
+  [data-inline-content-type="aiMath"]:hover { background: var(--color-line-2); }
 `;

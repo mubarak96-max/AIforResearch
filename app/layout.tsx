@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Source_Serif_4 } from 'next/font/google';
 import './globals.css';
 import { PricingDialog } from '@/components/billing/PricingDialog';
+import { ThemeSync } from '@/components/theme/theme';
+import { themeInitScript } from '@/components/theme/themeScript';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const serif = Source_Serif_4({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
@@ -16,7 +18,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#2563eb',
+  // Literal hex: browsers read this meta tag before any CSS. Matches --color-brand.
+  themeColor: '#1e3a5f',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
@@ -24,8 +27,13 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${serif.variable}`}>
+    // The init script sets data-theme before hydration, so React must not complain about it.
+    <html lang="en" className={`${inter.variable} ${serif.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body>
+        <ThemeSync />
         {children}
         <PricingDialog />
       </body>

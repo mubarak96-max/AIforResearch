@@ -3,66 +3,139 @@
 @source "../components/editor";
 
 /*
- * WriteOrbit design tokens, from the approved mockups (writeorbit-plan/mockups-2026-10-28,
- * source/base.css). Colours come only from these.
+ * WriteOrbit design tokens: "Ink & Paper" (light) with a "Nocturne" dark theme.
+ * Colours come only from these. Components use the token utilities (bg-surface, text-ink,
+ * border-line, bg-brand + text-on-brand ...) or var(--color-*), so both themes follow.
+ * Light values live in @theme; dark values override the same variables below.
  */
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-serif), Georgia, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --color-brand: #2563eb;
-  --color-brand-600: #1d4ed8;
-  --color-brand-50: #eff6ff;
-  --color-brand-100: #dbeafe;
-  --color-ink: #0f172a;
-  --color-ink-2: #334155;
-  --color-muted: #64748b;
-  --color-subtle: #94a3b8;
-  --color-line: #e5e7eb;
-  --color-line-2: #f1f5f9;
-  --color-soft: #f8fafc;
+  /* Brand: ink navy */
+  --color-brand: #1e3a5f;
+  --color-brand-600: #152a45;
+  --color-brand-50: #eef2f7;
+  --color-brand-100: #dbe3ee;
+  --color-on-brand: #ffffff;
+
+  /* Accent: burnt sienna (citations, marketing calls to action) */
+  --color-accent: #c2410c;
+  --color-accent-600: #9a3412;
+  --color-accent-50: #fdf0e8;
+  --color-accent-100: #fadcc8;
+  --color-accent-300: #f0a77a;
+  --color-cite: #c2410c;
+
+  /* Ink and warm paper neutrals */
+  --color-ink: #1c1917;
+  --color-on-ink: #ffffff;
+  --color-ink-2: #44403c;
+  --color-ink-3: #57534e;
+  --color-muted: #78716c;
+  --color-subtle: #a8a29e;
+  --color-line-3: #d6d0c7;
+  --color-line: #e7e2da;
+  --color-line-2: #f1ede6;
+  --color-soft: #faf8f5;
   --color-amber: #f59e0b;
   --color-amber-50: #fffbeb;
-  --color-positive: #16a34a;
-  --color-cite: #2563eb;
+  --color-positive: #3f7d58;
   /* Surfaces */
-  --color-page: #ffffff;
-  --color-surface: #ffffff;
-  --color-panel: #f8fafc;
+  --color-page: #fffdf9;
+  --color-surface: #fffdf9;
+  --color-panel: #f6f2ec;
 
   /* The editor uses "primary-*" utilities; they follow the brand. */
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
+  --color-primary-50: #eef2f7;
+  --color-primary-100: #dbe3ee;
+  --color-primary-200: #b9c8dc;
+  --color-primary-300: #8ea6c4;
+  --color-primary-400: #5f7fa6;
+  --color-primary-500: #3b5f88;
+  --color-primary-600: #1e3a5f;
+  --color-primary-700: #152a45;
+  --color-primary-800: #0f1f33;
+  --color-primary-900: #0a1524;
 
-  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 0 0 1px #e5e7eb;
-  --shadow-float: 0 22px 50px -18px rgb(15 23 42 / 0.35);
-  --shadow-brand: 0 6px 16px -6px rgb(37 99 235 / 0.7);
+  --shadow-card: 0 1px 2px rgb(28 25 23 / 0.04), 0 0 0 1px var(--color-line);
+  --shadow-float: 0 22px 50px -18px rgb(28 25 23 / 0.35);
+  --shadow-brand: 0 6px 16px -6px rgb(var(--brand-rgb) / 0.6);
 }
 
 :root {
+  color-scheme: light;
+  --brand-rgb: 30, 58, 95;
   /* Variables the editor reads for its accent colour. */
-  --theme-primary: #2563eb;
-  --theme-primary-rgb: 37, 99, 235;
-  --theme-primary-dark: #1d4ed8;
-  --theme-primary-light: #60a5fa;
-  --m-brand: #2563eb;
-  --m-brand-dark: #1d4ed8;
-  --m-brand-soft: #eff6ff;
-  --m-ink: #0f172a;
-  --m-on-brand: #ffffff;
-  --m-on-ink: #ffffff;
+  --theme-primary: var(--color-brand);
+  --theme-primary-rgb: var(--brand-rgb);
+  --theme-primary-dark: var(--color-brand-600);
+  --theme-primary-light: var(--color-primary-400);
+  --m-brand: var(--color-brand);
+  --m-brand-dark: var(--color-brand-600);
+  --m-brand-soft: var(--color-brand-50);
+  --m-ink: var(--color-ink);
+  --m-on-brand: var(--color-on-brand);
+  --m-on-ink: var(--color-on-ink);
 }
 
-html, body { background: #ffffff; color: var(--color-ink); }
+/*
+ * Nocturne: the dark theme. Set by <html data-theme="dark"> (see components/theme).
+ * Screen only, so printing a document always uses the light paper colours.
+ */
+@media screen {
+  html[data-theme="dark"] {
+    color-scheme: dark;
+    --brand-rgb: 139, 156, 247;
+
+    --color-brand: #8b9cf7;
+    --color-brand-600: #a5b4fc;
+    --color-brand-50: #1f2440;
+    --color-brand-100: #2a3260;
+    --color-on-brand: #0f111a;
+
+    --color-accent: #f4a26b;
+    --color-accent-600: #f7b98e;
+    --color-accent-50: #2b1f19;
+    --color-accent-100: #3d2a1f;
+    --color-accent-300: #f4a26b;
+    --color-cite: #f4a26b;
+
+    --color-ink: #e7e9f2;
+    --color-on-ink: #0f111a;
+    --color-ink-2: #c3c7d6;
+    --color-ink-3: #a9aec2;
+    --color-muted: #8b90a6;
+    --color-subtle: #6b7089;
+    --color-line-3: #3a3f55;
+    --color-line: #2a2e40;
+    --color-line-2: #1f2232;
+    --color-soft: #1a1d2a;
+    --color-amber: #fbbf24;
+    --color-amber-50: #2a2210;
+    --color-positive: #4ade80;
+    --color-page: #0f111a;
+    --color-surface: #151824;
+    --color-panel: #11131d;
+
+    --color-primary-50: #1f2440;
+    --color-primary-100: #2a3260;
+    --color-primary-200: #36407a;
+    --color-primary-300: #4c58a3;
+    --color-primary-400: #6b7ad6;
+    --color-primary-500: #8b9cf7;
+    --color-primary-600: #8b9cf7;
+    --color-primary-700: #a5b4fc;
+    --color-primary-800: #c7d0fe;
+    --color-primary-900: #e0e6ff;
+
+    --shadow-card: 0 0 0 1px var(--color-line);
+    --shadow-float: 0 22px 50px -18px rgb(0 0 0 / 0.7);
+  }
+}
+
+html, body { background: var(--color-page); color: var(--color-ink); }
 body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 
 /* Phones: inputs at 16px so iOS never zooms. */

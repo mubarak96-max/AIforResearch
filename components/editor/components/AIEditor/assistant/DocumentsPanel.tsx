@@ -124,7 +124,7 @@ export default function DocumentsPanel({ activeDocumentId, onOpenDocument, onCre
     </>
   );
   const sharedMark = (document: AIEditorDocumentSummary) =>
-    isShared(document) ? <LuUsers className="h-3.5 w-3.5 shrink-0 text-[#94a3b8]" aria-label="Shared" /> : null;
+    isShared(document) ? <LuUsers className="h-3.5 w-3.5 shrink-0 text-subtle" aria-label="Shared" /> : null;
   const viewButton = (value: View, label: string, icon: React.ReactNode) => (
     <button
       type="button"
@@ -132,24 +132,24 @@ export default function DocumentsPanel({ activeDocumentId, onOpenDocument, onCre
       aria-label={label}
       title={label}
       onClick={() => chooseView(value)}
-      className={`grid h-7 w-7 place-items-center rounded-[7px] transition-colors ${view === value ? 'bg-white text-[#0f172a] shadow-[0_1px_2px_rgba(15,23,42,.12)]' : 'text-[#94a3b8] hover:text-[#0f172a]'}`}
+      className={`grid h-7 w-7 place-items-center rounded-[7px] transition-colors ${view === value ? 'bg-surface text-ink shadow-[0_1px_2px_rgba(15,23,42,.12)]' : 'text-subtle hover:text-ink'}`}
     >
       {icon}
     </button>
   );
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-white">
+    <div className="flex h-full min-h-0 flex-col bg-surface">
       <div className="px-3 pt-3">
         <div className="flex items-center gap-1.5">
           <div className="group relative min-w-0 flex-1">
-            <LuSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94a3b8] group-focus-within:text-[var(--theme-primary,#2563eb)]" />
+            <LuSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle group-focus-within:text-[var(--theme-primary,var(--color-brand))]" />
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={documents.length ? `Search ${documents.length} document${documents.length === 1 ? '' : 's'}` : 'Search documents'}
               aria-label="Search your documents"
-              className="h-9 w-full rounded-[10px] border border-[#e2e8f0] bg-white pl-9 pr-3 text-[14px] text-[#0f172a] outline-none transition-[border,box-shadow] placeholder:text-[#94a3b8] focus:border-[var(--theme-primary,#2563eb)] focus:shadow-[0_0_0_3px_#eff6ff]"
+              className="h-9 w-full rounded-[10px] border border-line bg-surface pl-9 pr-3 text-[14px] text-ink outline-none transition-[border,box-shadow] placeholder:text-subtle focus:border-[var(--theme-primary,var(--color-brand))] focus:shadow-[0_0_0_3px_var(--color-brand-50)]"
             />
           </div>
           <button
@@ -157,15 +157,15 @@ export default function DocumentsPanel({ activeDocumentId, onOpenDocument, onCre
             onClick={create}
             aria-label="New document"
             title="New document"
-            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-[10px] bg-[#eff6ff] px-3 text-[13px] font-semibold text-[#1d4ed8] transition-colors hover:bg-[#dbeafe]"
+            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-[10px] bg-brand-50 px-3 text-[13px] font-semibold text-brand-600 transition-colors hover:bg-brand-100"
           >
             <LuPlus className="h-4 w-4" />
             New
           </button>
         </div>
-        <div className="mt-2 flex items-center justify-between border-b border-[#f1f5f9] px-1 pb-2">
-          <span className="text-[12.5px] font-medium text-[#64748b]">{query.trim() ? `${shown.length} found` : 'Recent'}</span>
-          <div role="group" aria-label="View" className="inline-flex rounded-[9px] bg-[#f1f5f9] p-0.5">
+        <div className="mt-2 flex items-center justify-between border-b border-line-2 px-1 pb-2">
+          <span className="text-[12.5px] font-medium text-muted">{query.trim() ? `${shown.length} found` : 'Recent'}</span>
+          <div role="group" aria-label="View" className="inline-flex rounded-[9px] bg-line-2 p-0.5">
             {viewButton('list', 'List view', <LuList className="h-4 w-4" />)}
             {viewButton('grid', 'Thumbnail view', <LuLayoutGrid className="h-4 w-4" />)}
           </div>
@@ -175,12 +175,12 @@ export default function DocumentsPanel({ activeDocumentId, onOpenDocument, onCre
       <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-3 pt-2">
         {signedOut ? (
           <div className="flex flex-col items-center px-4 py-10 text-center">
-            <LuFileText className="h-7 w-7 text-[#cbd5e1]" />
-            <p className="mt-2 text-[14px] font-semibold text-[#0f172a]">Sign in to see your documents</p>
+            <LuFileText className="h-7 w-7 text-line-3" />
+            <p className="mt-2 text-[14px] font-semibold text-ink">Sign in to see your documents</p>
             <button
               type="button"
               onClick={() => config.onRequireSignIn?.('see your documents')}
-              className="mt-3 h-9 rounded-[10px] bg-[var(--theme-primary,#2563eb)] px-3.5 text-[13.5px] font-semibold text-white hover:bg-[var(--theme-primary-dark,#1d4ed8)]"
+              className="mt-3 h-9 rounded-[10px] bg-[var(--theme-primary,var(--color-brand))] px-3.5 text-[13.5px] font-semibold text-white hover:bg-[var(--theme-primary-dark,var(--color-brand-600))]"
             >
               Sign in
             </button>
@@ -188,24 +188,24 @@ export default function DocumentsPanel({ activeDocumentId, onOpenDocument, onCre
         ) : loading && documents.length === 0 ? (
           <div className={view === 'grid' ? 'grid grid-cols-2 gap-2.5' : 'space-y-1.5'} role="status" aria-label="Loading documents">
             {[0, 1, 2, 3].map((index) => (
-              <div key={index} className={`animate-pulse rounded-[12px] bg-[#f8fafc] ${view === 'grid' ? 'h-[168px]' : 'h-[52px]'}`} />
+              <div key={index} className={`animate-pulse rounded-[12px] bg-soft ${view === 'grid' ? 'h-[168px]' : 'h-[52px]'}`} />
             ))}
           </div>
         ) : documents.length === 0 ? (
           <div className="flex flex-col items-center px-4 py-10 text-center">
-            <LuFileText className="h-7 w-7 text-[#cbd5e1]" />
-            <p className="mt-2 text-[14px] font-semibold text-[#0f172a]">No documents yet</p>
+            <LuFileText className="h-7 w-7 text-line-3" />
+            <p className="mt-2 text-[14px] font-semibold text-ink">No documents yet</p>
             <button
               type="button"
               onClick={create}
-              className="mt-3 inline-flex h-9 items-center gap-1.5 rounded-[10px] bg-[var(--theme-primary,#2563eb)] px-3.5 text-[13.5px] font-semibold text-white hover:bg-[var(--theme-primary-dark,#1d4ed8)]"
+              className="mt-3 inline-flex h-9 items-center gap-1.5 rounded-[10px] bg-[var(--theme-primary,var(--color-brand))] px-3.5 text-[13.5px] font-semibold text-white hover:bg-[var(--theme-primary-dark,var(--color-brand-600))]"
             >
               <LuPlus className="h-4 w-4" />
               New document
             </button>
           </div>
         ) : shown.length === 0 ? (
-          <p className="px-4 py-10 text-center text-[13.5px] text-[#64748b]">No documents match “{query.trim()}”</p>
+          <p className="px-4 py-10 text-center text-[13.5px] text-muted">No documents match “{query.trim()}”</p>
         ) : view === 'grid' ? (
           <div className="grid grid-cols-2 gap-2.5">
             {shown.map((document) => {
@@ -216,17 +216,17 @@ export default function DocumentsPanel({ activeDocumentId, onOpenDocument, onCre
                   type="button"
                   onClick={() => open(document.id)}
                   aria-current={active ? 'page' : undefined}
-                  className={`group block min-w-0 overflow-hidden rounded-[12px] border bg-white text-left transition-shadow hover:shadow-[0_10px_24px_-16px_rgba(15,23,42,.4)] ${
-                    active ? 'border-[var(--theme-primary,#2563eb)] ring-2 ring-[#dbeafe]' : 'border-[#e5e7eb]'
+                  className={`group block min-w-0 overflow-hidden rounded-[12px] border bg-surface text-left transition-shadow hover:shadow-[0_10px_24px_-16px_rgba(15,23,42,.4)] ${
+                    active ? 'border-[var(--theme-primary,var(--color-brand))] ring-2 ring-brand-100' : 'border-line'
                   }`}
                 >
                   <DocumentPreview document={document} small />
                   <span className="block px-2.5 py-2">
                     <span className="flex items-center gap-1">
-                      <b className="min-w-0 flex-1 truncate text-[13px] font-semibold text-[#0f172a]">{title(document)}</b>
+                      <b className="min-w-0 flex-1 truncate text-[13px] font-semibold text-ink">{title(document)}</b>
                       {sharedMark(document)}
                     </span>
-                    <span className="block truncate text-[11.5px] text-[#64748b]">{relativeTime(document.updatedAt)}</span>
+                    <span className="block truncate text-[11.5px] text-muted">{relativeTime(document.updatedAt)}</span>
                   </span>
                 </button>
               );
@@ -242,14 +242,14 @@ export default function DocumentsPanel({ activeDocumentId, onOpenDocument, onCre
                     type="button"
                     onClick={() => open(document.id)}
                     aria-current={active ? 'page' : undefined}
-                    className={`flex min-h-[52px] w-full items-center gap-2.5 rounded-[10px] px-2 py-1.5 text-left transition-colors ${active ? 'bg-[#eff6ff]' : 'hover:bg-[#f8fafc]'}`}
+                    className={`flex min-h-[52px] w-full items-center gap-2.5 rounded-[10px] px-2 py-1.5 text-left transition-colors ${active ? 'bg-brand-50' : 'hover:bg-soft'}`}
                   >
-                    <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-[9px] ${active ? 'bg-white text-[var(--theme-primary,#2563eb)]' : 'bg-[#f1f5f9] text-[#64748b]'}`}>
+                    <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-[9px] ${active ? 'bg-surface text-[var(--theme-primary,var(--color-brand))]' : 'bg-line-2 text-muted'}`}>
                       <LuFileText className="h-[18px] w-[18px]" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[14px] font-medium text-[#0f172a]">{title(document)}</span>
-                      <span className="block truncate text-[12px] text-[#64748b]">{meta(document)}</span>
+                      <span className="block truncate text-[14px] font-medium text-ink">{title(document)}</span>
+                      <span className="block truncate text-[12px] text-muted">{meta(document)}</span>
                     </span>
                     {sharedMark(document)}
                   </button>
@@ -261,14 +261,14 @@ export default function DocumentsPanel({ activeDocumentId, onOpenDocument, onCre
       </div>
 
       {!signedOut ? (
-        <div className="shrink-0 border-t border-[#f1f5f9] px-3 py-2">
+        <div className="shrink-0 border-t border-line-2 px-3 py-2">
           <button
             type="button"
             onClick={openHome}
-            className="flex h-9 w-full items-center justify-between rounded-[10px] px-2 text-[13.5px] font-medium text-[#334155] transition-colors hover:bg-[#f8fafc] hover:text-[#0f172a]"
+            className="flex h-9 w-full items-center justify-between rounded-[10px] px-2 text-[13.5px] font-medium text-ink-2 transition-colors hover:bg-soft hover:text-ink"
           >
             All documents
-            <LuArrowRight className="h-4 w-4 text-[#94a3b8]" />
+            <LuArrowRight className="h-4 w-4 text-subtle" />
           </button>
         </div>
       ) : null}

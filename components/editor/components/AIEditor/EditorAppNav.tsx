@@ -5,6 +5,7 @@ import type React from 'react';
 import { navLink, useEditorConfig } from '../../runtime';
 import { isPaidPlan, useEditorAccount } from '../../lib/aiEditor/account';
 import { toggleSideload, useSideloads, type SideloadTool } from '../../lib/sideloads';
+import { HostThemeToggle } from '../../lib/aiEditor/hostTheme';
 
 const icon = (paths: React.ReactNode) => (
   <svg viewBox="0 0 24 24" className="h-[18px] w-[18px] shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -26,9 +27,9 @@ export const NAV_ICONS = {
 /** The WriteOrbit wordmark (same as the host app's logo). */
 export function WriteOrbitLogo({ size = 32 }: { size?: number }) {
   return (
-    <span className="inline-flex items-center gap-2.5 text-[#0f172a]">
+    <span className="inline-flex items-center gap-2.5 text-ink">
       <span
-        className="grid shrink-0 place-items-center rounded-[9px] bg-gradient-to-br from-[#3b82f6] to-[#1d4ed8] shadow-[0_4px_12px_-4px_rgba(37,99,235,.6)]"
+        className="grid shrink-0 place-items-center rounded-[9px] bg-gradient-to-br from-primary-500 to-brand-600 shadow-[0_4px_12px_-4px_rgba(var(--brand-rgb),.6)]"
         style={{ width: size, height: size }}
         aria-hidden="true"
       >
@@ -38,7 +39,7 @@ export function WriteOrbitLogo({ size = 32 }: { size?: number }) {
         </svg>
       </span>
       <span className="font-extrabold tracking-[-0.02em] leading-none" style={{ fontSize: Math.round(size * 0.56) }}>
-        Research<span className="text-[#2563eb]">Cove</span>
+        Research<span className="text-brand">Cove</span>
       </span>
     </span>
   );
@@ -63,8 +64,8 @@ type EditorAppNavProps = {
 };
 
 const itemClass = 'flex h-10 w-full items-center gap-[11px] rounded-[10px] px-2.5 text-left text-[15px] font-medium';
-const itemIdle = 'text-[#334155] hover:bg-white/70';
-const itemOn = 'bg-white text-[#0f172a] shadow-[0_1px_2px_rgba(15,23,42,.06),0_0_0_1px_#e5e7eb]';
+const itemIdle = 'text-ink-2 hover:bg-surface/70';
+const itemOn = 'bg-surface text-ink shadow-[0_1px_2px_rgba(15,23,42,.06),0_0_0_1px_var(--color-line)]';
 
 /**
  * The app's left navigation from the mockups (232px, soft grey): New document, Documents,
@@ -94,19 +95,19 @@ export default function EditorAppNav({ recentDocuments, activeDocumentId, onCrea
   return (
     <aside
       aria-label="App"
-      className={`ai-editor-print-hidden h-full w-[232px] shrink-0 flex-col overflow-y-auto border-r border-[#e5e7eb] bg-[#f8fafc] px-3 pb-3 pt-4 ${className}`}
+      className={`ai-editor-print-hidden h-full w-[232px] shrink-0 flex-col overflow-y-auto border-r border-line bg-soft px-3 pb-3 pt-4 ${className}`}
     >
       <div className="flex items-start justify-between pb-[18px] pl-2">
         <a href={navLink('home')} className="block" aria-label="WriteOrbit home">
           <WriteOrbitLogo size={32} />
         </a>
         {onCollapse ? (
-          <button type="button" onClick={onCollapse} aria-label="Hide menu" title="Hide menu" className="grid h-8 w-8 place-items-center rounded-lg text-[#94a3b8] transition-colors hover:bg-white hover:text-[#0f172a]">
+          <button type="button" onClick={onCollapse} aria-label="Hide menu" title="Hide menu" className="grid h-8 w-8 place-items-center rounded-lg text-subtle transition-colors hover:bg-surface hover:text-ink">
             <LuPanelLeftClose className="h-[18px] w-[18px]" />
           </button>
         ) : null}
       </div>
-      <button type="button" onClick={onCreateDocument} className={`${itemClass} font-semibold text-[var(--theme-primary)] hover:bg-white/70`}>
+      <button type="button" onClick={onCreateDocument} className={`${itemClass} font-semibold text-[var(--theme-primary)] hover:bg-surface/70`}>
         {NAV_ICONS.new}New document
       </button>
       {/* Documents slides in like Library; it stays selected inside the editor unless another tool is open. */}
@@ -116,7 +117,7 @@ export default function EditorAppNav({ recentDocuments, activeDocumentId, onCrea
         aria-pressed={toolActive('documents')}
         className={`${itemClass} ${toolActive('documents') || !(['library', 'papers', 'chat'] as const).some(toolActive) ? itemOn : itemIdle}`}
       >
-        {NAV_ICONS.docs}Documents<span className="ml-auto text-[#94a3b8]">›</span>
+        {NAV_ICONS.docs}Documents<span className="ml-auto text-subtle">›</span>
       </button>
       {([
         ['library', 'Library', NAV_ICONS.library],
@@ -124,20 +125,20 @@ export default function EditorAppNav({ recentDocuments, activeDocumentId, onCrea
         ['chat', 'AI Chat', NAV_ICONS.chat],
       ] as const).map(([tool, label, icon]) => (
         <button key={tool} type="button" onClick={() => openTool(tool)} aria-pressed={toolActive(tool)} className={`${itemClass} ${toolActive(tool) ? itemOn : itemIdle}`}>
-          {icon}{label}{tool === 'library' ? <span className="ml-auto text-[#94a3b8]">›</span> : null}
+          {icon}{label}{tool === 'library' ? <span className="ml-auto text-subtle">›</span> : null}
         </button>
       ))}
       {recentDocuments.length > 0 ? (
         <>
-          <p className="px-2.5 pb-1 pt-5 text-[12px] font-medium text-[#94a3b8]">Recent</p>
+          <p className="px-2.5 pb-1 pt-5 text-[12px] font-medium text-subtle">Recent</p>
           {recentDocuments.slice(0, 3).map((document) => (
             <button
               key={document.id}
               type="button"
               onClick={() => onOpenDocument(document.id)}
               aria-current={document.id === activeDocumentId ? 'page' : undefined}
-              className={`block h-[34px] w-full shrink-0 truncate rounded-[10px] px-2.5 text-left text-[14px] leading-[34px] hover:bg-white/70 ${
-                document.id === activeDocumentId ? 'font-medium text-[#0f172a]' : 'text-[#334155]'
+              className={`block h-[34px] w-full shrink-0 truncate rounded-[10px] px-2.5 text-left text-[14px] leading-[34px] hover:bg-surface/70 ${
+                document.id === activeDocumentId ? 'font-medium text-ink' : 'text-ink-2'
               }`}
             >
               {document.title || 'Untitled document'}
@@ -151,17 +152,20 @@ export default function EditorAppNav({ recentDocuments, activeDocumentId, onCrea
       {account?.isAdmin ? <a href={navLink('admin')} className={`${itemClass} ${itemIdle}`}>{NAV_ICONS.admin}Admin</a> : null}
       <a href={navLink('help')} className={`${itemClass} ${itemIdle}`}>{NAV_ICONS.help}Help</a>
       {showPlan ? (
-        <div className="mt-2 flex shrink-0 items-center justify-between rounded-[10px] bg-white/70 px-2.5 py-2">
-          <span className="text-[13px] text-[#64748b]">Free plan</span>
+        <div className="mt-2 flex shrink-0 items-center justify-between rounded-[10px] bg-surface/70 px-2.5 py-2">
+          <span className="text-[13px] text-muted">Free plan</span>
           <button type="button" onClick={upgrade} className="text-[13px] font-semibold text-[var(--theme-primary)] hover:underline">Upgrade</button>
         </div>
       ) : null}
-      <a href={navLink('account')} className="flex shrink-0 items-center gap-2.5 px-2 pb-0.5 pt-3 text-[14px] font-medium text-[#0f172a]">
-        <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#fde68a] to-[#fb923c] text-[13px] font-bold text-[#7c2d12]">
-          {(name[0] || '·').toUpperCase()}
-        </span>
-        <span className="truncate">{name || 'Account'}</span>
-      </a>
+      <div className="flex shrink-0 items-center gap-1 pb-0.5 pt-3">
+        <a href={navLink('account')} className="flex min-w-0 flex-1 items-center gap-2.5 px-2 text-[14px] font-medium text-ink">
+          <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#fde68a] to-[#fb923c] text-[13px] font-bold text-[#7c2d12]">
+            {(name[0] || '·').toUpperCase()}
+          </span>
+          <span className="truncate">{name || 'Account'}</span>
+        </a>
+        <HostThemeToggle className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-line-2 hover:text-ink" />
+      </div>
     </aside>
   );
 }

@@ -56,24 +56,24 @@ export default function CustomCitationDialog({ isOpen, onClose, onCite }: { isOp
     onClose();
   };
 
-  const input = 'h-10 w-full rounded-[10px] border border-[#e5e7eb] px-3 text-[14px] outline-none focus:border-[var(--theme-primary,#2563eb)] focus:shadow-[0_0_0_4px_#eff6ff]';
+  const input = 'h-10 w-full rounded-[10px] border border-line px-3 text-[14px] outline-none focus:border-[var(--theme-primary,var(--color-brand))] focus:shadow-[0_0_0_4px_var(--color-brand-50)]';
   return (
     <div className="fixed inset-0 z-[13060] flex items-end justify-center bg-[rgba(15,23,42,0.35)] sm:items-center" role="dialog" aria-modal="true" aria-label="Add custom citation">
-      <div className="w-full max-w-[480px] rounded-t-[24px] bg-white p-5 border border-[#e5e7eb] shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)] sm:rounded-[16px]">
+      <div className="w-full max-w-[480px] rounded-t-[24px] bg-surface p-5 border border-line shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)] sm:rounded-[16px]">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-[18px] font-bold text-[#0f172a]">Add custom citation</h3>
-          <button type="button" onClick={onClose} aria-label="Close" className="rounded-full p-1.5 text-[#64748b] hover:bg-[#f1f5f9]"><LuX className="h-5 w-5" /></button>
+          <h3 className="text-[18px] font-bold text-ink">Add custom citation</h3>
+          <button type="button" onClick={onClose} aria-label="Close" className="rounded-full p-1.5 text-muted hover:bg-line-2"><LuX className="h-5 w-5" /></button>
         </div>
-        <div className="mb-3 inline-flex rounded-full bg-[#f1f5f9] p-1 text-[13px]">
+        <div className="mb-3 inline-flex rounded-full bg-line-2 p-1 text-[13px]">
           {(['doi', 'bibtex', 'manual'] as const).map((value) => (
-            <button key={value} type="button" onClick={() => setMode(value)} className={`h-8 rounded-full px-3.5 ${mode === value ? 'bg-white font-medium text-[#0f172a] shadow-sm' : 'text-[#64748b]'}`}>
+            <button key={value} type="button" onClick={() => setMode(value)} className={`h-8 rounded-full px-3.5 ${mode === value ? 'bg-surface font-medium text-ink shadow-sm' : 'text-muted'}`}>
               {value === 'doi' ? 'DOI' : value === 'bibtex' ? 'BibTeX' : 'Manual'}
             </button>
           ))}
         </div>
         {mode === 'doi' ? <input autoFocus value={doi} onChange={(event) => setDoi(event.target.value)} placeholder="10.1056/NEJMoa2034577" aria-label="DOI" className={input} /> : null}
         {mode === 'bibtex' ? (
-          <textarea autoFocus value={bibtex} onChange={(event) => setBibtex(event.target.value)} rows={7} placeholder="@article{smith2020, ...}" aria-label="BibTeX" className="w-full rounded-[10px] border border-[#e5e7eb] px-3 py-2 font-mono text-[12.5px] outline-none focus:border-[var(--theme-primary,#2563eb)] focus:shadow-[0_0_0_4px_#eff6ff]" />
+          <textarea autoFocus value={bibtex} onChange={(event) => setBibtex(event.target.value)} rows={7} placeholder="@article{smith2020, ...}" aria-label="BibTeX" className="w-full rounded-[10px] border border-line px-3 py-2 font-mono text-[12.5px] outline-none focus:border-[var(--theme-primary,var(--color-brand))] focus:shadow-[0_0_0_4px_var(--color-brand-50)]" />
         ) : null}
         {mode === 'manual' ? (
           <div className="space-y-2">
@@ -88,8 +88,8 @@ export default function CustomCitationDialog({ isOpen, onClose, onCite }: { isOp
         ) : null}
         {error ? <p className="mt-2 text-[13px] text-[#991b1b]">{error}</p> : null}
         <div className="mt-4 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="h-9 rounded-[9px] border border-[#e5e7eb] bg-white px-4 text-[13px] font-semibold text-[#334155] hover:bg-[#f8fafc]">Cancel</button>
-          <button type="button" disabled={busy} onClick={() => void submit()} className="h-9 rounded-[10px] bg-[var(--theme-primary,#2563eb)] shadow-[0_6px_16px_-8px_rgba(37,99,235,0.8)] px-5 text-[13px] font-semibold text-white disabled:opacity-60">{busy ? 'Looking up…' : 'Cite'}</button>
+          <button type="button" onClick={onClose} className="h-9 rounded-[9px] border border-line bg-surface px-4 text-[13px] font-semibold text-ink-2 hover:bg-soft">Cancel</button>
+          <button type="button" disabled={busy} onClick={() => void submit()} className="h-9 rounded-[10px] bg-[var(--theme-primary,var(--color-brand))] shadow-[0_6px_16px_-8px_rgba(var(--brand-rgb),0.8)] px-5 text-[13px] font-semibold text-white disabled:opacity-60">{busy ? 'Looking up…' : 'Cite'}</button>
         </div>
       </div>
     </div>

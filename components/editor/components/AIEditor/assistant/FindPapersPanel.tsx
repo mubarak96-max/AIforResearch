@@ -165,7 +165,7 @@ export default function FindPapersPanel({ suggestedQueries = [], documentTitle, 
   const quickYear = THIS_YEAR - 10;
   const chip = (on: boolean) =>
     `inline-flex h-7 shrink-0 items-center rounded-full border px-2.5 text-[12.5px] font-medium transition-colors ${
-      on ? 'border-[#dbeafe] bg-[#eff6ff] text-[#1d4ed8]' : 'border-[#e5e7eb] bg-white text-[#475569] hover:bg-[#f8fafc]'
+      on ? 'border-brand-100 bg-brand-50 text-brand-600' : 'border-line bg-surface text-ink-3 hover:bg-soft'
     }`;
   // "Sleep and memory" and "Sleep and Memory in Adults" are one suggestion, not two.
   const suggestions = suggestedQueries.filter((item, index) =>
@@ -175,18 +175,18 @@ export default function FindPapersPanel({ suggestedQueries = [], documentTitle, 
     }),
   );
   const option = (on: boolean) =>
-    `h-8 rounded-[9px] border text-[12.5px] transition-colors ${on ? 'border-[#dbeafe] bg-[#eff6ff] font-semibold text-[#1d4ed8]' : 'border-[#e5e7eb] bg-white text-[#334155] hover:bg-[#f8fafc]'}`;
+    `h-8 rounded-[9px] border text-[12.5px] transition-colors ${on ? 'border-brand-100 bg-brand-50 font-semibold text-brand-600' : 'border-line bg-surface text-ink-2 hover:bg-soft'}`;
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-white">
+    <div className="flex h-full min-h-0 flex-col bg-surface">
       <div className="px-3 pb-2 pt-3">
         {paragraph ? (
-          <div className="mb-2 flex items-start gap-2 rounded-[10px] bg-[#f8fafc] px-2.5 py-2">
-            <button type="button" onClick={onClearParagraph} aria-label="Back to search" className="mt-0.5 text-[#64748b] hover:text-[#0f172a]">
+          <div className="mb-2 flex items-start gap-2 rounded-[10px] bg-soft px-2.5 py-2">
+            <button type="button" onClick={onClearParagraph} aria-label="Back to search" className="mt-0.5 text-muted hover:text-ink">
               <LuArrowLeft className="h-4 w-4" />
             </button>
-            <div className="min-w-0 text-[12.5px] text-[#334155]">
-              <div className="font-semibold text-[#0f172a]">Citations for this paragraph</div>
+            <div className="min-w-0 text-[12.5px] text-ink-2">
+              <div className="font-semibold text-ink">Citations for this paragraph</div>
               <div className="line-clamp-2">{paragraph.text}</div>
 
             </div>
@@ -201,16 +201,16 @@ export default function FindPapersPanel({ suggestedQueries = [], documentTitle, 
           className="flex items-center gap-2"
         >
           <div className="group relative min-w-0 flex-1">
-            <LuSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94a3b8] group-focus-within:text-[var(--theme-primary,#2563eb)]" />
+            <LuSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle group-focus-within:text-[var(--theme-primary,var(--color-brand))]" />
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search papers"
               aria-label="Search papers"
-              className="h-9 w-full rounded-[10px] border border-[#e2e8f0] bg-white pl-9 pr-8 text-[14px] text-[#0f172a] outline-none transition-[border,box-shadow] placeholder:text-[#94a3b8] focus:border-[var(--theme-primary,#2563eb)] focus:shadow-[0_0_0_3px_#eff6ff]"
+              className="h-9 w-full rounded-[10px] border border-line bg-surface pl-9 pr-8 text-[14px] text-ink outline-none transition-[border,box-shadow] placeholder:text-subtle focus:border-[var(--theme-primary,var(--color-brand))] focus:shadow-[0_0_0_3px_var(--color-brand-50)]"
             />
             {query ? (
-              <button type="button" aria-label="Clear search" onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94a3b8] hover:text-[#334155]">
+              <button type="button" aria-label="Clear search" onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-subtle hover:text-ink-2">
                 <LuX className="h-4 w-4" />
               </button>
             ) : null}
@@ -220,10 +220,10 @@ export default function FindPapersPanel({ suggestedQueries = [], documentTitle, 
             onClick={() => setShowFilters((value) => !value)}
             aria-label="Filters"
             aria-pressed={showFilters}
-            className={`relative inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] transition-colors ${showFilters ? 'bg-[#eff6ff] text-[#1d4ed8]' : 'text-[#94a3b8] hover:bg-[#f1f5f9] hover:text-[#0f172a]'}`}
+            className={`relative inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] transition-colors ${showFilters ? 'bg-brand-50 text-brand-600' : 'text-subtle hover:bg-line-2 hover:text-ink'}`}
           >
             <LuSlidersHorizontal className="h-4 w-4" />
-            {filterCount ? <span className="absolute right-0.5 top-0.5 h-[15px] min-w-[15px] rounded-full bg-[var(--theme-primary,#2563eb)] px-1 text-[10px] font-semibold leading-[15px] text-white">{filterCount}</span> : null}
+            {filterCount ? <span className="absolute right-0.5 top-0.5 h-[15px] min-w-[15px] rounded-full bg-[var(--theme-primary,var(--color-brand))] px-1 text-[10px] font-semibold leading-[15px] text-white">{filterCount}</span> : null}
           </button>
         </form>
         <div className="mt-2 flex flex-wrap gap-1.5">
@@ -238,9 +238,9 @@ export default function FindPapersPanel({ suggestedQueries = [], documentTitle, 
           </button>
         </div>
         {showFilters ? (
-          <div className="mt-2 space-y-2.5 rounded-[12px] bg-[#f8fafc] p-3 text-[12.5px]">
+          <div className="mt-2 space-y-2.5 rounded-[12px] bg-soft p-3 text-[12.5px]">
             <div>
-              <div className="mb-1.5 font-semibold text-[#64748b]">Published</div>
+              <div className="mb-1.5 font-semibold text-muted">Published</div>
               <div className="grid grid-cols-2 gap-1.5">
                 {YEAR_PRESETS.map((preset) => (
                   <button key={preset.label} type="button" onClick={() => updateFilters({ yearFrom: preset.from })} className={option(yearFrom === preset.from)}>
@@ -250,7 +250,7 @@ export default function FindPapersPanel({ suggestedQueries = [], documentTitle, 
               </div>
             </div>
             <div>
-              <div className="mb-1.5 font-semibold text-[#64748b]">Cited by</div>
+              <div className="mb-1.5 font-semibold text-muted">Cited by</div>
               <div className="flex gap-1.5">
                 {CITED_PRESETS.map((value) => (
                   <button key={value} type="button" onClick={() => updateFilters({ minCited: value || null })} className={`flex-1 ${option((filters.minCited || 0) === value)}`}>
@@ -269,7 +269,7 @@ export default function FindPapersPanel({ suggestedQueries = [], documentTitle, 
           <div className="space-y-4 pt-1">
             {suggestions.length ? (
               <section>
-                <h4 className="mb-1 px-1 text-[12px] font-medium text-[#94a3b8]">Suggested</h4>
+                <h4 className="mb-1 px-1 text-[12px] font-medium text-subtle">Suggested</h4>
                 {suggestions.map((suggestion) => (
                   <button
                     key={suggestion}
@@ -278,9 +278,9 @@ export default function FindPapersPanel({ suggestedQueries = [], documentTitle, 
                       setQuery(suggestion);
                       void run(suggestion, filters);
                     }}
-                    className="flex w-full items-center gap-2 rounded-[10px] px-2 py-2 text-left text-[13.5px] text-[#334155] transition-colors hover:bg-[#f8fafc] hover:text-[#0f172a]"
+                    className="flex w-full items-center gap-2 rounded-[10px] px-2 py-2 text-left text-[13.5px] text-ink-2 transition-colors hover:bg-soft hover:text-ink"
                   >
-                    <LuSparkles className="h-[15px] w-[15px] shrink-0 text-[var(--theme-primary,#2563eb)]" />
+                    <LuSparkles className="h-[15px] w-[15px] shrink-0 text-[var(--theme-primary,var(--color-brand))]" />
                     <span className="truncate">{suggestion}</span>
                   </button>
                 ))}
@@ -288,7 +288,7 @@ export default function FindPapersPanel({ suggestedQueries = [], documentTitle, 
             ) : null}
             {recent.length ? (
               <section>
-                <h4 className="mb-1 px-1 text-[12px] font-medium text-[#94a3b8]">Recent</h4>
+                <h4 className="mb-1 px-1 text-[12px] font-medium text-subtle">Recent</h4>
                 {recent.map((item) => (
                   <button
                     key={item}
@@ -297,9 +297,9 @@ export default function FindPapersPanel({ suggestedQueries = [], documentTitle, 
                       setQuery(item);
                       void run(item, filters);
                     }}
-                    className="flex w-full items-center gap-2 rounded-[10px] px-2 py-2 text-left text-[13.5px] text-[#334155] transition-colors hover:bg-[#f8fafc] hover:text-[#0f172a]"
+                    className="flex w-full items-center gap-2 rounded-[10px] px-2 py-2 text-left text-[13.5px] text-ink-2 transition-colors hover:bg-soft hover:text-ink"
                   >
-                    <LuHistory className="h-[15px] w-[15px] shrink-0 text-[#94a3b8]" />
+                    <LuHistory className="h-[15px] w-[15px] shrink-0 text-subtle" />
                     <span className="truncate">{item}</span>
                   </button>
                 ))}
@@ -307,7 +307,7 @@ export default function FindPapersPanel({ suggestedQueries = [], documentTitle, 
             ) : null}
             {!suggestions.length ? (
               <section>
-                <h4 className="mb-1 px-1 text-[12px] font-medium text-[#94a3b8]">Try</h4>
+                <h4 className="mb-1 px-1 text-[12px] font-medium text-subtle">Try</h4>
                 {EXAMPLES.map((example) => (
                   <button
                     key={example}
@@ -316,9 +316,9 @@ export default function FindPapersPanel({ suggestedQueries = [], documentTitle, 
                       setQuery(example);
                       void run(example, filters);
                     }}
-                    className="flex w-full items-center gap-2 rounded-[10px] px-2 py-2 text-left text-[13.5px] text-[#334155] transition-colors hover:bg-[#f8fafc] hover:text-[#0f172a]"
+                    className="flex w-full items-center gap-2 rounded-[10px] px-2 py-2 text-left text-[13.5px] text-ink-2 transition-colors hover:bg-soft hover:text-ink"
                   >
-                    <LuSearch className="h-[15px] w-[15px] shrink-0 text-[#94a3b8]" />
+                    <LuSearch className="h-[15px] w-[15px] shrink-0 text-subtle" />
                     <span className="truncate">{example}</span>
                   </button>
                 ))}
@@ -329,17 +329,17 @@ export default function FindPapersPanel({ suggestedQueries = [], documentTitle, 
 
         {error ? <div className="rounded-[12px] border border-[#fecaca] bg-[#fef2f2] px-3 py-2 text-[13px] text-[#991b1b]">{error}</div> : null}
         {!showingStart && !loading && !error && !outOfCredits && results.length === 0 ? (
-          <p className="py-8 text-center text-[13px] text-[#94a3b8]">No papers found</p>
+          <p className="py-8 text-center text-[13px] text-subtle">No papers found</p>
         ) : null}
 
         {submitted && !paragraph && results.length > 0 ? (
-          <div className="mb-1.5 flex items-center justify-between px-0.5 text-[12.5px] text-[#64748b]">
+          <div className="mb-1.5 flex items-center justify-between px-0.5 text-[12.5px] text-muted">
             <span>{total > results.length ? `${total.toLocaleString()} results` : `${results.length} result${results.length === 1 ? '' : 's'}`}</span>
             <select
               value={filters.sort || 'relevance'}
               onChange={(event) => updateFilters({ sort: event.target.value as PaperFilters['sort'] })}
               aria-label="Sort results"
-              className="h-7 rounded-[8px] bg-transparent px-1 font-medium text-[#334155] outline-none hover:bg-[#f1f5f9]"
+              className="h-7 rounded-[8px] bg-transparent px-1 font-medium text-ink-2 outline-none hover:bg-line-2"
             >
               <option value="relevance">Most relevant</option>
               <option value="cited">Most cited</option>
@@ -367,7 +367,7 @@ export default function FindPapersPanel({ suggestedQueries = [], documentTitle, 
         {loading ? (
           <div className="flex flex-col gap-3 pt-3" aria-label="Loading papers">
             {[0, 1, 2].map((index) => (
-              <div key={index} className="h-[112px] animate-pulse rounded-[12px] bg-[#f8fafc]" />
+              <div key={index} className="h-[112px] animate-pulse rounded-[12px] bg-soft" />
             ))}
           </div>
         ) : null}
@@ -375,7 +375,7 @@ export default function FindPapersPanel({ suggestedQueries = [], documentTitle, 
           <button
             type="button"
             onClick={() => void run(submitted, filters, page + 1)}
-            className="mt-2 h-9 w-full rounded-[10px] text-[13px] font-medium text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a]"
+            className="mt-2 h-9 w-full rounded-[10px] text-[13px] font-medium text-muted hover:bg-soft hover:text-ink"
           >
             More results
           </button>

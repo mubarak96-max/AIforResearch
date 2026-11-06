@@ -11,7 +11,7 @@ export type PlanAction =
 
 const button = (primary?: boolean) =>
   `inline-flex h-11 w-full items-center justify-center gap-2 rounded-[11px] text-[15px] font-semibold transition-colors outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
-    primary ? 'bg-brand text-white shadow-brand hover:bg-brand-600 disabled:opacity-70' : 'border border-line bg-white text-ink hover:bg-soft disabled:text-subtle'
+    primary ? 'bg-brand text-on-brand shadow-brand hover:bg-brand-600 disabled:opacity-70' : 'border border-line bg-surface text-ink hover:bg-soft disabled:text-subtle'
   }`;
 
 function Action({ action }: { action: PlanAction }) {
@@ -37,10 +37,10 @@ export function PlanCards({ plans, interval, actionFor, currentId, compact = fal
         const current = plan.id === currentId;
         return (
           <section key={plan.id} aria-labelledby={`plan-${plan.id}`}
-            className={`relative flex flex-col rounded-[20px] bg-white ${compact ? 'p-5' : 'p-6 sm:p-7'} ${
-              plan.featured ? 'border-2 border-brand shadow-[0_30px_60px_-30px_rgba(37,99,235,.45)]' : 'border border-line'}`}>
+            className={`relative flex flex-col rounded-[20px] bg-surface ${compact ? 'p-5' : 'p-6 sm:p-7'} ${
+              plan.featured ? 'border-2 border-brand shadow-[0_30px_60px_-30px_rgba(var(--brand-rgb),.45)]' : 'border border-line'}`}>
             {(plan.featured || current) && (
-              <p className={`absolute -top-3 left-5 rounded-full px-2.5 py-1 text-[12px] font-bold ${current ? 'bg-ink text-white' : 'bg-brand text-white'}`}>
+              <p className={`absolute -top-3 left-5 rounded-full px-2.5 py-1 text-[12px] font-bold ${current ? 'bg-ink text-on-brand' : 'bg-brand text-on-brand'}`}>
                 {current ? 'Your plan' : 'Most popular'}
               </p>
             )}
@@ -74,7 +74,7 @@ export function PlanCards({ plans, interval, actionFor, currentId, compact = fal
 export function IntervalToggle({ value, onChange, saving }: { value: Interval; onChange: (value: Interval) => void; saving: number }) {
   const option = (id: Interval, label: string) => (
     <button type="button" aria-pressed={value === id} onClick={() => onChange(id)}
-      className={`flex h-9 items-center gap-2 rounded-[9px] px-4 text-[14.5px] font-semibold transition-colors ${value === id ? 'bg-white text-ink shadow-[0_1px_3px_rgba(15,23,42,.12)]' : 'text-muted hover:text-ink'}`}>
+      className={`flex h-9 items-center gap-2 rounded-[9px] px-4 text-[14.5px] font-semibold transition-colors ${value === id ? 'bg-surface text-ink shadow-[0_1px_3px_rgba(15,23,42,.12)]' : 'text-muted hover:text-ink'}`}>
       {label}
       {id === 'year' && saving > 0 && <span className="rounded-[7px] bg-green-100 px-2 py-0.5 text-[12.5px] font-semibold text-green-700">Save {saving}%</span>}
     </button>

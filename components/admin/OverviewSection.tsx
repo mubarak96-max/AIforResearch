@@ -57,7 +57,7 @@ export function groupStatus(group: string, fields: Setting[]): GroupStatus {
 
 function Stat({ icon: Icon, label, value, note }: { icon: IconType; label: string; value: string; note?: string }) {
   return (
-    <div className="rounded-2xl border border-line bg-white p-4">
+    <div className="rounded-2xl border border-line bg-surface p-4">
       <div className="flex items-center gap-2 text-[13px] text-muted"><Icon size={15} />{label}</div>
       <p className="mt-2 text-[26px] font-bold tabular-nums tracking-[-0.02em]">{value}</p>
       {note && <p className="text-[12.5px] text-muted">{note}</p>}

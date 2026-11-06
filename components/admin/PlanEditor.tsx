@@ -58,7 +58,7 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (val
       <span>{label}</span>
       <button type="button" role="switch" aria-checked={checked} aria-label={label} onClick={() => onChange(!checked)}
         className={`relative h-6 w-10 shrink-0 rounded-full transition-colors ${checked ? 'bg-brand' : 'bg-line'}`}>
-        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-[left] ${checked ? 'left-[18px]' : 'left-0.5'}`} />
+        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-surface shadow transition-[left] ${checked ? 'left-[18px]' : 'left-0.5'}`} />
       </button>
     </label>
   );
@@ -176,8 +176,8 @@ export function PlanEditor({ plan, defs, nextSort, onClose, onSaved }: {
   const stripe = plan ? stripeState(plan) : null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex justify-end bg-ink/40" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-      <div role="dialog" aria-modal="true" aria-labelledby="plan-editor-title" className="flex h-full w-full max-w-[640px] flex-col bg-white shadow-[0_20px_60px_-20px_rgba(15,23,42,.45)]">
+    <div className="fixed inset-0 z-[60] flex justify-end bg-black/40" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+      <div role="dialog" aria-modal="true" aria-labelledby="plan-editor-title" className="flex h-full w-full max-w-[640px] flex-col bg-surface shadow-[0_20px_60px_-20px_rgba(15,23,42,.45)]">
         <div className="flex items-center gap-3 border-b border-line-2 px-5 py-4">
           <h2 id="plan-editor-title" className="min-w-0 flex-1 truncate text-[17px] font-bold tracking-[-0.01em]">{isNew ? 'New plan' : plan.name}</h2>
           {stripe && <StatusPill tone={stripe.tone}>{stripe.label}</StatusPill>}
@@ -250,7 +250,7 @@ export function PlanEditor({ plan, defs, nextSort, onClose, onSaved }: {
                   {def.kind === 'feature' ? (
                     <button id={`limit-${key}`} type="button" role="switch" aria-checked={value.on} aria-label={def.label} onClick={() => setLimit(key, { on: !value.on })}
                       className={`relative h-6 w-10 shrink-0 rounded-full transition-colors ${value.on ? 'bg-brand' : 'bg-line'}`}>
-                      <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-[left] ${value.on ? 'left-[18px]' : 'left-0.5'}`} />
+                      <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-surface shadow transition-[left] ${value.on ? 'left-[18px]' : 'left-0.5'}`} />
                     </button>
                   ) : (
                     <div className="flex items-center gap-2">
@@ -258,7 +258,7 @@ export function PlanEditor({ plan, defs, nextSort, onClose, onSaved }: {
                         placeholder="Unlimited" className="h-9 w-[112px] rounded-[10px] border border-line px-3 text-[14px] tabular-nums placeholder:text-subtle focus:border-brand focus:outline-none" />
                       {def.kind === 'count' ? (
                         <select aria-label={`${def.label} per`} value={value.per} onChange={(event) => setLimit(key, { per: event.target.value as 'day' | 'month' })}
-                          className="h-9 rounded-[10px] border border-line bg-white px-2 text-[14px] focus:border-brand focus:outline-none">
+                          className="h-9 rounded-[10px] border border-line bg-surface px-2 text-[14px] focus:border-brand focus:outline-none">
                           <option value="day">a day</option>
                           <option value="month">a month</option>
                         </select>

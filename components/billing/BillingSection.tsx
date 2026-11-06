@@ -27,13 +27,13 @@ export type Billing = {
 const LIVE = ['active', 'trialing', 'past_due'];
 const day = (value: string | number) => new Date(typeof value === 'number' ? value * 1000 : value).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 const BRANDS: Record<string, { name: string; face: string }> = {
-  visa: { name: 'VISA', face: 'from-[#1a3fa8] via-[#2350d4] to-[#3b82f6]' },
+  visa: { name: 'VISA', face: 'from-[#1a3fa8] via-[#2350d4] to-primary-500' },
   mastercard: { name: 'mastercard', face: 'from-[#111827] via-[#1f2937] to-[#3f3f46]' },
   amex: { name: 'AMERICAN EXPRESS', face: 'from-[#0f766e] via-[#0e7490] to-[#38bdf8]' },
   discover: { name: 'DISCOVER', face: 'from-[#9a3412] via-[#ea580c] to-[#fb923c]' },
   jcb: { name: 'JCB', face: 'from-[#065f46] via-[#047857] to-[#10b981]' },
-  unionpay: { name: 'UnionPay', face: 'from-[#7f1d1d] via-[#b91c1c] to-[#1e3a8a]' },
-  diners: { name: 'Diners Club', face: 'from-[#334155] via-[#475569] to-[#94a3b8]' },
+  unionpay: { name: 'UnionPay', face: 'from-[#7f1d1d] via-[#b91c1c] to-primary-900' },
+  diners: { name: 'Diners Club', face: 'from-ink-2 via-ink-3 to-subtle' },
 };
 const CANCEL_REASONS = ['Too expensive', 'Not writing right now', 'Missing a feature', 'Switching tools', 'Other'];
 
@@ -185,13 +185,13 @@ export function BillingSection() {
             <div className="mt-3 flex flex-wrap gap-2">
               {CANCEL_REASONS.map((item) => (
                 <button key={item} type="button" aria-pressed={reason === item} onClick={() => setReason(item)}
-                  className={`h-[30px] rounded-full border px-3 text-[13px] font-medium ${reason === item ? 'border-brand-100 bg-brand-50 text-brand-600' : 'border-line bg-white text-ink-2'}`}>
+                  className={`h-[30px] rounded-full border px-3 text-[13px] font-medium ${reason === item ? 'border-brand-100 bg-brand-50 text-brand-600' : 'border-line bg-surface text-ink-2'}`}>
                   {item}
                 </button>
               ))}
             </div>
             <textarea value={comment} onChange={(event) => setComment(event.target.value)} rows={2} maxLength={400} placeholder="Anything we could do better? (optional)"
-              className="mt-3 w-full rounded-xl border border-line bg-white px-3 py-2 text-[14px] focus:border-brand focus:outline-none" />
+              className="mt-3 w-full rounded-xl border border-line bg-surface px-3 py-2 text-[14px] focus:border-brand focus:outline-none" />
             <div className="mt-3 flex flex-wrap justify-end gap-2">
               <Button variant="ghost" size="sm" onClick={() => setCancelling(false)}>Keep plan</Button>
               <Button variant="danger" size="sm" disabled={busy !== null} onClick={() => void run('cancel', async () => {
@@ -322,16 +322,16 @@ function Meter({ label, used, limit, per }: { label: string; used: number; limit
 
 /** A saved card drawn like the real thing: brand colours, chip, number, holder and expiry. */
 function BankCard({ card }: { card: SavedCard }) {
-  const brand = BRANDS[card.brand] ?? { name: card.brand.toUpperCase(), face: 'from-[#334155] via-[#475569] to-[#64748b]' };
+  const brand = BRANDS[card.brand] ?? { name: card.brand.toUpperCase(), face: 'from-ink-2 via-ink-3 to-muted' };
   return (
     <div className={`relative flex aspect-[1.586] w-full flex-col overflow-hidden rounded-2xl bg-gradient-to-br p-5 text-white shadow-[0_18px_40px_-20px_rgba(15,23,42,.6)] ${brand.face}`}>
-      <div className="pointer-events-none absolute -right-10 -top-16 h-48 w-48 rounded-full bg-white/10" aria-hidden="true" />
-      <div className="pointer-events-none absolute -bottom-20 -left-8 h-44 w-44 rounded-full bg-white/[.07]" aria-hidden="true" />
+      <div className="pointer-events-none absolute -right-10 -top-16 h-48 w-48 rounded-full bg-surface/10" aria-hidden="true" />
+      <div className="pointer-events-none absolute -bottom-20 -left-8 h-44 w-44 rounded-full bg-surface/[.07]" aria-hidden="true" />
       <div className="relative flex items-start justify-between">
         <span className="h-8 w-11 rounded-md bg-gradient-to-br from-[#fde68a] via-[#fbbf24] to-[#d97706] shadow-inner" aria-hidden="true">
           <span className="block h-full w-full rounded-md bg-[repeating-linear-gradient(90deg,transparent_0_9px,rgba(120,53,15,.35)_9px_10px)]" />
         </span>
-        {card.default && <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11.5px] font-semibold backdrop-blur">Default</span>}
+        {card.default && <span className="rounded-full bg-surface/20 px-2.5 py-1 text-[11.5px] font-semibold backdrop-blur">Default</span>}
       </div>
       <p className="relative mt-auto font-mono text-[17px] tracking-[0.14em] sm:text-[18px]" aria-label={`Card ending ${card.last4}`}>•••• •••• •••• {card.last4}</p>
       <div className="relative mt-3 flex items-end justify-between gap-3">

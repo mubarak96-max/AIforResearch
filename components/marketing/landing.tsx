@@ -16,7 +16,7 @@ import {
 import { AuthAware } from './AuthAware';
 import { btnGhost, btnPrimary, container } from './styles';
 
-export const h1 = 'text-balance text-[34px] font-semibold leading-[1.08] tracking-[-0.035em] text-ink sm:text-[44px] md:text-[52px]';
+export const h1 = 'text-balance font-serif text-[34px] font-semibold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[44px] md:text-[52px]';
 export const h2 = 'text-balance text-[30px] font-semibold leading-[1.12] tracking-[-0.03em] text-ink md:text-[40px]';
 export const lead = 'text-balance text-[16px] leading-[1.6] text-muted md:text-[17px]';
 const cta = `${btnPrimary} h-11 rounded-[10px] px-5 text-[15px]`;
@@ -148,7 +148,7 @@ const AUDIENCE: { icon: ReactNode; label: string }[] = [
 /** The top of a page other than home: title, one line, optional buttons. */
 export function PageIntro({ title, intro, children }: { title: string; intro: string; children?: ReactNode }) {
   return (
-    <section aria-labelledby="page-title" className="pt-14 text-center md:pt-20" style={{ background: 'radial-gradient(900px 340px at 50% -8%, #eff6ff 0%, rgba(239,246,255,0) 70%)' }}>
+    <section aria-labelledby="page-title" className="pt-14 text-center md:pt-20" style={{ background: 'radial-gradient(900px 340px at 50% -8%, var(--color-brand-50) 0%, transparent 70%)' }}>
       <div className={container}>
         <h1 id="page-title" className={`mx-auto max-w-[760px] ${h1}`}>{title}</h1>
         <p className={`mx-auto mt-5 max-w-[540px] ${lead}`}>{intro}</p>
@@ -175,7 +175,7 @@ export function Points({ items }: { items: string[] }) {
 export function ComparisonBand() {
   return (
     <section aria-labelledby="compare-title" className="px-4 pt-24 sm:px-6 md:pt-32">
-      <div className="mx-auto max-w-[1184px] rounded-[28px] bg-ink px-5 py-14 text-white sm:px-10 md:py-20">
+      <div className="mx-auto max-w-[1184px] rounded-[28px] bg-ink px-5 py-14 text-on-ink sm:px-10 md:py-20">
         <h2 id="compare-title" className="mx-auto max-w-[620px] text-balance text-center text-[30px] font-semibold leading-[1.12] tracking-[-0.03em] md:text-[40px]">Not another AI chatbot</h2>
         <p className="mx-auto mt-4 max-w-[480px] text-balance text-center text-[16px] leading-[1.6] text-slate-400">General AI chat can make up sources. WriteOrbit cites real papers, in your document.</p>
         <div className="mx-auto mt-10 max-w-[760px]">
@@ -205,7 +205,7 @@ export function AudienceSection() {
       <h2 id="audience-title" className={`mx-auto max-w-[620px] ${h2}`}>For every kind of academic writing</h2>
       <ul className="mx-auto mt-8 flex max-w-[820px] flex-wrap justify-center gap-2.5">
         {AUDIENCE.map((item) => (
-          <li key={item.label} className="inline-flex h-10 items-center gap-2 rounded-full border border-line bg-white px-4 text-[14px] text-ink-2">
+          <li key={item.label} className="inline-flex h-10 items-center gap-2 rounded-full border border-line bg-surface px-4 text-[14px] text-ink-2">
             <span className="text-brand" aria-hidden="true">{item.icon}</span>
             {item.label}
           </li>

@@ -8,15 +8,16 @@ export const focusRing =
 
 const btnBase = `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[11px] border font-semibold transition-colors ${focusRing}`;
 
-export const btnPrimary = `${btnBase} border-transparent bg-brand text-white shadow-[0_6px_16px_-6px_rgba(37,99,235,.7)] hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-brand`;
+/** The main call to action: burnt sienna, the one colour on the page that means "do this". */
+export const btnPrimary = `${btnBase} border-transparent bg-accent text-white shadow-[0_6px_16px_-6px_rgba(194,65,12,.55)] hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-accent`;
 
-export const btnGhost = `${btnBase} border-line bg-white text-ink hover:bg-soft`;
+export const btnGhost = `${btnBase} border-line bg-surface text-ink hover:bg-soft`;
 
 /** Small uppercase label above a section heading. */
 export const kicker = 'mb-3 text-sm font-bold uppercase tracking-[.08em] text-brand';
 
 /** Big section heading. */
 export const sectionTitle =
-  'max-w-[760px] text-balance text-[30px] lg:text-wrap font-bold leading-[1.1] tracking-[-0.03em] text-ink sm:text-[38px] lg:text-[44px]';
+  'max-w-[760px] text-balance font-serif text-[30px] lg:text-wrap font-semibold leading-[1.1] tracking-[-0.02em] text-ink sm:text-[38px] lg:text-[44px]';
 
 /** The public source code (a fork can point this at its own repository when it builds). */

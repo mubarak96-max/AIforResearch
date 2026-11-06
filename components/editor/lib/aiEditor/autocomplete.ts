@@ -104,8 +104,8 @@ export function createAutocompletePlugin(getHandlers: () => Handlers) {
 }
 
 export const AUTOCOMPLETE_CSS = `
-  .ce-ghost-text { color: #94a3b8; pointer-events: none; user-select: none; white-space: pre-wrap; }
-  .ce-ghost-text::after { content: 'Tab'; margin-left: 6px; padding: 0 5px; border: 1px solid #e5e7eb; border-bottom-width: 2px; border-radius: 5px;
-    font: 500 11px/15px var(--font-sans), Inter, system-ui, sans-serif; color: #64748b; background: #fff; vertical-align: 2px; }
+  .ce-ghost-text { color: var(--color-subtle); pointer-events: none; user-select: none; white-space: pre-wrap; }
+  .ce-ghost-text::after { content: 'Tab'; margin-left: 6px; padding: 0 5px; border: 1px solid var(--color-line); border-bottom-width: 2px; border-radius: 5px;
+    font: 500 11px/15px var(--font-sans), Inter, system-ui, sans-serif; color: var(--color-muted); background: #fff; vertical-align: 2px; }
   @keyframes ce-progress { 0% { transform: translateX(-100%); } 100% { transform: translateX(300%); } }
 `;

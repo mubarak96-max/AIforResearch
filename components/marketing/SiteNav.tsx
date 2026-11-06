@@ -108,7 +108,7 @@ export function SiteNav({ signedIn }: { signedIn: boolean }) {
         onClick={(event) => {
           if (event.target === event.currentTarget) setOpen(false);
         }}
-        className="m-0 h-dvh max-h-none w-full max-w-none bg-white p-0 md:hidden"
+        className="m-0 h-dvh max-h-none w-full max-w-none bg-surface p-0 md:hidden"
       >
         <div className="flex h-full flex-col">
           <div className="flex h-14 shrink-0 items-center px-4">
@@ -137,7 +137,7 @@ export function SiteNav({ signedIn }: { signedIn: boolean }) {
                   aria-current={current ? 'page' : undefined}
                   className={`flex items-center gap-3.5 rounded-[14px] px-2 py-[11px] ${current ? 'bg-soft' : ''} ${focusRing}`}
                 >
-                  <span className={`grid size-[42px] shrink-0 place-items-center rounded-xl border ${current ? 'border-brand-100 bg-brand-50 text-brand' : 'border-line bg-white text-ink-2'}`} aria-hidden="true">
+                  <span className={`grid size-[42px] shrink-0 place-items-center rounded-xl border ${current ? 'border-brand-100 bg-brand-50 text-brand' : 'border-line bg-surface text-ink-2'}`} aria-hidden="true">
                     <Icon className="size-[18px]" />
                   </span>
                   <span className="min-w-0">

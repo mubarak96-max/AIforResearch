@@ -10,7 +10,7 @@ export const metadata = pageMetadata({
 
 type Topic = { id: string; title: string; items: [string, React.ReactNode][] };
 
-const kbd = (keys: string) => <kbd className="rounded-md border border-b-2 border-line bg-white px-1.5 py-px font-sans text-[12.5px] text-ink-2">{keys}</kbd>;
+const kbd = (keys: string) => <kbd className="rounded-md border border-b-2 border-line bg-surface px-1.5 py-px font-sans text-[12.5px] text-ink-2">{keys}</kbd>;
 
 const TOPICS: Topic[] = [
   {

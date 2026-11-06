@@ -94,14 +94,14 @@ export default function EditorStatusBar({
 
   return (
     // No overflow clipping here: the citation style list opens upwards out of this bar.
-    <div className="ai-editor-print-hidden relative z-20 hidden h-9 shrink-0 items-center gap-1 whitespace-nowrap border-t border-[#f1f5f9] bg-white px-3 text-[12.5px] text-[#64748b] md:flex">
+    <div className="ai-editor-print-hidden relative z-20 hidden h-9 shrink-0 items-center gap-1 whitespace-nowrap border-t border-line-2 bg-surface px-3 text-[12.5px] text-muted md:flex">
       <span className="px-1.5">{pages} {pages === 1 ? 'page' : 'pages'}</span>
       <span className="px-1.5">{wordsLabel}</span>
       <CitationStyleSelector
         selectedStyle={citationStyle}
         onStyleChange={onCitationStyleChange}
         className="shrink-0"
-        triggerClassName="!h-7 !gap-1 !rounded-md !border-0 !bg-transparent !px-1.5 !py-0 hover:!bg-[#f1f5f9] [&>span]:!text-[12.5px] [&>span]:!font-medium [&>span]:!text-[#475569]"
+        triggerClassName="!h-7 !gap-1 !rounded-md !border-0 !bg-transparent !px-1.5 !py-0 hover:!bg-line-2 [&>span]:!text-[12.5px] [&>span]:!font-medium [&>span]:!text-ink-3"
         dropdownClassName="!w-[400px] !max-w-[calc(100vw-24px)] !z-[12020] !bottom-full !top-auto !left-0 !right-auto !mb-1"
         hideExample={false}
       />
@@ -110,19 +110,19 @@ export default function EditorStatusBar({
           <i className={`h-[7px] w-[7px] rounded-full ${saved ? 'bg-[#22c55e]' : /fail|error/i.test(savedLabel) ? 'bg-[#ef4444]' : 'bg-[#f59e0b]'}`} aria-hidden="true" />
           {saved ? 'Saved' : savedLabel.replace(/ to server/i, '')}
         </span>
-        <span className="mx-1 h-4 w-px bg-[#e5e7eb]" aria-hidden="true" />
-        <button type="button" aria-label="Zoom out" title="Zoom out" onClick={() => stepZoom(-1)} className="grid h-7 w-7 place-items-center rounded-md hover:bg-[#f1f5f9] hover:text-[#0f172a]">
+        <span className="mx-1 h-4 w-px bg-line" aria-hidden="true" />
+        <button type="button" aria-label="Zoom out" title="Zoom out" onClick={() => stepZoom(-1)} className="grid h-7 w-7 place-items-center rounded-md hover:bg-line-2 hover:text-ink">
           <LuMinus className="h-3.5 w-3.5" />
         </button>
         <button
           type="button"
           onClick={() => onZoomChange(zoomValue === 'Fit' ? '100%' : 'Fit')}
           title={zoomValue === 'Fit' ? 'Fitting the page to the window. Click for 100%.' : 'Fit the page to the window'}
-          className="h-7 min-w-[64px] rounded-md px-1.5 text-center hover:bg-[#f1f5f9] hover:text-[#0f172a]"
+          className="h-7 min-w-[64px] rounded-md px-1.5 text-center hover:bg-line-2 hover:text-ink"
         >
           {zoomValue === 'Fit' ? `Fit (${zoomPercentage}%)` : `${zoomPercentage}%`}
         </button>
-        <button type="button" aria-label="Zoom in" title="Zoom in" onClick={() => stepZoom(1)} className="grid h-7 w-7 place-items-center rounded-md hover:bg-[#f1f5f9] hover:text-[#0f172a]">
+        <button type="button" aria-label="Zoom in" title="Zoom in" onClick={() => stepZoom(1)} className="grid h-7 w-7 place-items-center rounded-md hover:bg-line-2 hover:text-ink">
           <LuPlus className="h-3.5 w-3.5" />
         </button>
       </div>

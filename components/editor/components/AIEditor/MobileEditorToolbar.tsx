@@ -49,7 +49,7 @@ function ToolButton({ label, active, onPress, children }: { label: string; activ
       onPointerDown={keepFocus}
       onMouseDown={keepFocus}
       onClick={onPress}
-      className={`inline-flex h-10 min-w-[40px] items-center justify-center rounded-[10px] ${active ? 'bg-[#eff6ff] text-[var(--theme-primary-dark)]' : 'text-[#334155]'}`}
+      className={`inline-flex h-10 min-w-[40px] items-center justify-center rounded-[10px] ${active ? 'bg-brand-50 text-[var(--theme-primary-dark)]' : 'text-ink-2'}`}
     >
       {children}
     </button>
@@ -134,9 +134,9 @@ export default function MobileEditorToolbar({ editor, surfaceRef, enabled, onCom
   return (
     <div className="ai-editor-print-hidden fixed inset-x-0 z-[11800] md:hidden" style={{ bottom }}>
       {sheet ? (
-        <div role="dialog" aria-label="Format" className="max-h-[50vh] overflow-y-auto rounded-t-[24px] border-t border-[#e5e7eb] bg-white px-3.5 pb-3 pt-3 shadow-[0_-10px_30px_-10px_rgba(15,23,42,.3)]">
+        <div role="dialog" aria-label="Format" className="max-h-[50vh] overflow-y-auto rounded-t-[24px] border-t border-line bg-surface px-3.5 pb-3 pt-3 shadow-[0_-10px_30px_-10px_rgba(15,23,42,.3)]">
           <div className="mb-3 flex items-center gap-2">
-            <div className="grid flex-1 grid-cols-3 rounded-[12px] bg-[#f1f5f9] p-1">
+            <div className="grid flex-1 grid-cols-3 rounded-[12px] bg-line-2 p-1">
               {(['text', 'paragraph', 'insert'] as const).map((tab) => (
                 <button
                   key={tab}
@@ -144,7 +144,7 @@ export default function MobileEditorToolbar({ editor, surfaceRef, enabled, onCom
                   onPointerDown={keepFocus}
                   onMouseDown={keepFocus}
                   onClick={() => setSheet(tab)}
-                  className={`h-9 rounded-[9px] text-[14.5px] font-semibold capitalize ${sheet === tab ? 'bg-white text-[#0f172a] shadow-[0_1px_3px_rgba(15,23,42,.12)]' : 'text-[#64748b]'}`}
+                  className={`h-9 rounded-[9px] text-[14.5px] font-semibold capitalize ${sheet === tab ? 'bg-surface text-ink shadow-[0_1px_3px_rgba(15,23,42,.12)]' : 'text-muted'}`}
                 >
                   {tab}
                 </button>
@@ -166,21 +166,21 @@ export default function MobileEditorToolbar({ editor, surfaceRef, enabled, onCom
                     onPointerDown={keepFocus}
                     onMouseDown={keepFocus}
                     onClick={() => setBlockType(style.type, style.level ? { level: style.level } : undefined)}
-                    className={`flex w-full items-center rounded-[10px] px-3 py-2 text-left ${style.className} ${active ? 'bg-[#eff6ff] text-[var(--theme-primary-dark)]' : 'text-[#0f172a]'}`}
+                    className={`flex w-full items-center rounded-[10px] px-3 py-2 text-left ${style.className} ${active ? 'bg-brand-50 text-[var(--theme-primary-dark)]' : 'text-ink'}`}
                     style={{ fontFamily: 'var(--font-serif), "Source Serif 4", Georgia, serif' }}
                   >
                     {style.label}
                   </button>
                 );
               })}
-              <div className="mt-2 grid grid-cols-4 overflow-hidden rounded-[12px] border border-[#e5e7eb]">
+              <div className="mt-2 grid grid-cols-4 overflow-hidden rounded-[12px] border border-line">
                 <ToolButton label="Bold" active={Boolean(styles.bold)} onPress={() => toggleStyle('bold')}><LuBold className="h-5 w-5" /></ToolButton>
                 <ToolButton label="Italic" active={Boolean(styles.italic)} onPress={() => toggleStyle('italic')}><LuItalic className="h-5 w-5" /></ToolButton>
                 <ToolButton label="Underline" active={Boolean(styles.underline)} onPress={() => toggleStyle('underline')}><LuUnderline className="h-5 w-5" /></ToolButton>
                 <ToolButton label="Strikethrough" active={Boolean(styles.strike)} onPress={() => toggleStyle('strike')}><LuStrikethrough className="h-5 w-5" /></ToolButton>
               </div>
               <div className="mt-3 flex items-center justify-between px-1">
-                <span className="text-[14px] text-[#0f172a]">Text colour</span>
+                <span className="text-[14px] text-ink">Text colour</span>
                 <div className="flex gap-2">
                   {TEXT_COLORS.map((color) => {
                     const active = (styles.textColor ?? 'default') === color.id;
@@ -194,7 +194,7 @@ export default function MobileEditorToolbar({ editor, surfaceRef, enabled, onCom
                         onMouseDown={keepFocus}
                         onClick={() => run((current) => (color.id === 'default' ? current.removeStyles({ textColor: 'default' } as any) : current.addStyles({ textColor: color.id } as any)))}
                         className="h-7 w-7 rounded-full"
-                        style={{ backgroundColor: color.swatch, boxShadow: active ? '0 0 0 2px #fff, 0 0 0 4px #2563eb' : undefined }}
+                        style={{ backgroundColor: color.swatch, boxShadow: active ? '0 0 0 2px #fff, 0 0 0 4px var(--color-brand)' : undefined }}
                       />
                     );
                   })}
@@ -205,7 +205,7 @@ export default function MobileEditorToolbar({ editor, surfaceRef, enabled, onCom
 
           {sheet === 'paragraph' ? (
             <div className="space-y-3">
-              <div className="grid grid-cols-4 overflow-hidden rounded-[12px] border border-[#e5e7eb]">
+              <div className="grid grid-cols-4 overflow-hidden rounded-[12px] border border-line">
                 {[
                   { id: 'left', label: 'Align left', icon: <LuAlignLeft className="h-5 w-5" /> },
                   { id: 'center', label: 'Centre', icon: <LuAlignCenter className="h-5 w-5" /> },
@@ -222,7 +222,7 @@ export default function MobileEditorToolbar({ editor, surfaceRef, enabled, onCom
                   </ToolButton>
                 ))}
               </div>
-              <div className="grid grid-cols-5 overflow-hidden rounded-[12px] border border-[#e5e7eb]">
+              <div className="grid grid-cols-5 overflow-hidden rounded-[12px] border border-line">
                 <ToolButton label="Bulleted list" active={blockType === 'bulletListItem'} onPress={() => toggleList('bulletListItem')}><LuList className="h-5 w-5" /></ToolButton>
                 <ToolButton label="Numbered list" active={blockType === 'numberedListItem'} onPress={() => toggleList('numberedListItem')}><LuListOrdered className="h-5 w-5" /></ToolButton>
                 <ToolButton label="Checklist" active={blockType === 'checkListItem'} onPress={() => toggleList('checkListItem')}><LuListChecks className="h-5 w-5" /></ToolButton>
@@ -263,7 +263,7 @@ export default function MobileEditorToolbar({ editor, surfaceRef, enabled, onCom
                   onPointerDown={keepFocus}
                   onMouseDown={keepFocus}
                   onClick={item.onPress}
-                  className="flex flex-col items-center gap-1 rounded-[14px] border border-[#e5e7eb] py-3 text-[13px] font-semibold text-[#334155]"
+                  className="flex flex-col items-center gap-1 rounded-[14px] border border-line py-3 text-[13px] font-semibold text-ink-2"
                 >
                   {item.icon}
                   {item.label}
@@ -275,7 +275,7 @@ export default function MobileEditorToolbar({ editor, surfaceRef, enabled, onCom
       ) : null}
 
       {/* The mockup's tool row over the keyboard: Aa · @ Cite · ∑ · ✦ AI … ⌄ */}
-      <div className="flex items-center gap-1.5 border-t border-[#e5e7eb] bg-[#f8fafc] px-2.5 py-2">
+      <div className="flex items-center gap-1.5 border-t border-line bg-soft px-2.5 py-2">
         {[
           { key: 'format', label: 'Format', active: Boolean(sheet), onPress: () => setSheet((current) => (current ? null : 'text')), content: <span>Aa</span> },
           { key: 'cite', label: 'Insert citation', onPress: onCite, content: <><b className="font-extrabold text-[var(--theme-primary)]">@</b> Cite</> },
@@ -290,7 +290,7 @@ export default function MobileEditorToolbar({ editor, surfaceRef, enabled, onCom
             onMouseDown={keepFocus}
             onClick={tool.onPress}
             className={`inline-flex h-10 min-w-10 items-center justify-center gap-1.5 rounded-[11px] border px-2.5 text-[14px] font-semibold ${
-              'active' in tool && tool.active ? 'border-[#dbeafe] bg-[#eff6ff] text-[var(--theme-primary-dark)]' : 'border-[#e5e7eb] bg-white text-[#334155]'
+              'active' in tool && tool.active ? 'border-brand-100 bg-brand-50 text-[var(--theme-primary-dark)]' : 'border-line bg-surface text-ink-2'
             }`}
           >
             {tool.content}
@@ -303,7 +303,7 @@ export default function MobileEditorToolbar({ editor, surfaceRef, enabled, onCom
             onPointerDown={keepFocus}
             onMouseDown={keepFocus}
             onClick={onWriteWithAI}
-            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-[11px] border border-[var(--theme-primary)] bg-[var(--theme-primary)] px-2.5 text-[14px] font-semibold text-white"
+            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-[11px] border border-[var(--theme-primary)] bg-[var(--theme-primary)] px-2.5 text-[14px] font-semibold text-on-brand"
           >
             ✦ AI
           </button>
@@ -315,7 +315,7 @@ export default function MobileEditorToolbar({ editor, surfaceRef, enabled, onCom
             setSheet(null);
             (document.activeElement as HTMLElement | null)?.blur();
           }}
-          className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-[11px] border border-[#e5e7eb] bg-white text-[#334155]"
+          className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-[11px] border border-line bg-surface text-ink-2"
         >
           <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
         </button>

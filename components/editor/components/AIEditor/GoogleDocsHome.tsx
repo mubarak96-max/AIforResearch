@@ -5,6 +5,7 @@ import { navLink, useEditorConfig } from '../../runtime';
 import { isPaidPlan, useEditorAccount } from '../../lib/aiEditor/account';
 import { DOCUMENT_TEMPLATES } from '../../lib/aiEditor/templates';
 import { WriteOrbitLogo } from './EditorAppNav';
+import { HostThemeToggle } from '../../lib/aiEditor/hostTheme';
 import { DocumentPreview, relativeTime } from './documentPreview';
 
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -93,7 +94,7 @@ function DocumentActionsMenu({
           event.stopPropagation();
           onToggle();
         }}
-        className="inline-flex h-8 w-8 items-center justify-center rounded-[8px] text-[#94a3b8] transition-colors hover:bg-[#f1f5f9] hover:text-[#0f172a]"
+        className="inline-flex h-8 w-8 items-center justify-center rounded-[8px] text-subtle transition-colors hover:bg-line-2 hover:text-ink"
         aria-label={`More actions for ${document.title || 'Untitled document'}`}
         aria-expanded={isOpen}
       >
@@ -106,14 +107,14 @@ function DocumentActionsMenu({
         <div
           role="menu"
           aria-label={`Actions for ${document.title || 'Untitled document'}`}
-          className="absolute right-0 top-9 z-20 min-w-[180px] overflow-hidden rounded-[12px] border border-[#e5e7eb] bg-white p-1 shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]"
+          className="absolute right-0 top-9 z-20 min-w-[180px] overflow-hidden rounded-[12px] border border-line bg-surface p-1 shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]"
           onClick={(event) => event.stopPropagation()}
         >
-          <button type="button" role="menuitem" onClick={onOpen} className="flex w-full items-center rounded-[8px] px-3 py-2 text-left text-[13.5px] text-[#0f172a] hover:bg-[#f1f5f9]">
+          <button type="button" role="menuitem" onClick={onOpen} className="flex w-full items-center rounded-[8px] px-3 py-2 text-left text-[13.5px] text-ink hover:bg-line-2">
             Open
           </button>
           {document.source === 'owned' ? (
-            <button type="button" role="menuitem" onClick={onRename} className="flex w-full items-center rounded-[8px] px-3 py-2 text-left text-[13.5px] text-[#0f172a] hover:bg-[#f1f5f9]">
+            <button type="button" role="menuitem" onClick={onRename} className="flex w-full items-center rounded-[8px] px-3 py-2 text-left text-[13.5px] text-ink hover:bg-line-2">
               Rename
             </button>
           ) : null}
@@ -318,19 +319,19 @@ export default function GoogleDocsHome({
       wide: 'mb-3 h-[120px] rounded-[10px] border text-[22px]',
     }[size];
     const kind = {
-      blank: `border-[#dbeafe] ${size === 'icon' ? 'bg-white text-[22px]' : 'bg-[#eff6ff]'} font-light text-[var(--theme-primary)] ${size === 'medium' || size === 'wide' ? '!text-[34px]' : size === 'phone' ? '!text-[22px]' : ''}`,
-      word: `border-dashed border-[#cbd5e1] bg-[#f8fafc] font-extrabold text-[#2b579a] ${size === 'wide' ? 'border-2' : ''}`,
-      template: 'border-[#f1f5f9] bg-[#f8fafc] text-[var(--theme-primary)]',
+      blank: `border-brand-100 ${size === 'icon' ? 'bg-surface text-[22px]' : 'bg-brand-50'} font-light text-[var(--theme-primary)] ${size === 'medium' || size === 'wide' ? '!text-[34px]' : size === 'phone' ? '!text-[22px]' : ''}`,
+      word: `border-dashed border-line-3 bg-soft font-extrabold text-[#2b579a] ${size === 'wide' ? 'border-2' : ''}`,
+      template: 'border-line-2 bg-soft text-[var(--theme-primary)]',
     }[start.kind];
     const lines = start.kind === 'template' && (size === 'medium' || size === 'wide');
     return (
       <span className={`grid place-items-center ${box} ${kind} ${lines ? '!flex flex-col justify-start gap-[6px] px-3.5 py-3' : ''}`} aria-hidden="true">
         {start.kind === 'blank' ? '+' : start.kind === 'word' ? (size === 'icon' ? 'W' : 'W ⇪') : lines ? (
           <>
-            <i className="h-[9px] w-[60%] rounded-full bg-[#cbd5e1]" />
-            <i className="h-[6px] rounded-full bg-[#e2e8f0]" style={{ width: ['100%', '100%', '85%'][start.index] }} />
-            <i className="h-[6px] rounded-full bg-[#e2e8f0]" style={{ width: ['100%', '80%', '100%'][start.index] }} />
-            <i className="h-[6px] rounded-full bg-[#e2e8f0]" style={{ width: ['70%', '100%', '60%'][start.index] }} />
+            <i className="h-[9px] w-[60%] rounded-full bg-line-3" />
+            <i className="h-[6px] rounded-full bg-line" style={{ width: ['100%', '100%', '85%'][start.index] }} />
+            <i className="h-[6px] rounded-full bg-line" style={{ width: ['100%', '80%', '100%'][start.index] }} />
+            <i className="h-[6px] rounded-full bg-line" style={{ width: ['70%', '100%', '60%'][start.index] }} />
           </>
         ) : '≡'}
       </span>
@@ -346,13 +347,13 @@ export default function GoogleDocsHome({
           onClick={() => setFilter(option)}
           aria-pressed={filter === option}
           className={`inline-flex h-[30px] items-center whitespace-nowrap rounded-full border px-[11px] text-[13px] font-medium transition-colors ${
-            filter === option ? 'border-[#dbeafe] bg-[#eff6ff] text-[var(--theme-primary-dark)]' : 'border-[#e5e7eb] bg-white text-[#334155] hover:bg-[#f8fafc]'
+            filter === option ? 'border-brand-100 bg-brand-50 text-[var(--theme-primary-dark)]' : 'border-line bg-surface text-ink-2 hover:bg-soft'
           }`}
         >
           {option === 'all' ? 'All' : option === 'owned' ? (layout === 'medium' ? 'Mine' : 'Owned by me') : layout === 'medium' ? 'Shared' : 'Shared with me'}
         </button>
       ))}
-      <div className="ml-1 inline-flex rounded-full border border-[#e5e7eb] p-0.5" role="group" aria-label="View">
+      <div className="ml-1 inline-flex rounded-full border border-line p-0.5" role="group" aria-label="View">
         {(['grid', 'list'] as DocsHomeView[]).map((option) => (
           <button
             key={option}
@@ -360,7 +361,7 @@ export default function GoogleDocsHome({
             onClick={() => changeView(option)}
             aria-label={option === 'grid' ? 'Grid view' : 'List view'}
             aria-pressed={view === option}
-            className={`grid h-[24px] w-[28px] place-items-center rounded-full ${view === option ? 'bg-[#eff6ff] text-[var(--theme-primary-dark)]' : 'text-[#94a3b8] hover:text-[#0f172a]'}`}
+            className={`grid h-[24px] w-[28px] place-items-center rounded-full ${view === option ? 'bg-brand-50 text-[var(--theme-primary-dark)]' : 'text-subtle hover:text-ink'}`}
           >
             <svg viewBox="0 0 24 24" className="h-[15px] w-[15px]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               {option === 'grid' ? (
@@ -376,7 +377,7 @@ export default function GoogleDocsHome({
   );
   // Narrow column: the filter is a small menu.
   const filterSelect = (
-    <label className="relative inline-flex h-[30px] items-center rounded-full border border-[#e5e7eb] bg-white pl-[11px] pr-7 text-[13px] font-semibold text-[#334155]">
+    <label className="relative inline-flex h-[30px] items-center rounded-full border border-line bg-surface pl-[11px] pr-7 text-[13px] font-semibold text-ink-2">
       <span className="sr-only">Show</span>
       <select value={filter} onChange={(event) => setFilter(event.target.value as DocsHomeFilter)} className="cursor-pointer appearance-none bg-transparent outline-none">
         <option value="all">All</option>
@@ -389,7 +390,7 @@ export default function GoogleDocsHome({
 
   const title = (document: HomeDocumentItem) => <>{document.starred ? STAR : null}{document.title || 'Untitled document'}</>;
   const searchBox = (className: string, inputClass: string, placeholder: string, shortcut: boolean) => (
-    <label className={`flex items-center gap-2.5 border border-[#e5e7eb] bg-[#f8fafc] px-3.5 text-[#94a3b8] focus-within:border-[var(--theme-primary)] focus-within:bg-white focus-within:shadow-[0_0_0_4px_#eff6ff] ${className}`}>
+    <label className={`flex items-center gap-2.5 border border-line bg-soft px-3.5 text-subtle focus-within:border-[var(--theme-primary)] focus-within:bg-surface focus-within:shadow-[0_0_0_4px_var(--color-brand-50)] ${className}`}>
       {searchIcon}
       <input
         ref={phone ? undefined : searchRef}
@@ -397,24 +398,24 @@ export default function GoogleDocsHome({
         onChange={(event) => setQuery(event.target.value)}
         placeholder={placeholder}
         aria-label="Search documents"
-        className={`min-w-0 flex-1 bg-transparent text-[#0f172a] outline-none placeholder:text-[#94a3b8] ${inputClass}`}
+        className={`min-w-0 flex-1 bg-transparent text-ink outline-none placeholder:text-subtle ${inputClass}`}
       />
-      {shortcut ? <span className="rounded-[5px] border border-b-2 border-[#e5e7eb] bg-white px-[5px] py-px text-[11px] text-[#64748b]">⌘K</span> : null}
+      {shortcut ? <span className="rounded-[5px] border border-b-2 border-line bg-surface px-[5px] py-px text-[11px] text-muted">⌘K</span> : null}
     </label>
   );
   const newButton = (
     <button
       type="button"
       onClick={onCreateDocument}
-      className="inline-flex h-[42px] shrink-0 items-center gap-2 whitespace-nowrap rounded-[11px] bg-[var(--theme-primary)] px-[18px] text-[15px] font-semibold text-white shadow-[0_6px_16px_-6px_rgba(37,99,235,.7)] transition-colors hover:bg-[var(--theme-primary-dark)]"
+      className="inline-flex h-[42px] shrink-0 items-center gap-2 whitespace-nowrap rounded-[11px] bg-[var(--theme-primary)] px-[18px] text-[15px] font-semibold text-on-brand shadow-[0_6px_16px_-6px_rgba(var(--brand-rgb),.7)] transition-colors hover:bg-[var(--theme-primary-dark)]"
     >
       {signedIn ? '+ New document' : 'Sign in to create'}
     </button>
   );
   const emptyState = (
-    <div className="rounded-[16px] border border-dashed border-[#e5e7eb] px-6 py-12 text-center">
-      <div className="text-[16px] font-semibold text-[#0f172a]">{query ? 'No documents match your search' : 'No documents yet'}</div>
-      <div className="mt-1.5 text-[14px] text-[#64748b]">
+    <div className="rounded-[16px] border border-dashed border-line px-6 py-12 text-center">
+      <div className="text-[16px] font-semibold text-ink">{query ? 'No documents match your search' : 'No documents yet'}</div>
+      <div className="mt-1.5 text-[14px] text-muted">
         {query
           ? 'Try a different word, or start a new document.'
           : signedIn
@@ -424,12 +425,12 @@ export default function GoogleDocsHome({
     </div>
   );
   const listRow = (document: HomeDocumentItem, meta: string) => (
-    <div key={document.id} className="flex items-center gap-3 border-b border-[#f1f5f9] py-3">
+    <div key={document.id} className="flex items-center gap-3 border-b border-line-2 py-3">
       <button type="button" onClick={() => onOpenDocument(document.id)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
         <DocumentPreview document={document} compact />
         <span className="min-w-0">
-          <b className={`block truncate font-bold text-[#0f172a] ${phone ? 'text-[15.5px]' : 'text-[14.5px]'}`}>{title(document)}</b>
-          <span className="block truncate text-[13px] text-[#64748b]">{meta}</span>
+          <b className={`block truncate font-bold text-ink ${phone ? 'text-[15.5px]' : 'text-[14.5px]'}`}>{title(document)}</b>
+          <span className="block truncate text-[13px] text-muted">{meta}</span>
         </span>
       </button>
       {menuFor(document)}
@@ -440,30 +441,30 @@ export default function GoogleDocsHome({
   const gridCards = (columns: string) => (
     <div className={`grid gap-4 ${columns}`}>
       {documents.map((document) => (
-        <article key={document.id} className="group relative overflow-hidden rounded-[16px] border border-[#e5e7eb] bg-white transition-shadow hover:shadow-[0_12px_30px_-18px_rgba(15,23,42,.35)]">
+        <article key={document.id} className="group relative overflow-hidden rounded-[16px] border border-line bg-surface transition-shadow hover:shadow-[0_12px_30px_-18px_rgba(15,23,42,.35)]">
           <button type="button" onClick={() => onOpenDocument(document.id)} className="block w-full text-left">
             <DocumentPreview document={document} />
             <span className="block px-3.5 py-3">
-              <b className="block truncate text-[14.5px] font-bold text-[#0f172a]">{title(document)}</b>
-              <span className="text-[12.5px] text-[#64748b]">
+              <b className="block truncate text-[14.5px] font-bold text-ink">{title(document)}</b>
+              <span className="text-[12.5px] text-muted">
                 Edited {relativeTime(document.updatedAt)}
                 {wordsLabel(document) ? ` · ${wordsLabel(document)}` : ''}
                 {isShared(document) ? (
-                  <span className="ml-1.5 rounded-full bg-[#eff6ff] px-2 py-0.5 text-[11.5px] font-semibold text-[var(--theme-primary-dark)]">
+                  <span className="ml-1.5 rounded-full bg-brand-50 px-2 py-0.5 text-[11.5px] font-semibold text-[var(--theme-primary-dark)]">
                     {document.source === 'shared' ? 'Shared with you' : 'Shared'}
                   </span>
                 ) : null}
               </span>
             </span>
           </button>
-          {menuFor(document, `absolute right-2 top-2 rounded-[8px] bg-white/80 ${openMenuId === document.id ? '' : 'opacity-0 group-hover:opacity-100 focus-within:opacity-100'}`)}
+          {menuFor(document, `absolute right-2 top-2 rounded-[8px] bg-surface/80 ${openMenuId === document.id ? '' : 'opacity-0 group-hover:opacity-100 focus-within:opacity-100'}`)}
         </article>
       ))}
     </div>
   );
 
   return (
-    <div ref={rootRef} className="ai-editor-theme min-h-full bg-white text-[#0f172a]">
+    <div ref={rootRef} className="ai-editor-theme min-h-full bg-surface text-ink">
       {phone ? (
         // Phones: the mockup's app bar (logo, Upgrade, account).
         <div className="flex h-14 items-center gap-2 pl-[18px] pr-3.5">
@@ -471,11 +472,12 @@ export default function GoogleDocsHome({
             <WriteOrbitLogo size={30} />
           </span>
           {showUpgrade ? (
-            <button type="button" onClick={upgrade} className="flex h-[34px] items-center gap-1 rounded-full bg-[var(--theme-primary)] px-3 text-[13px] font-bold text-white shadow-[0_4px_12px_-4px_rgba(37,99,235,.7)]">
+            <button type="button" onClick={upgrade} className="flex h-[34px] items-center gap-1 rounded-full bg-[var(--theme-primary)] px-3 text-[13px] font-bold text-on-brand shadow-[0_4px_12px_-4px_rgba(var(--brand-rgb),.7)]">
               ⚡ Upgrade
             </button>
           ) : null}
-          <a href={navLink('account')} aria-label="Account" className="grid h-[34px] w-[34px] place-items-center rounded-full bg-[#0f172a] text-[14px] font-bold text-white">
+          <HostThemeToggle className="grid h-[34px] w-[34px] place-items-center rounded-full text-muted hover:bg-line-2 hover:text-ink" />
+          <a href={navLink('account')} aria-label="Account" className="grid h-[34px] w-[34px] place-items-center rounded-full bg-ink text-[14px] font-bold text-on-ink">
             {(name[0] || '·').toUpperCase()}
           </a>
         </div>
@@ -487,20 +489,20 @@ export default function GoogleDocsHome({
           searchBox('h-[46px] rounded-[14px]', 'text-[16px]', 'Search documents', false)
         ) : tight ? (
           <>
-            <h1 className={`${layout === 'narrow' ? 'text-[22px]' : 'text-[24px]'} font-bold leading-[1.2] tracking-[-0.02em] text-[#0f172a]`}>{signedIn ? greeting(name) : 'Documents'}</h1>
+            <h1 className={`${layout === 'narrow' ? 'text-[22px]' : 'text-[24px]'} font-bold leading-[1.2] tracking-[-0.02em] text-ink`}>{signedIn ? greeting(name) : 'Documents'}</h1>
             {searchBox('mt-3.5 h-[42px] rounded-[12px]', 'text-[15px]', 'Search your documents', true)}
           </>
         ) : layout === 'medium' ? (
           <>
             <div className="flex items-center gap-3.5">
-              <h1 className="min-w-0 flex-1 truncate text-[24px] font-bold tracking-[-0.02em] text-[#0f172a]">{signedIn ? greeting(name) : 'Documents'}</h1>
+              <h1 className="min-w-0 flex-1 truncate text-[24px] font-bold tracking-[-0.02em] text-ink">{signedIn ? greeting(name) : 'Documents'}</h1>
               {newButton}
             </div>
             {searchBox('mt-3.5 h-11 rounded-[12px]', 'text-[15px]', 'Search your documents', true)}
           </>
         ) : (
           <div className="mb-[26px] flex flex-wrap items-center gap-x-3.5 gap-y-3">
-            <h1 className="w-full whitespace-nowrap text-[26px] font-bold tracking-[-0.02em] text-[#0f172a] @[760px]/home:w-auto">{signedIn ? greeting(name) : 'Documents'}</h1>
+            <h1 className="w-full whitespace-nowrap text-[26px] font-bold tracking-[-0.02em] text-ink @[760px]/home:w-auto">{signedIn ? greeting(name) : 'Documents'}</h1>
             {searchBox('h-11 max-w-[520px] flex-1 rounded-[12px] @[760px]/home:ml-auto', 'text-[15px]', 'Search your documents', true)}
             {newButton}
           </div>
@@ -508,35 +510,35 @@ export default function GoogleDocsHome({
 
         {phone ? (
           <>
-            <p className="mb-2.5 mt-[18px] text-[13px] font-bold uppercase tracking-[0.06em] text-[#94a3b8]">Start something new</p>
+            <p className="mb-2.5 mt-[18px] text-[13px] font-bold uppercase tracking-[0.06em] text-subtle">Start something new</p>
             <div className="-mx-[18px] flex gap-2.5 overflow-x-auto px-[18px] pb-1">
-              {starts.map((start) => startItem(start, 'group flex w-[104px] shrink-0 flex-col rounded-[14px] border border-[#e5e7eb] bg-white p-2.5 text-left', (
-                <>{preview(start, 'phone')}<span className="block text-[13px] font-semibold text-[#0f172a]">{start.short}</span></>
+              {starts.map((start) => startItem(start, 'group flex w-[104px] shrink-0 flex-col rounded-[14px] border border-line bg-surface p-2.5 text-left', (
+                <>{preview(start, 'phone')}<span className="block text-[13px] font-semibold text-ink">{start.short}</span></>
               )))}
             </div>
           </>
         ) : layout === 'narrow' ? (
           <>
-            <h2 className="mb-2.5 mt-6 text-[16px] font-bold text-[#0f172a]">Start something new</h2>
+            <h2 className="mb-2.5 mt-6 text-[16px] font-bold text-ink">Start something new</h2>
             <div className="-mx-5 flex gap-2.5 overflow-x-auto px-5 pb-1 [scrollbar-width:thin]">
-              {starts.map((start) => startItem(start, 'group flex w-[96px] shrink-0 flex-col rounded-[14px] border border-[#e5e7eb] bg-white p-2.5 text-left transition-shadow hover:shadow-[0_8px_24px_-14px_rgba(15,23,42,.35)]', (
-                <>{preview(start, 'phone')}<span className="block truncate text-[13px] font-semibold text-[#0f172a]">{start.short}</span></>
+              {starts.map((start) => startItem(start, 'group flex w-[96px] shrink-0 flex-col rounded-[14px] border border-line bg-surface p-2.5 text-left transition-shadow hover:shadow-[0_8px_24px_-14px_rgba(15,23,42,.35)]', (
+                <>{preview(start, 'phone')}<span className="block truncate text-[13px] font-semibold text-ink">{start.short}</span></>
               )))}
             </div>
           </>
         ) : layout === 'compact' ? (
           <>
-            <h2 className="mb-2.5 mt-6 text-[16px] font-bold text-[#0f172a]">Start something new</h2>
+            <h2 className="mb-2.5 mt-6 text-[16px] font-bold text-ink">Start something new</h2>
             <div className="grid grid-cols-1 gap-2.5 @[340px]/home:grid-cols-2">
               {starts.map((start) => startItem(
                 start,
                 `group flex min-w-0 items-center gap-[11px] rounded-[14px] border p-[11px] text-left transition-shadow hover:shadow-[0_8px_24px_-14px_rgba(15,23,42,.35)] ${
-                  start.kind === 'blank' ? 'col-span-full border-[#dbeafe] bg-[#eff6ff]' : 'border-[#e5e7eb] bg-white'}`,
+                  start.kind === 'blank' ? 'col-span-full border-brand-100 bg-brand-50' : 'border-line bg-surface'}`,
                 <>
                   {preview(start, 'icon')}
                   <span className="min-w-0">
-                    <b className="block truncate text-[14px] font-semibold text-[#0f172a]">{start.kind === 'blank' ? start.name : start.short}</b>
-                    <span className="mt-0.5 block truncate text-[12.5px] text-[#64748b]">{start.kind === 'blank' ? start.description : start.tagline}</span>
+                    <b className="block truncate text-[14px] font-semibold text-ink">{start.kind === 'blank' ? start.name : start.short}</b>
+                    <span className="mt-0.5 block truncate text-[12.5px] text-muted">{start.kind === 'blank' ? start.description : start.tagline}</span>
                   </span>
                 </>,
               ))}
@@ -544,31 +546,31 @@ export default function GoogleDocsHome({
           </>
         ) : layout === 'medium' ? (
           <>
-            <h2 className="mb-2.5 mt-6 text-[16px] font-bold text-[#0f172a]">Start something new</h2>
+            <h2 className="mb-2.5 mt-6 text-[16px] font-bold text-ink">Start something new</h2>
             <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${starts.length}, minmax(0, 1fr))` }}>
               {starts.map((start) => startItem(start, 'group flex min-w-0 flex-col text-left', (
                 <>
                   {preview(start, 'medium')}
-                  <b className="mt-2 block truncate text-[13.5px] font-semibold text-[#0f172a]">{start.short}</b>
-                  <span className="block text-[12px] leading-[1.35] text-[#64748b]">{start.tagline}</span>
+                  <b className="mt-2 block truncate text-[13.5px] font-semibold text-ink">{start.short}</b>
+                  <span className="block text-[12px] leading-[1.35] text-muted">{start.tagline}</span>
                 </>
               )))}
             </div>
           </>
         ) : (
           <div className="mb-[34px] grid grid-cols-3 gap-4 @[880px]/home:grid-cols-5">
-            {starts.map((start) => startItem(start, 'group flex flex-col rounded-[16px] border border-[#e5e7eb] bg-white p-3.5 text-left transition-shadow hover:shadow-[0_8px_24px_-14px_rgba(15,23,42,.35)]', (
+            {starts.map((start) => startItem(start, 'group flex flex-col rounded-[16px] border border-line bg-surface p-3.5 text-left transition-shadow hover:shadow-[0_8px_24px_-14px_rgba(15,23,42,.35)]', (
               <>
                 {preview(start, 'wide')}
-                <span className="block text-[15px] font-bold text-[#0f172a]">{start.name}</span>
-                <span className="mt-[3px] block text-[13px] leading-[1.35] text-[#64748b]">{start.description}</span>
+                <span className="block text-[15px] font-bold text-ink">{start.name}</span>
+                <span className="mt-[3px] block text-[13px] leading-[1.35] text-muted">{start.description}</span>
               </>
             )))}
           </div>
         )}
 
         <div className={`flex items-center gap-2 ${phone ? 'mb-2.5 mt-[18px]' : layout === 'wide' ? 'mb-3.5' : 'mb-2 mt-7'}`}>
-          <h2 className={`mr-auto ${phone ? 'text-[13px] font-bold uppercase tracking-[0.06em] text-[#94a3b8]' : `${layout === 'wide' ? 'text-[18px]' : 'text-[16px]'} font-bold text-[#0f172a]`}`}>
+          <h2 className={`mr-auto ${phone ? 'text-[13px] font-bold uppercase tracking-[0.06em] text-subtle' : `${layout === 'wide' ? 'text-[18px]' : 'text-[16px]'} font-bold text-ink`}`}>
             {phone ? 'Recent' : 'Recent documents'}
           </h2>
           {phone ? null : tight ? filterSelect : <div className="flex items-center gap-2">{filterButtons}</div>}
@@ -586,15 +588,15 @@ export default function GoogleDocsHome({
           view === 'grid' ? gridCards('grid-cols-2') : (
             <div>
               {documents.map((document) => (
-                <div key={document.id} className="grid grid-cols-[minmax(0,1fr)_112px_36px] items-center gap-3 border-b border-[#f1f5f9] py-2.5">
+                <div key={document.id} className="grid grid-cols-[minmax(0,1fr)_112px_36px] items-center gap-3 border-b border-line-2 py-2.5">
                   <button type="button" onClick={() => onOpenDocument(document.id)} className="flex min-w-0 items-center gap-3 text-left">
                     <DocumentPreview document={document} compact />
                     <span className="min-w-0">
-                      <b className="block truncate text-[14.5px] font-bold text-[#0f172a]">{title(document)}</b>
-                      <span className="block truncate text-[13px] text-[#64748b]">{[wordsLabel(document), sharedNote(document)].filter(Boolean).join(' · ') || '—'}</span>
+                      <b className="block truncate text-[14.5px] font-bold text-ink">{title(document)}</b>
+                      <span className="block truncate text-[13px] text-muted">{[wordsLabel(document), sharedNote(document)].filter(Boolean).join(' · ') || '—'}</span>
                     </span>
                   </button>
-                  <span className="text-[13px] text-[#64748b]">{capitalize(relativeTime(document.updatedAt))}</span>
+                  <span className="text-[13px] text-muted">{capitalize(relativeTime(document.updatedAt))}</span>
                   {menuFor(document)}
                 </div>
               ))}
@@ -603,8 +605,8 @@ export default function GoogleDocsHome({
         ) : view === 'grid' ? (
           gridCards('grid-cols-2 @[700px]/home:grid-cols-3 @[1000px]/home:grid-cols-4')
         ) : (
-          <div className="overflow-visible rounded-[16px] border border-[#e5e7eb]">
-            <div className="grid grid-cols-[minmax(0,1fr)_160px_140px_110px_44px] items-center gap-4 border-b border-[#f1f5f9] px-4 py-2.5 text-[12px] text-[#64748b]">
+          <div className="overflow-visible rounded-[16px] border border-line">
+            <div className="grid grid-cols-[minmax(0,1fr)_160px_140px_110px_44px] items-center gap-4 border-b border-line-2 px-4 py-2.5 text-[12px] text-muted">
               <div>Name</div>
               <div>Last edited</div>
               <div>Words</div>
@@ -612,15 +614,15 @@ export default function GoogleDocsHome({
               <div />
             </div>
             {documents.map((document, index) => (
-              <div key={document.id} className={`grid grid-cols-[minmax(0,1fr)_160px_140px_110px_44px] items-center gap-4 px-4 py-2 text-[13.5px] ${index ? 'border-t border-[#f1f5f9]' : ''}`}>
+              <div key={document.id} className={`grid grid-cols-[minmax(0,1fr)_160px_140px_110px_44px] items-center gap-4 px-4 py-2 text-[13.5px] ${index ? 'border-t border-line-2' : ''}`}>
                 <button type="button" onClick={() => onOpenDocument(document.id)} className="flex min-w-0 items-center gap-3 text-left">
                   <DocumentPreview document={document} compact />
-                  <span className="truncate font-semibold text-[#0f172a]">{title(document)}</span>
+                  <span className="truncate font-semibold text-ink">{title(document)}</span>
                 </button>
-                <div className="text-[#64748b]">{capitalize(relativeTime(document.updatedAt))}</div>
-                <div className="text-[#64748b]">{wordsLabel(document) ?? '—'}</div>
+                <div className="text-muted">{capitalize(relativeTime(document.updatedAt))}</div>
+                <div className="text-muted">{wordsLabel(document) ?? '—'}</div>
                 <div>
-                  <span className={`rounded-full px-2 py-0.5 text-[11.5px] font-semibold ${isShared(document) ? 'bg-[#eff6ff] text-[var(--theme-primary-dark)]' : 'bg-[#f1f5f9] text-[#334155]'}`}>
+                  <span className={`rounded-full px-2 py-0.5 text-[11.5px] font-semibold ${isShared(document) ? 'bg-brand-50 text-[var(--theme-primary-dark)]' : 'bg-line-2 text-ink-2'}`}>
                     {document.source === 'shared' ? 'Shared with you' : isShared(document) ? 'Shared' : 'Private'}
                   </span>
                 </div>

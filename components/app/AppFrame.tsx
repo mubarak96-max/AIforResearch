@@ -11,6 +11,7 @@ import { MobileTabBar } from '@/components/app/MobileTabBar';
 import { api, hasSession, useSession } from '@/lib/session';
 import { openPricing } from '@/lib/billing';
 import { LuZap } from 'react-icons/lu';
+import { ThemeToggle } from '@/components/theme/theme';
 
 // Library and Find papers slide in from the left in place of the menu; AI Chat opens on the right.
 const AppToolDrawer = dynamic(() => import('@/components/editor').then((mod) => mod.AppToolDrawer), { ssr: false });
@@ -61,7 +62,7 @@ export function AppFrame({ title, actions, children, wide = false }: { title: st
   const isFree = Boolean(user) && (!user?.plan || user.plan === 'free');
   const sideloads = useSideloads();
   const itemClass = (active: boolean) =>
-    `flex h-10 w-full items-center gap-[11px] rounded-[10px] px-2.5 text-left text-[15px] font-medium ${active ? 'bg-white text-ink shadow-[0_1px_2px_rgba(15,23,42,.06),0_0_0_1px_var(--color-line)]' : 'text-ink-2 hover:bg-white/70'}`;
+    `flex h-10 w-full items-center gap-[11px] rounded-[10px] px-2.5 text-left text-[15px] font-medium ${active ? 'bg-surface text-ink shadow-[0_1px_2px_rgba(15,23,42,.06),0_0_0_1px_var(--color-line)]' : 'text-ink-2 hover:bg-surface/70'}`;
   const item = (href: string, label: string, glyph: React.ReactNode, extra?: React.ReactNode) => {
     const active = pathname.startsWith(href);
     return (
@@ -79,10 +80,10 @@ export function AppFrame({ title, actions, children, wide = false }: { title: st
     );
   };
   return (
-    <div className="min-h-dvh bg-white md:flex">
+    <div className="min-h-dvh bg-surface md:flex">
       <aside className={`sticky top-0 h-dvh w-[232px] shrink-0 flex-col border-r border-line bg-soft px-3 pt-4 pb-3 ${sideloads.drawer && !sideloads.menu ? 'hidden md:flex lg:hidden' : 'hidden md:flex'}`}>
         <Link href="/" className="px-2 pb-[18px]" aria-label="WriteOrbit home"><Logo size={32} /></Link>
-        <Link href="/editor?new=1" className="flex h-10 items-center gap-[11px] rounded-[10px] px-2.5 text-[15px] font-semibold text-brand hover:bg-white/70">{ICONS.new}New document</Link>
+        <Link href="/editor?new=1" className="flex h-10 items-center gap-[11px] rounded-[10px] px-2.5 text-[15px] font-semibold text-brand hover:bg-surface/70">{ICONS.new}New document</Link>
         {tool('documents', 'Documents', ICONS.docs)}
         {tool('library', 'Library', ICONS.library, <span className="ml-auto text-subtle">›</span>)}
         {tool('papers', 'Find papers', ICONS.papers)}
@@ -91,7 +92,7 @@ export function AppFrame({ title, actions, children, wide = false }: { title: st
           <>
             <p className="px-2.5 pt-5 pb-1 text-[12px] font-medium text-subtle">Recent</p>
             {recent.map((doc) => (
-              <Link key={doc.id} href={`/editor?doc=${doc.id}`} className="block h-[34px] truncate rounded-[10px] px-2.5 text-[14px] leading-[34px] text-ink-2 hover:bg-white/70">{doc.title || 'Untitled document'}</Link>
+              <Link key={doc.id} href={`/editor?doc=${doc.id}`} className="block h-[34px] truncate rounded-[10px] px-2.5 text-[14px] leading-[34px] text-ink-2 hover:bg-surface/70">{doc.title || 'Untitled document'}</Link>
             ))}
           </>
         )}
@@ -100,15 +101,18 @@ export function AppFrame({ title, actions, children, wide = false }: { title: st
         {user?.is_admin && item('/admin', 'Admin', ICONS.admin)}
         {item('/help', 'Help', ICONS.help)}
         {isFree && (
-          <div className="mt-2 flex items-center justify-between rounded-[10px] bg-white/70 px-2.5 py-2">
+          <div className="mt-2 flex items-center justify-between rounded-[10px] bg-surface/70 px-2.5 py-2">
             <span className="text-[13px] text-muted">{user?.plan_name || 'Free'} plan</span>
             <button type="button" onClick={() => openPricing()} className="text-[13px] font-semibold text-brand hover:underline">Upgrade</button>
           </div>
         )}
-        <Link href="/account" className="flex items-center gap-2.5 px-2 pt-3 pb-0.5 text-[14px] font-medium">
-          <span className="grid h-[30px] w-[30px] place-items-center rounded-full bg-gradient-to-br from-amber-200 to-orange-400 text-[13px] font-bold text-orange-900">{(name[0] || '·').toUpperCase()}</span>
-          <span className="truncate">{name || 'Account'}</span>
-        </Link>
+        <div className="flex items-center gap-1 pt-3 pb-0.5">
+          <Link href="/account" className="flex min-w-0 flex-1 items-center gap-2.5 px-2 text-[14px] font-medium">
+            <span className="grid h-[30px] w-[30px] place-items-center rounded-full bg-gradient-to-br from-amber-200 to-orange-400 text-[13px] font-bold text-orange-900">{(name[0] || '·').toUpperCase()}</span>
+            <span className="truncate">{name || 'Account'}</span>
+          </Link>
+          <ThemeToggle />
+        </div>
       </aside>
       <Suspense fallback={null}><EditorHost><AppToolDrawer className={docked} /></EditorHost></Suspense>
 
@@ -116,8 +120,9 @@ export function AppFrame({ title, actions, children, wide = false }: { title: st
         {/* Phones: the mockup's app bar */}
         <div className="flex h-14 items-center gap-2 px-[18px] md:hidden">
           <h1 className="min-w-0 flex-1 truncate text-[22px] font-extrabold tracking-[-0.02em]">{title}</h1>
-          {isFree && <button type="button" onClick={() => openPricing()} className="flex h-[34px] items-center gap-1 rounded-full bg-brand px-3 text-[13px] font-bold text-white shadow-brand"><LuZap className="h-3.5 w-3.5" aria-hidden="true" />Upgrade</button>}
-          <Link href="/account" aria-label="Account" className="grid h-[34px] w-[34px] place-items-center rounded-full bg-ink text-[14px] font-bold text-white">{(name[0] || '·').toUpperCase()}</Link>
+          {isFree && <button type="button" onClick={() => openPricing()} className="flex h-[34px] items-center gap-1 rounded-full bg-brand px-3 text-[13px] font-bold text-on-brand shadow-brand"><LuZap className="h-3.5 w-3.5" aria-hidden="true" />Upgrade</button>}
+          <ThemeToggle />
+          <Link href="/account" aria-label="Account" className="grid h-[34px] w-[34px] place-items-center rounded-full bg-ink text-[14px] font-bold text-on-ink">{(name[0] || '·').toUpperCase()}</Link>
         </div>
         {/* Desktop: page title and actions, as in the documents mockup */}
         <div className={`mx-auto px-[18px] pb-8 md:px-10 md:pt-7 ${wide ? 'max-w-6xl' : 'max-w-4xl'}`}>

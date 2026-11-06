@@ -58,24 +58,24 @@ export default function PaperCard({
   const meta = [shortAuthors(paper), paper.source_name, paper.year].filter(Boolean).join(' · ');
 
   const facts = [kind, cited ? `Cited by ${formatCount(cited)}` : null].filter(Boolean).join(' · ');
-  const ghost = 'inline-flex h-7 items-center gap-1 rounded-lg px-2 text-[12.5px] font-medium text-[#475569] transition-colors hover:bg-[#f1f5f9] hover:text-[#0f172a] disabled:cursor-default disabled:hover:bg-transparent';
+  const ghost = 'inline-flex h-7 items-center gap-1 rounded-lg px-2 text-[12.5px] font-medium text-ink-3 transition-colors hover:bg-line-2 hover:text-ink disabled:cursor-default disabled:hover:bg-transparent';
 
   return (
-    <article className="ce-paper-card rounded-[12px] border border-[#eef2f6] bg-white px-3 pb-2 pt-2.5 transition-colors hover:border-[#e2e8f0]">
+    <article className="ce-paper-card rounded-[12px] border border-line-2 bg-surface px-3 pb-2 pt-2.5 transition-colors hover:border-line">
       {badge || facts || paper.is_open_access ? (
-        <div className="mb-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px] font-medium text-[#94a3b8]">
+        <div className="mb-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px] font-medium text-subtle">
           {badge}
           {facts ? <span>{facts}</span> : null}
           {paper.is_open_access ? <span className="inline-flex items-center gap-1 text-[#15803d]"><span className="h-1.5 w-1.5 rounded-full bg-[#22c55e]" />Open access</span> : null}
         </div>
       ) : null}
-      <h4 className="text-[14px] font-semibold leading-[1.4] text-[#0f172a]">{paper.title}</h4>
-      <p className="mt-0.5 text-[12.5px] leading-snug text-[#64748b]">{meta}</p>
+      <h4 className="text-[14px] font-semibold leading-[1.4] text-ink">{paper.title}</h4>
+      <p className="mt-0.5 text-[12.5px] leading-snug text-muted">{meta}</p>
       {!compact && abstract ? (
-        <p className={`mt-1.5 text-[12.5px] leading-[1.5] text-[#475569] ${expanded ? '' : 'line-clamp-2'}`}>
+        <p className={`mt-1.5 text-[12.5px] leading-[1.5] text-ink-3 ${expanded ? '' : 'line-clamp-2'}`}>
           {abstract}
           {abstract.length > 160 ? (
-            <button type="button" onClick={() => setExpanded((value) => !value)} className="ml-1 font-medium text-[var(--theme-primary,#2563eb)] hover:underline">
+            <button type="button" onClick={() => setExpanded((value) => !value)} className="ml-1 font-medium text-[var(--theme-primary,var(--color-brand))] hover:underline">
               {expanded ? 'Less' : 'More'}
             </button>
           ) : null}
@@ -86,7 +86,7 @@ export default function PaperCard({
           <button
             type="button"
             onClick={actions.onCite}
-            className="mr-1 inline-flex h-7 items-center gap-1 rounded-lg bg-[var(--theme-primary,#2563eb)] px-2.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-[#1d4ed8]"
+            className="mr-1 inline-flex h-7 items-center gap-1 rounded-lg bg-[var(--theme-primary,var(--color-brand))] px-2.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-brand-600"
           >
             {actions.citeLabel === 'Copy' ? <LuCopy className="h-3.5 w-3.5" /> : <LuQuote className="h-3.5 w-3.5" />}{actions.citeLabel || 'Cite'}
           </button>

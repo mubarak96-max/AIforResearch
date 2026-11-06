@@ -5,6 +5,7 @@ import { editorPath, navLink, useEditorConfig } from '../../runtime';
 import type { AutocompleteSettings } from '../../lib/aiEditor/assistApi';
 import { getDocuments, getFolders } from '../../utils/libraryApi';
 import { isPaidPlan, useEditorAccount } from '../../lib/aiEditor/account';
+import { HostThemeToggle } from '../../lib/aiEditor/hostTheme';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { Block, BlockNoteEditor } from '@blocknote/core';
@@ -791,7 +792,7 @@ function HeaderIconButton({
       aria-label={label}
       title={label}
       onClick={onClick}
-      className={`inline-flex h-[34px] w-[34px] items-center justify-center rounded-[8px] text-[#475569] transition-colors hover:bg-[#f1f5f9] hover:text-[#0f172a] ${className}`}
+      className={`inline-flex h-[34px] w-[34px] items-center justify-center rounded-[8px] text-ink-3 transition-colors hover:bg-line-2 hover:text-ink ${className}`}
     >
       {children}
     </button>
@@ -824,8 +825,8 @@ function ToolbarIconButton({
       disabled={disabled}
       onMouseDown={(event) => event.preventDefault()}
       onClick={onClick}
-      className={`inline-flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[8px] transition-colors hover:bg-[#f1f5f9] ${
-        active ? 'bg-[#eff6ff] text-[var(--theme-primary-dark)] hover:bg-[#dbeafe]' : 'text-[#475569] hover:text-[#0f172a]'
+      className={`inline-flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[8px] transition-colors hover:bg-line-2 ${
+        active ? 'bg-brand-50 text-[var(--theme-primary-dark)] hover:bg-brand-100' : 'text-ink-3 hover:text-ink'
       } ${disabled ? 'cursor-not-allowed opacity-40 hover:bg-transparent' : ''} ${className}`}
     >
       {children}
@@ -856,8 +857,8 @@ function ToolbarSelect({
       disabled={disabled}
       onMouseDown={(event) => event.preventDefault()}
       onClick={onClick}
-      className={`inline-flex h-[34px] shrink-0 items-center justify-between gap-2 rounded-[8px] px-2.5 text-[14px] text-[#334155] transition-colors hover:bg-[#f1f5f9] ${
-        isOpen ? 'bg-[#f1f5f9] text-[#0f172a]' : ''
+      className={`inline-flex h-[34px] shrink-0 items-center justify-between gap-2 rounded-[8px] px-2.5 text-[14px] text-ink-2 transition-colors hover:bg-line-2 ${
+        isOpen ? 'bg-line-2 text-ink' : ''
       } ${disabled ? 'cursor-not-allowed opacity-40 hover:bg-transparent' : ''} ${className}`}
     >
       <span className="truncate">{value}</span>
@@ -867,13 +868,13 @@ function ToolbarSelect({
 }
 
 function ToolbarDivider({ className = '' }: { className?: string }) {
-  return <div className={`mx-1.5 h-[22px] w-px shrink-0 bg-[#e5e7eb] ${className}`} aria-hidden="true" />;
+  return <div className={`mx-1.5 h-[22px] w-px shrink-0 bg-line ${className}`} aria-hidden="true" />;
 }
 
 /** The mockup's small "⌄" after a select's value. */
 function ChevronDown({ className = '' }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 shrink-0 text-[#94a3b8] ${className}`} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 shrink-0 text-subtle ${className}`} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="m6 9 6 6 6-6" />
     </svg>
   );
@@ -901,11 +902,11 @@ const ICON_PANEL = <LineIcon><rect x="3" y="4" width="18" height="16" rx="3" /><
 function shortSaveState(label: string): { text: string; dot: string } {
   const value = label.toLowerCase();
   if (value.startsWith('saved')) return { text: 'Saved', dot: 'bg-[#16a34a]' };
-  if (value.startsWith('saving')) return { text: 'Saving…', dot: 'bg-[#94a3b8] animate-pulse' };
+  if (value.startsWith('saving')) return { text: 'Saving…', dot: 'bg-subtle animate-pulse' };
   if (value.includes('reconnect') || value.includes('offline') || value.includes('queued')) return { text: 'Offline', dot: 'bg-[#f59e0b]' };
   if (value.includes('unavailable') || value.includes('fail')) return { text: 'Not saved', dot: 'bg-[#dc2626]' };
-  if (value.startsWith('connecting')) return { text: 'Connecting…', dot: 'bg-[#94a3b8]' };
-  return { text: label.replace(/\.\.\.$/, '…'), dot: 'bg-[#94a3b8]' };
+  if (value.startsWith('connecting')) return { text: 'Connecting…', dot: 'bg-subtle' };
+  return { text: label.replace(/\.\.\.$/, '…'), dot: 'bg-subtle' };
 }
 
 function ToolbarSplitButton({
@@ -932,7 +933,7 @@ function ToolbarSplitButton({
         disabled={disabled}
         onMouseDown={(event) => event.preventDefault()}
         onClick={onButtonClick}
-        className={`inline-flex h-[34px] w-[30px] items-center justify-center rounded-l-[8px] text-[#475569] transition-colors hover:bg-[#f1f5f9] hover:text-[#0f172a] ${
+        className={`inline-flex h-[34px] w-[30px] items-center justify-center rounded-l-[8px] text-ink-3 transition-colors hover:bg-line-2 hover:text-ink ${
           disabled ? 'cursor-not-allowed opacity-40 hover:bg-transparent' : ''
         }`}
       >
@@ -945,8 +946,8 @@ function ToolbarSplitButton({
         disabled={disabled}
         onMouseDown={(event) => event.preventDefault()}
         onClick={onArrowClick}
-        className={`inline-flex h-[34px] w-[18px] items-center justify-center rounded-r-[8px] text-[#475569] transition-colors hover:bg-[#f1f5f9] ${
-          isOpen ? 'bg-[#f1f5f9]' : ''
+        className={`inline-flex h-[34px] w-[18px] items-center justify-center rounded-r-[8px] text-ink-3 transition-colors hover:bg-line-2 ${
+          isOpen ? 'bg-line-2' : ''
         } ${disabled ? 'cursor-not-allowed opacity-40 hover:bg-transparent' : ''}`}
       >
         <ChevronDown className="h-3 w-3" />
@@ -978,8 +979,8 @@ function ToolbarMenuButton({
       disabled={disabled}
       onMouseDown={(event) => event.preventDefault()}
       onClick={onClick}
-      className={`inline-flex h-[34px] items-center gap-0.5 rounded-[8px] px-1.5 text-[#475569] transition-colors hover:bg-[#f1f5f9] hover:text-[#0f172a] ${
-        isOpen ? 'bg-[#f1f5f9] text-[#0f172a]' : ''
+      className={`inline-flex h-[34px] items-center gap-0.5 rounded-[8px] px-1.5 text-ink-3 transition-colors hover:bg-line-2 hover:text-ink ${
+        isOpen ? 'bg-line-2 text-ink' : ''
       } ${disabled ? 'cursor-not-allowed opacity-40 hover:bg-transparent' : ''} ${className}`}
     >
       {icon}
@@ -1056,7 +1057,7 @@ function DropdownSurface({
               : { position: 'fixed', top: -9999, left: -9999 }
           }
           data-docs-toolbar-dropdown=""
-          className={`z-[12000] max-h-[min(72vh,600px)] overflow-y-auto rounded-[12px] border border-[#e5e7eb] bg-white p-1 text-[#0f172a] shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)] ${sizeClasses}`}
+          className={`z-[12000] max-h-[min(72vh,600px)] overflow-y-auto rounded-[12px] border border-line bg-surface p-1 text-ink shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)] ${sizeClasses}`}
         >
           {children}
         </div>,
@@ -1076,20 +1077,20 @@ function AutocompleteSettingsPanel({ settings, onChange }: { settings: Autocompl
       role="switch"
       aria-checked={settings[key]}
       onClick={() => onChange({ ...settings, [key]: !settings[key] })}
-      className="flex w-full items-center justify-between gap-3 rounded-[8px] px-2.5 py-2 text-left hover:bg-[#f8fafc]"
+      className="flex w-full items-center justify-between gap-3 rounded-[8px] px-2.5 py-2 text-left hover:bg-soft"
     >
       <span>
-        <span className="block text-[13.5px] font-medium text-[#0f172a]">{label}</span>
-        <span className="block text-[12px] text-[#64748b]">{hint}</span>
+        <span className="block text-[13.5px] font-medium text-ink">{label}</span>
+        <span className="block text-[12px] text-muted">{hint}</span>
       </span>
-      <span className={`relative h-[20px] w-[34px] shrink-0 rounded-full transition-colors ${settings[key] ? 'bg-[var(--theme-primary)]' : 'bg-[#cbd5e1]'}`}>
-        <span className={`absolute top-[2px] h-4 w-4 rounded-full bg-white shadow-[0_1px_2px_rgba(15,23,42,.2)] transition-all ${settings[key] ? 'left-[16px]' : 'left-[2px]'}`} />
+      <span className={`relative h-[20px] w-[34px] shrink-0 rounded-full transition-colors ${settings[key] ? 'bg-[var(--theme-primary)]' : 'bg-line-3'}`}>
+        <span className={`absolute top-[2px] h-4 w-4 rounded-full bg-surface shadow-[0_1px_2px_rgba(15,23,42,.2)] transition-all ${settings[key] ? 'left-[16px]' : 'left-[2px]'}`} />
       </span>
     </button>
   );
   const choices = <T extends number | null>(label: string, value: T, options: [T, string][], set: (value: T) => void) => (
     <div className="flex items-center justify-between gap-2 px-2.5 py-1.5">
-      <span className="text-[13.5px] font-medium text-[#0f172a]">{label}</span>
+      <span className="text-[13.5px] font-medium text-ink">{label}</span>
       <div className="flex gap-1">
         {options.map(([option, text]) => (
           <button
@@ -1097,7 +1098,7 @@ function AutocompleteSettingsPanel({ settings, onChange }: { settings: Autocompl
             type="button"
             aria-pressed={value === option}
             onClick={() => set(option)}
-            className={`h-7 rounded-[7px] px-2 text-[12.5px] ${value === option ? 'bg-[#eff6ff] font-semibold text-[#1d4ed8]' : 'text-[#475569] hover:bg-[#f1f5f9]'}`}
+            className={`h-7 rounded-[7px] px-2 text-[12.5px] ${value === option ? 'bg-brand-50 font-semibold text-brand-600' : 'text-ink-3 hover:bg-line-2'}`}
           >
             {text}
           </button>
@@ -1108,27 +1109,27 @@ function AutocompleteSettingsPanel({ settings, onChange }: { settings: Autocompl
   const scoped = settings.libraryDocuments.length + settings.libraryFolders.length;
   return (
     <div className="max-h-[min(72vh,620px)] overflow-y-auto">
-      <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-[#f1f5f9] bg-white px-3.5 py-2.5 text-[14px] font-semibold text-[#0f172a]">
-        <LuSettings className="h-4 w-4 text-[#64748b]" />Autocomplete settings
+      <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-line-2 bg-surface px-3.5 py-2.5 text-[14px] font-semibold text-ink">
+        <LuSettings className="h-4 w-4 text-muted" />Autocomplete settings
       </div>
       <div className="p-1.5">
-        <div className="px-2.5 pb-1 pt-1.5 text-[11.5px] font-medium text-[#94a3b8]">Sources</div>
+        <div className="px-2.5 pb-1 pt-1.5 text-[11.5px] font-medium text-subtle">Sources</div>
         {toggle('Web search', 'Cite from 250M+ papers', 'web')}
         {toggle('Library search', 'Cite from your Library', 'library')}
         {settings.library ? (
-          <div className="mb-1 ml-3 border-l-2 border-[#f1f5f9] pl-3 pr-1">
-            <div className="text-[13px] font-medium text-[#0f172a]">Limit to</div>
-            <div className="text-[12px] text-[#64748b]">{scoped ? 'Only these sources and folders' : 'Your whole Library'}</div>
+          <div className="mb-1 ml-3 border-l-2 border-line-2 pl-3 pr-1">
+            <div className="text-[13px] font-medium text-ink">Limit to</div>
+            <div className="text-[12px] text-muted">{scoped ? 'Only these sources and folders' : 'Your whole Library'}</div>
             {scoped ? (
               <div className="mt-1.5 flex flex-wrap gap-1">
                 {settings.libraryFolders.map((folder) => (
-                  <span key={folder.id} className="inline-flex max-w-full items-center gap-1 rounded-md bg-[#eff6ff] px-1.5 py-0.5 text-[12px] text-[#1d4ed8]">
+                  <span key={folder.id} className="inline-flex max-w-full items-center gap-1 rounded-md bg-brand-50 px-1.5 py-0.5 text-[12px] text-brand-600">
                     <LuFolder className="h-3 w-3 shrink-0" /><span className="truncate">{folder.name}</span>
                     <button type="button" aria-label={`Remove ${folder.name}`} onClick={() => onChange({ ...settings, libraryFolders: settings.libraryFolders.filter((item) => item.id !== folder.id) })}><LuX className="h-3 w-3" /></button>
                   </span>
                 ))}
                 {settings.libraryDocuments.map((document) => (
-                  <span key={document.id} className="inline-flex max-w-full items-center gap-1 rounded-md bg-[#f1f5f9] px-1.5 py-0.5 text-[12px] text-[#334155]">
+                  <span key={document.id} className="inline-flex max-w-full items-center gap-1 rounded-md bg-line-2 px-1.5 py-0.5 text-[12px] text-ink-2">
                     <LuFileText className="h-3 w-3 shrink-0" /><span className="max-w-[200px] truncate">{document.title}</span>
                     <button type="button" aria-label={`Remove ${document.title}`} onClick={() => onChange({ ...settings, libraryDocuments: settings.libraryDocuments.filter((item) => item.id !== document.id) })}><LuX className="h-3 w-3" /></button>
                   </span>
@@ -1138,13 +1139,13 @@ function AutocompleteSettingsPanel({ settings, onChange }: { settings: Autocompl
             {picking ? (
               <LibraryScopePicker settings={settings} onChange={onChange} onClose={() => setPicking(false)} />
             ) : (
-              <button type="button" onClick={() => setPicking(true)} className="mt-1.5 inline-flex h-7 items-center gap-1 rounded-[7px] border border-[#e2e8f0] px-2 text-[12.5px] font-medium text-[#334155] hover:bg-[#f8fafc]">
+              <button type="button" onClick={() => setPicking(true)} className="mt-1.5 inline-flex h-7 items-center gap-1 rounded-[7px] border border-line px-2 text-[12.5px] font-medium text-ink-2 hover:bg-soft">
                 <LuPlus className="h-3.5 w-3.5" />Select sources
               </button>
             )}
           </div>
         ) : null}
-        <div className="px-2.5 pb-1 pt-3 text-[11.5px] font-medium text-[#94a3b8]">Citation filters</div>
+        <div className="px-2.5 pb-1 pt-3 text-[11.5px] font-medium text-subtle">Citation filters</div>
         {choices('Published', settings.yearFrom, [[null, 'All'], [year - 5, 'Last 5 years'], [year - 10, 'Last 10']], (yearFrom) => onChange({ ...settings, yearFrom }))}
         {choices('Cited by', settings.minCited, [[null, 'All'], [5, '5+'], [20, '20+'], [50, '50+']], (minCited) => onChange({ ...settings, minCited }))}
         {toggle('Include preprints', 'Papers not yet peer reviewed', 'preprints')}
@@ -1180,18 +1181,18 @@ function LibraryScopePicker({ settings, onChange, onClose }: { settings: Autocom
   const chosenDocs = new Set(settings.libraryDocuments.map((item) => item.id));
   const chosenFolders = new Set(settings.libraryFolders.map((item) => item.id));
   return (
-    <div className="mt-1.5 rounded-[10px] border border-[#e5e7eb] bg-white p-1.5 shadow-[0_12px_28px_-16px_rgba(15,23,42,.35)]">
+    <div className="mt-1.5 rounded-[10px] border border-line bg-surface p-1.5 shadow-[0_12px_28px_-16px_rgba(15,23,42,.35)]">
       <div className="flex items-center gap-1">
         {(['sources', 'folders'] as const).map((value) => (
-          <button key={value} type="button" aria-pressed={tab === value} onClick={() => setTab(value)} className={`h-7 rounded-[7px] px-2 text-[12.5px] ${tab === value ? 'bg-[#f1f5f9] font-semibold text-[#0f172a]' : 'text-[#64748b] hover:text-[#0f172a]'}`}>
+          <button key={value} type="button" aria-pressed={tab === value} onClick={() => setTab(value)} className={`h-7 rounded-[7px] px-2 text-[12.5px] ${tab === value ? 'bg-line-2 font-semibold text-ink' : 'text-muted hover:text-ink'}`}>
             {value === 'sources' ? 'Sources' : 'Folders'}
           </button>
         ))}
-        <button type="button" onClick={onClose} aria-label="Done" title="Done" className="ml-auto grid h-7 w-7 place-items-center rounded-[7px] text-[#94a3b8] hover:bg-[#f1f5f9] hover:text-[#0f172a]"><LuCheck className="h-4 w-4" /></button>
+        <button type="button" onClick={onClose} aria-label="Done" title="Done" className="ml-auto grid h-7 w-7 place-items-center rounded-[7px] text-subtle hover:bg-line-2 hover:text-ink"><LuCheck className="h-4 w-4" /></button>
       </div>
       <label className="relative mt-1 block">
-        <LuSearch className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#94a3b8]" />
-        <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder={tab === 'sources' ? 'Search sources…' : 'Search folders…'} className="h-8 w-full rounded-[8px] border border-[#e2e8f0] pl-8 pr-2 text-[13px] outline-none focus:border-[var(--theme-primary)]" />
+        <LuSearch className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-subtle" />
+        <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder={tab === 'sources' ? 'Search sources…' : 'Search folders…'} className="h-8 w-full rounded-[8px] border border-line pl-8 pr-2 text-[13px] outline-none focus:border-[var(--theme-primary)]" />
       </label>
       <ul className="mt-1 max-h-[220px] overflow-y-auto">
         {tab === 'sources'
@@ -1206,9 +1207,9 @@ function LibraryScopePicker({ settings, onChange, onClose }: { settings: Autocom
                       ? settings.libraryDocuments.filter((item) => item.id !== document.id)
                       : [...settings.libraryDocuments, { id: document.id, title: document.title }].slice(0, 50),
                   })}
-                  className="flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left text-[13px] text-[#0f172a] hover:bg-[#f8fafc]"
+                  className="flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left text-[13px] text-ink hover:bg-soft"
                 >
-                  <span className={`grid h-4 w-4 shrink-0 place-items-center rounded border ${chosenDocs.has(document.id) ? 'border-[var(--theme-primary)] bg-[var(--theme-primary)] text-white' : 'border-[#cbd5e1]'}`}>{chosenDocs.has(document.id) ? <LuCheck className="h-3 w-3" /> : null}</span>
+                  <span className={`grid h-4 w-4 shrink-0 place-items-center rounded border ${chosenDocs.has(document.id) ? 'border-[var(--theme-primary)] bg-[var(--theme-primary)] text-on-brand' : 'border-line-3'}`}>{chosenDocs.has(document.id) ? <LuCheck className="h-3 w-3" /> : null}</span>
                   <span className="min-w-0 flex-1 truncate">{document.title}</span>
                 </button>
               </li>
@@ -1224,17 +1225,17 @@ function LibraryScopePicker({ settings, onChange, onClose }: { settings: Autocom
                       ? settings.libraryFolders.filter((item) => item.id !== folder.id)
                       : [...settings.libraryFolders, { id: folder.id, name: folder.name }].slice(0, 50),
                   })}
-                  className="flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left text-[13px] text-[#0f172a] hover:bg-[#f8fafc]"
+                  className="flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left text-[13px] text-ink hover:bg-soft"
                 >
-                  <LuFolder className={`h-4 w-4 shrink-0 ${chosenFolders.has(folder.id) ? 'text-[var(--theme-primary)]' : 'text-[#94a3b8]'}`} />
+                  <LuFolder className={`h-4 w-4 shrink-0 ${chosenFolders.has(folder.id) ? 'text-[var(--theme-primary)]' : 'text-subtle'}`} />
                   <span className="min-w-0 flex-1 truncate">{folder.name}</span>
-                  <span className="text-[12px] text-[#94a3b8]">{folder.count}</span>
+                  <span className="text-[12px] text-subtle">{folder.count}</span>
                   {chosenFolders.has(folder.id) ? <LuCheck className="h-3.5 w-3.5 text-[var(--theme-primary)]" /> : null}
                 </button>
               </li>
             ))}
         {(tab === 'sources' ? documents.length : folders.length) === 0 ? (
-          <li className="px-2 py-3 text-center text-[12.5px] text-[#94a3b8]">{tab === 'sources' ? 'No sources found' : 'No folders yet'}</li>
+          <li className="px-2 py-3 text-center text-[12.5px] text-subtle">{tab === 'sources' ? 'No sources found' : 'No folders yet'}</li>
         ) : null}
       </ul>
     </div>
@@ -1259,19 +1260,19 @@ function DropdownList({
             onMouseDown={(event) => event.preventDefault()}
             onClick={() => onItemSelect?.(item)}
             title={item.description}
-            className={`flex w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left transition-colors hover:bg-[#f1f5f9] ${
+            className={`flex w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left transition-colors hover:bg-line-2 ${
               compact ? 'min-h-[32px] py-1' : 'min-h-[34px] py-1'
             }`}
           >
             <span className="flex w-4 shrink-0 items-center justify-center text-[var(--theme-primary)]">
               {item.selected ? <LuCheck className="h-4 w-4" /> : null}
             </span>
-            <span className="min-w-0 flex-1 truncate text-[13.5px] text-[#0f172a]">{item.label}</span>
+            <span className="min-w-0 flex-1 truncate text-[13.5px] text-ink">{item.label}</span>
             {item.shortcut ? (
-              <span className="shrink-0 pl-3 text-[12px] text-[#94a3b8]">{item.shortcut}</span>
+              <span className="shrink-0 pl-3 text-[12px] text-subtle">{item.shortcut}</span>
             ) : null}
           </button>
-          {item.dividerAfter ? <div className="my-1 h-px bg-[#f1f5f9]" /> : null}
+          {item.dividerAfter ? <div className="my-1 h-px bg-line-2" /> : null}
         </div>
       ))}
     </div>
@@ -3849,7 +3850,7 @@ export default function GoogleDocsHeader({
 
   // AI controls: one menu on wide screens, a section of the phone sheet.
   const renderAIControls = (onDone: () => void, roomy = false) => {
-    const row = `flex w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left text-[#0f172a] transition-colors hover:bg-[#f1f5f9] disabled:cursor-not-allowed disabled:opacity-60 ${roomy ? 'min-h-[46px] text-[15px]' : 'min-h-[34px] text-[13.5px]'}`;
+    const row = `flex w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left text-ink transition-colors hover:bg-line-2 disabled:cursor-not-allowed disabled:opacity-60 ${roomy ? 'min-h-[46px] text-[15px]' : 'min-h-[34px] text-[13.5px]'}`;
     return (
     <div>
       <button
@@ -3882,8 +3883,8 @@ export default function GoogleDocsHeader({
         >
           <span className="w-4 shrink-0" />
           <span className="flex-1">{option.label}</span>
-          <span className={`relative h-[18px] w-[30px] shrink-0 rounded-full transition-colors ${option.checked ? 'bg-[var(--theme-primary)]' : 'bg-[#cbd5e1]'}`}>
-            <span className={`absolute top-[2px] h-[14px] w-[14px] rounded-full bg-white shadow-[0_1px_2px_rgba(15,23,42,.2)] transition-all ${option.checked ? 'left-[14px]' : 'left-[2px]'}`} />
+          <span className={`relative h-[18px] w-[30px] shrink-0 rounded-full transition-colors ${option.checked ? 'bg-[var(--theme-primary)]' : 'bg-line-3'}`}>
+            <span className={`absolute top-[2px] h-[14px] w-[14px] rounded-full bg-surface shadow-[0_1px_2px_rgba(15,23,42,.2)] transition-all ${option.checked ? 'left-[14px]' : 'left-[2px]'}`} />
           </span>
         </button>
       ))}
@@ -4265,7 +4266,7 @@ export default function GoogleDocsHeader({
   // The "⋯" menu: every command of the old File … Citations menus, grouped, plus a search.
   const renderMoreMenu = () => (
     <div className="flex flex-col">
-      <label className="-mx-1 -mt-1 mb-1 flex h-10 items-center gap-2 border-b border-[#f1f5f9] px-3.5 text-[#94a3b8]">
+      <label className="-mx-1 -mt-1 mb-1 flex h-10 items-center gap-2 border-b border-line-2 px-3.5 text-subtle">
         {ICON_SEARCH}
         <input
           type="text"
@@ -4277,14 +4278,14 @@ export default function GoogleDocsHeader({
           placeholder="Search…"
           aria-label="Search menus"
           autoFocus
-          className="min-w-0 flex-1 bg-transparent text-[13.5px] text-[#0f172a] outline-none placeholder:text-[#94a3b8]"
+          className="min-w-0 flex-1 bg-transparent text-[13.5px] text-ink outline-none placeholder:text-subtle"
         />
       </label>
       {moreMenuQuery ? (
         moreMenuResults.length ? (
           <DropdownList items={moreMenuResults} compact onItemSelect={handleMoreMenuSelect} />
         ) : (
-          <div className="px-3 py-2 text-[13px] text-[#64748b]">No matching commands</div>
+          <div className="px-3 py-2 text-[13px] text-muted">No matching commands</div>
         )
       ) : moreMenuGroup ? (
         <>
@@ -4292,12 +4293,12 @@ export default function GoogleDocsHeader({
             type="button"
             onMouseDown={(event) => event.preventDefault()}
             onClick={() => setMoreMenuGroup(null)}
-            className="mb-0.5 flex w-full items-center gap-1.5 rounded-[8px] px-2 py-1.5 text-left text-[13px] font-semibold text-[#0f172a] hover:bg-[#f1f5f9]"
+            className="mb-0.5 flex w-full items-center gap-1.5 rounded-[8px] px-2 py-1.5 text-left text-[13px] font-semibold text-ink hover:bg-line-2"
           >
-            <LuChevronRight className="h-4 w-4 rotate-180 text-[#94a3b8]" />
+            <LuChevronRight className="h-4 w-4 rotate-180 text-subtle" />
             {moreMenuGroup}
           </button>
-          <div className="mb-1 h-px bg-[#f1f5f9]" />
+          <div className="mb-1 h-px bg-line-2" />
           {moreMenuGroup === 'AI' ? (
             renderAIControls(closeDropdown)
           ) : (
@@ -4312,14 +4313,14 @@ export default function GoogleDocsHeader({
               type="button"
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => setMoreMenuGroup(menu)}
-              className="flex min-h-[34px] w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left text-[13.5px] text-[#0f172a] hover:bg-[#f1f5f9]"
+              className="flex min-h-[34px] w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left text-[13.5px] text-ink hover:bg-line-2"
             >
-              <span className="flex w-4 shrink-0 justify-center text-[#64748b]">{moreMenuGroupIcons[menu]}</span>
+              <span className="flex w-4 shrink-0 justify-center text-muted">{moreMenuGroupIcons[menu]}</span>
               <span className="flex-1">{menu === 'AI' ? 'AI tools' : menu}</span>
-              <LuChevronRight className="h-4 w-4 text-[#94a3b8]" />
+              <LuChevronRight className="h-4 w-4 text-subtle" />
             </button>
           ))}
-          <div className="my-1 h-px bg-[#f1f5f9]" />
+          <div className="my-1 h-px bg-line-2" />
           {([
             { label: 'Version history', icon: <LuHistory className="h-4 w-4" /> },
             { label: DOWNLOAD_DOCX_LABEL, icon: <LuDownload className="h-4 w-4" /> },
@@ -4331,11 +4332,11 @@ export default function GoogleDocsHeader({
               type="button"
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => handleMoreMenuSelect({ label: item.label })}
-              className="flex min-h-[34px] w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left text-[13.5px] text-[#0f172a] hover:bg-[#f1f5f9]"
+              className="flex min-h-[34px] w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left text-[13.5px] text-ink hover:bg-line-2"
             >
-              <span className="flex w-4 shrink-0 justify-center text-[#64748b]">{item.icon}</span>
+              <span className="flex w-4 shrink-0 justify-center text-muted">{item.icon}</span>
               <span className="flex-1">{item.label}</span>
-              {'shortcut' in item ? <span className="text-[12px] text-[#94a3b8]">{item.shortcut}</span> : null}
+              {'shortcut' in item ? <span className="text-[12px] text-subtle">{item.shortcut}</span> : null}
             </button>
           ))}
         </>
@@ -4346,16 +4347,16 @@ export default function GoogleDocsHeader({
   return (
     <header
       ref={headerRef}
-      className="relative z-[11000] bg-white"
+      className="relative z-[11000] bg-surface"
       style={{ isolation: 'isolate' }}
     >
-      <div className="@container/header flex h-[52px] items-center gap-1.5 border-b border-[#f1f5f9] px-2.5 md:h-auto md:min-h-[60px] md:gap-3 md:py-1.5 md:pl-3 md:pr-3">
+      <div className="@container/header flex h-[52px] items-center gap-1.5 border-b border-line-2 px-2.5 md:h-auto md:min-h-[60px] md:gap-3 md:py-1.5 md:pl-3 md:pr-3">
         <button
           type="button"
           onClick={onMainMenuClick}
           aria-label="Menu"
           title="Menu"
-          className={`${isNavCollapsed ? 'hidden md:inline-flex' : 'hidden md:inline-flex xl:hidden'} h-9 w-9 shrink-0 items-center justify-center rounded-[8px] text-[#475569] transition-colors hover:bg-[#f1f5f9] hover:text-[#0f172a]`}
+          className={`${isNavCollapsed ? 'hidden md:inline-flex' : 'hidden md:inline-flex xl:hidden'} h-9 w-9 shrink-0 items-center justify-center rounded-[8px] text-ink-3 transition-colors hover:bg-line-2 hover:text-ink`}
         >
           <LuMenu className="h-[18px] w-[18px]" />
         </button>
@@ -4364,7 +4365,7 @@ export default function GoogleDocsHeader({
           onClick={onDocsHomeClick}
           aria-label="All documents"
           title="All documents"
-          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] text-[#334155] transition-colors hover:bg-[#f1f5f9] md:hidden"
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] text-ink-2 transition-colors hover:bg-line-2 md:hidden"
         >
           {ICON_BACK}
         </button>
@@ -4407,20 +4408,20 @@ export default function GoogleDocsHeader({
               disabled={!canEdit}
               title={titleDraft}
               style={{ ['--ve-title-w' as string]: titleWidth ? `${Math.max(titleWidth, 80) + 16}px` : `${Math.min(Math.max(titleDraft.length, 10), 60)}ch` }}
-              className="-mx-1.5 w-[calc(100%+12px)] min-w-0 truncate rounded-[8px] border border-transparent bg-transparent px-1.5 py-0.5 text-[15px] font-bold leading-[1.3] text-[#0f172a] outline-none transition-colors hover:border-[#e5e7eb] focus:border-[var(--theme-primary)] focus:bg-white disabled:hover:border-transparent md:w-[var(--ve-title-w)] md:max-w-[min(100%,560px)] md:text-[16px] md:font-semibold"
+              className="-mx-1.5 w-[calc(100%+12px)] min-w-0 truncate rounded-[8px] border border-transparent bg-transparent px-1.5 py-0.5 text-[15px] font-bold leading-[1.3] text-ink outline-none transition-colors hover:border-line focus:border-[var(--theme-primary)] focus:bg-surface disabled:hover:border-transparent md:w-[var(--ve-title-w)] md:max-w-[min(100%,560px)] md:text-[16px] md:font-semibold"
             />
             <span
               role="status"
               aria-label={documentStatusLabel}
               title={documentStatusLabel}
-              className={`inline-flex shrink-0 items-center gap-1.5 text-[12px] leading-4 md:text-[13px] md:text-[#64748b] ${saveState.text === 'Saved' ? 'text-[#16a34a]' : 'text-[#64748b]'}`}
+              className={`inline-flex shrink-0 items-center gap-1.5 text-[12px] leading-4 md:text-[13px] md:text-muted ${saveState.text === 'Saved' ? 'text-[#16a34a]' : 'text-muted'}`}
             >
               <i className={`h-[7px] w-[7px] rounded-full ${saveState.dot}`} aria-hidden="true" />
               {saveState.text}
             </span>
           </div>
           {/* File, Edit, View … as in Docs (tablet and desktop). */}
-          <div className="-ml-1.5 hidden h-[26px] min-w-0 flex-wrap items-center gap-px overflow-hidden text-[13.5px] text-[#475569] md:flex">
+          <div className="-ml-1.5 hidden h-[26px] min-w-0 flex-wrap items-center gap-px overflow-hidden text-[13.5px] text-ink-3 md:flex">
             {[...topMenus, 'AI'].map((menu) => (
               <div
                 key={menu}
@@ -4434,7 +4435,7 @@ export default function GoogleDocsHeader({
                   aria-expanded={openDropdown === `menu-${menu}`}
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => toggleDropdown(`menu-${menu}`)}
-                  className={`h-[26px] whitespace-nowrap rounded-md px-[7px] transition-colors hover:bg-[#f1f5f9] hover:text-[#0f172a] ${openDropdown === `menu-${menu}` ? 'bg-[#f1f5f9] text-[#0f172a]' : ''}`}
+                  className={`h-[26px] whitespace-nowrap rounded-md px-[7px] transition-colors hover:bg-line-2 hover:text-ink ${openDropdown === `menu-${menu}` ? 'bg-line-2 text-ink' : ''}`}
                 >
                   {menu}
                 </button>
@@ -4458,7 +4459,7 @@ export default function GoogleDocsHeader({
           aria-label="Undo"
           title="Undo"
           onClick={() => runEditorAction((currentEditor) => currentEditor.undo())}
-          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] text-[#334155] md:hidden"
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] text-ink-2 md:hidden"
         >
           {ICON_UNDO}
         </button>
@@ -4467,7 +4468,7 @@ export default function GoogleDocsHeader({
           aria-label="More document options"
           title="More document options"
           onClick={() => setIsPhoneSheetOpen(true)}
-          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] text-[#334155] md:hidden"
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] text-ink-2 md:hidden"
         >
           {ICON_DOTS}
         </button>
@@ -4479,7 +4480,7 @@ export default function GoogleDocsHeader({
               {visibleCollaborators.map((collaborator) => (
                 <span
                   key={collaborator.sessionId}
-                  className="-ml-2 grid h-7 w-7 place-items-center rounded-full border-2 border-white text-[11px] font-bold text-white"
+                  className="-ml-2 grid h-7 w-7 place-items-center rounded-full border-2 border-surface text-[11px] font-bold text-white"
                   style={{ backgroundColor: collaborator.color }}
                   title={`${collaborator.displayName} (${collaborator.role})`}
                 >
@@ -4488,11 +4489,12 @@ export default function GoogleDocsHeader({
               ))}
             </div>
           ) : null}
+          <HostThemeToggle className="grid h-9 w-9 shrink-0 place-items-center rounded-[9px] text-muted transition-colors hover:bg-soft hover:text-ink" />
           <button
             type="button"
             onClick={onShareClick}
             title="Share"
-            className="inline-flex h-9 items-center gap-[7px] rounded-[9px] border border-[#e5e7eb] bg-white px-2.5 text-[14px] font-medium text-[#334155] transition-colors hover:bg-[#f8fafc] hover:text-[#0f172a] @[880px]/header:px-3"
+            className="inline-flex h-9 items-center gap-[7px] rounded-[9px] border border-line bg-surface px-2.5 text-[14px] font-medium text-ink-2 transition-colors hover:bg-soft hover:text-ink @[880px]/header:px-3"
           >
             {ICON_SHARE}
             <span className="hidden @[880px]/header:inline">Share</span>
@@ -4502,7 +4504,7 @@ export default function GoogleDocsHeader({
               type="button"
               onClick={onReviewClick}
               title="Review the document with AI"
-              className="inline-flex h-9 items-center gap-[7px] rounded-[9px] border border-[#e5e7eb] bg-white px-2.5 text-[14px] font-medium text-[#334155] transition-colors hover:bg-[#f8fafc] hover:text-[#0f172a] @[880px]/header:px-3"
+              className="inline-flex h-9 items-center gap-[7px] rounded-[9px] border border-line bg-surface px-2.5 text-[14px] font-medium text-ink-2 transition-colors hover:bg-soft hover:text-ink @[880px]/header:px-3"
             >
               {ICON_REVIEW}
               <span className="hidden @[880px]/header:inline">Review</span>
@@ -4513,7 +4515,7 @@ export default function GoogleDocsHeader({
               type="button"
               onClick={handleUpgrade}
               title="Upgrade"
-              className="inline-flex h-9 items-center gap-[7px] rounded-[9px] bg-[var(--theme-primary)] px-3 text-[14px] font-semibold text-white shadow-[0_6px_14px_-8px_rgba(37,99,235,.8)] transition-colors hover:bg-[var(--theme-primary-dark)]"
+              className="inline-flex h-9 items-center gap-[7px] rounded-[9px] bg-[var(--theme-primary)] px-3 text-[14px] font-semibold text-on-brand shadow-[0_6px_14px_-8px_rgba(var(--brand-rgb),.8)] transition-colors hover:bg-[var(--theme-primary-dark)]"
             >
               <LuZap className="h-4 w-4 fill-current" aria-hidden="true" />
               <span className="hidden @[640px]/header:inline">Upgrade</span>
@@ -4548,9 +4550,9 @@ export default function GoogleDocsHeader({
                       if (item.run) item.run();
                       else if (item.command) handleMoreMenuSelect({ label: item.command });
                     }}
-                    className="flex min-h-[36px] w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left text-[13.5px] text-[#0f172a] hover:bg-[#f1f5f9]"
+                    className="flex min-h-[36px] w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left text-[13.5px] text-ink hover:bg-line-2"
                   >
-                    <span className="text-[#64748b]">{item.icon}</span>
+                    <span className="text-muted">{item.icon}</span>
                     {item.label}
                   </button>
                 ))}
@@ -4560,7 +4562,7 @@ export default function GoogleDocsHeader({
         </div>
       </div>
 
-      <div className="ai-editor-print-hidden relative hidden border-b border-[#f1f5f9] md:block">
+      <div className="ai-editor-print-hidden relative hidden border-b border-line-2 md:block">
         {/* One row of tools, most used first; what doesn't fit waits behind ⋮ (as in Docs). */}
         <div className="flex h-12 items-center gap-1 px-3">
           <div className="relative h-10 min-w-0 flex-1">
@@ -4570,7 +4572,7 @@ export default function GoogleDocsHeader({
               data-expanded={isToolbarExpanded ? 'true' : undefined}
               className={`ve-toolbar-row flex flex-wrap items-center gap-x-0.5 gap-y-1 pt-[3px] ${
                 isToolbarExpanded
-                  ? 'absolute -left-3 -right-3 top-0 z-[40] rounded-b-[14px] border-x border-b border-[#e5e7eb] bg-white px-3 pb-2 shadow-[0_22px_40px_-24px_rgba(15,23,42,.35)]'
+                  ? 'absolute -left-3 -right-3 top-0 z-[40] rounded-b-[14px] border-x border-b border-line bg-surface px-3 pb-2 shadow-[0_22px_40px_-24px_rgba(15,23,42,.35)]'
                   : 'h-10'
               }`}
             >
@@ -4644,7 +4646,7 @@ export default function GoogleDocsHeader({
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => (onInsertCitation ? onInsertCitation() : handleOpenCitationDialog())}
               disabled={!canEdit}
-              className="inline-flex h-[34px] shrink-0 items-center gap-1.5 rounded-[8px] px-[11px] text-[14px] font-semibold text-[#0f172a] transition-colors hover:bg-[#f1f5f9] disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex h-[34px] shrink-0 items-center gap-1.5 rounded-[8px] px-[11px] text-[14px] font-semibold text-ink transition-colors hover:bg-line-2 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <span className="font-extrabold text-[var(--theme-primary)]">@</span>Cite
             </button>
@@ -4667,25 +4669,25 @@ export default function GoogleDocsHeader({
               />
               {openDropdown === 'select-font' ? (
                 <DropdownSurface className="left-0 top-full mt-2 flex w-[min(100vw-24px,300px)] flex-col overflow-hidden p-0">
-                  <div className="shrink-0 border-b border-[#f1f5f9] p-1">
+                  <div className="shrink-0 border-b border-line-2 p-1">
                     <button
                       type="button"
                       title="More fonts (opens font catalog in Google Docs)"
                       onMouseDown={(event) => event.preventDefault()}
-                      className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-[13px] text-[#0f172a] transition-colors hover:bg-[#f1f5f9]"
+                      className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-[13px] text-ink transition-colors hover:bg-line-2"
                       onClick={() => {
                         setIsMoreFontsOpen(true);
                         setFontCatalogQuery('');
                       }}
                     >
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-[#e5e7eb] bg-white text-[#64748b]">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-line bg-surface text-muted">
                         <LuPlus className="h-4 w-4" />
                       </span>
                       <span>More fonts</span>
                     </button>
-                    <div className="my-1 h-px bg-[#f1f5f9]" />
+                    <div className="my-1 h-px bg-line-2" />
                     <div
-                      className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#94a3b8]"
+                      className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-subtle"
                       aria-hidden
                     >
                       Recent
@@ -4696,7 +4698,7 @@ export default function GoogleDocsHeader({
                         type="button"
                         onMouseDown={(event) => event.preventDefault()}
                         onClick={() => selectFontFamily(family)}
-                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] text-[#0f172a] transition-colors hover:bg-[#f1f5f9]"
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] text-ink transition-colors hover:bg-line-2"
                         style={{
                           fontFamily: `"${family}", "Google Sans", Roboto, Arial, sans-serif`,
                         }}
@@ -4716,7 +4718,7 @@ export default function GoogleDocsHeader({
                           onMouseDown={(event) => event.preventDefault()}
                           onMouseEnter={() => item.submenu && setFontSubmenuFamily(item.family)}
                           onClick={() => selectFontFamily(item.family)}
-                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 pr-1 text-left text-[13px] text-[#0f172a] transition-colors hover:bg-[#f1f5f9]"
+                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 pr-1 text-left text-[13px] text-ink transition-colors hover:bg-line-2"
                           style={{
                             fontFamily: `"${item.family}", "Google Sans", Roboto, Arial, sans-serif`,
                           }}
@@ -4727,7 +4729,7 @@ export default function GoogleDocsHeader({
                           <span className="min-w-0 flex-1 truncate">{item.family}</span>
                           {item.submenu ? (
                             <LuChevronRight
-                              className={`h-4 w-4 shrink-0 text-[#64748b] transition-transform ${
+                              className={`h-4 w-4 shrink-0 text-muted transition-transform ${
                                 fontSubmenuFamily === item.family ? 'rotate-90' : ''
                               }`}
                               aria-hidden
@@ -4735,14 +4737,14 @@ export default function GoogleDocsHeader({
                           ) : null}
                         </button>
                         {item.submenu && fontSubmenuFamily === item.family ? (
-                          <div className="mb-1 ml-7 border-l-2 border-[#e5e7eb] py-0.5 pl-2">
+                          <div className="mb-1 ml-7 border-l-2 border-line py-0.5 pl-2">
                             {(item.variants ?? ['Regular']).map((variant) => (
                               <button
                                 key={variant}
                                 type="button"
                                 onMouseDown={(event) => event.preventDefault()}
                                 onClick={() => selectFontFamily(item.family, variant)}
-                                className="flex w-full rounded-md px-2 py-1.5 text-left text-[12px] text-[#0f172a] transition-colors hover:bg-[var(--theme-primary-soft)]"
+                                className="flex w-full rounded-md px-2 py-1.5 text-left text-[12px] text-ink transition-colors hover:bg-[var(--theme-primary-soft)]"
                                 style={{
                                   fontFamily: `"${item.family}", "Google Sans", Roboto, Arial, sans-serif`,
                                   fontWeight: getFontWeightValue(variant),
@@ -4793,7 +4795,7 @@ export default function GoogleDocsHeader({
                             applyFontSizeValue(option);
                             closeDropdown();
                           }}
-                          className="flex w-full items-center gap-3 rounded-lg px-3 py-1.5 text-left text-[13px] text-[#0f172a] transition-colors hover:bg-[#f1f5f9]"
+                          className="flex w-full items-center gap-3 rounded-lg px-3 py-1.5 text-left text-[13px] text-ink transition-colors hover:bg-line-2"
                         >
                           <span className="flex w-4 shrink-0 items-center justify-center text-[var(--theme-primary)]">
                             {fontSizeValue === option ? <LuCheck className="h-4 w-4" /> : null}
@@ -4833,7 +4835,7 @@ export default function GoogleDocsHeader({
                 disabled={!canEdit}
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => toggleDropdown('toolbar-text-color')}
-                className={`inline-flex h-7 flex-col items-center justify-center rounded-sm px-1 text-[#334155] transition-colors hover:bg-[#f1f5f9] ${
+                className={`inline-flex h-7 flex-col items-center justify-center rounded-sm px-1 text-ink-2 transition-colors hover:bg-line-2 ${
                   openDropdown === 'toolbar-text-color' ? 'bg-[var(--theme-primary-soft)] text-[var(--theme-primary-dark)]' : ''
                 } ${!canEdit ? 'cursor-not-allowed opacity-40 hover:bg-transparent' : ''}`}
               >
@@ -4845,16 +4847,16 @@ export default function GoogleDocsHeader({
               </button>
               {openDropdown === 'toolbar-text-color' ? (
                 <DropdownSurface className="left-0 top-full mt-2 w-[360px] p-2.5">
-                  <div className="mb-2 text-[11px] font-medium uppercase tracking-wide text-[#64748b]">
+                  <div className="mb-2 text-[11px] font-medium uppercase tracking-wide text-muted">
                     Text color
                   </div>
                   <button
                     type="button"
                     onMouseDown={(event) => event.preventDefault()}
                     onClick={() => handleTextColorChange('default')}
-                    className="mb-2 flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-[12px] text-[#0f172a] transition-colors hover:bg-[#f1f5f9]"
+                    className="mb-2 flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-[12px] text-ink transition-colors hover:bg-line-2"
                   >
-                    <span className="flex h-5 w-5 items-center justify-center rounded border border-[#e5e7eb] bg-[linear-gradient(135deg,#fff_44%,#dadce0_44%,#dadce0_56%,#fff_56%)]" />
+                    <span className="flex h-5 w-5 items-center justify-center rounded border border-line bg-[linear-gradient(135deg,#fff_44%,#dadce0_44%,#dadce0_56%,#fff_56%)]" />
                     <span>None</span>
                   </button>
                   <div className="grid grid-cols-10 gap-1.5">
@@ -4866,7 +4868,7 @@ export default function GoogleDocsHeader({
                         aria-label={sw.label}
                         onMouseDown={(event) => event.preventDefault()}
                         onClick={() => handleTextColorChange(sw.hex)}
-                        className={`flex h-7 w-7 items-center justify-center rounded border border-[#e5e7eb] ${
+                        className={`flex h-7 w-7 items-center justify-center rounded border border-line ${
                           textColorChoice === sw.hex ? 'ring-2 ring-[var(--theme-primary)]' : ''
                         }`}
                         style={{ backgroundColor: sw.hex }}
@@ -4886,7 +4888,7 @@ export default function GoogleDocsHeader({
                 disabled={!canEdit}
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => toggleDropdown('toolbar-highlight')}
-                className={`inline-flex h-7 flex-col items-center justify-center rounded-sm px-1 text-[#334155] transition-colors hover:bg-[#f1f5f9] ${
+                className={`inline-flex h-7 flex-col items-center justify-center rounded-sm px-1 text-ink-2 transition-colors hover:bg-line-2 ${
                   openDropdown === 'toolbar-highlight' ? 'bg-[var(--theme-primary-soft)] text-[var(--theme-primary-dark)]' : ''
                 } ${!canEdit ? 'cursor-not-allowed opacity-40 hover:bg-transparent' : ''}`}
               >
@@ -4900,16 +4902,16 @@ export default function GoogleDocsHeader({
               </button>
               {openDropdown === 'toolbar-highlight' ? (
                 <DropdownSurface className="left-0 top-full mt-2 w-[360px] p-2.5">
-                  <div className="mb-2 text-[11px] font-medium uppercase tracking-wide text-[#64748b]">
+                  <div className="mb-2 text-[11px] font-medium uppercase tracking-wide text-muted">
                     Highlight color
                   </div>
                   <button
                     type="button"
                     onMouseDown={(event) => event.preventDefault()}
                     onClick={() => handleHighlightChange('default')}
-                    className="mb-2 flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-[12px] text-[#0f172a] transition-colors hover:bg-[#f1f5f9]"
+                    className="mb-2 flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-[12px] text-ink transition-colors hover:bg-line-2"
                   >
-                    <span className="flex h-5 w-5 items-center justify-center rounded border border-[#e5e7eb] bg-[linear-gradient(135deg,#fff_44%,#dadce0_44%,#dadce0_56%,#fff_56%)]" />
+                    <span className="flex h-5 w-5 items-center justify-center rounded border border-line bg-[linear-gradient(135deg,#fff_44%,#dadce0_44%,#dadce0_56%,#fff_56%)]" />
                     <span>None</span>
                   </button>
                   <div className="grid grid-cols-10 gap-1.5">
@@ -4921,7 +4923,7 @@ export default function GoogleDocsHeader({
                         aria-label={sw.label}
                         onMouseDown={(event) => event.preventDefault()}
                         onClick={() => handleHighlightChange(sw.hex)}
-                        className={`flex h-7 w-7 items-center justify-center rounded border border-[#e5e7eb] ${
+                        className={`flex h-7 w-7 items-center justify-center rounded border border-line ${
                           highlightChoice === sw.hex ? 'ring-2 ring-[var(--theme-primary)]' : ''
                         }`}
                         style={{
@@ -4953,7 +4955,7 @@ export default function GoogleDocsHeader({
                     <DropdownSurface className="left-0 top-full mt-2 w-[min(100vw-24px,320px)] p-3">
                       <div className="space-y-3">
                         <div>
-                          <label className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-[#64748b]">
+                          <label className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-muted">
                             Link
                           </label>
                           <input
@@ -4961,11 +4963,11 @@ export default function GoogleDocsHeader({
                             value={linkEditorUrl}
                             onChange={(event) => setLinkEditorUrl(event.target.value)}
                             placeholder="https://"
-                            className="h-9 w-full rounded-lg border border-[#e5e7eb] px-3 text-[13px] text-[#0f172a] outline-none transition-colors focus:border-[var(--theme-primary)]"
+                            className="h-9 w-full rounded-lg border border-line px-3 text-[13px] text-ink outline-none transition-colors focus:border-[var(--theme-primary)]"
                           />
                         </div>
                         <div>
-                          <label className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-[#64748b]">
+                          <label className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-muted">
                             Text
                           </label>
                           <input
@@ -4973,7 +4975,7 @@ export default function GoogleDocsHeader({
                             value={linkEditorText}
                             onChange={(event) => setLinkEditorText(event.target.value)}
                             placeholder="Link text"
-                            className="h-9 w-full rounded-lg border border-[#e5e7eb] px-3 text-[13px] text-[#0f172a] outline-none transition-colors focus:border-[var(--theme-primary)]"
+                            className="h-9 w-full rounded-lg border border-line px-3 text-[13px] text-ink outline-none transition-colors focus:border-[var(--theme-primary)]"
                           />
                         </div>
                         <div className="flex items-center justify-between gap-2">
@@ -4982,7 +4984,7 @@ export default function GoogleDocsHeader({
                             onMouseDown={(event) => event.preventDefault()}
                             onClick={handleRemoveSelectedLink}
                             disabled={!selectedLinkUrl}
-                            className="inline-flex h-9 items-center rounded-lg px-3 text-[12px] font-medium text-[#64748b] transition-colors hover:bg-[#f1f5f9] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+                            className="inline-flex h-9 items-center rounded-lg px-3 text-[12px] font-medium text-muted transition-colors hover:bg-line-2 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
                           >
                             Remove
                           </button>
@@ -4991,7 +4993,7 @@ export default function GoogleDocsHeader({
                               type="button"
                               onMouseDown={(event) => event.preventDefault()}
                               onClick={closeDropdown}
-                              className="inline-flex h-9 items-center rounded-lg px-3 text-[12px] font-medium text-[#64748b] transition-colors hover:bg-[#f1f5f9]"
+                              className="inline-flex h-9 items-center rounded-lg px-3 text-[12px] font-medium text-muted transition-colors hover:bg-line-2"
                             >
                               Cancel
                             </button>
@@ -5072,7 +5074,7 @@ export default function GoogleDocsHeader({
               </ToolbarIconButton>
               {openDropdown === 'toolbar-more' ? (
                 <DropdownSurface className="left-0 top-full mt-2 min-w-[240px]">
-                  <div className="border-b border-[#f1f5f9] px-2 py-1.5 text-[11px] text-[#64748b]">
+                  <div className="border-b border-line-2 px-2 py-1.5 text-[11px] text-muted">
                     More formatting
                   </div>
                   <div className="flex flex-wrap gap-0.5 p-1.5">
@@ -5101,7 +5103,7 @@ export default function GoogleDocsHeader({
                       <LuSubscript className="h-[18px] w-[18px]" />
                     </ToolbarIconButton>
                   </div>
-                  <div className="my-1 h-px bg-[#f1f5f9]" />
+                  <div className="my-1 h-px bg-line-2" />
                   <DropdownList
                     items={moreToolbarMenuItems}
                     compact
@@ -5144,7 +5146,7 @@ export default function GoogleDocsHeader({
               ) : null}
               {openDropdown === 'toolbar-special-characters' ? (
                 <DropdownSurface className="left-0 top-full mt-2 w-[min(100vw-24px,296px)] p-2.5">
-                  <div className="mb-2 text-[11px] font-medium uppercase tracking-wide text-[#64748b]">
+                  <div className="mb-2 text-[11px] font-medium uppercase tracking-wide text-muted">
                     Special characters
                   </div>
                   <div className="grid grid-cols-7 gap-1.5">
@@ -5159,7 +5161,7 @@ export default function GoogleDocsHeader({
                           });
                           closeDropdown();
                         }}
-                        className="flex h-9 items-center justify-center rounded-lg border border-[#e5e7eb] text-[18px] text-[#0f172a] transition-colors hover:bg-[#f1f5f9]"
+                        className="flex h-9 items-center justify-center rounded-lg border border-line text-[18px] text-ink transition-colors hover:bg-line-2"
                       >
                         {character}
                       </button>
@@ -5242,8 +5244,8 @@ export default function GoogleDocsHeader({
                 <DropdownSurface className="left-0 top-full mt-2 w-[min(100vw-24px,328px)] p-2.5">
                   <div className="mb-2 flex items-center justify-between">
                     <div>
-                      <div className="text-[12px] font-medium text-[#0f172a]">Table tools</div>
-                      <div className="text-[11px] text-[#64748b]">
+                      <div className="text-[12px] font-medium text-ink">Table tools</div>
+                      <div className="text-[11px] text-muted">
                         {activeTableCell
                           ? `Selected cell: row ${activeTableCell.row + 1}, column ${activeTableCell.col + 1}`
                           : 'Place the cursor inside a table cell'}
@@ -5275,18 +5277,18 @@ export default function GoogleDocsHeader({
                               | 'remove-column',
                           )
                         }
-                        className="rounded-lg border border-[#e5e7eb] px-2.5 py-2 text-left text-[12px] text-[#0f172a] transition-colors hover:bg-[#f8fafc]"
+                        className="rounded-lg border border-line px-2.5 py-2 text-left text-[12px] text-ink transition-colors hover:bg-soft"
                       >
                         {label}
                       </button>
                     ))}
                   </div>
 
-                  <div className="my-2 h-px bg-[#f1f5f9]" />
+                  <div className="my-2 h-px bg-line-2" />
 
                   <div className="space-y-2">
                     <div>
-                      <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[#64748b]">
+                      <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-muted">
                         Current row fill
                       </div>
                       <div className="grid grid-cols-9 gap-1">
@@ -5297,8 +5299,8 @@ export default function GoogleDocsHeader({
                             title={swatch.label}
                             onMouseDown={(event) => event.preventDefault()}
                             onClick={() => applyTableAxisColor('row', swatch.hex)}
-                            className={`h-6 w-6 rounded border border-[#e5e7eb] ${
-                              swatch.hex === 'default' ? 'bg-white text-[10px] text-[#64748b]' : ''
+                            className={`h-6 w-6 rounded border border-line ${
+                              swatch.hex === 'default' ? 'bg-surface text-[10px] text-muted' : ''
                             }`}
                             style={
                               swatch.hex === 'default' ? undefined : { backgroundColor: swatch.hex }
@@ -5311,7 +5313,7 @@ export default function GoogleDocsHeader({
                     </div>
 
                     <div>
-                      <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[#64748b]">
+                      <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-muted">
                         Current column fill
                       </div>
                       <div className="grid grid-cols-9 gap-1">
@@ -5322,8 +5324,8 @@ export default function GoogleDocsHeader({
                             title={swatch.label}
                             onMouseDown={(event) => event.preventDefault()}
                             onClick={() => applyTableAxisColor('column', swatch.hex)}
-                            className={`h-6 w-6 rounded border border-[#e5e7eb] ${
-                              swatch.hex === 'default' ? 'bg-white text-[10px] text-[#64748b]' : ''
+                            className={`h-6 w-6 rounded border border-line ${
+                              swatch.hex === 'default' ? 'bg-surface text-[10px] text-muted' : ''
                             }`}
                             style={
                               swatch.hex === 'default' ? undefined : { backgroundColor: swatch.hex }
@@ -5336,7 +5338,7 @@ export default function GoogleDocsHeader({
                     </div>
                   </div>
 
-                  <div className="my-2 h-px bg-[#f1f5f9]" />
+                  <div className="my-2 h-px bg-line-2" />
 
                   <button
                     type="button"
@@ -5467,11 +5469,11 @@ export default function GoogleDocsHeader({
               aria-expanded={openDropdown === 'select-mode'}
               onClick={() => toggleDropdown('select-mode')}
               title={`Mode: ${editingModeValue}`}
-              className={`inline-flex h-[34px] shrink-0 items-center gap-1.5 rounded-[8px] px-2.5 text-[14px] text-[#334155] transition-colors hover:bg-[#f1f5f9] ${
-                openDropdown === 'select-mode' ? 'bg-[#f1f5f9] text-[#0f172a]' : ''
+              className={`inline-flex h-[34px] shrink-0 items-center gap-1.5 rounded-[8px] px-2.5 text-[14px] text-ink-2 transition-colors hover:bg-line-2 ${
+                openDropdown === 'select-mode' ? 'bg-line-2 text-ink' : ''
               }`}
             >
-              <LuPencil className="h-4 w-4 text-[#475569]" />
+              <LuPencil className="h-4 w-4 text-ink-3" />
               <span>
                 {activeRole === 'owner' || activeRole === 'editor'
                   ? editingModeValue
@@ -5492,15 +5494,15 @@ export default function GoogleDocsHeader({
                         onEditingModeChange?.(option.label as 'Editing' | 'Suggesting' | 'Viewing');
                         closeDropdown();
                       }}
-                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors hover:bg-[#f1f5f9]"
+                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors hover:bg-line-2"
                     >
                       <span className="flex w-4 shrink-0 items-center justify-center text-[var(--theme-primary)]">
                         {editingModeValue === option.label ? <LuCheck className="h-4 w-4" /> : null}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[13px] text-[#0f172a]">{option.label}</span>
+                        <span className="block text-[13px] text-ink">{option.label}</span>
                         {option.description ? (
-                          <span className="block text-[11px] text-[#64748b]">{option.description}</span>
+                          <span className="block text-[11px] text-muted">{option.description}</span>
                         ) : null}
                       </span>
                     </button>
@@ -5573,7 +5575,7 @@ export default function GoogleDocsHeader({
                           onZoomChange?.(option);
                           closeDropdown();
                         }}
-                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-[13px] text-[#0f172a] transition-colors hover:bg-[#f1f5f9]"
+                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-[13px] text-ink transition-colors hover:bg-line-2"
                       >
                         <span className="flex w-4 shrink-0 items-center justify-center text-[var(--theme-primary)]">
                           {zoomValue === option ? <LuCheck className="h-4 w-4" /> : null}
@@ -5600,7 +5602,7 @@ export default function GoogleDocsHeader({
               </ToolbarIconButton>
             </span>
           ) : null}
-          <span className="mx-1 h-5 w-px shrink-0 bg-[#e5e7eb]" aria-hidden="true" />
+          <span className="mx-1 h-5 w-px shrink-0 bg-line" aria-hidden="true" />
           {autocompleteSettings && onAutocompleteSettingsChange ? (
             <div className="relative">
               <ToolbarIconButton label="Autocomplete settings" active={openDropdown === 'autocomplete-settings'} onClick={() => toggleDropdown('autocomplete-settings')}>
@@ -5620,12 +5622,12 @@ export default function GoogleDocsHeader({
             onClick={() => onToggleAIWritingSuggestions?.()}
             disabled={!canEdit || !onToggleAIWritingSuggestions}
             title="Grey text suggests your next sentence, with citations. Tab accepts it."
-            className="inline-flex shrink-0 items-center gap-2 rounded-[8px] pl-1.5 text-[13.5px] font-medium text-[#334155] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex shrink-0 items-center gap-2 rounded-[8px] pl-1.5 text-[13.5px] font-medium text-ink-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <LuSparkles className="h-4 w-4 text-[var(--theme-primary)] xl:hidden" aria-hidden="true" />
             <span className="hidden xl:inline">Autocomplete</span>
-            <span className={`relative h-[22px] w-[38px] shrink-0 rounded-full transition-colors ${aiWritingSuggestionsEnabled ? 'bg-[var(--theme-primary)]' : 'bg-[#cbd5e1]'}`}>
-              <span className={`absolute top-[3px] h-4 w-4 rounded-full bg-white shadow-[0_1px_2px_rgba(15,23,42,.2)] transition-all ${aiWritingSuggestionsEnabled ? 'left-[19px]' : 'left-[3px]'}`} />
+            <span className={`relative h-[22px] w-[38px] shrink-0 rounded-full transition-colors ${aiWritingSuggestionsEnabled ? 'bg-[var(--theme-primary)]' : 'bg-line-3'}`}>
+              <span className={`absolute top-[3px] h-4 w-4 rounded-full bg-surface shadow-[0_1px_2px_rgba(15,23,42,.2)] transition-all ${aiWritingSuggestionsEnabled ? 'left-[19px]' : 'left-[3px]'}`} />
             </span>
           </button>
         </div>
@@ -5642,16 +5644,16 @@ export default function GoogleDocsHeader({
                   setPhoneSheetMenu(null);
                 }}
               />
-              <div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-[24px] bg-white px-3.5 pb-[calc(16px+env(safe-area-inset-bottom))] pt-2 text-[#0f172a] shadow-[0_-10px_30px_-10px_rgba(15,23,42,.3)]">
-                <div className="mx-auto mb-3 mt-0.5 h-[5px] w-[42px] rounded-full bg-[#cbd5e1]" />
+              <div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-[24px] bg-surface px-3.5 pb-[calc(16px+env(safe-area-inset-bottom))] pt-2 text-ink shadow-[0_-10px_30px_-10px_rgba(15,23,42,.3)]">
+                <div className="mx-auto mb-3 mt-0.5 h-[5px] w-[42px] rounded-full bg-line-3" />
                 {phoneSheetMenu ? (
                   <>
                     <button
                       type="button"
                       onClick={() => setPhoneSheetMenu(null)}
-                      className="mb-1 flex items-center gap-2 rounded-[10px] px-2 py-2 text-[15px] font-semibold text-[#0f172a]"
+                      className="mb-1 flex items-center gap-2 rounded-[10px] px-2 py-2 text-[15px] font-semibold text-ink"
                     >
-                      <LuArrowLeft className="h-5 w-5 text-[#64748b]" />
+                      <LuArrowLeft className="h-5 w-5 text-muted" />
                       {phoneSheetMenu}
                     </button>
                     <DropdownList
@@ -5683,27 +5685,27 @@ export default function GoogleDocsHeader({
                             setIsPhoneSheetOpen(false);
                             action.onClick?.();
                           }}
-                          className="flex flex-col items-center gap-1.5 rounded-[12px] px-1 py-2 text-[12px] font-medium text-[#475569] active:bg-[#f8fafc]"
+                          className="flex flex-col items-center gap-1.5 rounded-[12px] px-1 py-2 text-[12px] font-medium text-ink-3 active:bg-soft"
                         >
-                          <span className="inline-flex h-11 w-11 items-center justify-center rounded-[14px] bg-[#f1f5f9] text-[#334155]">{action.icon}</span>
+                          <span className="inline-flex h-11 w-11 items-center justify-center rounded-[14px] bg-line-2 text-ink-2">{action.icon}</span>
                           {action.label}
                         </button>
                       ))}
                     </div>
-                    <div className="my-2 h-px bg-[#f1f5f9]" />
+                    <div className="my-2 h-px bg-line-2" />
                     {renderAIControls(() => setIsPhoneSheetOpen(false), true)}
-                    <div className="my-2 h-px bg-[#f1f5f9]" />
+                    <div className="my-2 h-px bg-line-2" />
                     {activeRole === 'owner' || activeRole === 'editor' ? (
                       <div className="flex items-center justify-between gap-3 px-2 py-1.5">
-                        <span className="text-[15px] text-[#0f172a]">Mode</span>
-                        <div className="inline-flex rounded-[12px] bg-[#f1f5f9] p-1">
+                        <span className="text-[15px] text-ink">Mode</span>
+                        <div className="inline-flex rounded-[12px] bg-line-2 p-1">
                           {(['Editing', 'Viewing'] as const).map((mode) => (
                             <button
                               key={mode}
                               type="button"
                               aria-pressed={editingModeValue === mode}
                               onClick={() => onEditingModeChange?.(mode)}
-                              className={`h-8 rounded-[9px] px-3 text-[13.5px] font-semibold ${editingModeValue === mode ? 'bg-white text-[#0f172a] shadow-[0_1px_3px_rgba(15,23,42,.12)]' : 'text-[#64748b]'}`}
+                              className={`h-8 rounded-[9px] px-3 text-[13.5px] font-semibold ${editingModeValue === mode ? 'bg-surface text-ink shadow-[0_1px_3px_rgba(15,23,42,.12)]' : 'text-muted'}`}
                             >
                               {mode}
                             </button>
@@ -5712,26 +5714,26 @@ export default function GoogleDocsHeader({
                       </div>
                     ) : null}
                     <div className="flex items-center justify-between gap-3 px-2 py-1.5">
-                      <span className="text-[15px] text-[#0f172a]">Citation style</span>
+                      <span className="text-[15px] text-ink">Citation style</span>
                       <CitationStyleSelector
                         selectedStyle={citationStyle}
                         onStyleChange={(styleId) => onCitationStyleChange?.(styleId)}
                         className="shrink-0"
-                        triggerClassName="!h-9 !rounded-[10px] !border-[#e5e7eb] !px-3 !py-0 min-w-[132px]"
+                        triggerClassName="!h-9 !rounded-[10px] !border-line !px-3 !py-0 min-w-[132px]"
                         dropdownClassName="!w-[min(92vw,380px)] !max-w-[calc(100vw-16px)] !z-[12620]"
                         hideExample
                       />
                     </div>
-                    <div className="my-2 h-px bg-[#f1f5f9]" />
+                    <div className="my-2 h-px bg-line-2" />
                     {topMenus.map((menu) => (
                       <button
                         key={menu}
                         type="button"
                         onClick={() => setPhoneSheetMenu(menu)}
-                        className="flex w-full items-center justify-between rounded-[10px] px-2 py-2.5 text-left text-[15px] text-[#0f172a] active:bg-[#f8fafc]"
+                        className="flex w-full items-center justify-between rounded-[10px] px-2 py-2.5 text-left text-[15px] text-ink active:bg-soft"
                       >
                         {menu}
-                        <LuChevronRight className="h-5 w-5 text-[#94a3b8]" />
+                        <LuChevronRight className="h-5 w-5 text-subtle" />
                       </button>
                     ))}
                     {editorConfig.renderNavigation ? <button
@@ -5740,9 +5742,9 @@ export default function GoogleDocsHeader({
                         setIsPhoneSheetOpen(false);
                         onMainMenuClick?.();
                       }}
-                      className="mt-1 flex w-full items-center gap-2 rounded-lg px-2 py-2.5 text-left text-[15px] text-[#0f172a] hover:bg-[#f1f5f9]"
+                      className="mt-1 flex w-full items-center gap-2 rounded-lg px-2 py-2.5 text-left text-[15px] text-ink hover:bg-line-2"
                     >
-                      <LuMenu className="h-5 w-5 text-[#64748b]" />
+                      <LuMenu className="h-5 w-5 text-muted" />
                       App menu
                     </button> : null}
                   </>
@@ -5756,36 +5758,36 @@ export default function GoogleDocsHeader({
         ? createPortal(
         <div className="fixed inset-0 z-[13000] flex items-center justify-center bg-[rgba(15,23,42,.35)] p-4">
           <div className="absolute inset-0" aria-hidden="true" onClick={() => setIsWordCountOpen(false)} />
-          <div role="dialog" aria-modal="true" aria-label="Word count" className="relative z-10 w-full max-w-[420px] rounded-[16px] border border-[#e5e7eb] bg-white p-6 shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
+          <div role="dialog" aria-modal="true" aria-label="Word count" className="relative z-10 w-full max-w-[420px] rounded-[16px] border border-line bg-surface p-6 shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-[18px] font-bold text-[#0f172a]">Word count</h2>
+                <h2 className="text-[18px] font-bold text-ink">Word count</h2>
               </div>
               <button
                 type="button"
                 onClick={() => setIsWordCountOpen(false)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#64748b] transition-colors hover:bg-[#f1f5f9]"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-line-2"
                 aria-label="Close word count"
               >
                 <LuX className="h-5 w-5" />
               </button>
             </div>
             <div className="mt-5 grid grid-cols-2 gap-3">
-              <div className="rounded-2xl border border-[#f1f5f9] bg-[#f8fafc] px-4 py-3">
-                <div className="text-[12px] text-[#64748b]">Words</div>
-                <div className="mt-1 text-2xl font-semibold text-[#0f172a]">{wordCountStats.words}</div>
+              <div className="rounded-2xl border border-line-2 bg-soft px-4 py-3">
+                <div className="text-[12px] text-muted">Words</div>
+                <div className="mt-1 text-2xl font-semibold text-ink">{wordCountStats.words}</div>
               </div>
-              <div className="rounded-2xl border border-[#f1f5f9] bg-[#f8fafc] px-4 py-3">
-                <div className="text-[12px] text-[#64748b]">Paragraphs</div>
-                <div className="mt-1 text-2xl font-semibold text-[#0f172a]">{wordCountStats.paragraphs}</div>
+              <div className="rounded-2xl border border-line-2 bg-soft px-4 py-3">
+                <div className="text-[12px] text-muted">Paragraphs</div>
+                <div className="mt-1 text-2xl font-semibold text-ink">{wordCountStats.paragraphs}</div>
               </div>
-              <div className="rounded-2xl border border-[#f1f5f9] bg-[#f8fafc] px-4 py-3">
-                <div className="text-[12px] text-[#64748b]">Characters</div>
-                <div className="mt-1 text-2xl font-semibold text-[#0f172a]">{wordCountStats.characters}</div>
+              <div className="rounded-2xl border border-line-2 bg-soft px-4 py-3">
+                <div className="text-[12px] text-muted">Characters</div>
+                <div className="mt-1 text-2xl font-semibold text-ink">{wordCountStats.characters}</div>
               </div>
-              <div className="rounded-2xl border border-[#f1f5f9] bg-[#f8fafc] px-4 py-3">
-                <div className="text-[12px] text-[#64748b]">Characters excluding spaces</div>
-                <div className="mt-1 text-2xl font-semibold text-[#0f172a]">
+              <div className="rounded-2xl border border-line-2 bg-soft px-4 py-3">
+                <div className="text-[12px] text-muted">Characters excluding spaces</div>
+                <div className="mt-1 text-2xl font-semibold text-ink">
                   {wordCountStats.charactersNoSpaces}
                 </div>
               </div>
@@ -5824,17 +5826,17 @@ export default function GoogleDocsHeader({
       {isGeminiDialogOpen ? (
         <div className="fixed inset-0 z-[13000] flex items-center justify-center bg-[rgba(15,23,42,.35)] p-4">
           <div className="absolute inset-0" aria-hidden="true" onClick={() => setIsGeminiDialogOpen(false)} />
-          <div className="relative z-10 w-full max-w-[620px] rounded-[16px] border border-[#e5e7eb] bg-white shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
-            <div className="border-b border-[#f1f5f9] px-6 py-5">
-              <h2 className="text-[18px] font-bold text-[#0f172a]">AI assistant</h2>
-              <p className="mt-1 text-[13px] text-[#64748b]">
+          <div className="relative z-10 w-full max-w-[620px] rounded-[16px] border border-line bg-surface shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
+            <div className="border-b border-line-2 px-6 py-5">
+              <h2 className="text-[18px] font-bold text-ink">AI assistant</h2>
+              <p className="mt-1 text-[13px] text-muted">
                 Launch one of the existing AI tools with your current selection or document context.
               </p>
             </div>
             <div className="space-y-4 px-6 py-5">
-              <div className="rounded-2xl border border-[#f1f5f9] bg-[#f8fafc] px-4 py-3">
-                <div className="text-[11px] font-semibold uppercase tracking-wide text-[#64748b]">Context</div>
-                <div className="mt-2 max-h-[180px] overflow-y-auto whitespace-pre-wrap text-sm text-[#0f172a]">
+              <div className="rounded-2xl border border-line-2 bg-soft px-4 py-3">
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-muted">Context</div>
+                <div className="mt-2 max-h-[180px] overflow-y-auto whitespace-pre-wrap text-sm text-ink">
                   {assistantContext || 'Select text in the document to send focused context into an AI tool.'}
                 </div>
               </div>
@@ -5850,14 +5852,14 @@ export default function GoogleDocsHeader({
                 <button
                   type="button"
                   onClick={() => void handleLaunchAssistantTool('/ai-detector')}
-                  className="inline-flex h-10 items-center justify-center rounded-xl border border-[#e5e7eb] px-4 text-sm font-medium text-[#334155] transition-colors hover:bg-[#f1f5f9]"
+                  className="inline-flex h-10 items-center justify-center rounded-xl border border-line px-4 text-sm font-medium text-ink-2 transition-colors hover:bg-line-2"
                 >
                   Open AI Detector
                 </button>
                 <button
                   type="button"
                   onClick={() => void handleLaunchAssistantTool('/humanizer')}
-                  className="inline-flex h-10 items-center justify-center rounded-xl border border-[#e5e7eb] px-4 text-sm font-medium text-[#334155] transition-colors hover:bg-[#f1f5f9]"
+                  className="inline-flex h-10 items-center justify-center rounded-xl border border-line px-4 text-sm font-medium text-ink-2 transition-colors hover:bg-line-2"
                 >
                   Open Humanizer
                 </button>
@@ -5870,10 +5872,10 @@ export default function GoogleDocsHeader({
       {isCitationDialogOpen ? (
         <div className="fixed inset-0 z-[13000] flex items-center justify-center bg-[rgba(15,23,42,.35)] p-4">
           <div className="absolute inset-0" aria-hidden="true" onClick={() => setIsCitationDialogOpen(false)} />
-          <div className="relative z-10 w-full max-w-[620px] rounded-[16px] border border-[#e5e7eb] bg-white shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
-            <div className="border-b border-[#f1f5f9] px-6 py-5">
-              <h2 className="text-[18px] font-bold text-[#0f172a]">Citation</h2>
-              <p className="mt-1 text-[13px] text-[#64748b]">
+          <div className="relative z-10 w-full max-w-[620px] rounded-[16px] border border-line bg-surface shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
+            <div className="border-b border-line-2 px-6 py-5">
+              <h2 className="text-[18px] font-bold text-ink">Citation</h2>
+              <p className="mt-1 text-[13px] text-muted">
                 Insert a citation and reuse saved entries when building a bibliography.
               </p>
             </div>
@@ -5883,18 +5885,18 @@ export default function GoogleDocsHeader({
                 value={citationLabel}
                 onChange={(event) => setCitationLabel(event.target.value)}
                 placeholder="Author, title, or citation label"
-                className="h-11 w-full rounded-2xl border border-[#e5e7eb] px-4 text-[14px] text-[#0f172a] outline-none transition-colors focus:border-[var(--theme-primary)]"
+                className="h-11 w-full rounded-2xl border border-line px-4 text-[14px] text-ink outline-none transition-colors focus:border-[var(--theme-primary)]"
               />
               <input
                 type="url"
                 value={citationUrl}
                 onChange={(event) => setCitationUrl(event.target.value)}
                 placeholder="Optional source URL"
-                className="h-11 w-full rounded-2xl border border-[#e5e7eb] px-4 text-[14px] text-[#0f172a] outline-none transition-colors focus:border-[var(--theme-primary)]"
+                className="h-11 w-full rounded-2xl border border-line px-4 text-[14px] text-ink outline-none transition-colors focus:border-[var(--theme-primary)]"
               />
               {savedCitations.length ? (
-                <div className="rounded-2xl border border-[#f1f5f9] px-4 py-3">
-                  <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-[#64748b]">
+                <div className="rounded-2xl border border-line-2 px-4 py-3">
+                  <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted">
                     Saved citations
                   </div>
                   <div className="space-y-2">
@@ -5906,10 +5908,10 @@ export default function GoogleDocsHeader({
                           setCitationLabel(entry.label);
                           setCitationUrl(entry.url ?? '');
                         }}
-                        className="flex w-full items-center justify-between rounded-xl bg-[#f8fafc] px-3 py-2 text-left text-sm text-[#0f172a] transition-colors hover:bg-[var(--theme-primary-tint)]"
+                        className="flex w-full items-center justify-between rounded-xl bg-soft px-3 py-2 text-left text-sm text-ink transition-colors hover:bg-[var(--theme-primary-tint)]"
                       >
                         <span className="truncate">{entry.label}</span>
-                        <span className="ml-3 shrink-0 text-[11px] text-[#64748b]">Reuse</span>
+                        <span className="ml-3 shrink-0 text-[11px] text-muted">Reuse</span>
                       </button>
                     ))}
                   </div>
@@ -5919,7 +5921,7 @@ export default function GoogleDocsHeader({
                 <button
                   type="button"
                   onClick={() => setIsCitationDialogOpen(false)}
-                  className="inline-flex h-10 items-center rounded-xl px-4 text-sm font-medium text-[#64748b] transition-colors hover:bg-[#f1f5f9]"
+                  className="inline-flex h-10 items-center rounded-xl px-4 text-sm font-medium text-muted transition-colors hover:bg-line-2"
                 >
                   Cancel
                 </button>
@@ -5938,10 +5940,10 @@ export default function GoogleDocsHeader({
       {isEquationDialogOpen ? (
         <div className="fixed inset-0 z-[13000] flex items-center justify-center bg-[rgba(15,23,42,.35)] p-4">
           <div className="absolute inset-0" aria-hidden="true" onClick={() => setIsEquationDialogOpen(false)} />
-          <div className="relative z-10 w-full max-w-[620px] rounded-[16px] border border-[#e5e7eb] bg-white shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
-            <div className="border-b border-[#f1f5f9] px-6 py-5">
-              <h2 className="text-[18px] font-bold text-[#0f172a]">Insert equation</h2>
-              <p className="mt-1 text-[13px] text-[#64748b]">
+          <div className="relative z-10 w-full max-w-[620px] rounded-[16px] border border-line bg-surface shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
+            <div className="border-b border-line-2 px-6 py-5">
+              <h2 className="text-[18px] font-bold text-ink">Insert equation</h2>
+              <p className="mt-1 text-[13px] text-muted">
                 Add a formula block using LaTeX-style equation text.
               </p>
             </div>
@@ -5950,16 +5952,16 @@ export default function GoogleDocsHeader({
                 value={equationValue}
                 onChange={(event) => setEquationValue(event.target.value)}
                 placeholder="E = mc^2"
-                className="min-h-[160px] w-full resize-none rounded-2xl border border-[#e5e7eb] px-4 py-3 font-mono text-[14px] text-[#0f172a] outline-none transition-colors focus:border-[var(--theme-primary)]"
+                className="min-h-[160px] w-full resize-none rounded-2xl border border-line px-4 py-3 font-mono text-[14px] text-ink outline-none transition-colors focus:border-[var(--theme-primary)]"
               />
-              <div className="rounded-2xl border border-[#f1f5f9] bg-[#f8fafc] px-4 py-3 text-sm text-[#64748b]">
+              <div className="rounded-2xl border border-line-2 bg-soft px-4 py-3 text-sm text-muted">
                 The equation is inserted as a dedicated formula block using `$$ ... $$` content so it can be refined later.
               </div>
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsEquationDialogOpen(false)}
-                  className="inline-flex h-10 items-center rounded-xl px-4 text-sm font-medium text-[#64748b] transition-colors hover:bg-[#f1f5f9]"
+                  className="inline-flex h-10 items-center rounded-xl px-4 text-sm font-medium text-muted transition-colors hover:bg-line-2"
                 >
                   Cancel
                 </button>
@@ -5979,26 +5981,26 @@ export default function GoogleDocsHeader({
         ? createPortal(
         <div className="fixed inset-0 z-[13000] flex items-center justify-center bg-[rgba(15,23,42,.35)] p-4">
           <div className="absolute inset-0" aria-hidden="true" onClick={() => setIsDetailsDialogOpen(false)} />
-          <div role="dialog" aria-modal="true" aria-label="Document details" className="relative z-10 w-full max-w-[560px] rounded-[16px] border border-[#e5e7eb] bg-white shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
-            <div className="border-b border-[#f1f5f9] px-6 py-5">
-              <h2 className="text-[18px] font-bold text-[#0f172a]">Document details</h2>
+          <div role="dialog" aria-modal="true" aria-label="Document details" className="relative z-10 w-full max-w-[560px] rounded-[16px] border border-line bg-surface shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
+            <div className="border-b border-line-2 px-6 py-5">
+              <h2 className="text-[18px] font-bold text-ink">Document details</h2>
             </div>
             <div className="grid gap-3 px-6 py-5 sm:grid-cols-2">
-              <div className="rounded-2xl border border-[#f1f5f9] px-4 py-3">
-                <div className="text-[11px] font-semibold uppercase tracking-wide text-[#64748b]">Title</div>
-                <div className="mt-1 text-sm text-[#0f172a]">{documentTitle}</div>
+              <div className="rounded-2xl border border-line-2 px-4 py-3">
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-muted">Title</div>
+                <div className="mt-1 text-sm text-ink">{documentTitle}</div>
               </div>
-              <div className="rounded-2xl border border-[#f1f5f9] px-4 py-3">
-                <div className="text-[11px] font-semibold uppercase tracking-wide text-[#64748b]">Words</div>
-                <div className="mt-1 text-sm text-[#0f172a]">{wordCountStats.words.toLocaleString()}</div>
+              <div className="rounded-2xl border border-line-2 px-4 py-3">
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-muted">Words</div>
+                <div className="mt-1 text-sm text-ink">{wordCountStats.words.toLocaleString()}</div>
               </div>
-              <div className="rounded-2xl border border-[#f1f5f9] px-4 py-3">
-                <div className="text-[11px] font-semibold uppercase tracking-wide text-[#64748b]">Language</div>
-                <div className="mt-1 text-sm text-[#0f172a]">{documentLanguage}</div>
+              <div className="rounded-2xl border border-line-2 px-4 py-3">
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-muted">Language</div>
+                <div className="mt-1 text-sm text-ink">{documentLanguage}</div>
               </div>
-              <div className="rounded-2xl border border-[#f1f5f9] px-4 py-3">
-                <div className="text-[11px] font-semibold uppercase tracking-wide text-[#64748b]">Characters</div>
-                <div className="mt-1 text-sm text-[#0f172a]">{wordCountStats.characters.toLocaleString()}</div>
+              <div className="rounded-2xl border border-line-2 px-4 py-3">
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-muted">Characters</div>
+                <div className="mt-1 text-sm text-ink">{wordCountStats.characters.toLocaleString()}</div>
               </div>
             </div>
             <div className="flex justify-end px-6 pb-6">
@@ -6023,10 +6025,10 @@ export default function GoogleDocsHeader({
             aria-hidden="true"
             onClick={() => setIsKeyboardShortcutsOpen(false)}
           />
-          <div role="dialog" aria-modal="true" aria-label="Keyboard shortcuts" className="relative z-10 w-full max-w-[520px] rounded-[16px] border border-[#e5e7eb] bg-white shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
-            <div className="flex items-center justify-between border-b border-[#f1f5f9] px-6 py-5">
+          <div role="dialog" aria-modal="true" aria-label="Keyboard shortcuts" className="relative z-10 w-full max-w-[520px] rounded-[16px] border border-line bg-surface shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
+            <div className="flex items-center justify-between border-b border-line-2 px-6 py-5">
               <div>
-                <h2 className="text-[18px] font-bold text-[#0f172a]">Keyboard shortcuts</h2>
+                <h2 className="text-[18px] font-bold text-ink">Keyboard shortcuts</h2>
               </div>
               <button
                 type="button"
@@ -6040,10 +6042,10 @@ export default function GoogleDocsHeader({
               {keyboardShortcutGroups.map((item) => (
                 <div
                   key={item.label}
-                  className="flex items-center justify-between rounded-2xl border border-[#f1f5f9] px-4 py-3"
+                  className="flex items-center justify-between rounded-2xl border border-line-2 px-4 py-3"
                 >
-                  <span className="text-[14px] text-[#0f172a]">{item.label}</span>
-                  <kbd className="rounded-md bg-[#f1f5f9] px-2 py-1 text-[12px] font-medium text-[#334155]">
+                  <span className="text-[14px] text-ink">{item.label}</span>
+                  <kbd className="rounded-md bg-line-2 px-2 py-1 text-[12px] font-medium text-ink-2">
                     {item.shortcut}
                   </kbd>
                 </div>
@@ -6085,19 +6087,19 @@ export default function GoogleDocsHeader({
       {isMoreFontsOpen ? (
         <div className="fixed inset-0 z-[13000] flex items-center justify-center bg-[rgba(15,23,42,.35)] p-4">
           <div className="absolute inset-0" aria-hidden="true" onClick={() => setIsMoreFontsOpen(false)} />
-          <div className="relative z-10 flex max-h-[80vh] w-full max-w-[560px] flex-col overflow-hidden rounded-[16px] border border-[#e5e7eb] bg-white shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
-            <div className="border-b border-[#f1f5f9] px-6 py-5">
+          <div className="relative z-10 flex max-h-[80vh] w-full max-w-[560px] flex-col overflow-hidden rounded-[16px] border border-line bg-surface shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]">
+            <div className="border-b border-line-2 px-6 py-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h2 className="text-[18px] font-bold text-[#0f172a]">More fonts</h2>
-                  <p className="mt-1 text-sm text-[#64748b]">
+                  <h2 className="text-[18px] font-bold text-ink">More fonts</h2>
+                  <p className="mt-1 text-sm text-muted">
                     Search the full font catalog and apply a family or variant.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsMoreFontsOpen(false)}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#64748b] transition-colors hover:bg-[#f1f5f9]"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-line-2"
                   aria-label="Close more fonts"
                 >
                   <LuX className="h-5 w-5" />
@@ -6108,18 +6110,18 @@ export default function GoogleDocsHeader({
                 value={fontCatalogQuery}
                 onChange={(event) => setFontCatalogQuery(event.target.value)}
                 placeholder="Search fonts"
-                className="mt-4 h-10 w-full rounded-2xl border border-[#e5e7eb] px-4 text-[14px] text-[#0f172a] outline-none transition-colors focus:border-[var(--theme-primary)]"
+                className="mt-4 h-10 w-full rounded-2xl border border-line px-4 text-[14px] text-ink outline-none transition-colors focus:border-[var(--theme-primary)]"
               />
             </div>
             <div className="overflow-y-auto px-4 py-3">
               <div className="space-y-2">
                 {filteredFontCatalog.map((item) => (
-                  <div key={`modal-${item.family}`} className="rounded-2xl border border-[#f1f5f9] bg-[#f8fafc] p-3">
+                  <div key={`modal-${item.family}`} className="rounded-2xl border border-line-2 bg-soft p-3">
                     <div className="flex items-center justify-between gap-3">
                       <button
                         type="button"
                         onClick={() => selectFontFamily(item.family)}
-                        className="min-w-0 flex-1 rounded-xl px-3 py-2 text-left text-[16px] text-[#0f172a] transition-colors hover:bg-white"
+                        className="min-w-0 flex-1 rounded-xl px-3 py-2 text-left text-[16px] text-ink transition-colors hover:bg-surface"
                         style={{ fontFamily: `"${item.family}", "Google Sans", Roboto, Arial, sans-serif` }}
                       >
                         {item.family}
@@ -6137,7 +6139,7 @@ export default function GoogleDocsHeader({
                             key={`modal-${item.family}-${variant}`}
                             type="button"
                             onClick={() => selectFontFamily(item.family, variant)}
-                            className="rounded-full border border-[#e5e7eb] bg-white px-3 py-1.5 text-[12px] text-[#0f172a] transition-colors hover:bg-[var(--theme-primary-tint)]"
+                            className="rounded-full border border-line bg-surface px-3 py-1.5 text-[12px] text-ink transition-colors hover:bg-[var(--theme-primary-tint)]"
                             style={{
                               fontFamily: `"${item.family}", "Google Sans", Roboto, Arial, sans-serif`,
                               fontWeight: getFontWeightValue(variant),
@@ -6151,7 +6153,7 @@ export default function GoogleDocsHeader({
                   </div>
                 ))}
                 {filteredFontCatalog.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-[#e5e7eb] bg-white px-4 py-6 text-sm text-[#64748b]">
+                  <div className="rounded-2xl border border-dashed border-line bg-surface px-4 py-6 text-sm text-muted">
                     No fonts match your search.
                   </div>
                 ) : null}

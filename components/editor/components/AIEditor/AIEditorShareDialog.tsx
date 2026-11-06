@@ -19,7 +19,7 @@ const ROLES: { value: ShareRole; label: string; verb: string }[] = [
   { value: 'editor', label: 'Editor', verb: 'edit' },
 ];
 
-const SELECT = 'h-8 rounded-lg bg-transparent px-1.5 text-[13px] font-medium text-[#334155] outline-none hover:bg-[#f1f5f9] focus:bg-[#f1f5f9] disabled:cursor-default disabled:hover:bg-transparent';
+const SELECT = 'h-8 rounded-lg bg-transparent px-1.5 text-[13px] font-medium text-ink-2 outline-none hover:bg-line-2 focus:bg-line-2 disabled:cursor-default disabled:hover:bg-transparent';
 
 type AIEditorShareDialogProps = {
   isOpen: boolean;
@@ -43,7 +43,7 @@ type AIEditorShareDialogProps = {
 
 function Avatar({ name }: { name: string }) {
   return (
-    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#eff6ff] text-[13px] font-semibold text-[#1d4ed8]" aria-hidden="true">
+    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-50 text-[13px] font-semibold text-brand-600" aria-hidden="true">
       {(name.trim()[0] || '?').toUpperCase()}
     </span>
   );
@@ -117,10 +117,10 @@ export default function AIEditorShareDialog({
     <div role="dialog" aria-modal="true" aria-label="Share" className="fixed inset-0 z-[13000] flex items-end justify-center bg-[rgba(15,23,42,0.35)] sm:items-center sm:p-4">
       <div className="absolute inset-0" aria-hidden="true" onClick={onClose} />
 
-      <div className="relative z-10 flex max-h-[90vh] w-full max-w-[500px] flex-col overflow-hidden rounded-t-[20px] bg-white shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)] sm:rounded-[16px]">
+      <div className="relative z-10 flex max-h-[90vh] w-full max-w-[500px] flex-col overflow-hidden rounded-t-[20px] bg-surface shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)] sm:rounded-[16px]">
         <div className="flex items-center gap-3 px-5 pb-2 pt-4">
-          <h2 className="min-w-0 flex-1 truncate text-[17px] font-semibold text-[#0f172a]">Share “{documentSnapshot.title || 'Untitled document'}”</h2>
-          <button type="button" onClick={onClose} aria-label="Close share dialog" className="grid h-8 w-8 place-items-center rounded-lg text-[#94a3b8] hover:bg-[#f1f5f9] hover:text-[#0f172a]">
+          <h2 className="min-w-0 flex-1 truncate text-[17px] font-semibold text-ink">Share “{documentSnapshot.title || 'Untitled document'}”</h2>
+          <button type="button" onClick={onClose} aria-label="Close share dialog" className="grid h-8 w-8 place-items-center rounded-lg text-subtle hover:bg-line-2 hover:text-ink">
             <LuX className="h-[18px] w-[18px]" />
           </button>
         </div>
@@ -132,7 +132,7 @@ export default function AIEditorShareDialog({
                 event.preventDefault();
                 invite();
               }}
-              className="flex items-center gap-1 rounded-[10px] border border-[#e2e8f0] py-1 pl-3 pr-1 focus-within:border-[var(--theme-primary,#2563eb)] focus-within:shadow-[0_0_0_3px_#eff6ff]"
+              className="flex items-center gap-1 rounded-[10px] border border-line py-1 pl-3 pr-1 focus-within:border-[var(--theme-primary,var(--color-brand))] focus-within:shadow-[0_0_0_3px_var(--color-brand-50)]"
             >
               <input
                 type="email"
@@ -141,26 +141,26 @@ export default function AIEditorShareDialog({
                 placeholder="Add people by email"
                 aria-label="Email"
                 autoFocus
-                className="min-w-0 flex-1 bg-transparent text-[14px] text-[#0f172a] outline-none placeholder:text-[#94a3b8]"
+                className="min-w-0 flex-1 bg-transparent text-[14px] text-ink outline-none placeholder:text-subtle"
               />
               <select value={inviteRole} onChange={(event) => setInviteRole(event.target.value as ShareRole)} aria-label="Role" className={SELECT}>
                 {ROLES.map((role) => <option key={role.value} value={role.value}>{role.label}</option>)}
               </select>
-              <button type="submit" disabled={!emailValid} className="h-8 rounded-lg bg-[var(--theme-primary,#2563eb)] px-3 text-[13px] font-semibold text-white hover:bg-[#1d4ed8] disabled:bg-[#e2e8f0] disabled:text-[#94a3b8]">
+              <button type="submit" disabled={!emailValid} className="h-8 rounded-lg bg-[var(--theme-primary,var(--color-brand))] px-3 text-[13px] font-semibold text-white hover:bg-brand-600 disabled:bg-line disabled:text-subtle">
                 Invite
               </button>
             </form>
           ) : null}
 
-          <h3 className="mb-1 mt-4 text-[12.5px] font-medium text-[#94a3b8]">People with access</h3>
+          <h3 className="mb-1 mt-4 text-[12.5px] font-medium text-subtle">People with access</h3>
           <ul>
             <li className="flex items-center gap-3 py-1.5">
               <Avatar name={currentUserDisplayName} />
               <div className="min-w-0 flex-1">
-                <div className="truncate text-[14px] font-medium text-[#0f172a]">{currentUserDisplayName} <span className="font-normal text-[#94a3b8]">(you)</span></div>
-                {currentUserEmail ? <div className="truncate text-[12.5px] text-[#64748b]">{currentUserEmail}</div> : null}
+                <div className="truncate text-[14px] font-medium text-ink">{currentUserDisplayName} <span className="font-normal text-subtle">(you)</span></div>
+                {currentUserEmail ? <div className="truncate text-[12.5px] text-muted">{currentUserEmail}</div> : null}
               </div>
-              <span className="pr-1.5 text-[13px] text-[#94a3b8]">{isOwner ? 'Owner' : null}</span>
+              <span className="pr-1.5 text-[13px] text-subtle">{isOwner ? 'Owner' : null}</span>
             </li>
             {members
               .filter((member) => member.email.toLowerCase() !== (currentUserEmail || '').toLowerCase())
@@ -168,28 +168,28 @@ export default function AIEditorShareDialog({
                 <li key={member.id} className="flex items-center gap-3 py-1.5">
                   <Avatar name={member.displayName || member.email} />
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-[14px] font-medium text-[#0f172a]">{member.displayName || member.email}</div>
-                    {member.displayName && member.displayName !== member.email ? <div className="truncate text-[12.5px] text-[#64748b]">{member.email}</div> : null}
+                    <div className="truncate text-[14px] font-medium text-ink">{member.displayName || member.email}</div>
+                    {member.displayName && member.displayName !== member.email ? <div className="truncate text-[12.5px] text-muted">{member.email}</div> : null}
                   </div>
                   {isOwner ? (
                     <>
                       <select value={member.role} onChange={(event) => onUpdateMemberRole(member.id, event.target.value as ShareRole)} aria-label={`Role for ${member.email}`} className={SELECT}>
                         {ROLES.map((role) => <option key={role.value} value={role.value}>{role.label}</option>)}
                       </select>
-                      <button type="button" onClick={() => onRemoveMember(member.id)} aria-label={`Remove ${member.email}`} title="Remove" className="grid h-8 w-8 place-items-center rounded-lg text-[#94a3b8] hover:bg-[#fef2f2] hover:text-[#b91c1c]">
+                      <button type="button" onClick={() => onRemoveMember(member.id)} aria-label={`Remove ${member.email}`} title="Remove" className="grid h-8 w-8 place-items-center rounded-lg text-subtle hover:bg-[#fef2f2] hover:text-[#b91c1c]">
                         <LuX className="h-4 w-4" />
                       </button>
                     </>
                   ) : (
-                    <span className="pr-1.5 text-[13px] text-[#94a3b8]">{ROLES.find((role) => role.value === member.role)?.label}</span>
+                    <span className="pr-1.5 text-[13px] text-subtle">{ROLES.find((role) => role.value === member.role)?.label}</span>
                   )}
                 </li>
               ))}
           </ul>
 
-          <h3 className="mb-1 mt-4 text-[12.5px] font-medium text-[#94a3b8]">General access</h3>
+          <h3 className="mb-1 mt-4 text-[12.5px] font-medium text-subtle">General access</h3>
           <div className="flex items-center gap-3 py-1.5">
-            <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${isLinkSharingEnabled ? 'bg-[#f0fdf4] text-[#15803d]' : 'bg-[#f1f5f9] text-[#64748b]'}`} aria-hidden="true">
+            <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${isLinkSharingEnabled ? 'bg-[#f0fdf4] text-[#15803d]' : 'bg-line-2 text-muted'}`} aria-hidden="true">
               {isLinkSharingEnabled ? <LuGlobe className="h-4 w-4" /> : <LuLock className="h-4 w-4" />}
             </span>
             <div className="min-w-0 flex-1">
@@ -198,12 +198,12 @@ export default function AIEditorShareDialog({
                 disabled={!isOwner}
                 onChange={(event) => onUpdateShareSettings({ isLinkSharingEnabled: event.target.value === 'link' })}
                 aria-label="General access"
-                className={`${SELECT} -ml-1.5 text-[14px] text-[#0f172a]`}
+                className={`${SELECT} -ml-1.5 text-[14px] text-ink`}
               >
                 <option value="restricted">Restricted</option>
                 <option value="link">Anyone with the link</option>
               </select>
-              <div className="text-[12.5px] text-[#64748b]">
+              <div className="text-[12.5px] text-muted">
                 {isLinkSharingEnabled ? `Anyone with the link can ${linkRole.verb}` : 'Only people added can open'}
               </div>
             </div>
@@ -215,12 +215,12 @@ export default function AIEditorShareDialog({
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-2 border-t border-[#f1f5f9] px-5 py-3">
-          <button type="button" onClick={() => void copyLink()} className="inline-flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-[13.5px] font-semibold text-[var(--theme-primary,#2563eb)] hover:bg-[#eff6ff]">
+        <div className="flex items-center justify-between gap-2 border-t border-line-2 px-5 py-3">
+          <button type="button" onClick={() => void copyLink()} className="inline-flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-[13.5px] font-semibold text-[var(--theme-primary,var(--color-brand))] hover:bg-brand-50">
             {copied ? <LuCheck className="h-4 w-4" /> : <LuLink className="h-4 w-4" />}
             {copied ? 'Copied' : 'Copy link'}
           </button>
-          <button type="button" onClick={onClose} className="h-9 rounded-lg bg-[var(--theme-primary,#2563eb)] px-4 text-[13.5px] font-semibold text-white hover:bg-[#1d4ed8]">
+          <button type="button" onClick={onClose} className="h-9 rounded-lg bg-[var(--theme-primary,var(--color-brand))] px-4 text-[13.5px] font-semibold text-white hover:bg-brand-600">
             Done
           </button>
         </div>

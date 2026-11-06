@@ -62,7 +62,7 @@ function Toggle({ active, onClick, icon, label }: { active: boolean; onClick: ()
       aria-pressed={active}
       title={`${active ? 'Using' : 'Not using'} ${label.toLowerCase()}`}
       className={`inline-flex h-7 shrink-0 items-center gap-1 rounded-full px-2 text-[12.5px] font-medium transition-colors ${
-        active ? 'bg-[#eff6ff] text-[#1d4ed8]' : 'text-[#94a3b8] hover:bg-[#f8fafc] hover:text-[#334155]'
+        active ? 'bg-brand-50 text-brand-600' : 'text-subtle hover:bg-soft hover:text-ink-2'
       }`}
     >
       {/* A narrow chat (the panel shares the screen with the menu and the page) shows the words only. */}
@@ -298,20 +298,20 @@ export default function ChatPanel({
   };
 
   const starters = inDocument ? STARTERS : GENERAL_STARTERS;
-  const iconButton = 'inline-flex h-8 w-8 items-center justify-center rounded-lg text-[#94a3b8] transition-colors hover:bg-[#f1f5f9] hover:text-[#0f172a]';
+  const iconButton = 'inline-flex h-8 w-8 items-center justify-center rounded-lg text-subtle transition-colors hover:bg-line-2 hover:text-ink';
   const historyMenu = (
     <div className="relative">
       <button type="button" onClick={() => setShowHistory((value) => !value)} aria-expanded={showHistory} aria-label="Chat history" title="Chat history" className={iconButton}>
         <LuHistory className="h-[17px] w-[17px]" />
       </button>
       {showHistory ? (
-        <div className="absolute right-0 top-9 z-20 max-h-[320px] w-[280px] overflow-y-auto rounded-[14px] border border-[#e5e7eb] bg-white p-1 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]">
-          {threads.length === 0 ? <div className="px-3 py-2.5 text-[13px] text-[#64748b]">No chats yet</div> : null}
+        <div className="absolute right-0 top-9 z-20 max-h-[320px] w-[280px] overflow-y-auto rounded-[14px] border border-line bg-surface p-1 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]">
+          {threads.length === 0 ? <div className="px-3 py-2.5 text-[13px] text-muted">No chats yet</div> : null}
           {threads.map((thread) => (
-            <div key={thread.id} className={`group flex items-center gap-1 rounded-[10px] px-1 ${thread.id === threadId ? 'bg-[#eff6ff]' : 'hover:bg-[#f8fafc]'}`}>
+            <div key={thread.id} className={`group flex items-center gap-1 rounded-[10px] px-1 ${thread.id === threadId ? 'bg-brand-50' : 'hover:bg-soft'}`}>
               <button type="button" onClick={() => void openThread(thread.id)} className="min-w-0 flex-1 px-2 py-2 text-left">
-                <div className="truncate text-[13.5px] font-medium text-[#0f172a]">{thread.title}</div>
-                <div className="text-[12px] text-[#64748b]">{new Date(thread.updatedAt).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</div>
+                <div className="truncate text-[13.5px] font-medium text-ink">{thread.title}</div>
+                <div className="text-[12px] text-muted">{new Date(thread.updatedAt).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</div>
               </button>
               <button
                 type="button"
@@ -321,7 +321,7 @@ export default function ChatPanel({
                   if (thread.id === threadId) newChat();
                   refreshThreads();
                 }}
-                className="rounded-lg p-1.5 text-[#94a3b8] opacity-70 hover:bg-white hover:text-[#334155] group-hover:opacity-100"
+                className="rounded-lg p-1.5 text-subtle opacity-70 hover:bg-surface hover:text-ink-2 group-hover:opacity-100"
               >
                 <LuTrash2 className="h-4 w-4" />
               </button>
@@ -338,10 +338,10 @@ export default function ChatPanel({
   );
 
   return (
-    <div className="relative flex h-full min-h-0 flex-col bg-white">
+    <div className="relative flex h-full min-h-0 flex-col bg-surface">
       {onClose ? (
-        <div className="flex h-[52px] shrink-0 items-center gap-0.5 border-b border-[#f1f5f9] pl-4 pr-2">
-          <h2 className="min-w-0 flex-1 truncate text-[14.5px] font-semibold text-[#0f172a]">AI Chat</h2>
+        <div className="flex h-[52px] shrink-0 items-center gap-0.5 border-b border-line-2 pl-4 pr-2">
+          <h2 className="min-w-0 flex-1 truncate text-[14.5px] font-semibold text-ink">AI Chat</h2>
           {historyMenu}
           {newChatButton}
           <button type="button" onClick={onClose} aria-label="Close panel" title="Close" className={iconButton}>
@@ -358,17 +358,17 @@ export default function ChatPanel({
       <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col gap-[14px] overflow-y-auto px-[18px] pb-2 pt-3">
         {rendered.length === 0 ? (
           <div className="my-auto flex flex-col items-center px-1 pb-4 text-center">
-            <span className="grid h-11 w-11 place-items-center rounded-[14px] bg-[#eff6ff] text-[var(--theme-primary,#2563eb)]">
+            <span className="grid h-11 w-11 place-items-center rounded-[14px] bg-brand-50 text-[var(--theme-primary,var(--color-brand))]">
               <LuSparkles className="h-5 w-5" />
             </span>
-            <p className="mt-3 text-[16px] font-semibold text-[#0f172a]">How can I help?</p>
+            <p className="mt-3 text-[16px] font-semibold text-ink">How can I help?</p>
             <div className="mt-4 flex w-full flex-col gap-1.5">
               {starters.map((starter) => (
                 <button
                   key={starter}
                   type="button"
                   onClick={() => void send(starter)}
-                  className="rounded-[12px] border border-[#e5e7eb] px-3 py-2.5 text-left text-[13.5px] leading-snug text-[#334155] transition-colors hover:border-[#bfdbfe] hover:bg-[#f8fafc] hover:text-[#0f172a]"
+                  className="rounded-[12px] border border-line px-3 py-2.5 text-left text-[13.5px] leading-snug text-ink-2 transition-colors hover:border-primary-200 hover:bg-soft hover:text-ink"
                 >
                   {starter}
                 </button>
@@ -378,39 +378,39 @@ export default function ChatPanel({
         ) : null}
         {rendered.map((message) =>
           message.role === 'user' ? (
-            <div key={message.id} className="max-w-[82%] self-end rounded-[16px_16px_4px_16px] bg-[var(--theme-primary,#2563eb)] px-[14px] py-[10px] text-[14px] leading-[1.5] text-white">
+            <div key={message.id} className="max-w-[82%] self-end rounded-[16px_16px_4px_16px] bg-[var(--theme-primary,var(--color-brand))] px-[14px] py-[10px] text-[14px] leading-[1.5] text-white">
               {message.selection ? <div className="mb-1.5 line-clamp-2 border-l-2 border-white/40 pl-2 text-[12.5px] text-white/80">{message.selection}</div> : null}
               <div className="whitespace-pre-wrap">{message.content}</div>
             </div>
           ) : (
-            <div key={message.id} className="text-[14px] leading-[1.6] text-[#334155] [&_b]:font-bold [&_b]:text-[#0f172a] [&_strong]:font-bold [&_strong]:text-[#0f172a]">
+            <div key={message.id} className="text-[14px] leading-[1.6] text-ink-2 [&_b]:font-bold [&_b]:text-ink [&_strong]:font-bold [&_strong]:text-ink">
               {message.content ? (
                 <div className="ce-chat-markdown">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{previewAIText(message.content, new Map(), message.sources || [])}</ReactMarkdown>
                 </div>
               ) : (
-                <div className="flex items-center gap-1.5 py-1 text-[13px] text-[#64748b]">
-                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#94a3b8]" />
-                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#94a3b8] [animation-delay:120ms]" />
-                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#94a3b8] [animation-delay:240ms]" />
+                <div className="flex items-center gap-1.5 py-1 text-[13px] text-muted">
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-subtle" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-subtle [animation-delay:120ms]" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-subtle [animation-delay:240ms]" />
                   {message.sources?.length ? `Reading ${message.sources.length} sources…` : 'Thinking…'}
                 </div>
               )}
               {message.sources?.length && message.id !== 'pending' ? (
                 <div className="mt-[10px] flex flex-col gap-[7px]">
                   {message.sources.map((source) => (
-                    <div key={`${message.id}-${source.n}`} className="flex items-start gap-[9px] rounded-[11px] border border-[#e5e7eb] px-[10px] py-[9px] text-[12.5px] leading-[1.4]">
-                      <em className="shrink-0 rounded-[6px] bg-[#eff6ff] px-[6px] py-[1px] text-[12px] font-bold not-italic text-[var(--theme-primary,#2563eb)]">{source.n}</em>
+                    <div key={`${message.id}-${source.n}`} className="flex items-start gap-[9px] rounded-[11px] border border-line px-[10px] py-[9px] text-[12.5px] leading-[1.4]">
+                      <em className="shrink-0 rounded-[6px] bg-brand-50 px-[6px] py-[1px] text-[12px] font-bold not-italic text-[var(--theme-primary,var(--color-brand))]">{source.n}</em>
                       <span className="min-w-0 flex-1">
-                        <b className="block font-bold text-[#0f172a]" title={source.title}>{source.title || shortCitation(source)}</b>
-                        <span className="text-[#64748b]">{sourceMeta(source) || shortCitation(source)}</span>
+                        <b className="block font-bold text-ink" title={source.title}>{source.title || shortCitation(source)}</b>
+                        <span className="text-muted">{sourceMeta(source) || shortCitation(source)}</span>
                       </span>
                       <button
                         type="button"
                         onClick={() => citeOrCopy(source)}
                         disabled={!source.bibtex || (Boolean(onCiteSource) && !canInsert)}
                         aria-label={`${onCiteSource ? 'Cite' : 'Copy reference for'} ${shortCitation(source)}`}
-                        className="ml-auto inline-flex shrink-0 items-center gap-1 whitespace-nowrap font-semibold text-[var(--theme-primary,#2563eb)] hover:underline disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
+                        className="ml-auto inline-flex shrink-0 items-center gap-1 whitespace-nowrap font-semibold text-[var(--theme-primary,var(--color-brand))] hover:underline disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
                       >
                         {onCiteSource ? '+ Cite' : <><LuCopy className="h-3.5 w-3.5" />Copy</>}
                       </button>
@@ -423,7 +423,7 @@ export default function ChatPanel({
                   <button
                     type="button"
                     onClick={() => onInsert(message)}
-                    className="inline-flex h-7 items-center gap-1 rounded-lg px-2 text-[13px] font-medium text-[#64748b] transition-colors hover:bg-[#eff6ff] hover:text-[#1d4ed8]"
+                    className="inline-flex h-7 items-center gap-1 rounded-lg px-2 text-[13px] font-medium text-muted transition-colors hover:bg-brand-50 hover:text-brand-600"
                   >
                     <LuListPlus className="h-4 w-4" /> Insert
                   </button>
@@ -435,12 +435,12 @@ export default function ChatPanel({
         {outOfCredits ? <CreditsUpsell feature="AI Chat" isMobile={isMobile} onDismiss={() => setOutOfCredits(false)} /> : null}
       </div>
 
-      <div className={isMobile ? 'border-t border-[#f1f5f9] bg-white px-3 pb-3 pt-2.5' : 'bg-white px-3 pb-3 pt-1'}>
-        <div className="relative rounded-[16px] border border-[#e2e8f0] bg-white px-3 pb-2 pt-2 transition-shadow focus-within:border-[var(--theme-primary,#2563eb)] focus-within:shadow-[0_0_0_3px_#eff6ff]">
+      <div className={isMobile ? 'border-t border-line-2 bg-surface px-3 pb-3 pt-2.5' : 'bg-surface px-3 pb-3 pt-1'}>
+        <div className="relative rounded-[16px] border border-line bg-surface px-3 pb-2 pt-2 transition-shadow focus-within:border-[var(--theme-primary,var(--color-brand))] focus-within:shadow-[0_0_0_3px_var(--color-brand-50)]">
           {mentionQuery !== null && mentionResults ? (
-            <div className="absolute inset-x-0 bottom-full z-20 mb-2 overflow-hidden rounded-[14px] border border-[#e5e7eb] bg-white p-1 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]">
-              <div className="px-3 pb-1 pt-1.5 text-[11.5px] font-medium text-[#94a3b8]">Library</div>
-              {mentionResults.length === 0 ? <div className="px-3 pb-2 pt-0.5 text-[13px] text-[#64748b]">{mentionQuery ? 'No matches' : 'Your Library is empty'}</div> : null}
+            <div className="absolute inset-x-0 bottom-full z-20 mb-2 overflow-hidden rounded-[14px] border border-line bg-surface p-1 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]">
+              <div className="px-3 pb-1 pt-1.5 text-[11.5px] font-medium text-subtle">Library</div>
+              {mentionResults.length === 0 ? <div className="px-3 pb-2 pt-0.5 text-[13px] text-muted">{mentionQuery ? 'No matches' : 'Your Library is empty'}</div> : null}
               {mentionResults.map((document) => (
                 <button
                   key={document.id}
@@ -449,9 +449,9 @@ export default function ChatPanel({
                     event.preventDefault();
                     addMention(document);
                   }}
-                  className="flex w-full items-center gap-2 rounded-[9px] px-3 py-2 text-left text-[13.5px] text-[#0f172a] hover:bg-[#f8fafc]"
+                  className="flex w-full items-center gap-2 rounded-[9px] px-3 py-2 text-left text-[13.5px] text-ink hover:bg-soft"
                 >
-                  <LuFileText className="h-4 w-4 shrink-0 text-[#94a3b8]" />
+                  <LuFileText className="h-4 w-4 shrink-0 text-subtle" />
                   <span className="truncate">{document.title || document.filename}</span>
                 </button>
               ))}
@@ -461,20 +461,20 @@ export default function ChatPanel({
             <button
               type="button"
               onClick={addContext}
-              className="inline-flex h-6 items-center gap-1 rounded-[7px] border border-[#e5e7eb] px-1.5 text-[12px] font-medium text-[#64748b] transition-colors hover:bg-[#f8fafc] hover:text-[#0f172a]"
+              className="inline-flex h-6 items-center gap-1 rounded-[7px] border border-line px-1.5 text-[12px] font-medium text-muted transition-colors hover:bg-soft hover:text-ink"
             >
               <LuAtSign className="h-3 w-3" />Add context
             </button>
             {context ? (
-              <span className="inline-flex max-w-full items-center gap-1 rounded-[7px] border border-[#e5e7eb] bg-[#f8fafc] px-1.5 py-0.5 text-[12px] text-[#334155]">
+              <span className="inline-flex max-w-full items-center gap-1 rounded-[7px] border border-line bg-soft px-1.5 py-0.5 text-[12px] text-ink-2">
                 <span className="truncate">“{context.label || context.text.slice(0, 60)}”</span>
-                <button type="button" aria-label="Remove context" onClick={onClearContext} className="text-[#94a3b8] hover:text-[#334155]">
+                <button type="button" aria-label="Remove context" onClick={onClearContext} className="text-subtle hover:text-ink-2">
                   <LuX className="h-3.5 w-3.5" />
                 </button>
               </span>
             ) : null}
             {mentions.map((mention) => (
-              <span key={mention.id} className="inline-flex max-w-[220px] items-center gap-1 rounded-[7px] border border-[#dbeafe] bg-[#eff6ff] px-1.5 py-0.5 text-[12px] font-medium text-[#1d4ed8]">
+              <span key={mention.id} className="inline-flex max-w-[220px] items-center gap-1 rounded-[7px] border border-brand-100 bg-brand-50 px-1.5 py-0.5 text-[12px] font-medium text-brand-600">
                 <span className="truncate">@{mention.title}</span>
                 <button type="button" aria-label={`Remove ${mention.title}`} onClick={() => onMentionsChange(mentions.filter((item) => item.id !== mention.id))}>
                   <LuX className="h-3.5 w-3.5" />
@@ -500,16 +500,16 @@ export default function ChatPanel({
             rows={1}
             placeholder={inDocument ? 'Ask about your document…' : 'Ask anything…'}
             aria-label="Message WriteOrbit AI"
-            className={`block max-h-40 min-h-[24px] w-full resize-none bg-transparent px-0.5 leading-[1.45] text-[#0f172a] outline-none placeholder:text-[#94a3b8] ${isMobile ? 'text-[16px]' : 'text-[14.5px]'}`}
+            className={`block max-h-40 min-h-[24px] w-full resize-none bg-transparent px-0.5 leading-[1.45] text-ink outline-none placeholder:text-subtle ${isMobile ? 'text-[16px]' : 'text-[14.5px]'}`}
           />
-          <div className="@container/tools mt-1.5 flex items-center gap-0.5 text-[#64748b]">
+          <div className="@container/tools mt-1.5 flex items-center gap-0.5 text-muted">
             <button
               type="button"
               aria-label="Attach a PDF"
               title="Attach a PDF"
               disabled={attaching}
               onClick={() => fileRef.current?.click()}
-              className="mr-1 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[#94a3b8] transition-colors hover:bg-[#f8fafc] hover:text-[#0f172a] disabled:opacity-50"
+              className="mr-1 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-subtle transition-colors hover:bg-soft hover:text-ink disabled:opacity-50"
             >
               <LuPaperclip className="h-4 w-4" />
             </button>
@@ -530,8 +530,8 @@ export default function ChatPanel({
               }}
             />
             {streaming ? (
-              <button type="button" aria-label="Stop" onClick={() => abortRef.current?.abort()} className="ml-auto inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0f172a] text-white">
-                <span className="h-2.5 w-2.5 rounded-[2px] bg-white" />
+              <button type="button" aria-label="Stop" onClick={() => abortRef.current?.abort()} className="ml-auto inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink text-on-ink">
+                <span className="h-2.5 w-2.5 rounded-[2px] bg-surface" />
               </button>
             ) : (
               <button
@@ -539,7 +539,7 @@ export default function ChatPanel({
                 aria-label="Send"
                 disabled={!input.trim()}
                 onClick={() => void send(input)}
-                className="ml-auto inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--theme-primary,#2563eb)] text-white transition-colors hover:bg-[#1d4ed8] disabled:cursor-default disabled:bg-[#e2e8f0] disabled:text-[#94a3b8]"
+                className="ml-auto inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--theme-primary,var(--color-brand))] text-white transition-colors hover:bg-brand-600 disabled:cursor-default disabled:bg-line disabled:text-subtle"
               >
                 <LuArrowUp className="h-4 w-4" />
               </button>

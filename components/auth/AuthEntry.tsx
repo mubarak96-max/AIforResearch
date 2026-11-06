@@ -36,7 +36,7 @@ function OptionButton({ icon, verb, name, busy, disabled, compact, onClick }: {
   if (compact) {
     return (
       <button type="button" onClick={onClick} disabled={disabled} aria-label={`${verb} ${name}`}
-        className={`flex h-[52px] w-full min-w-0 items-center gap-2.5 rounded-xl border border-line bg-white px-3 text-left transition-colors hover:bg-soft disabled:opacity-60 ${focusRing}`}>
+        className={`flex h-[52px] w-full min-w-0 items-center gap-2.5 rounded-xl border border-line bg-surface px-3 text-left transition-colors hover:bg-soft disabled:opacity-60 ${focusRing}`}>
         <span className="shrink-0">{icon}</span>
         {busy ? <span className="truncate text-[14px] font-semibold">{busy}</span> : (
           <span className="flex min-w-0 flex-col leading-tight">
@@ -49,7 +49,7 @@ function OptionButton({ icon, verb, name, busy, disabled, compact, onClick }: {
   }
   return (
     <button type="button" onClick={onClick} disabled={disabled}
-      className={`relative flex h-12 w-full items-center justify-center rounded-xl border border-line bg-white px-12 text-[15px] font-semibold transition-colors hover:bg-soft disabled:opacity-60 ${focusRing}`}>
+      className={`relative flex h-12 w-full items-center justify-center rounded-xl border border-line bg-surface px-12 text-[15px] font-semibold transition-colors hover:bg-soft disabled:opacity-60 ${focusRing}`}>
       <span className="absolute left-4 flex items-center">{icon}</span>
       {busy || `${verb} ${name}`}
     </button>

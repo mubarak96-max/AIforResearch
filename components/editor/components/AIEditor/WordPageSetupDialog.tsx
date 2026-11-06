@@ -116,32 +116,32 @@ export default function WordPageSetupDialog({ isOpen, canEdit, settings, onClose
     });
   };
 
-  const field = 'w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm outline-none focus:border-[#1d4ed8] disabled:bg-[#f8fafc]';
+  const field = 'w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand-600 disabled:bg-soft';
 
   // On the page root: the header is its own stacking layer, under the editor's pop-ups.
   return createPortal(
     <div className="fixed inset-0 z-[13000] flex items-center justify-center bg-[rgba(15,23,42,0.35)] p-4" role="dialog" aria-modal="true" aria-label="Page setup">
       <div className="absolute inset-0" aria-hidden="true" onClick={onClose} />
-      <div className="relative z-10 flex max-h-[92dvh] w-full max-w-[640px] flex-col overflow-hidden rounded-[16px] border border-[#e5e7eb] bg-white shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]">
-        <div className="flex items-center justify-between border-b border-[#f1f5f9] px-6 py-4">
+      <div className="relative z-10 flex max-h-[92dvh] w-full max-w-[640px] flex-col overflow-hidden rounded-[16px] border border-line bg-surface shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]">
+        <div className="flex items-center justify-between border-b border-line-2 px-6 py-4">
           <div>
-            <h2 className="text-[18px] font-bold text-[#0f172a]">Page setup</h2>
-            <p className="text-[13px] text-[#64748b]">Used on screen and in the Word and PDF files.</p>
+            <h2 className="text-[18px] font-bold text-ink">Page setup</h2>
+            <p className="text-[13px] text-muted">Used on screen and in the Word and PDF files.</p>
           </div>
-          <button type="button" aria-label="Close page setup" onClick={onClose} className="rounded-full p-2 text-[#64748b] hover:bg-[#f1f5f9]">
+          <button type="button" aria-label="Close page setup" onClick={onClose} className="rounded-full p-2 text-muted hover:bg-line-2">
             <LuX className="h-5 w-5" />
           </button>
         </div>
         <div className="grid flex-1 gap-6 overflow-y-auto px-6 py-5 sm:grid-cols-[1fr_170px]">
           <div className="space-y-4">
-            <label className="block text-[13px] font-medium text-[#334155]">
+            <label className="block text-[13px] font-medium text-ink-2">
               Paper size
               <select className={`${field} mt-1`} value={state.paper} disabled={!canEdit} onChange={(event) => setState({ ...state, paper: event.target.value })}>
                 {PAPERS.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
               </select>
             </label>
             <fieldset disabled={!canEdit}>
-              <legend className="text-[13px] font-medium text-[#334155]">Orientation</legend>
+              <legend className="text-[13px] font-medium text-ink-2">Orientation</legend>
               <div className="mt-1 flex gap-2">
                 {[false, true].map((landscape) => (
                   <button
@@ -149,7 +149,7 @@ export default function WordPageSetupDialog({ isOpen, canEdit, settings, onClose
                     type="button"
                     aria-pressed={state.landscape === landscape}
                     onClick={() => setState({ ...state, landscape })}
-                    className={`flex-1 rounded-lg border px-3 py-2 text-sm ${state.landscape === landscape ? 'border-[#1d4ed8] bg-[#eff6ff] text-[#1d4ed8]' : 'border-[#e5e7eb] text-[#334155]'}`}
+                    className={`flex-1 rounded-lg border px-3 py-2 text-sm ${state.landscape === landscape ? 'border-brand-600 bg-brand-50 text-brand-600' : 'border-line text-ink-2'}`}
                   >
                     {landscape ? 'Landscape' : 'Portrait'}
                   </button>
@@ -157,14 +157,14 @@ export default function WordPageSetupDialog({ isOpen, canEdit, settings, onClose
               </div>
             </fieldset>
             <fieldset disabled={!canEdit}>
-              <legend className="text-[13px] font-medium text-[#334155]">Margins (cm)</legend>
+              <legend className="text-[13px] font-medium text-ink-2">Margins (cm)</legend>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {MARGIN_PRESETS.map((preset) => (
                   <button
                     key={preset.label}
                     type="button"
                     onClick={() => setState({ ...state, margins: { ...preset.cm } })}
-                    className="rounded-full border border-[#e5e7eb] px-2.5 py-1 text-[12px] text-[#334155] hover:border-[#1d4ed8]"
+                    className="rounded-full border border-line px-2.5 py-1 text-[12px] text-ink-2 hover:border-brand-600"
                   >
                     {preset.label}
                   </button>
@@ -172,7 +172,7 @@ export default function WordPageSetupDialog({ isOpen, canEdit, settings, onClose
               </div>
               <div className="mt-2 grid grid-cols-4 gap-2">
                 {(['top', 'bottom', 'left', 'right'] as const).map((side) => (
-                  <label key={side} className="text-[12px] capitalize text-[#64748b]">
+                  <label key={side} className="text-[12px] capitalize text-muted">
                     {side}
                     <input
                       type="number"
@@ -187,15 +187,15 @@ export default function WordPageSetupDialog({ isOpen, canEdit, settings, onClose
                 ))}
               </div>
             </fieldset>
-            <label className="block text-[13px] font-medium text-[#334155]">
+            <label className="block text-[13px] font-medium text-ink-2">
               Header
               <input className={`${field} mt-1`} disabled={!canEdit} value={state.header} placeholder="e.g. Running head: SHORT TITLE" onChange={(event) => setState({ ...state, header: event.target.value })} />
             </label>
-            <label className="block text-[13px] font-medium text-[#334155]">
+            <label className="block text-[13px] font-medium text-ink-2">
               Footer
               <input className={`${field} mt-1`} disabled={!canEdit} value={state.footer} placeholder="Optional" onChange={(event) => setState({ ...state, footer: event.target.value })} />
             </label>
-            <label className="block text-[13px] font-medium text-[#334155]">
+            <label className="block text-[13px] font-medium text-ink-2">
               Page numbers
               <select className={`${field} mt-1`} disabled={!canEdit} value={state.numbers} onChange={(event) => setState({ ...state, numbers: event.target.value as PageNumbers })}>
                 <option value="none">None</option>
@@ -204,16 +204,16 @@ export default function WordPageSetupDialog({ isOpen, canEdit, settings, onClose
                 <option value="header-right">Top, right</option>
               </select>
             </label>
-            <label className="flex items-center gap-2 text-[13px] text-[#334155]">
+            <label className="flex items-center gap-2 text-[13px] text-ink-2">
               <input type="checkbox" disabled={!canEdit} checked={state.differentFirst} onChange={(event) => setState({ ...state, differentFirst: event.target.checked })} />
               Different first page (no header or number on the title page)
             </label>
           </div>
           <div className="hidden sm:block" aria-hidden="true">
-            <div className="text-[12px] text-[#64748b]">Preview</div>
-            <div className="relative mt-2 border border-[#e5e7eb] bg-white shadow-sm" style={{ width: pageWidth * scale, height: pageHeight * scale }}>
+            <div className="text-[12px] text-muted">Preview</div>
+            <div className="relative mt-2 border border-line bg-surface shadow-sm" style={{ width: pageWidth * scale, height: pageHeight * scale }}>
               <div
-                className="absolute border border-dashed border-[#bfdbfe] bg-[#eff6ff]"
+                className="absolute border border-dashed border-primary-200 bg-brand-50"
                 style={{
                   top: state.margins.top * PT_PER_CM * scale,
                   bottom: state.margins.bottom * PT_PER_CM * scale,
@@ -222,22 +222,22 @@ export default function WordPageSetupDialog({ isOpen, canEdit, settings, onClose
                 }}
               />
               {state.header || state.numbers === 'header-right' ? (
-                <div className="absolute left-0 right-0 truncate px-2 text-[7px] text-[#64748b]" style={{ top: 6, textAlign: state.numbers === 'header-right' ? 'right' : 'left' }}>
+                <div className="absolute left-0 right-0 truncate px-2 text-[7px] text-muted" style={{ top: 6, textAlign: state.numbers === 'header-right' ? 'right' : 'left' }}>
                   {state.header}{state.numbers === 'header-right' ? ' 1' : ''}
                 </div>
               ) : null}
               {state.footer || state.numbers.startsWith('footer') ? (
-                <div className="absolute left-0 right-0 truncate px-2 text-[7px] text-[#64748b]" style={{ bottom: 6, textAlign: state.numbers === 'footer-right' ? 'right' : 'center' }}>
+                <div className="absolute left-0 right-0 truncate px-2 text-[7px] text-muted" style={{ bottom: 6, textAlign: state.numbers === 'footer-right' ? 'right' : 'center' }}>
                   {state.footer}{state.numbers.startsWith('footer') ? ' 1' : ''}
                 </div>
               ) : null}
             </div>
           </div>
         </div>
-        <div className="flex justify-end gap-2 border-t border-[#f1f5f9] px-6 py-3">
-          <button type="button" onClick={onClose} className="rounded-full px-4 py-2 text-sm text-[#334155] hover:bg-[#f1f5f9]">Cancel</button>
+        <div className="flex justify-end gap-2 border-t border-line-2 px-6 py-3">
+          <button type="button" onClick={onClose} className="rounded-full px-4 py-2 text-sm text-ink-2 hover:bg-line-2">Cancel</button>
           {canEdit ? (
-            <button type="button" onClick={save} className="rounded-full bg-[#1d4ed8] px-5 py-2 text-sm font-medium text-white hover:bg-[#1d4ed8]">Save</button>
+            <button type="button" onClick={save} className="rounded-full bg-brand-600 px-5 py-2 text-sm font-medium text-on-brand hover:bg-brand-600">Save</button>
           ) : null}
         </div>
       </div>

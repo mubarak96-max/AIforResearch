@@ -215,14 +215,14 @@ export default function AIEditorCommentsDialog({
   };
 
   return (
-    <aside className="flex h-full w-[340px] shrink-0 flex-col border-l border-[#e5e7eb] bg-[#f8fafc] ">
-      <div className="flex items-center justify-between border-b border-[#e5e7eb] px-4 py-3">
-        <div className="text-[20px] font-medium text-[#0f172a]">Comments</div>
+    <aside className="flex h-full w-[340px] shrink-0 flex-col border-l border-line bg-soft ">
+      <div className="flex items-center justify-between border-b border-line px-4 py-3">
+        <div className="text-[20px] font-medium text-ink">Comments</div>
         <div className="flex items-center gap-1">
           <button
             type="button"
             aria-label="Notification settings"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[#64748b] transition-colors hover:bg-[#eff6ff]"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted transition-colors hover:bg-brand-50"
           >
             <LuBell className="h-5 w-5" />
           </button>
@@ -230,14 +230,14 @@ export default function AIEditorCommentsDialog({
             type="button"
             onClick={onClose}
             aria-label="Close comments"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[#64748b] transition-colors hover:bg-[#eff6ff]"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted transition-colors hover:bg-brand-50"
           >
             <LuX className="h-5 w-5" />
           </button>
         </div>
       </div>
 
-      <div className="border-b border-[#e5e7eb] px-4 pt-3">
+      <div className="border-b border-line px-4 pt-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-5">
             <button
@@ -246,7 +246,7 @@ export default function AIEditorCommentsDialog({
               className={`border-b-2 pb-2 text-[14px] transition-colors ${
                 activeTab === 'all'
                   ? 'border-[var(--theme-primary)] font-medium text-[var(--theme-primary)]'
-                  : 'border-transparent text-[#334155]'
+                  : 'border-transparent text-ink-2'
               }`}
             >
               All comments
@@ -257,19 +257,19 @@ export default function AIEditorCommentsDialog({
               className={`border-b-2 pb-2 text-[14px] transition-colors ${
                 activeTab === 'for-you'
                   ? 'border-[var(--theme-primary)] font-medium text-[var(--theme-primary)]'
-                  : 'border-transparent text-[#334155]'
+                  : 'border-transparent text-ink-2'
               }`}
             >
               For you
             </button>
           </div>
           <div className="relative">
-            <LuSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748b]" />
+            <LuSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
             <input
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Search comments"
-              className="h-9 w-[148px] rounded-full border border-[#e5e7eb] bg-white pl-9 pr-3 text-[13px] text-[#0f172a] outline-none transition-colors focus:border-[var(--theme-primary,#2563eb)] focus:shadow-[0_0_0_4px_#eff6ff]"
+              className="h-9 w-[148px] rounded-full border border-line bg-surface pl-9 pr-3 text-[13px] text-ink outline-none transition-colors focus:border-[var(--theme-primary,var(--color-brand))] focus:shadow-[0_0_0_4px_var(--color-brand-50)]"
             />
           </div>
         </div>
@@ -278,7 +278,7 @@ export default function AIEditorCommentsDialog({
           <select
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value as CommentStatusFilter)}
-            className="h-9 rounded-xl border border-[#cbd5e1] bg-white px-3 text-[13px] text-[#334155] outline-none"
+            className="h-9 rounded-xl border border-line-3 bg-surface px-3 text-[13px] text-ink-2 outline-none"
           >
             <option value="all">All types</option>
             <option value="open">Open</option>
@@ -287,7 +287,7 @@ export default function AIEditorCommentsDialog({
           <select
             value={locationFilter}
             onChange={(event) => setLocationFilter(event.target.value as CommentLocationFilter)}
-            className="h-9 rounded-xl border border-[#cbd5e1] bg-white px-3 text-[13px] text-[#334155] outline-none"
+            className="h-9 rounded-xl border border-line-3 bg-surface px-3 text-[13px] text-ink-2 outline-none"
           >
             <option value="all">All tabs</option>
             <option value="current">This tab</option>
@@ -296,9 +296,9 @@ export default function AIEditorCommentsDialog({
       </div>
 
       {canComment && (initialSelectedText || initialBlockId) ? (
-        <div className="border-b border-[#e5e7eb] bg-white px-4 py-3">
+        <div className="border-b border-line bg-surface px-4 py-3">
           {initialSelectedText ? (
-            <div className="mb-2 line-clamp-2 rounded-xl bg-[#f1f5f9] px-3 py-2 text-[12px] text-[#64748b]">
+            <div className="mb-2 line-clamp-2 rounded-xl bg-line-2 px-3 py-2 text-[12px] text-muted">
               {initialSelectedText}
             </div>
           ) : null}
@@ -307,19 +307,19 @@ export default function AIEditorCommentsDialog({
               value={newCommentText}
               onChange={(event) => setNewCommentText(event.target.value)}
               placeholder={`Comment as ${currentUserDisplayName || 'you'}`}
-              className="min-h-[72px] w-full resize-none rounded-[14px] border border-[#e5e7eb] bg-white px-3 py-2.5 text-[13px] text-[#0f172a] outline-none transition-colors focus:border-[var(--theme-primary,#2563eb)] focus:shadow-[0_0_0_4px_#eff6ff]"
+              className="min-h-[72px] w-full resize-none rounded-[14px] border border-line bg-surface px-3 py-2.5 text-[13px] text-ink outline-none transition-colors focus:border-[var(--theme-primary,var(--color-brand))] focus:shadow-[0_0_0_4px_var(--color-brand-50)]"
             />
             {newCommentMentionSuggestions.length > 0 ? (
-              <div className="absolute inset-x-0 top-full z-10 mt-2 overflow-hidden rounded-[14px] border border-[#e5e7eb] bg-white shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]">
+              <div className="absolute inset-x-0 top-full z-10 mt-2 overflow-hidden rounded-[14px] border border-line bg-surface shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]">
                 {newCommentMentionSuggestions.map((person) => (
                   <button
                     key={person.id}
                     type="button"
                     onClick={() => setNewCommentText((current) => applyMention(current, person.displayName))}
-                    className="flex w-full items-center justify-between px-3 py-2 text-left transition-colors hover:bg-[#f8fafc]"
+                    className="flex w-full items-center justify-between px-3 py-2 text-left transition-colors hover:bg-soft"
                   >
-                    <span className="text-[13px] text-[#0f172a]">{person.displayName}</span>
-                    <span className="truncate pl-3 text-[11px] text-[#64748b]">{person.email || ''}</span>
+                    <span className="text-[13px] text-ink">{person.displayName}</span>
+                    <span className="truncate pl-3 text-[11px] text-muted">{person.email || ''}</span>
                   </button>
                 ))}
               </div>
@@ -330,7 +330,7 @@ export default function AIEditorCommentsDialog({
               type="button"
               onClick={handleSubmitNewComment}
               disabled={!newCommentText.trim()}
-              className="inline-flex h-8 items-center justify-center rounded-[10px] bg-[var(--theme-primary,#2563eb)] shadow-[0_6px_16px_-8px_rgba(37,99,235,0.8)] px-4 text-[12px] font-medium text-white transition-colors hover:bg-[#1d4ed8] disabled:cursor-not-allowed disabled:bg-[#cbd5e1]"
+              className="inline-flex h-8 items-center justify-center rounded-[10px] bg-[var(--theme-primary,var(--color-brand))] shadow-[0_6px_16px_-8px_rgba(var(--brand-rgb),0.8)] px-4 text-[12px] font-medium text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:bg-line-3"
             >
               Comment
             </button>
@@ -340,7 +340,7 @@ export default function AIEditorCommentsDialog({
 
       <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
         {visibleComments.length === 0 ? (
-          <div className="rounded-[14px] border border-dashed border-[#e5e7eb] bg-white px-4 py-8 text-center text-[13px] text-[#64748b]">
+          <div className="rounded-[14px] border border-dashed border-line bg-surface px-4 py-8 text-center text-[13px] text-muted">
             No matching comments yet.
           </div>
         ) : (
@@ -365,8 +365,8 @@ export default function AIEditorCommentsDialog({
               return (
                 <div
                   key={comment.id}
-                  className={`overflow-hidden rounded-[14px] border bg-white  ${
-                    selected ? 'border-[var(--theme-primary-border)] ring-1 ring-[var(--theme-primary-ring)]' : 'border-[#e5e7eb]'
+                  className={`overflow-hidden rounded-[14px] border bg-surface  ${
+                    selected ? 'border-[var(--theme-primary-border)] ring-1 ring-[var(--theme-primary-ring)]' : 'border-line'
                   }`}
                 >
                   <button
@@ -374,8 +374,8 @@ export default function AIEditorCommentsDialog({
                     onClick={() => onActiveCommentChange?.(comment.id)}
                     className="block w-full text-left"
                   >
-                    <div className="border-b border-[#f1f5f9] bg-[#f8fafc] px-4 py-2">
-                      <div className="truncate text-[12px] font-medium text-[#334155]">
+                    <div className="border-b border-line-2 bg-soft px-4 py-2">
+                      <div className="truncate text-[12px] font-medium text-ink-2">
                         {comment.selectedText || 'Comment location'}
                       </div>
                     </div>
@@ -388,10 +388,10 @@ export default function AIEditorCommentsDialog({
                           {getInitials(comment.actorDisplayName)}
                         </div>
                         <div className="min-w-0">
-                          <div className="truncate text-[13px] font-semibold text-[#0f172a]">
+                          <div className="truncate text-[13px] font-semibold text-ink">
                             {comment.actorDisplayName}
                           </div>
-                          <div className="text-[11px] text-[#64748b]">{formatCommentTime(comment.createdAt)}</div>
+                          <div className="text-[11px] text-muted">{formatCommentTime(comment.createdAt)}</div>
                         </div>
                       </div>
 
@@ -403,7 +403,7 @@ export default function AIEditorCommentsDialog({
                           className={`inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
                             isResolved(comment)
                               ? 'bg-[#dcfce7] text-[#16a34a]'
-                              : 'text-[#64748b] hover:bg-[#eff6ff]'
+                              : 'text-muted hover:bg-brand-50'
                           }`}
                         >
                           <LuCheck className="h-5 w-5" />
@@ -413,12 +413,12 @@ export default function AIEditorCommentsDialog({
                             type="button"
                             onClick={() => setOpenMenuId((current) => (current === comment.id ? null : comment.id))}
                             aria-label="More options"
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[#64748b] transition-colors hover:bg-[#eff6ff]"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted transition-colors hover:bg-brand-50"
                           >
                             <LuEllipsisVertical className="h-5 w-5" />
                           </button>
                           {openMenuId === comment.id ? (
-                            <div className="absolute right-0 top-9 z-10 min-w-[180px] overflow-hidden rounded-[10px] border border-[#e5e7eb] bg-white py-1 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]">
+                            <div className="absolute right-0 top-9 z-10 min-w-[180px] overflow-hidden rounded-[10px] border border-line bg-surface py-1 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]">
                               {canManage ? (
                                 <button
                                   type="button"
@@ -427,7 +427,7 @@ export default function AIEditorCommentsDialog({
                                     setEditingText(comment.text);
                                     setOpenMenuId(null);
                                   }}
-                                  className="flex w-full items-center px-4 py-2 text-left text-[13px] text-[#0f172a] transition-colors hover:bg-[#f8fafc]"
+                                  className="flex w-full items-center px-4 py-2 text-left text-[13px] text-ink transition-colors hover:bg-soft"
                                 >
                                   Edit
                                 </button>
@@ -456,7 +456,7 @@ export default function AIEditorCommentsDialog({
                                   });
                                   setOpenMenuId(null);
                                 }}
-                                className="flex w-full items-center px-4 py-2 text-left text-[13px] text-[#0f172a] transition-colors hover:bg-[#f8fafc]"
+                                className="flex w-full items-center px-4 py-2 text-left text-[13px] text-ink transition-colors hover:bg-soft"
                               >
                                 Get link to this comment
                               </button>
@@ -471,7 +471,7 @@ export default function AIEditorCommentsDialog({
                         <textarea
                           value={editingText}
                           onChange={(event) => setEditingText(event.target.value)}
-                          className="min-h-[72px] w-full resize-none rounded-[14px] border border-[#e5e7eb] px-3 py-2.5 text-[13px] text-[#0f172a] outline-none transition-colors focus:border-[var(--theme-primary,#2563eb)] focus:shadow-[0_0_0_4px_#eff6ff]"
+                          className="min-h-[72px] w-full resize-none rounded-[14px] border border-line px-3 py-2.5 text-[13px] text-ink outline-none transition-colors focus:border-[var(--theme-primary,var(--color-brand))] focus:shadow-[0_0_0_4px_var(--color-brand-50)]"
                         />
                         <div className="mt-2 flex justify-end gap-2">
                           <button
@@ -480,7 +480,7 @@ export default function AIEditorCommentsDialog({
                               setEditingCommentId(null);
                               setEditingText('');
                             }}
-                            className="inline-flex h-8 items-center justify-center rounded-full px-3 text-[12px] text-[#64748b] transition-colors hover:bg-[#f1f5f9]"
+                            className="inline-flex h-8 items-center justify-center rounded-full px-3 text-[12px] text-muted transition-colors hover:bg-line-2"
                           >
                             Cancel
                           </button>
@@ -492,29 +492,29 @@ export default function AIEditorCommentsDialog({
                               setEditingText('');
                             }}
                             disabled={!editingText.trim()}
-                            className="inline-flex h-8 items-center justify-center rounded-[10px] bg-[var(--theme-primary,#2563eb)] shadow-[0_6px_16px_-8px_rgba(37,99,235,0.8)] px-4 text-[12px] font-medium text-white transition-colors hover:bg-[#1d4ed8] disabled:cursor-not-allowed disabled:bg-[#cbd5e1]"
+                            className="inline-flex h-8 items-center justify-center rounded-[10px] bg-[var(--theme-primary,var(--color-brand))] shadow-[0_6px_16px_-8px_rgba(var(--brand-rgb),0.8)] px-4 text-[12px] font-medium text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:bg-line-3"
                           >
                             Save
                           </button>
                         </div>
                       </div>
                     ) : (
-                      <div className="mt-3 whitespace-pre-wrap text-[14px] text-[#0f172a]">{comment.text}</div>
+                      <div className="mt-3 whitespace-pre-wrap text-[14px] text-ink">{comment.text}</div>
                     )}
 
                     {replies.length > 0 ? (
-                      <div className="mt-3 space-y-2 border-t border-[#f1f5f9] pt-3">
+                      <div className="mt-3 space-y-2 border-t border-line-2 pt-3">
                         {replies.map((reply) => (
-                          <div key={reply.id} className="rounded-xl bg-[#f8fafc] px-3 py-2.5">
+                          <div key={reply.id} className="rounded-xl bg-soft px-3 py-2.5">
                             <div className="flex items-center gap-2">
-                              <span className="text-[12px] font-medium text-[#0f172a]">
+                              <span className="text-[12px] font-medium text-ink">
                                 {reply.actorDisplayName}
                               </span>
-                              <span className="text-[11px] text-[#94a3b8]">
+                              <span className="text-[11px] text-subtle">
                                 {formatCommentTime(reply.createdAt)}
                               </span>
                             </div>
-                            <div className="mt-1 whitespace-pre-wrap text-[13px] text-[#0f172a]">
+                            <div className="mt-1 whitespace-pre-wrap text-[13px] text-ink">
                               {reply.text}
                             </div>
                           </div>
@@ -523,7 +523,7 @@ export default function AIEditorCommentsDialog({
                     ) : null}
 
                     {selected && canComment ? (
-                      <div className="mt-3 border-t border-[#f1f5f9] pt-3">
+                      <div className="mt-3 border-t border-line-2 pt-3">
                         <div className="flex items-start gap-2">
                           <div className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--theme-primary-soft)] text-[10px] font-semibold text-[var(--theme-primary-dark)]">
                             {getInitials(currentUserDisplayName || 'You')}
@@ -539,10 +539,10 @@ export default function AIEditorCommentsDialog({
                                   }))
                                 }
                                 placeholder="Reply or add others with @"
-                                className="h-10 w-full rounded-full border border-[#e5e7eb] bg-white px-4 text-[13px] text-[#0f172a] outline-none transition-colors focus:border-[var(--theme-primary,#2563eb)] focus:shadow-[0_0_0_4px_#eff6ff]"
+                                className="h-10 w-full rounded-full border border-line bg-surface px-4 text-[13px] text-ink outline-none transition-colors focus:border-[var(--theme-primary,var(--color-brand))] focus:shadow-[0_0_0_4px_var(--color-brand-50)]"
                               />
                               {replyMentionSuggestions.length > 0 ? (
-                                <div className="absolute inset-x-0 top-full z-10 mt-2 overflow-hidden rounded-[14px] border border-[#e5e7eb] bg-white shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]">
+                                <div className="absolute inset-x-0 top-full z-10 mt-2 overflow-hidden rounded-[14px] border border-line bg-surface shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]">
                                   {replyMentionSuggestions.map((person) => (
                                     <button
                                       key={person.id}
@@ -553,10 +553,10 @@ export default function AIEditorCommentsDialog({
                                           [comment.id]: applyMention(current[comment.id] ?? '', person.displayName),
                                         }))
                                       }
-                                      className="flex w-full items-center justify-between px-3 py-2 text-left transition-colors hover:bg-[#f8fafc]"
+                                      className="flex w-full items-center justify-between px-3 py-2 text-left transition-colors hover:bg-soft"
                                     >
-                                      <span className="text-[13px] text-[#0f172a]">{person.displayName}</span>
-                                      <span className="truncate pl-3 text-[11px] text-[#64748b]">
+                                      <span className="text-[13px] text-ink">{person.displayName}</span>
+                                      <span className="truncate pl-3 text-[11px] text-muted">
                                         {person.email || ''}
                                       </span>
                                     </button>
@@ -568,7 +568,7 @@ export default function AIEditorCommentsDialog({
                               <button
                                 type="button"
                                 onClick={() => setReplyDrafts((current) => ({ ...current, [comment.id]: '' }))}
-                                className="inline-flex h-8 items-center justify-center rounded-full px-3 text-[12px] text-[#64748b] transition-colors hover:bg-[#f1f5f9]"
+                                className="inline-flex h-8 items-center justify-center rounded-full px-3 text-[12px] text-muted transition-colors hover:bg-line-2"
                               >
                                 Cancel
                               </button>
@@ -576,7 +576,7 @@ export default function AIEditorCommentsDialog({
                                 type="button"
                                 onClick={() => handleReply(comment.id)}
                                 disabled={!replyDrafts[comment.id]?.trim()}
-                                className="inline-flex h-8 items-center justify-center rounded-[10px] bg-[var(--theme-primary,#2563eb)] shadow-[0_6px_16px_-8px_rgba(37,99,235,0.8)] px-4 text-[12px] font-medium text-white transition-colors hover:bg-[#1d4ed8] disabled:cursor-not-allowed disabled:bg-[#cbd5e1]"
+                                className="inline-flex h-8 items-center justify-center rounded-[10px] bg-[var(--theme-primary,var(--color-brand))] shadow-[0_6px_16px_-8px_rgba(var(--brand-rgb),0.8)] px-4 text-[12px] font-medium text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:bg-line-3"
                               >
                                 Reply
                               </button>
@@ -600,8 +600,8 @@ export default function AIEditorCommentsDialog({
       </div>
 
       {activeComment ? (
-        <div className="border-t border-[#e5e7eb] bg-white px-4 py-3 text-[11px] text-[#64748b]">
-          Active thread: <span className="font-medium text-[#0f172a]">{activeComment.actorDisplayName}</span>
+        <div className="border-t border-line bg-surface px-4 py-3 text-[11px] text-muted">
+          Active thread: <span className="font-medium text-ink">{activeComment.actorDisplayName}</span>
         </div>
       ) : null}
     </aside>

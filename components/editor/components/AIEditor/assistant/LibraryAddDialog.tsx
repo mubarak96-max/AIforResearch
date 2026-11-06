@@ -71,38 +71,38 @@ export default function LibraryAddDialog({ open, onClose, folderId = null, initi
   if (!open || typeof document === 'undefined') return null;
   return createPortal(
     <div className="fixed inset-0 z-[14000] flex items-end justify-center bg-[rgba(15,23,42,.45)] sm:items-center sm:p-4" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-      <div role="dialog" aria-modal="true" aria-label="Add to Library" className="flex h-[min(92dvh,660px)] w-full max-w-[880px] flex-col overflow-hidden rounded-t-[20px] bg-white shadow-[0_24px_60px_-12px_rgba(15,23,42,.35)] sm:rounded-[18px]">
-        <div className="flex items-center gap-3 border-b border-[#f1f5f9] px-5 py-4">
-          <h2 className="flex-1 text-[18px] font-semibold text-[#0f172a]">Add to Library</h2>
-          <button type="button" onClick={onClose} aria-label="Close" className="grid h-9 w-9 place-items-center rounded-lg text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#0f172a]"><LuX className="h-5 w-5" /></button>
+      <div role="dialog" aria-modal="true" aria-label="Add to Library" className="flex h-[min(92dvh,660px)] w-full max-w-[880px] flex-col overflow-hidden rounded-t-[20px] bg-surface shadow-[0_24px_60px_-12px_rgba(15,23,42,.35)] sm:rounded-[18px]">
+        <div className="flex items-center gap-3 border-b border-line-2 px-5 py-4">
+          <h2 className="flex-1 text-[18px] font-semibold text-ink">Add to Library</h2>
+          <button type="button" onClick={onClose} aria-label="Close" className="grid h-9 w-9 place-items-center rounded-lg text-muted hover:bg-line-2 hover:text-ink"><LuX className="h-5 w-5" /></button>
         </div>
         <div className="flex min-h-0 flex-1 flex-col sm:flex-row">
-          <nav aria-label="Ways to add" className="flex shrink-0 gap-1 overflow-x-auto border-b border-[#f1f5f9] px-3 py-2 sm:w-[220px] sm:flex-col sm:overflow-visible sm:border-b-0 sm:border-r sm:px-3 sm:py-4">
+          <nav aria-label="Ways to add" className="flex shrink-0 gap-1 overflow-x-auto border-b border-line-2 px-3 py-2 sm:w-[220px] sm:flex-col sm:overflow-visible sm:border-b-0 sm:border-r sm:px-3 sm:py-4">
             {TABS.map((item) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => setTab(item.id)}
                 aria-current={tab === item.id ? 'page' : undefined}
-                className={`flex h-10 shrink-0 items-center gap-3 whitespace-nowrap rounded-[10px] px-3 text-[14px] font-medium transition-colors ${tab === item.id ? 'bg-[#f1f5f9] text-[#0f172a]' : 'text-[#475569] hover:bg-[#f8fafc]'}`}
+                className={`flex h-10 shrink-0 items-center gap-3 whitespace-nowrap rounded-[10px] px-3 text-[14px] font-medium transition-colors ${tab === item.id ? 'bg-line-2 text-ink' : 'text-ink-3 hover:bg-soft'}`}
               >
-                <span className="text-[#475569]" aria-hidden="true">{item.icon}</span>{item.label}
+                <span className="text-ink-3" aria-hidden="true">{item.icon}</span>{item.label}
               </button>
             ))}
           </nav>
           <div className="flex min-h-0 flex-1 flex-col">
             <div className="flex flex-wrap items-center gap-2 px-5 pt-4">
-              <label htmlFor="library-add-target" className="text-[13.5px] text-[#64748b]">Add to</label>
+              <label htmlFor="library-add-target" className="text-[13.5px] text-muted">Add to</label>
               <div className="relative">
-                <LuLibrary className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748b]" />
+                <LuLibrary className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
                 <select id="library-add-target" value={target} onChange={(event) => setTarget(event.target.value)}
-                  className="h-9 max-w-[240px] rounded-[10px] border border-[#e2e8f0] bg-white pl-8 pr-8 text-[14px] text-[#0f172a] outline-none focus:border-[var(--theme-primary,#2563eb)]">
+                  className="h-9 max-w-[240px] rounded-[10px] border border-line bg-surface pl-8 pr-8 text-[14px] text-ink outline-none focus:border-[var(--theme-primary,var(--color-brand))]">
                   <option value="">All sources</option>
                   {folders.map((folder) => <option key={folder.id} value={folder.id}>{folder.name}</option>)}
                 </select>
               </div>
               {limits && limits.pdfs_limit !== null && (
-                <span className="ml-auto text-[12.5px] text-[#64748b]" data-testid="pdf-room">{limits.pdfs_used.toLocaleString('en-US')} of {limits.pdfs_limit.toLocaleString('en-US')} PDFs used</span>
+                <span className="ml-auto text-[12.5px] text-muted" data-testid="pdf-room">{limits.pdfs_used.toLocaleString('en-US')} of {limits.pdfs_limit.toLocaleString('en-US')} PDFs used</span>
               )}
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 pt-4">
@@ -188,34 +188,34 @@ function PdfUploads({ folderId, limits, onChanged, onUpgrade }: { folderId: stri
         tabIndex={0}
         onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); input.current?.click(); } }}
         data-testid="pdf-dropzone"
-        className={`flex cursor-pointer flex-col items-center rounded-2xl border-2 border-dashed px-6 py-9 text-center transition-colors ${dragging ? 'border-[var(--theme-primary,#2563eb)] bg-[#eff6ff]' : 'border-[#e2e8f0] bg-[#f8fafc] hover:border-[#bfdbfe]'}`}
+        className={`flex cursor-pointer flex-col items-center rounded-2xl border-2 border-dashed px-6 py-9 text-center transition-colors ${dragging ? 'border-[var(--theme-primary,var(--color-brand))] bg-brand-50' : 'border-line bg-soft hover:border-primary-200'}`}
       >
-        <span className="grid h-12 w-12 place-items-center rounded-full bg-white text-[var(--theme-primary,#2563eb)] shadow-[0_1px_3px_rgba(15,23,42,.12)]"><LuUpload className="h-5 w-5" /></span>
-        <p className="mt-3 text-[15px] font-semibold text-[#0f172a]">Drop PDFs here or <span className="text-[var(--theme-primary,#2563eb)]">browse</span></p>
-        <p className="mt-1 text-[13px] text-[#64748b]">{limits ? `Up to ${limits.upload_batch} at a time, ${limits.upload_mb} MB each` : 'Several at once'}</p>
+        <span className="grid h-12 w-12 place-items-center rounded-full bg-surface text-[var(--theme-primary,var(--color-brand))] shadow-[0_1px_3px_rgba(15,23,42,.12)]"><LuUpload className="h-5 w-5" /></span>
+        <p className="mt-3 text-[15px] font-semibold text-ink">Drop PDFs here or <span className="text-[var(--theme-primary,var(--color-brand))]">browse</span></p>
+        <p className="mt-1 text-[13px] text-muted">{limits ? `Up to ${limits.upload_batch} at a time, ${limits.upload_mb} MB each` : 'Several at once'}</p>
         <input ref={input} type="file" accept="application/pdf,.pdf" multiple className="hidden" onChange={(event) => { add([...(event.target.files || [])]); event.target.value = ''; }} />
       </div>
       {note && <p className="text-[13px] text-[#b45309]">{note}</p>}
       {uploads.length > 0 && (
         <div>
-          <p className="mb-2 text-[13px] text-[#64748b]">{busyCount ? `Uploading ${busyCount}…` : `${plural(doneCount, 'PDF')} added. They will be ready to cite in a moment.`}</p>
+          <p className="mb-2 text-[13px] text-muted">{busyCount ? `Uploading ${busyCount}…` : `${plural(doneCount, 'PDF')} added. They will be ready to cite in a moment.`}</p>
           <ul className="flex flex-col gap-2" data-testid="upload-list">
             {uploads.map((item) => (
-              <li key={item.id} className="rounded-xl border border-[#e2e8f0] px-3.5 py-2.5">
+              <li key={item.id} className="rounded-xl border border-line px-3.5 py-2.5">
                 <div className="flex items-center gap-2.5">
-                  <LuFileText className="h-4 w-4 shrink-0 text-[#94a3b8]" />
-                  <span className="min-w-0 flex-1 truncate text-[13.5px] text-[#0f172a]">{item.file.name}</span>
-                  <span className="shrink-0 text-[12px] text-[#94a3b8]">{mb(item.file.size)}</span>
+                  <LuFileText className="h-4 w-4 shrink-0 text-subtle" />
+                  <span className="min-w-0 flex-1 truncate text-[13.5px] text-ink">{item.file.name}</span>
+                  <span className="shrink-0 text-[12px] text-subtle">{mb(item.file.size)}</span>
                   {item.status === 'done' && <LuCheck className="h-4 w-4 shrink-0 text-[#16a34a]" aria-label="Added" />}
                   {item.status === 'failed' && <LuCircleAlert className="h-4 w-4 shrink-0 text-[#dc2626]" aria-label="Not added" />}
                 </div>
                 {(item.status === 'uploading' || item.status === 'waiting') && (
-                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#f1f5f9]"><div className="h-full rounded-full bg-[var(--theme-primary,#2563eb)] transition-[width]" style={{ width: `${Math.round(item.progress * 100)}%` }} /></div>
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-line-2"><div className="h-full rounded-full bg-[var(--theme-primary,var(--color-brand))] transition-[width]" style={{ width: `${Math.round(item.progress * 100)}%` }} /></div>
                 )}
                 {item.status === 'failed' && (
                   <p className="mt-1 text-[12.5px] text-[#dc2626]">
                     {item.error}
-                    {item.upgrade && <button type="button" onClick={() => onUpgrade(item.error)} className="ml-1.5 font-semibold text-[var(--theme-primary,#2563eb)] hover:underline">Upgrade</button>}
+                    {item.upgrade && <button type="button" onClick={() => onUpgrade(item.error)} className="ml-1.5 font-semibold text-[var(--theme-primary,var(--color-brand))] hover:underline">Upgrade</button>}
                   </p>
                 )}
               </li>
@@ -255,11 +255,11 @@ function ReferenceFileImport({ folderId, onChanged }: { folderId: string | null;
         role="button"
         tabIndex={0}
         onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); input.current?.click(); } }}
-        className={`flex cursor-pointer flex-col items-center rounded-2xl border-2 border-dashed px-6 py-9 text-center transition-colors ${dragging ? 'border-[var(--theme-primary,#2563eb)] bg-[#eff6ff]' : 'border-[#e2e8f0] bg-[#f8fafc] hover:border-[#bfdbfe]'}`}
+        className={`flex cursor-pointer flex-col items-center rounded-2xl border-2 border-dashed px-6 py-9 text-center transition-colors ${dragging ? 'border-[var(--theme-primary,var(--color-brand))] bg-brand-50' : 'border-line bg-soft hover:border-primary-200'}`}
       >
-        <span className="grid h-12 w-12 place-items-center rounded-full bg-white text-[var(--theme-primary,#2563eb)] shadow-[0_1px_3px_rgba(15,23,42,.12)]"><LuFileText className="h-5 w-5" /></span>
-        <p className="mt-3 text-[15px] font-semibold text-[#0f172a]">Drop a .bib or .ris file or <span className="text-[var(--theme-primary,#2563eb)]">browse</span></p>
-        <p className="mt-1 text-[13px] text-[#64748b]">From EndNote, Zotero, Mendeley, Google Scholar or any reference manager</p>
+        <span className="grid h-12 w-12 place-items-center rounded-full bg-surface text-[var(--theme-primary,var(--color-brand))] shadow-[0_1px_3px_rgba(15,23,42,.12)]"><LuFileText className="h-5 w-5" /></span>
+        <p className="mt-3 text-[15px] font-semibold text-ink">Drop a .bib or .ris file or <span className="text-[var(--theme-primary,var(--color-brand))]">browse</span></p>
+        <p className="mt-1 text-[13px] text-muted">From EndNote, Zotero, Mendeley, Google Scholar or any reference manager</p>
         <input ref={input} type="file" accept=".bib,.ris,.txt,application/x-bibtex,application/x-research-info-systems" className="hidden" onChange={(event) => { void start(event.target.files?.[0]); event.target.value = ''; }} />
       </div>
       <FindPdfs value={findPdfs} onChange={setFindPdfs} />
@@ -291,20 +291,20 @@ function PasteIds({ folderId, onChanged }: { folderId: string | null; onChanged:
   if (job) return <ImportProgress job={job} onAgain={reset} />;
   return (
     <div className="flex flex-col gap-3">
-      <label htmlFor="library-paste-ids" className="text-[14px] font-medium text-[#0f172a]">DOIs, PubMed ids or arXiv ids</label>
+      <label htmlFor="library-paste-ids" className="text-[14px] font-medium text-ink">DOIs, PubMed ids or arXiv ids</label>
       <textarea
         id="library-paste-ids"
         value={text}
         onChange={(event) => setText(event.target.value)}
         rows={8}
         placeholder={'10.1038/nrn2762\nPMID: 23589831\narXiv:1706.03762'}
-        className="w-full resize-y rounded-xl border border-[#e2e8f0] px-3.5 py-3 font-mono text-[13px] leading-relaxed text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[var(--theme-primary,#2563eb)] focus:shadow-[0_0_0_3px_#eff6ff]"
+        className="w-full resize-y rounded-xl border border-line px-3.5 py-3 font-mono text-[13px] leading-relaxed text-ink outline-none placeholder:text-subtle focus:border-[var(--theme-primary,var(--color-brand))] focus:shadow-[0_0_0_3px_var(--color-brand-50)]"
       />
       <FindPdfs value={findPdfs} onChange={setFindPdfs} />
       {error && <p role="alert" className="text-[13px] text-[#dc2626]">{error}</p>}
       <div>
         <button type="button" disabled={busy || !count} onClick={() => void start()}
-          className="inline-flex h-10 items-center gap-2 rounded-[10px] bg-[var(--theme-primary,#2563eb)] px-5 text-[14px] font-semibold text-white hover:opacity-90 disabled:opacity-50">
+          className="inline-flex h-10 items-center gap-2 rounded-[10px] bg-[var(--theme-primary,var(--color-brand))] px-5 text-[14px] font-semibold text-white hover:opacity-90 disabled:opacity-50">
           {busy ? <LuLoader className="h-4 w-4 animate-spin" /> : null}{count > 1 ? `Add ${count} papers` : 'Add paper'}
         </button>
       </div>

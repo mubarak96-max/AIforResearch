@@ -117,7 +117,7 @@ export function parseBibtexToMetadata(bibtex: string): CitationMetadata | null {
 /**
  * Get entry type display name
  */
-const CARD_ACTION = 'inline-flex h-7 items-center gap-1 whitespace-nowrap rounded-lg px-2 text-[12.5px] font-medium text-[#475569] transition-colors hover:bg-[#f1f5f9] hover:text-[#0f172a]';
+const CARD_ACTION = 'inline-flex h-7 items-center gap-1 whitespace-nowrap rounded-lg px-2 text-[12.5px] font-medium text-ink-3 transition-colors hover:bg-line-2 hover:text-ink';
 
 /** "Rasch B, Born J" (two authors) or "Walker M et al." (more), as on the mockup's card. */
 function shortAuthorList(authors: string[]): string {
@@ -360,7 +360,7 @@ const CitationTooltip: React.FC<CitationTooltipProps> = ({
         onMouseEnter={handleTooltipMouseEnter}
         onMouseLeave={handleTooltipMouseLeave}
         role="tooltip"
-        className="fixed z-[16000] w-[340px] max-w-[calc(100vw-20px)] overflow-hidden rounded-[14px] border border-[#e5e7eb] bg-white px-3.5 pb-2.5 pt-3 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]"
+        className="fixed z-[16000] w-[340px] max-w-[calc(100vw-20px)] overflow-hidden rounded-[14px] border border-line bg-surface px-3.5 pb-2.5 pt-3 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]"
         style={{
           left: Math.max(10, Math.min(position.x - 175, window.innerWidth - 360)),
           top: position.placement === 'bottom' ? position.y : 'auto',
@@ -368,18 +368,18 @@ const CitationTooltip: React.FC<CitationTooltipProps> = ({
           transformOrigin: position.placement === 'bottom' ? 'top center' : 'bottom center',
         }}
       >
-        <div className="mb-1 flex flex-wrap items-center gap-x-2 text-[11.5px] font-medium text-[#94a3b8]">
+        <div className="mb-1 flex flex-wrap items-center gap-x-2 text-[11.5px] font-medium text-subtle">
           <span>{[getEntryTypeLabel(metadata.type || 'article'), typeof metadata.citedBy === 'number' && metadata.citedBy > 0 ? `Cited by ${metadata.citedBy.toLocaleString()}` : null].filter(Boolean).join(' · ')}</span>
           {metadata.isOpenAccess ? <span className="inline-flex items-center gap-1 text-[#15803d]"><span className="h-1.5 w-1.5 rounded-full bg-[#22c55e]" />Open access</span> : null}
         </div>
 
-        <h4 className="line-clamp-2 text-[14.5px] font-semibold leading-[1.4] text-[#0f172a]">{metadata.title}</h4>
-        <div className="mt-0.5 line-clamp-1 text-[12.5px] text-[#64748b]">
+        <h4 className="line-clamp-2 text-[14.5px] font-semibold leading-[1.4] text-ink">{metadata.title}</h4>
+        <div className="mt-0.5 line-clamp-1 text-[12.5px] text-muted">
           {[shortAuthorList(metadata.authors), metadata.journal, metadata.year].filter(Boolean).join(' · ')}
         </div>
 
         {truncatedAbstract ? (
-          <p className="mt-2 line-clamp-3 text-[12.5px] leading-[1.5] text-[#475569]">{truncatedAbstract}</p>
+          <p className="mt-2 line-clamp-3 text-[12.5px] leading-[1.5] text-ink-3">{truncatedAbstract}</p>
         ) : null}
 
         {onEdit || onNarrative || onView || onSave ? (
@@ -391,7 +391,7 @@ const CitationTooltip: React.FC<CitationTooltipProps> = ({
                 aria-pressed={isSaved}
                 className={isSaved
                   ? 'mr-1 inline-flex h-7 items-center gap-1 whitespace-nowrap rounded-lg bg-[#f0fdf4] px-2.5 text-[12.5px] font-semibold text-[#15803d]'
-                  : 'mr-1 inline-flex h-7 items-center gap-1 whitespace-nowrap rounded-lg bg-[var(--theme-primary,#2563eb)] px-2.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-[#1d4ed8]'}
+                  : 'mr-1 inline-flex h-7 items-center gap-1 whitespace-nowrap rounded-lg bg-[var(--theme-primary,var(--color-brand))] px-2.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-brand-600'}
               >
                 {isSaved ? <><LuCheck className="h-3.5 w-3.5" />Saved</> : <><LuBookmark className="h-3.5 w-3.5" />Save</>}
               </button>

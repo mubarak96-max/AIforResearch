@@ -66,7 +66,7 @@ export default async function DevelopersPage() {
   const starter = prices?.starter_credits ?? 100;
   return (
     <>
-      <div style={{ background: 'radial-gradient(900px 400px at 50% -50px, #dbeafe 0%, rgba(219,234,254,0) 70%)' }}>
+      <div style={{ background: 'radial-gradient(900px 400px at 50% -50px, var(--color-brand-100) 0%, transparent 70%)' }}>
         <div className={`${container} pb-12 pt-10 text-center md:pb-16 md:pt-[46px]`}>
           <p className={kicker}>Developers</p>
           <h1 className="mx-auto max-w-[820px] text-balance text-[34px] font-semibold leading-[1.08] tracking-[-0.035em] text-ink sm:text-[44px] lg:text-[52px]">
@@ -86,7 +86,7 @@ export default async function DevelopersPage() {
           <h2 id="services" className={sectionTitle}>What one key gives you</h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {SERVICES.map(({ icon: Icon, title, text, code }) => (
-              <div key={title} className="flex flex-col rounded-2xl border border-line bg-white p-5">
+              <div key={title} className="flex flex-col rounded-2xl border border-line bg-surface p-5">
                 <span className="grid size-10 place-items-center rounded-xl bg-brand-50 text-brand"><Icon size={20} /></span>
                 <h3 className="mt-4 text-[17px] font-bold tracking-[-0.01em] text-ink">{title}</h3>
                 <p className="mt-1.5 flex-1 text-[14.5px] leading-relaxed text-muted">{text}</p>
@@ -104,14 +104,14 @@ export default async function DevelopersPage() {
               <p className="text-[28px] font-bold tracking-[-0.02em] text-ink">{number(free)} free credits</p>
               <p className="mt-1 text-[14.5px] text-ink-2">Every day, for papers, full text, research tools and reference checks. Back at midnight UTC.</p>
             </div>
-            <div className="rounded-2xl border border-line bg-white p-5">
+            <div className="rounded-2xl border border-line bg-surface p-5">
               <p className="text-[28px] font-bold tracking-[-0.02em] text-ink">{number(starter)} credits to start</p>
               <p className="mt-1 text-[14.5px] text-ink-2">On your first key, to try AI, reviews and exports. Confirm your email to get both.</p>
             </div>
           </div>
           {prices && (
             <div className="mt-8 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-              <div className="overflow-x-auto rounded-2xl border border-line bg-white">
+              <div className="overflow-x-auto rounded-2xl border border-line bg-surface">
                 <table className="w-full text-left text-[14px]">
                   <thead><tr className="text-[12.5px] text-muted"><th className="px-5 py-3 font-medium">Service</th><th className="px-5 py-3 text-right font-medium">Credits</th></tr></thead>
                   <tbody>
@@ -128,7 +128,7 @@ export default async function DevelopersPage() {
                 <h3 className="text-[15px] font-semibold text-ink">Credit packs</h3>
                 <ul className="mt-3 grid gap-2.5">
                   {prices.packs.map((pack) => (
-                    <li key={pack.id} className="flex items-center justify-between rounded-xl border border-line bg-white px-4 py-3">
+                    <li key={pack.id} className="flex items-center justify-between rounded-xl border border-line bg-surface px-4 py-3">
                       <span className="text-[15px] font-bold tabular-nums text-ink">{pack.credits.toLocaleString('en-US')}</span>
                       <span className="text-[14px] text-muted"><span className="font-semibold text-ink">{usd(pack.cents)}</span> · ${pack.usd_per_1000.toFixed(2)} per 1,000</span>
                     </li>
@@ -183,7 +183,7 @@ reply = client.chat.completions.create(
 
         <section aria-labelledby="institutions" className="mb-16 border-t border-line-2 py-10 md:mb-[90px] md:py-14">
           <div className="rounded-3xl border border-line bg-soft p-6 md:p-10">
-            <span className="grid size-10 place-items-center rounded-xl bg-white text-brand shadow-card"><LuGraduationCap size={20} /></span>
+            <span className="grid size-10 place-items-center rounded-xl bg-surface text-brand shadow-card"><LuGraduationCap size={20} /></span>
             <h2 id="institutions" className={`${sectionTitle} mt-4`}>For universities and research groups</h2>
             <p className="mt-3 max-w-[720px] text-[16px] leading-relaxed text-muted">Run WriteOrbit for a whole department or university in a Firebase project your institution owns, with your own sign-in rules, plans and providers.</p>
             {contactEmail && <a href={contact} className={`${btnPrimary} mt-6 h-12 px-6 text-[16px]`}>Talk to us</a>}

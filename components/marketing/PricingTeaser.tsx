@@ -26,8 +26,8 @@ export function PricingTeaser({ plans }: { plans: PublicPlan[] | null }) {
           {plans.map((plan) => {
             const line = price(plan);
             return (
-              <li key={plan.id} className={`relative flex flex-col rounded-[20px] bg-white p-5 ${plan.featured ? 'border-2 border-brand shadow-[0_24px_50px_-34px_rgba(37,99,235,.55)]' : 'border border-line'}`}>
-                {plan.featured && <span className="absolute -top-2.5 left-5 rounded-full bg-brand px-2 py-0.5 text-[11.5px] font-semibold text-white">Most popular</span>}
+              <li key={plan.id} className={`relative flex flex-col rounded-[20px] bg-surface p-5 ${plan.featured ? 'border-2 border-brand shadow-[0_24px_50px_-34px_rgba(var(--brand-rgb),.55)]' : 'border border-line'}`}>
+                {plan.featured && <span className="absolute -top-2.5 left-5 rounded-full bg-brand px-2 py-0.5 text-[11.5px] font-semibold text-on-brand">Most popular</span>}
                 <h3 className="text-[15px] font-semibold text-ink">{plan.name}</h3>
                 <p className="mt-2.5 flex items-baseline gap-1.5">
                   <span className="text-[30px] font-semibold leading-none tracking-[-0.03em] text-ink">{line.amount}</span>

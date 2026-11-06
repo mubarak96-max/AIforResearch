@@ -5,7 +5,7 @@ import { focusRing } from '@/components/marketing/styles';
 
 /** 16px on phones (no iOS zoom), 15px from 768px up. */
 export const inputClass =
-  'h-12 w-full rounded-xl border border-line bg-white px-3.5 text-base text-ink placeholder:text-slate-400 outline-none transition-[border-color,box-shadow] focus:border-brand focus:ring-4 focus:ring-brand-100 aria-invalid:border-red-400 aria-invalid:focus:ring-red-100 disabled:bg-soft md:text-[15px]';
+  'h-12 w-full rounded-xl border border-line bg-surface px-3.5 text-base text-ink placeholder:text-slate-400 outline-none transition-[border-color,box-shadow] focus:border-brand focus:ring-4 focus:ring-brand-100 aria-invalid:border-red-400 aria-invalid:focus:ring-red-100 disabled:bg-soft md:text-[15px]';
 
 export function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;

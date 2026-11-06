@@ -121,13 +121,13 @@ export default function CitationInsertModal({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 16 }}
           transition={{ duration: 0.18 }}
-          className="flex max-h-[82vh] w-full max-w-3xl flex-col overflow-hidden rounded-[14px] bg-white border border-[#e5e7eb] shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]"
+          className="flex max-h-[82vh] w-full max-w-3xl flex-col overflow-hidden rounded-[14px] bg-surface border border-line shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]"
           onClick={(event) => event.stopPropagation()}
         >
-          <div className="flex items-start justify-between border-b border-[#e5e7eb] px-6 py-4">
+          <div className="flex items-start justify-between border-b border-line px-6 py-4">
             <div>
-              <h3 className="text-[18px] font-bold text-[#0f172a]">Add citation</h3>
-              <p className="mt-0.5 text-sm text-[#64748b]">
+              <h3 className="text-[18px] font-bold text-ink">Add citation</h3>
+              <p className="mt-0.5 text-sm text-muted">
                 Search your reference manager, open a folder, and insert a paper as a live citation node.
               </p>
             </div>
@@ -135,7 +135,7 @@ export default function CitationInsertModal({
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="rounded-lg p-1.5 text-[#64748b] transition-colors hover:bg-[#f1f5f9] disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg p-1.5 text-muted transition-colors hover:bg-line-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -143,10 +143,10 @@ export default function CitationInsertModal({
             </button>
           </div>
 
-          <div className="border-b border-[#f1f5f9] px-6 py-3">
+          <div className="border-b border-line-2 px-6 py-3">
             <div className="relative">
               <svg
-                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94a3b8]"
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -159,25 +159,25 @@ export default function CitationInsertModal({
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Search papers, authors, DOI, or filename"
-                className="w-full rounded-lg border border-[#e5e7eb] py-2 pl-9 pr-3 text-sm focus:border-[#93c5fd] focus:outline-none focus:ring-1 focus:ring-[#bfdbfe]"
+                className="w-full rounded-lg border border-line py-2 pl-9 pr-3 text-sm focus:border-primary-300 focus:outline-none focus:ring-1 focus:ring-primary-200"
               />
             </div>
           </div>
 
           <div className="flex min-h-0 flex-1 overflow-hidden">
-            <aside className="w-56 shrink-0 overflow-y-auto border-r border-[#f1f5f9] bg-[#f8fafc]/60 py-2">
+            <aside className="w-56 shrink-0 overflow-y-auto border-r border-line-2 bg-soft/60 py-2">
               <button
                 type="button"
                 onClick={() => setSelectedFolderId(null)}
                 className={`flex w-full items-center gap-2 px-4 py-2 text-left text-sm transition-colors ${
                   selectedFolderId === null
-                    ? 'bg-[#eff6ff] font-medium text-[#1d4ed8]'
-                    : 'text-[#64748b] hover:bg-[#f1f5f9]'
+                    ? 'bg-brand-50 font-medium text-brand-600'
+                    : 'text-muted hover:bg-line-2'
                 }`}
               >
                 <span>All Papers</span>
               </button>
-              <div className="px-4 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wide text-[#94a3b8]">
+              <div className="px-4 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wide text-subtle">
                 Libraries
               </div>
               {scopes.map((scope) => (
@@ -190,22 +190,22 @@ export default function CitationInsertModal({
                   }}
                   className={`flex w-full items-center gap-2 px-4 py-2 text-left text-sm transition-colors ${
                     selectedScopeId === scope.id && selectedFolderId === null
-                      ? 'bg-[#eff6ff] font-medium text-[#1d4ed8]'
-                      : 'text-[#334155] hover:bg-[#f1f5f9]'
+                      ? 'bg-brand-50 font-medium text-brand-600'
+                      : 'text-ink-2 hover:bg-line-2'
                   }`}
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block truncate">{scope.label}</span>
-                    <span className="block truncate text-[10px] text-[#94a3b8]">
+                    <span className="block truncate text-[10px] text-subtle">
                       {scope.groupLibraryId ? 'Group library' : 'Personal library'}
                     </span>
                   </span>
-                  <span className="ml-auto shrink-0 text-[10px] text-[#94a3b8]">
+                  <span className="ml-auto shrink-0 text-[10px] text-subtle">
                     {scope.groupLibraryId ? 'Group' : 'Personal'}
                   </span>
                 </button>
               ))}
-              <div className="px-4 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wide text-[#94a3b8]">
+              <div className="px-4 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wide text-subtle">
                 Folders
               </div>
               {folders.filter((folder) => folder.scopeId === selectedScopeId).map((folder) => (
@@ -215,8 +215,8 @@ export default function CitationInsertModal({
                   onClick={() => setSelectedFolderId(folder.id)}
                   className={`flex w-full items-center gap-2 px-4 py-2 text-left text-sm transition-colors ${
                     selectedFolderId === folder.id
-                      ? 'bg-[#eff6ff] font-medium text-[#1d4ed8]'
-                      : 'text-[#64748b] hover:bg-[#f1f5f9]'
+                      ? 'bg-brand-50 font-medium text-brand-600'
+                      : 'text-muted hover:bg-line-2'
                   }`}
                 >
                   <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -229,27 +229,27 @@ export default function CitationInsertModal({
                   <span className="min-w-0 flex-1">
                     <span className="block truncate">{folder.name}</span>
                     {folder.scopeLabel !== 'My Library' ? (
-                      <span className="block truncate text-[10px] text-[#94a3b8]">{folder.scopeLabel}</span>
+                      <span className="block truncate text-[10px] text-subtle">{folder.scopeLabel}</span>
                     ) : null}
                   </span>
-                  <span className="ml-auto shrink-0 text-[10px] text-[#94a3b8]">{folder.document_count}</span>
+                  <span className="ml-auto shrink-0 text-[10px] text-subtle">{folder.document_count}</span>
                 </button>
               ))}
               {folders.filter((folder) => folder.scopeId === selectedScopeId).length === 0 ? (
-                <div className="px-4 py-2 text-xs text-[#94a3b8]">
+                <div className="px-4 py-2 text-xs text-subtle">
                   No folders in this library.
                 </div>
               ) : null}
             </aside>
 
             <section className="flex min-h-0 flex-1 flex-col">
-              <div className="border-b border-[#f1f5f9] px-4 py-2 text-xs font-medium uppercase tracking-wide text-[#64748b]">
+              <div className="border-b border-line-2 px-4 py-2 text-xs font-medium uppercase tracking-wide text-muted">
                 {isFetching ? 'Loading papers...' : `${documents.length} paper${documents.length === 1 ? '' : 's'}`}
               </div>
 
               <div className="min-h-0 flex-1 overflow-y-auto">
                 {documents.length === 0 && !isFetching ? (
-                  <div className="px-4 py-8 text-sm text-[#64748b]">
+                  <div className="px-4 py-8 text-sm text-muted">
                     No matching references found in this folder.
                   </div>
                 ) : (
@@ -260,23 +260,23 @@ export default function CitationInsertModal({
                         type="button"
                         key={document.id}
                         onClick={() => setSelectedDocumentId(document.id)}
-                        className={`block w-full border-b border-[#f1f5f9] px-4 py-3 text-left transition-colors ${
-                          isSelected ? 'bg-[#eff6ff]' : 'hover:bg-[#f8fafc]'
+                        className={`block w-full border-b border-line-2 px-4 py-3 text-left transition-colors ${
+                          isSelected ? 'bg-brand-50' : 'hover:bg-soft'
                         }`}
                       >
                         <div className="flex items-start gap-3">
                           <div
                             className={`mt-0.5 h-4 w-4 rounded-full border ${
-                              isSelected ? 'border-[#2563eb] bg-[#2563eb]' : 'border-[#cbd5e1] bg-white'
+                              isSelected ? 'border-brand bg-brand' : 'border-line-3 bg-surface'
                             }`}
                           >
-                            {isSelected ? <div className="mx-auto mt-1 h-1.5 w-1.5 rounded-full bg-white" /> : null}
+                            {isSelected ? <div className="mx-auto mt-1 h-1.5 w-1.5 rounded-full bg-surface" /> : null}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="truncate text-sm font-medium text-[#0f172a]">
+                            <div className="truncate text-sm font-medium text-ink">
                               {document.title || document.filename}
                             </div>
-                            <div className="mt-1 line-clamp-2 text-xs text-[#64748b]">
+                            <div className="mt-1 line-clamp-2 text-xs text-muted">
                               {renderSubtitle(document)}
                             </div>
                           </div>
@@ -289,8 +289,8 @@ export default function CitationInsertModal({
             </section>
           </div>
 
-          <div className="flex items-center justify-between border-t border-[#e5e7eb] px-6 py-4">
-            <div className="text-sm text-[#64748b]">
+          <div className="flex items-center justify-between border-t border-line px-6 py-4">
+            <div className="text-sm text-muted">
               {selectedDocument ? `Selected: ${selectedDocument.title || selectedDocument.filename}` : 'Choose a paper to cite'}
             </div>
             <div className="flex items-center gap-2">
@@ -298,7 +298,7 @@ export default function CitationInsertModal({
                 type="button"
                 onClick={onClose}
                 disabled={isLoading}
-                className="rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-medium text-[#64748b] transition-colors hover:bg-[#f8fafc] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-lg border border-line px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-soft disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -306,7 +306,7 @@ export default function CitationInsertModal({
                 type="button"
                 onClick={() => void handleConfirm()}
                 disabled={!selectedDocument || isLoading}
-                className="rounded-lg bg-[#2563eb] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1d4ed8] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-lg bg-brand px-3 py-2 text-sm font-medium text-on-brand transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isLoading ? 'Adding citation...' : 'Add Citation'}
               </button>

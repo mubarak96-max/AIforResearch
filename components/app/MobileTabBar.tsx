@@ -49,13 +49,13 @@ export function MobileTabBar() {
   return (
     <>
       <div className="h-[84px] md:hidden" aria-hidden="true" />
-      <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-[60] grid h-[84px] grid-cols-5 border-t border-line bg-white/95 px-1.5 pt-2 pb-[max(22px,env(safe-area-inset-bottom))] backdrop-blur md:hidden">
+      <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-[60] grid h-[84px] grid-cols-5 border-t border-line bg-surface/95 px-1.5 pt-2 pb-[max(22px,env(safe-area-inset-bottom))] backdrop-blur md:hidden">
         <Link href="/editor" aria-current={docsActive ? 'page' : undefined} className={label(docsActive)}>
           {DOCS_ICON}Docs
         </Link>
         {tool(TOOLS[0])}
         <Link href="/editor?new=1" aria-label="New document" className="flex justify-center">
-          <span className="-mt-3.5 grid h-12 w-12 place-items-center rounded-2xl bg-brand shadow-[0_10px_20px_-8px_rgba(37,99,235,.8)]">
+          <span className="-mt-3.5 grid h-12 w-12 place-items-center rounded-2xl bg-brand shadow-[0_10px_20px_-8px_rgba(var(--brand-rgb),.8)]">
             <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
           </span>
         </Link>

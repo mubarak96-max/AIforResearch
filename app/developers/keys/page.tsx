@@ -141,7 +141,7 @@ export default function DeveloperKeysPage() {
             <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
               {(data?.packs ?? []).map((pack) => (
                 <button key={pack.id} type="button" disabled={!data?.payments_enabled || busy !== null} onClick={() => void buy(pack.id)}
-                  className="flex flex-col items-start rounded-xl border border-line bg-white px-3.5 py-3 text-left transition-colors hover:border-brand hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-60">
+                  className="flex flex-col items-start rounded-xl border border-line bg-surface px-3.5 py-3 text-left transition-colors hover:border-brand hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-60">
                   <span className="text-[15px] font-bold tabular-nums">{number(pack.credits)}<span className="ml-1 text-[12.5px] font-medium text-muted">credits</span></span>
                   <span className="mt-0.5 text-[14px] font-semibold text-ink-2">{usd(pack.cents)}</span>
                   <span className="text-[12.5px] text-muted">${pack.usd_per_1000.toFixed(2)} per 1,000</span>

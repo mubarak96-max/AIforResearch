@@ -17,6 +17,7 @@ import {
 } from '@blocknote/core';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { MantineProvider } from '@mantine/core';
+import { useHostTheme } from '../../lib/aiEditor/hostTheme';
 import { SuggestionMenuController, getDefaultReactSlashMenuItems, useCreateBlockNote } from '@blocknote/react';
 import { SuggestionMenu as SuggestionMenuExtension, filterSuggestionItems, insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
 import { LuFlag, LuQuote, LuSigma, LuSparkles, LuTableOfContents, LuThumbsDown, LuThumbsUp } from 'react-icons/lu';
@@ -2070,6 +2071,7 @@ export default function AIEditorWorkspace() {
   const provider = getAIEditorProvider();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const hostTheme = useHostTheme();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const { canUseHumanizer, humanizer, isLoading: isAIToolsAccessLoading } = useAIToolsAccess();
   const [mounted, setMounted] = useState(false);
@@ -6022,7 +6024,7 @@ export default function AIEditorWorkspace() {
         className="absolute inset-0 h-full w-full cursor-default bg-[rgba(15,23,42,.35)]"
         onClick={() => setIsAppMenuOpen(false)}
       />
-      <div className="absolute inset-y-0 left-0 max-w-[85vw] overflow-y-auto bg-white">
+      <div className="absolute inset-y-0 left-0 max-w-[85vw] overflow-y-auto bg-surface">
         {editorConfig.renderNavigation ? (
           <NavigationSidebar />
         ) : (
@@ -6043,7 +6045,7 @@ export default function AIEditorWorkspace() {
 
   if (!documentId) {
     return (
-      <main className="ai-editor-theme flex min-h-dvh bg-white lg:h-dvh lg:overflow-hidden">
+      <main className="ai-editor-theme flex min-h-dvh bg-surface lg:h-dvh lg:overflow-hidden">
         {appNav}
         <AppToolDrawer documents={documentsDrawer} />
         <div className="min-w-0 flex-1 lg:overflow-y-auto">
@@ -6069,18 +6071,18 @@ export default function AIEditorWorkspace() {
   // A document link opened while signed out: say why instead of opening an editor that cannot save.
   if (!authLoading && !isAuthenticated) {
     return (
-      <main className="ai-editor-theme flex min-h-dvh flex-col bg-[#f8fafc]">
+      <main className="ai-editor-theme flex min-h-dvh flex-col bg-soft">
         <section className="flex flex-1 items-center justify-center px-4 py-10">
-          <div className="w-full max-w-[460px] rounded-[16px] border border-[#e5e7eb] bg-white px-6 py-8 text-center shadow-[0_22px_50px_-18px_rgba(15,23,42,.25)]">
-            <div className="text-[18px] font-bold text-[#0f172a]">Sign in to open this document</div>
-            <p className="mt-2 text-[14px] leading-[1.6] text-[#64748b]">
+          <div className="w-full max-w-[460px] rounded-[16px] border border-line bg-surface px-6 py-8 text-center shadow-[0_22px_50px_-18px_rgba(15,23,42,.25)]">
+            <div className="text-[18px] font-bold text-ink">Sign in to open this document</div>
+            <p className="mt-2 text-[14px] leading-[1.6] text-muted">
               Documents are saved to your WriteOrbit account. Sign in, or create a free account, to write, cite and review with AI.
             </p>
             <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
-              <button type="button" onClick={() => setAuthPrompt('login')} className="h-[42px] rounded-[11px] bg-[var(--theme-primary)] px-[18px] text-[15px] font-semibold text-white shadow-[0_6px_16px_-6px_rgba(37,99,235,.7)] hover:bg-[var(--theme-primary-dark)]">Sign in</button>
-              <button type="button" onClick={() => setAuthPrompt('signup')} className="h-[42px] rounded-[11px] border border-[#e5e7eb] bg-white px-[18px] text-[15px] font-semibold text-[#0f172a] hover:bg-[#f8fafc]">Create a free account</button>
+              <button type="button" onClick={() => setAuthPrompt('login')} className="h-[42px] rounded-[11px] bg-[var(--theme-primary)] px-[18px] text-[15px] font-semibold text-on-brand shadow-[0_6px_16px_-6px_rgba(var(--brand-rgb),.7)] hover:bg-[var(--theme-primary-dark)]">Sign in</button>
+              <button type="button" onClick={() => setAuthPrompt('signup')} className="h-[42px] rounded-[11px] border border-line bg-surface px-[18px] text-[15px] font-semibold text-ink hover:bg-soft">Create a free account</button>
             </div>
-            <button type="button" onClick={handleOpenDocsHome} className="mt-4 text-[14px] text-[#64748b] underline underline-offset-2 hover:text-[#0f172a]">Back to documents</button>
+            <button type="button" onClick={handleOpenDocsHome} className="mt-4 text-[14px] text-muted underline underline-offset-2 hover:text-ink">Back to documents</button>
           </div>
         </section>
         <AuthModal module="AI Article Generator" reason="write and save documents" isOpen={authPrompt !== null} initialMode={authPrompt ?? 'login'} onClose={() => setAuthPrompt(null)} />
@@ -6090,12 +6092,12 @@ export default function AIEditorWorkspace() {
 
   if (!documentSnapshot) {
     return (
-      <main className="ai-editor-theme flex h-dvh overflow-hidden bg-white">
+      <main className="ai-editor-theme flex h-dvh overflow-hidden bg-surface">
         {appNav}
         <section className="flex min-w-0 flex-1 flex-col items-center justify-center gap-2 px-4 py-10 text-center" role="status">
-          <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#dbeafe] border-t-[var(--theme-primary)]" aria-hidden="true" />
-          <div className="text-[15px] font-semibold text-[#0f172a]">Opening document…</div>
-          <div className="max-w-[420px] text-[13.5px] text-[#64748b]">
+          <span className="h-5 w-5 animate-spin rounded-full border-2 border-brand-100 border-t-[var(--theme-primary)]" aria-hidden="true" />
+          <div className="text-[15px] font-semibold text-ink">Opening document…</div>
+          <div className="max-w-[420px] text-[13.5px] text-muted">
             {isAuthenticated
               ? 'If this document does not exist yet, it will be created automatically.'
               : 'Sign in to load shared documents, or continue with a local draft.'}
@@ -6127,7 +6129,7 @@ export default function AIEditorWorkspace() {
   );
 
   return (
-    <main className="ai-editor-theme relative flex h-dvh overflow-hidden bg-white">
+    <main className="ai-editor-theme relative flex h-dvh overflow-hidden bg-surface">
       <EditorToaster />
       {appNav}
       <AppToolDrawer
@@ -6233,14 +6235,14 @@ export default function AIEditorWorkspace() {
         {/* Below the header: the page, then the open tool, then the tool rail. */}
         <div className="relative flex min-h-0 flex-1">
           <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-            <section className={`relative z-0 flex min-h-0 flex-1 overflow-hidden ${paginationConfig ? 'bg-[#f8fafc]' : 'bg-white'}`}>
+            <section className={`relative z-0 flex min-h-0 flex-1 overflow-hidden ${paginationConfig ? 'bg-soft' : 'bg-surface'}`}>
                 <div
                   ref={attachDocumentScrollContainer}
                   className={`relative min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-auto ${paginationConfig ? 'md:px-4 md:pt-[72px]' : 'md:pt-3'}`}
                 >
                   {requiresAccountForInvite ? (
-                    <div className="mx-auto mb-3 w-[calc(100%-32px)] max-w-[720px] md:w-[calc(100%-144px)] rounded-[14px] border border-[#e5e7eb] bg-white px-4 py-4 text-[14px] text-[#64748b]">
-                      <div className="font-medium text-[#0f172a]">Account required for invited collaboration</div>
+                    <div className="mx-auto mb-3 w-[calc(100%-32px)] max-w-[720px] md:w-[calc(100%-144px)] rounded-[14px] border border-line bg-surface px-4 py-4 text-[14px] text-muted">
+                      <div className="font-medium text-ink">Account required for invited collaboration</div>
                       <div className="mt-1">
                         Shared documents are tied to user accounts. Create an account or sign in first, then this document will appear in your shared documents list if your email was invited.
                       </div>
@@ -6255,7 +6257,7 @@ export default function AIEditorWorkspace() {
                         <button
                           type="button"
                           onClick={() => handleAuthRedirect('signup')}
-                          className="inline-flex h-10 items-center justify-center rounded-xl border border-[#e5e7eb] px-4 text-sm font-medium text-[#334155] transition-colors hover:bg-[#f1f5f9]"
+                          className="inline-flex h-10 items-center justify-center rounded-xl border border-line px-4 text-sm font-medium text-ink-2 transition-colors hover:bg-line-2"
                         >
                           Create account
                         </button>
@@ -6264,9 +6266,9 @@ export default function AIEditorWorkspace() {
                   ) : null}
 
                   {isAuthenticated && invitedMember ? (
-                    <div className="mx-auto mb-3 w-[calc(100%-32px)] max-w-[720px] md:w-[calc(100%-144px)] rounded-[14px] border border-[#e5e7eb] bg-[#f8fafc] px-4 py-3 text-[14px] text-[#64748b]">
-                      This document is shared directly with <span className="font-medium text-[#0f172a]">{user?.email}</span> as{' '}
-                      <span className="font-medium capitalize text-[#0f172a]">{invitedMember.role}</span>. It will continue to appear in your shared documents list after you sign in.
+                    <div className="mx-auto mb-3 w-[calc(100%-32px)] max-w-[720px] md:w-[calc(100%-144px)] rounded-[14px] border border-line bg-soft px-4 py-3 text-[14px] text-muted">
+                      This document is shared directly with <span className="font-medium text-ink">{user?.email}</span> as{' '}
+                      <span className="font-medium capitalize text-ink">{invitedMember.role}</span>. It will continue to appear in your shared documents list after you sign in.
                     </div>
                   ) : null}
 
@@ -6285,7 +6287,7 @@ export default function AIEditorWorkspace() {
                     </div>
                   ) : null}
                   {!isWritingEnabled ? (
-                    <div className="mx-auto mb-3 w-[calc(100%-32px)] max-w-[720px] md:w-[calc(100%-144px)] rounded-[14px] border border-[#e5e7eb] bg-[#f8fafc] px-4 py-3 text-[14px] text-[#64748b]">
+                    <div className="mx-auto mb-3 w-[calc(100%-32px)] max-w-[720px] md:w-[calc(100%-144px)] rounded-[14px] border border-line bg-soft px-4 py-3 text-[14px] text-muted">
                       {canEdit
                         ? 'Viewing mode is read-only. Switch back to Editing mode to make document changes.'
                         : effectiveRole === 'commenter'
@@ -6300,16 +6302,16 @@ export default function AIEditorWorkspace() {
                   ) : null}
 
                   {aiSuggestion.isActive && aiSuggestion.isLoading ? (
-                    <div className="mx-auto mb-3 w-[calc(100%-32px)] max-w-[720px] md:w-[calc(100%-144px)] rounded-[14px] border border-[#dbeafe] bg-[#eff6ff] px-4 py-3 text-[14px] text-[#1d4ed8]">
+                    <div className="mx-auto mb-3 w-[calc(100%-32px)] max-w-[720px] md:w-[calc(100%-144px)] rounded-[14px] border border-brand-100 bg-brand-50 px-4 py-3 text-[14px] text-brand-600">
                       <div className="flex items-center justify-between gap-3">
                         <div>
                           <div className="font-medium">AI writing continues on the server</div>
-                          <div className="mt-1 text-xs text-[#475569]">
+                          <div className="mt-1 text-xs text-ink-3">
                             {(aiSuggestion.stage || 'queued').replaceAll('_', ' ')} · {aiSuggestion.progressPct}%
                             {aiSuggestion.connectionState === 'reconnecting' ? ' · Reconnecting this view' : ''}
                           </div>
                         </div>
-                        <div className="h-2 w-28 overflow-hidden rounded-full bg-white">
+                        <div className="h-2 w-28 overflow-hidden rounded-full bg-surface">
                           <div
                             className="h-full rounded-full bg-[var(--theme-primary)] transition-all"
                             style={{ width: `${Math.max(4, aiSuggestion.progressPct)}%` }}
@@ -6327,7 +6329,7 @@ export default function AIEditorWorkspace() {
                           type="button"
                           onClick={() => void aiSuggestion.retryFailed()}
                           disabled={aiSuggestion.isLoading}
-                          className="shrink-0 rounded-lg border border-[#fca5a5] bg-white px-3 py-1.5 text-xs font-medium hover:bg-[#fff7f7] disabled:opacity-50"
+                          className="shrink-0 rounded-lg border border-[#fca5a5] bg-surface px-3 py-1.5 text-xs font-medium hover:bg-[#fff7f7] disabled:opacity-50"
                         >
                           Retry saved task
                         </button>
@@ -6341,13 +6343,13 @@ export default function AIEditorWorkspace() {
                     <div
                       ref={suggestionCardRef}
                       style={suggestionAnchor ? { position: 'absolute', top: suggestionAnchor.top, left: suggestionAnchor.left, width: suggestionAnchor.width } : undefined}
-                      className={`${suggestionAnchor ? 'z-30' : 'mx-auto mb-3 w-[calc(100%-32px)] max-w-[720px] md:w-[calc(100%-144px)]'} rounded-[14px] border border-[#dbeafe] bg-white px-4 pb-3 pt-3 shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]`}
+                      className={`${suggestionAnchor ? 'z-30' : 'mx-auto mb-3 w-[calc(100%-32px)] max-w-[720px] md:w-[calc(100%-144px)]'} rounded-[14px] border border-brand-100 bg-surface px-4 pb-3 pt-3 shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)]`}
                     >
                       <div className="flex items-center gap-1.5 text-[12px] font-semibold text-[var(--theme-primary-dark)]">
                         <LuSparkles className="h-3.5 w-3.5" />
                         {isStartWritingFlow ? `AI draft · ${activeAISuggestion.type}` : 'AI suggestion'}
                       </div>
-                      <div className="mt-1.5 max-h-[40vh] overflow-y-auto whitespace-pre-wrap text-[15px] leading-[1.65] text-[#334155]" style={{ fontFamily: "var(--font-serif), 'Source Serif 4', Georgia, serif" }}>
+                      <div className="mt-1.5 max-h-[40vh] overflow-y-auto whitespace-pre-wrap text-[15px] leading-[1.65] text-ink-2" style={{ fontFamily: "var(--font-serif), 'Source Serif 4', Georgia, serif" }}>
                         {stripHtmlToText(activeAISuggestion.html || activeAISuggestion.text)}
                       </div>
                       <div className="mt-2.5 flex flex-wrap items-center gap-1">
@@ -6355,7 +6357,7 @@ export default function AIEditorWorkspace() {
                           type="button"
                           onClick={() => void handleAcceptAISuggestion()}
                           disabled={aiSuggestion.isApplying}
-                          className="mr-1 h-8 rounded-lg bg-[var(--theme-primary)] px-3 text-[13px] font-semibold text-white hover:bg-[var(--theme-primary-dark)] disabled:opacity-50"
+                          className="mr-1 h-8 rounded-lg bg-[var(--theme-primary)] px-3 text-[13px] font-semibold text-on-brand hover:bg-[var(--theme-primary-dark)] disabled:opacity-50"
                         >
                           {aiSuggestion.isApplying ? 'Adding…' : 'Accept'}
                         </button>
@@ -6363,7 +6365,7 @@ export default function AIEditorWorkspace() {
                           type="button"
                           onClick={handleRetryAISuggestion}
                           disabled={aiSuggestion.isApplying || aiSuggestion.isLoading}
-                          className="h-8 rounded-lg px-2.5 text-[13px] font-medium text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0f172a] disabled:opacity-50"
+                          className="h-8 rounded-lg px-2.5 text-[13px] font-medium text-ink-3 hover:bg-line-2 hover:text-ink disabled:opacity-50"
                         >
                           Try again
                         </button>
@@ -6372,7 +6374,7 @@ export default function AIEditorWorkspace() {
                             type="button"
                             onClick={() => void handleConcludeAISuggestion()}
                             disabled={aiSuggestion.isApplying || aiSuggestion.isLoading}
-                            className="h-8 rounded-lg px-2.5 text-[13px] font-medium text-[var(--theme-primary-dark)] hover:bg-[#eff6ff] disabled:opacity-50"
+                            className="h-8 rounded-lg px-2.5 text-[13px] font-medium text-[var(--theme-primary-dark)] hover:bg-brand-50 disabled:opacity-50"
                           >
                             Accept and conclude
                           </button>
@@ -6381,7 +6383,7 @@ export default function AIEditorWorkspace() {
                           type="button"
                           onClick={handleStopAISuggestion}
                           disabled={aiSuggestion.isApplying}
-                          className="ml-auto h-8 rounded-lg px-2.5 text-[13px] font-medium text-[#94a3b8] hover:bg-[#f1f5f9] hover:text-[#0f172a] disabled:opacity-50"
+                          className="ml-auto h-8 rounded-lg px-2.5 text-[13px] font-medium text-subtle hover:bg-line-2 hover:text-ink disabled:opacity-50"
                         >
                           Dismiss
                         </button>
@@ -6396,7 +6398,7 @@ export default function AIEditorWorkspace() {
                     reflow={isMobile}
                     paginated={Boolean(paginationConfig)}
                   >
-                    <div ref={editorSurfaceRef} className="relative bg-white" onContextMenu={handleEditorContextMenu} onClick={(event) => { handleSuggestionClick(event); handleMathClick(event); }}>
+                    <div ref={editorSurfaceRef} className="relative bg-surface" onContextMenu={handleEditorContextMenu} onClick={(event) => { handleSuggestionClick(event); handleMathClick(event); }}>
                       {suggestionPopover ? (
                         <div className="ce-suggestion-popover ai-editor-print-hidden" style={{ top: suggestionPopover.top, left: suggestionPopover.left }} role="dialog" aria-label="Suggested edit">
                           <span>
@@ -6410,10 +6412,10 @@ export default function AIEditorWorkspace() {
                           ) : null}
                         </div>
                       ) : null}
-                      <MantineProvider defaultColorScheme="light" theme={mantineTheme}>
+                      <MantineProvider forceColorScheme={hostTheme} theme={mantineTheme}>
                         <div className="relative">
                             {crdtCollaboration.isConnecting ? (
-                              <div className="pointer-events-none absolute left-1/2 top-4 z-20 -translate-x-1/2 rounded-full border border-[#e5e7eb] bg-white/95 px-3 py-1 text-[12px] font-medium text-[#64748b] backdrop-blur ai-editor-print-hidden">
+                              <div className="pointer-events-none absolute left-1/2 top-4 z-20 -translate-x-1/2 rounded-full border border-line bg-surface/95 px-3 py-1 text-[12px] font-medium text-muted backdrop-blur ai-editor-print-hidden">
                                 Connecting realtime collaboration...
                               </div>
                             ) : null}
@@ -6422,7 +6424,7 @@ export default function AIEditorWorkspace() {
                                 {activeEditingCollaborators.map((collaborator) => (
                                   <div
                                     key={collaborator.sessionId}
-                                    className="inline-flex items-center gap-1.5 rounded-full border border-[#e5e7eb] bg-white/95 px-2.5 py-1 text-[12px] font-medium text-[#0f172a] backdrop-blur"
+                                    className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface/95 px-2.5 py-1 text-[12px] font-medium text-ink backdrop-blur"
                                   >
                                     <span
                                       className="h-2 w-2 rounded-full"
@@ -6440,7 +6442,7 @@ export default function AIEditorWorkspace() {
                                 <div
                                   key={anchor.issueId}
                                   data-review-card="true"
-                                  className="absolute z-20 w-[280px] rounded-2xl border border-[#fde68a] bg-white p-3 text-left shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)] ai-editor-print-hidden"
+                                  className="absolute z-20 w-[280px] rounded-2xl border border-[#fde68a] bg-surface p-3 text-left shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)] ai-editor-print-hidden"
                                   style={{ top: `${anchor.top + 4}px`, left: `${Math.max(0, anchor.left)}px` }}
                                 >
                                   <div className="flex items-start justify-between gap-2">
@@ -6448,28 +6450,28 @@ export default function AIEditorWorkspace() {
                                       <div className="text-[10px] font-semibold uppercase tracking-[0.04em] text-[#b45309]">
                                         {anchor.category}
                                       </div>
-                                      <div className="mt-1 text-[13px] font-semibold leading-5 text-[#0f172a]">
+                                      <div className="mt-1 text-[13px] font-semibold leading-5 text-ink">
                                         {anchor.title}
                                       </div>
                                     </div>
                                     <button
                                       type="button"
                                       onClick={() => setActiveReviewIssueId(null)}
-                                      className="shrink-0 inline-flex h-5 w-5 items-center justify-center rounded-full text-[#64748b] hover:bg-[#fef3c7] transition-colors"
+                                      className="shrink-0 inline-flex h-5 w-5 items-center justify-center rounded-full text-muted hover:bg-[#fef3c7] transition-colors"
                                       aria-label="Close"
                                     >
                                       ×
                                     </button>
                                   </div>
-                                  <div className="mt-2 text-[12px] leading-5 text-[#64748b]">
+                                  <div className="mt-2 text-[12px] leading-5 text-muted">
                                     {anchor.explanation}
                                   </div>
                                   <div className="mt-2 rounded-xl bg-[#fffbeb] px-2.5 py-2 text-[11px] text-[#92400e]">
                                     <div className="font-medium">Replace</div>
                                     <div className="mt-1 line-clamp-2">&ldquo;{anchor.original_text}&rdquo;</div>
                                   </div>
-                                  <div className="mt-2 rounded-xl border border-[#f1f5f9] bg-white px-2.5 py-2 text-[11px] text-[#0f172a]">
-                                    <div className="font-medium text-[#0f172a]">With</div>
+                                  <div className="mt-2 rounded-xl border border-line-2 bg-surface px-2.5 py-2 text-[11px] text-ink">
+                                    <div className="font-medium text-ink">With</div>
                                     <div className="mt-1 line-clamp-3">{anchor.suggested_text}</div>
                                   </div>
                                   <div className="mt-3 flex items-center gap-2">
@@ -6477,7 +6479,7 @@ export default function AIEditorWorkspace() {
                                       type="button"
                                       onClick={handleAcceptReviewIssue}
                                       disabled={!isWritingEnabled}
-                                      className="inline-flex h-7 items-center rounded-full bg-[var(--theme-primary)] px-3 text-[11px] font-medium text-white transition-colors hover:bg-[var(--theme-primary-dark)] disabled:cursor-not-allowed disabled:opacity-60"
+                                      className="inline-flex h-7 items-center rounded-full bg-[var(--theme-primary)] px-3 text-[11px] font-medium text-on-brand transition-colors hover:bg-[var(--theme-primary-dark)] disabled:cursor-not-allowed disabled:opacity-60"
                                     >
                                       Accept
                                     </button>
@@ -6504,7 +6506,7 @@ export default function AIEditorWorkspace() {
                                     setSelectionBubble(null);
                                     handleOpenComments(true);
                                   }}
-                                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white text-[var(--theme-primary)] shadow-[0_1px_3px_rgba(60,64,67,0.24)] ring-1 ring-[#e5e7eb] transition-all hover:shadow-[0_2px_6px_rgba(60,64,67,0.32)] hover:ring-[var(--theme-primary)]"
+                                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-surface text-[var(--theme-primary)] shadow-[0_1px_3px_rgba(60,64,67,0.24)] ring-1 ring-line transition-all hover:shadow-[0_2px_6px_rgba(60,64,67,0.32)] hover:ring-[var(--theme-primary)]"
                                 >
                                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm0 15.17L18.83 16H4V4h16v13.17zM13 5h-2v4H7v2h4v4h2v-4h4V9h-4z"/></svg>
                                 </button>
@@ -6518,10 +6520,10 @@ export default function AIEditorWorkspace() {
                               return (
                                 <div
                                   key={anchor.blockId}
-                                  className={`absolute z-20 hidden w-[260px] rounded-xl border bg-white text-left shadow-[0_1px_3px_rgba(60,64,67,0.15)] transition-shadow lg:block ai-editor-print-hidden ${
+                                  className={`absolute z-20 hidden w-[260px] rounded-xl border bg-surface text-left shadow-[0_1px_3px_rgba(60,64,67,0.15)] transition-shadow lg:block ai-editor-print-hidden ${
                                     isExpanded
                                       ? 'border-[var(--theme-primary-border)] ring-1 ring-[var(--theme-primary-ring)] shadow-[0_4px_12px_rgba(60,64,67,0.2)]'
-                                      : 'border-[#e5e7eb] hover:shadow-[0_4px_12px_rgba(60,64,67,0.2)] cursor-pointer'
+                                      : 'border-line hover:shadow-[0_4px_12px_rgba(60,64,67,0.2)] cursor-pointer'
                                   }`}
                                   style={{ top: `${anchor.top}px`, left: 'calc(100% + 12px)' }}
                                   onClick={!isExpanded ? () => {
@@ -6538,10 +6540,10 @@ export default function AIEditorWorkspace() {
                                           {commentInitials(anchor.actorDisplayName)}
                                         </div>
                                         <div className="min-w-0">
-                                          <div className="truncate text-[13px] font-semibold text-[#0f172a]">
+                                          <div className="truncate text-[13px] font-semibold text-ink">
                                             {anchor.actorDisplayName}
                                           </div>
-                                          <div className="text-[11px] text-[#64748b]">
+                                          <div className="text-[11px] text-muted">
                                             {commentTimeLabel(anchor.createdAt)}
                                           </div>
                                         </div>
@@ -6554,7 +6556,7 @@ export default function AIEditorWorkspace() {
                                               event.stopPropagation();
                                               resolveComment(anchor.commentId, true);
                                             }}
-                                            className="inline-flex h-7 w-7 items-center justify-center rounded-full text-[#64748b] hover:bg-[var(--theme-primary-soft)] transition-colors"
+                                            className="inline-flex h-7 w-7 items-center justify-center rounded-full text-muted hover:bg-[var(--theme-primary-soft)] transition-colors"
                                             title="Mark as resolved"
                                             aria-label="Mark as resolved"
                                           >
@@ -6567,7 +6569,7 @@ export default function AIEditorWorkspace() {
                                               setExpandedCommentBlockId(null);
                                               setActiveCommentId(null);
                                             }}
-                                            className="inline-flex h-7 w-7 items-center justify-center rounded-full text-[#64748b] hover:bg-[#f1f5f9] transition-colors text-[16px]"
+                                            className="inline-flex h-7 w-7 items-center justify-center rounded-full text-muted hover:bg-line-2 transition-colors text-[16px]"
                                             aria-label="Close"
                                           >
                                             ×
@@ -6575,13 +6577,13 @@ export default function AIEditorWorkspace() {
                                         </div>
                                       ) : null}
                                     </div>
-                                    <div className={`mt-2 whitespace-pre-wrap text-[13px] leading-5 text-[#0f172a] ${isExpanded ? '' : 'line-clamp-2'}`}>
+                                    <div className={`mt-2 whitespace-pre-wrap text-[13px] leading-5 text-ink ${isExpanded ? '' : 'line-clamp-2'}`}>
                                       {anchor.text}
                                     </div>
                                   </div>
 
                                   {isExpanded && anchor.replies.length > 0 ? (
-                                    <div className="border-t border-[#e5e7eb] mx-3 pt-2 pb-1 space-y-2">
+                                    <div className="border-t border-line mx-3 pt-2 pb-1 space-y-2">
                                       {anchor.replies.map((reply) => (
                                         <div key={reply.id} className="flex items-start gap-2">
                                           <div className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--theme-primary-soft)] text-[9px] font-semibold text-[var(--theme-primary-dark)]">
@@ -6589,10 +6591,10 @@ export default function AIEditorWorkspace() {
                                           </div>
                                           <div className="min-w-0">
                                             <div className="flex items-baseline gap-2">
-                                              <span className="text-[12px] font-medium text-[#0f172a]">{reply.actorDisplayName}</span>
-                                              <span className="text-[10px] text-[#94a3b8]">{commentTimeLabel(reply.createdAt)}</span>
+                                              <span className="text-[12px] font-medium text-ink">{reply.actorDisplayName}</span>
+                                              <span className="text-[10px] text-subtle">{commentTimeLabel(reply.createdAt)}</span>
                                             </div>
-                                            <div className="mt-0.5 whitespace-pre-wrap text-[12px] text-[#0f172a]">{reply.text}</div>
+                                            <div className="mt-0.5 whitespace-pre-wrap text-[12px] text-ink">{reply.text}</div>
                                           </div>
                                         </div>
                                       ))}
@@ -6600,7 +6602,7 @@ export default function AIEditorWorkspace() {
                                   ) : null}
 
                                   {isExpanded && canComment ? (
-                                    <div className="border-t border-[#e5e7eb] px-3 py-2">
+                                    <div className="border-t border-line px-3 py-2">
                                       <div className="flex items-start gap-2">
                                         <div className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--theme-primary-soft)] text-[9px] font-semibold text-[var(--theme-primary-dark)]">
                                           {commentInitials(session?.displayName ?? 'You')}
@@ -6624,7 +6626,7 @@ export default function AIEditorWorkspace() {
                                           }}
                                           onClick={(event) => event.stopPropagation()}
                                           placeholder="Reply or add others with @"
-                                          className="h-8 min-w-0 flex-1 rounded-full border border-[#e5e7eb] bg-white px-3 text-[12px] text-[#0f172a] outline-none transition-colors focus:border-[var(--theme-primary)] placeholder:text-[#94a3b8]"
+                                          className="h-8 min-w-0 flex-1 rounded-full border border-line bg-surface px-3 text-[12px] text-ink outline-none transition-colors focus:border-[var(--theme-primary)] placeholder:text-subtle"
                                         />
                                       </div>
                                       {replyDraft.trim() ? (
@@ -6638,7 +6640,7 @@ export default function AIEditorWorkspace() {
                                                 [anchor.commentId]: '',
                                               }));
                                             }}
-                                            className="inline-flex h-7 items-center rounded-full px-3 text-[11px] text-[#64748b] hover:bg-[#f1f5f9]"
+                                            className="inline-flex h-7 items-center rounded-full px-3 text-[11px] text-muted hover:bg-line-2"
                                           >
                                             Cancel
                                           </button>
@@ -6679,12 +6681,12 @@ export default function AIEditorWorkspace() {
                               // editor view is not available ... view['posAtDOM']").
                               key={getEditorViewKey(editor)}
                               editor={editor}
-                              theme="light"
+                              theme={hostTheme}
                               onChange={handleEditorChange}
                               onSelectionChange={handleEditorSelectionChange}
                               sideMenu={false}
                               slashMenu={false}
-                              className={`ai-editor-blocknote bg-white ${
+                              className={`ai-editor-blocknote bg-surface ${
                                 isMobile
                                   ? 'ai-editor-reflow min-h-[70vh] px-5 pb-28 pt-[18px]'
                                   : paginationConfig
@@ -6903,7 +6905,7 @@ export default function AIEditorWorkspace() {
       {autocompleteState.writingAt ? (
         // "WriteOrbit AI" writes at the cursor until the grey text appears.
         <div className="pointer-events-none fixed z-[11500]" style={{ top: autocompleteState.writingAt.top - 20, left: autocompleteState.writingAt.left - 1 }} aria-live="polite">
-          <span className="block w-fit rounded-[5px] rounded-bl-none bg-[var(--theme-primary)] px-1.5 py-[2px] text-[11px] font-semibold leading-none text-white">WriteOrbit AI</span>
+          <span className="block w-fit rounded-[5px] rounded-bl-none bg-[var(--theme-primary)] px-1.5 py-[2px] text-[11px] font-semibold leading-none text-on-brand">WriteOrbit AI</span>
           <span className="block h-[22px] w-[2px] animate-pulse bg-[var(--theme-primary)]" />
         </div>
       ) : null}
@@ -6917,7 +6919,7 @@ export default function AIEditorWorkspace() {
           }}
           onMouseDown={(event) => event.preventDefault()}
         >
-          <div className="flex items-center gap-1 rounded-[10px] border border-[#e5e7eb] bg-white p-[3px] shadow-[0_10px_24px_-12px_rgba(15,23,42,.4)]">
+          <div className="flex items-center gap-1 rounded-[10px] border border-line bg-surface p-[3px] shadow-[0_10px_24px_-12px_rgba(15,23,42,.4)]">
             <button
               type="button"
               onMouseDown={(event) => {
@@ -6926,7 +6928,7 @@ export default function AIEditorWorkspace() {
               }}
               disabled={isInsertingCitation}
               title="Write the next part here, with citations"
-              className="inline-flex h-6 items-center gap-1 whitespace-nowrap rounded-[7px] bg-[#eff6ff] px-2 text-[12px] font-semibold text-[var(--theme-primary)] transition-colors hover:bg-[#dbeafe] disabled:cursor-not-allowed disabled:opacity-70"
+              className="inline-flex h-6 items-center gap-1 whitespace-nowrap rounded-[7px] bg-brand-50 px-2 text-[12px] font-semibold text-[var(--theme-primary)] transition-colors hover:bg-brand-100 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {cursorActionBar.loading ? (
                 <>
@@ -6970,14 +6972,14 @@ export default function AIEditorWorkspace() {
           }}
           onMouseDown={(event) => event.preventDefault()}
         >
-          <div className="flex items-center gap-1 rounded-[10px] border border-[#e5e7eb] bg-white p-[3px] shadow-[0_10px_24px_-12px_rgba(15,23,42,.4)]">
+          <div className="flex items-center gap-1 rounded-[10px] border border-line bg-surface p-[3px] shadow-[0_10px_24px_-12px_rgba(15,23,42,.4)]">
             <button
               type="button"
               onMouseDown={(event) => {
                 event.preventDefault();
                 handleAcceptAISuggestion();
               }}
-              className="flex items-center gap-0.5 h-6 rounded-[7px] bg-[var(--theme-primary)] px-2 text-[12px] font-semibold leading-none text-white transition-colors hover:bg-[var(--theme-primary-dark)]"
+              className="flex items-center gap-0.5 h-6 rounded-[7px] bg-[var(--theme-primary)] px-2 text-[12px] font-semibold leading-none text-on-brand transition-colors hover:bg-[var(--theme-primary-dark)]"
             >
               <span>✓</span>
               <span>Accept</span>
@@ -7002,7 +7004,7 @@ export default function AIEditorWorkspace() {
                   handleConcludeAISuggestion();
                 }}
                 disabled={aiSuggestion.isLoading}
-                className="flex items-center gap-0.5 h-6 rounded-[7px] px-2 text-[12px] font-semibold leading-none text-[var(--theme-primary)] transition-colors hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex items-center gap-0.5 h-6 rounded-[7px] px-2 text-[12px] font-semibold leading-none text-[var(--theme-primary)] transition-colors hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <span>Conclude</span>
               </button>
@@ -7034,14 +7036,14 @@ export default function AIEditorWorkspace() {
             event.stopPropagation();
           }}
         >
-          <div className="w-[210px] rounded-2xl border border-[#fde68a] bg-white/98 p-2 shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)] backdrop-blur">
+          <div className="w-[210px] rounded-2xl border border-[#fde68a] bg-surface/98 p-2 shadow-[0_22px_50px_-18px_rgba(15,23,42,.35)] backdrop-blur">
             <div className="px-2 pb-2 pt-1 text-[11px] font-medium text-[#92400e]">
               Review selected text
             </div>
             <button
               type="button"
               onClick={() => void handleRunSelectionReview('grammar')}
-              className="flex w-full items-center justify-between rounded-xl px-2 py-2 text-left text-[12px] text-[#0f172a] transition-colors hover:bg-[#fffbeb]"
+              className="flex w-full items-center justify-between rounded-xl px-2 py-2 text-left text-[12px] text-ink transition-colors hover:bg-[#fffbeb]"
             >
               <span>Grammar suggestion</span>
               <span className="text-[#b45309]">Open</span>
@@ -7051,7 +7053,7 @@ export default function AIEditorWorkspace() {
               <button
                 type="button"
                 onClick={() => void handleRunSelectionReview('rewrite')}
-                className="mt-1 flex w-full items-center justify-between rounded-xl px-2 py-2 text-left text-[12px] text-[#0f172a] transition-colors hover:bg-[#fffbeb]"
+                className="mt-1 flex w-full items-center justify-between rounded-xl px-2 py-2 text-left text-[12px] text-ink transition-colors hover:bg-[#fffbeb]"
               >
                 <span>Rewrite selection</span>
                 <span className="text-[#b45309]">Focus</span>
@@ -7094,7 +7096,7 @@ export default function AIEditorWorkspace() {
           border-left: 3px solid var(--theme-primary);
           padding-left: 12px;
           margin-left: -15px;
-          background: linear-gradient(to right, rgba(37, 99, 235, 0.04), transparent);
+          background: linear-gradient(to right, rgba(var(--brand-rgb), 0.04), transparent);
         }
         .ai-ghost-block,
         .ai-ghost-block p,
@@ -7117,7 +7119,7 @@ export default function AIEditorWorkspace() {
           font-family: var(--font-serif), "Source Serif 4", Georgia, serif;
           font-size: 18.5px;
           line-height: 1.75;
-          color: #1e293b;
+          color: var(--color-ink);
         }
         .ai-editor-blocknote.ai-editor-paginated {
           font-size: 16px;
@@ -7157,7 +7159,7 @@ export default function AIEditorWorkspace() {
           margin-bottom: 0.58em;
           font-family: inherit;
           font-weight: 700;
-          color: #0f172a;
+          color: var(--color-ink);
         }
         .ai-editor-blocknote .bn-block-group > .bn-block-outer:first-child > .bn-block > [data-content-type="heading"] {
           margin-top: 0;
@@ -7235,7 +7237,7 @@ export default function AIEditorWorkspace() {
         .ce-chat-markdown ul { list-style: disc; }
         .ce-chat-markdown ol { list-style: decimal; }
         .ce-chat-markdown h1, .ce-chat-markdown h2, .ce-chat-markdown h3 { font-weight: 600; margin: 10px 0 6px; }
-        .ce-chat-markdown code { background: #f1f5f9; border-radius: 4px; padding: 0 4px; }
+        .ce-chat-markdown code { background: var(--color-line-2); border-radius: 4px; padding: 0 4px; }
         ${wordSettingsCss(wordSettings)}
 
         /* The page padding is the document margin (1 inch, as in Word); BlockNote's own
@@ -7372,23 +7374,23 @@ export default function AIEditorWorkspace() {
       {autocompleteState.bar ? (
         // The bar under the grey text: Accept (Tab), Refine, Conclude, feedback.
         <div
-          className="ce-ghost-bar fixed z-[12550] flex items-center gap-1 rounded-[12px] border border-[#e5e7eb] bg-white p-1 text-[13px] font-medium text-[#334155] shadow-[0_12px_28px_-12px_rgba(15,23,42,.35)]"
+          className="ce-ghost-bar fixed z-[12550] flex items-center gap-1 rounded-[12px] border border-line bg-surface p-1 text-[13px] font-medium text-ink-2 shadow-[0_12px_28px_-12px_rgba(15,23,42,.35)]"
           style={{ top: autocompleteState.bar.top, left: autocompleteState.bar.left }}
           onMouseDown={(event) => event.preventDefault()}
         >
-          <button type="button" onClick={() => autocompleteState.accept()} className="inline-flex h-8 items-center gap-2 rounded-[9px] bg-[var(--theme-primary)] pl-3 pr-1.5 font-semibold text-white hover:bg-[var(--theme-primary-dark)]">
-            Accept <span className="rounded-[6px] bg-white/[.18] px-1.5 py-0.5 text-[11.5px]">Tab</span>
+          <button type="button" onClick={() => autocompleteState.accept()} className="inline-flex h-8 items-center gap-2 rounded-[9px] bg-[var(--theme-primary)] pl-3 pr-1.5 font-semibold text-on-brand hover:bg-[var(--theme-primary-dark)]">
+            Accept <span className="rounded-[6px] bg-surface/[.18] px-1.5 py-0.5 text-[11.5px]">Tab</span>
           </button>
-          <button type="button" onClick={autocompleteState.refine} className="inline-flex h-8 items-center gap-1.5 rounded-[9px] px-2.5 hover:bg-[#f1f5f9] hover:text-[#0f172a]">
+          <button type="button" onClick={autocompleteState.refine} className="inline-flex h-8 items-center gap-1.5 rounded-[9px] px-2.5 hover:bg-line-2 hover:text-ink">
             <LuSparkles className="h-3.5 w-3.5 text-[var(--theme-primary)]" />Refine suggestion
           </button>
-          <button type="button" onClick={autocompleteState.conclude} title="Close this section with a concluding statement and start the next one" className="inline-flex h-8 items-center gap-1.5 rounded-[9px] px-2.5 hover:bg-[#f1f5f9] hover:text-[#0f172a]">
+          <button type="button" onClick={autocompleteState.conclude} title="Close this section with a concluding statement and start the next one" className="inline-flex h-8 items-center gap-1.5 rounded-[9px] px-2.5 hover:bg-line-2 hover:text-ink">
             <LuFlag className="h-3.5 w-3.5" />Conclude
           </button>
-          <button type="button" aria-label="Good suggestion" onClick={() => autocompleteState.feedback('up')} className="grid h-8 w-8 place-items-center rounded-[9px] text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#0f172a]"><LuThumbsUp className="h-4 w-4" /></button>
-          <button type="button" aria-label="Bad suggestion" onClick={() => autocompleteState.feedback('down')} className="grid h-8 w-8 place-items-center rounded-[9px] text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#0f172a]"><LuThumbsDown className="h-4 w-4" /></button>
+          <button type="button" aria-label="Good suggestion" onClick={() => autocompleteState.feedback('up')} className="grid h-8 w-8 place-items-center rounded-[9px] text-muted hover:bg-line-2 hover:text-ink"><LuThumbsUp className="h-4 w-4" /></button>
+          <button type="button" aria-label="Bad suggestion" onClick={() => autocompleteState.feedback('down')} className="grid h-8 w-8 place-items-center rounded-[9px] text-muted hover:bg-line-2 hover:text-ink"><LuThumbsDown className="h-4 w-4" /></button>
           {autocompleteState.bar.heading ? (
-            <span className="ml-1 max-w-[220px] truncate rounded-[8px] bg-[#eff6ff] px-2 py-1 text-[12px] text-[#1d4ed8]" title="Accepting also starts this section">Next: {autocompleteState.bar.heading}</span>
+            <span className="ml-1 max-w-[220px] truncate rounded-[8px] bg-brand-50 px-2 py-1 text-[12px] text-brand-600" title="Accepting also starts this section">Next: {autocompleteState.bar.heading}</span>
           ) : null}
         </div>
       ) : null}
@@ -7399,7 +7401,7 @@ export default function AIEditorWorkspace() {
       ) : null}
       {isParagraphReviewOpen ? (
         <div className="fixed inset-0 z-[12000] flex items-center justify-center bg-slate-900/45 p-4" onClick={(event) => { if (event.target === event.currentTarget) setIsParagraphReviewOpen(false); }}>
-          <div role="dialog" aria-modal="true" aria-label="AI detection" className="flex max-h-[88vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-2xl">
+          <div role="dialog" aria-modal="true" aria-label="AI detection" className="flex max-h-[88vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-gray-200 bg-surface shadow-2xl">
             <div className="border-b border-gray-200 px-5 py-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -7438,7 +7440,7 @@ export default function AIEditorWorkspace() {
                       <div
                         key={block.blockId}
                         className={`rounded-2xl border p-4 ${
-                          isFlagged ? 'border-[#fecaca] bg-[#fef2f2]' : 'border-[#e5e7eb] bg-white'
+                          isFlagged ? 'border-[#fecaca] bg-[#fef2f2]' : 'border-line bg-surface'
                         }`}
                       >
                         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -7481,7 +7483,7 @@ export default function AIEditorWorkspace() {
                               type="button"
                               onClick={() => void handleHumanizeBlock(block.blockId)}
                               disabled={isHumanizingThis || isOverLimit}
-                              className="rounded-[8px] border border-[#dbeafe] px-3 py-1.5 text-[12px] font-semibold text-[var(--theme-primary-dark)] transition-colors hover:bg-[#eff6ff] disabled:cursor-not-allowed disabled:opacity-50"
+                              className="rounded-[8px] border border-brand-100 px-3 py-1.5 text-[12px] font-semibold text-[var(--theme-primary-dark)] transition-colors hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               {isHumanizingThis ? 'Humanizing...' : 'Humanize'}
                             </button>

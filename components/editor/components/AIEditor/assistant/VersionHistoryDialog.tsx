@@ -129,9 +129,9 @@ function LineView({ line }: { line: DiffLine }) {
   const tone = line.change === 'added' ? 'border-l-[3px] border-[#34a853] pl-2' : line.change === 'removed' ? 'border-l-[3px] border-[#ea4335] pl-2' : line.change === 'changed' ? 'border-l-[3px] border-[#f59e0b] pl-2' : '';
   if (line.kind === 'heading') {
     const size = line.level === 1 ? 'text-[22px]' : line.level === 2 ? 'text-[18px]' : 'text-[16px]';
-    return <h3 className={`mb-2 mt-4 font-semibold text-[#0f172a] ${size} ${tone}`}>{content}</h3>;
+    return <h3 className={`mb-2 mt-4 font-semibold text-ink ${size} ${tone}`}>{content}</h3>;
   }
-  return <p className={`mb-2 whitespace-pre-wrap text-[14px] leading-relaxed text-[#0f172a] ${line.kind === 'table' ? 'font-mono text-[12px]' : ''} ${tone}`} style={line.level ? { marginLeft: line.level * 16 } : undefined}>{content}</p>;
+  return <p className={`mb-2 whitespace-pre-wrap text-[14px] leading-relaxed text-ink ${line.kind === 'table' ? 'font-mono text-[12px]' : ''} ${tone}`} style={line.level ? { marginLeft: line.level * 16 } : undefined}>{content}</p>;
 }
 
 function versionLabel(version: DocumentVersion) {
@@ -244,14 +244,14 @@ export default function VersionHistoryDialog({
 
   return (
     <div className="fixed inset-0 z-[13050] flex items-stretch justify-center bg-[rgba(15,23,42,0.35)] md:p-6" role="dialog" aria-modal="true" aria-label="Version history">
-      <div className="flex min-h-0 w-full max-w-[1200px] flex-col overflow-hidden bg-white md:rounded-[16px] md:border md:border-[#e5e7eb] md:shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]">
-        <div className="flex items-center justify-between gap-3 border-b border-[#e5e7eb] px-4 py-3">
-          <div className="flex items-center gap-2 text-[18px] font-bold text-[#0f172a]">
-            <LuHistory className="h-5 w-5 text-[#64748b]" /> Version history
+      <div className="flex min-h-0 w-full max-w-[1200px] flex-col overflow-hidden bg-surface md:rounded-[16px] md:border md:border-line md:shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)]">
+        <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
+          <div className="flex items-center gap-2 text-[18px] font-bold text-ink">
+            <LuHistory className="h-5 w-5 text-muted" /> Version history
           </div>
           <div className="flex items-center gap-2">
-            <label className="hidden items-center gap-1.5 text-[13px] text-[#334155] sm:inline-flex">
-              <input type="checkbox" className="accent-[var(--theme-primary,#2563eb)]" checked={showChanges} onChange={(event) => setShowChanges(event.target.checked)} /> Show changes since
+            <label className="hidden items-center gap-1.5 text-[13px] text-ink-2 sm:inline-flex">
+              <input type="checkbox" className="accent-[var(--theme-primary,var(--color-brand))]" checked={showChanges} onChange={(event) => setShowChanges(event.target.checked)} /> Show changes since
             </label>
             {canRestore && documentId ? (
               <button
@@ -272,25 +272,25 @@ export default function VersionHistoryDialog({
                     setBusy(false);
                   }
                 }}
-                className="h-9 rounded-[10px] border border-[#e5e7eb] bg-white px-3 text-[13px] font-semibold text-[#0f172a] hover:bg-[#f8fafc]"
+                className="h-9 rounded-[10px] border border-line bg-surface px-3 text-[13px] font-semibold text-ink hover:bg-soft"
               >
                 Name current version
               </button>
             ) : null}
-            <button type="button" onClick={onClose} aria-label="Close version history" className="rounded-[9px] p-1.5 text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a]">
+            <button type="button" onClick={onClose} aria-label="Close version history" className="rounded-[9px] p-1.5 text-muted hover:bg-soft hover:text-ink">
               <LuX className="h-5 w-5" />
             </button>
           </div>
         </div>
         <div className="flex min-h-0 flex-1 flex-col-reverse md:flex-row">
-          <div className="min-h-0 flex-1 overflow-y-auto bg-[#f8fafc] px-3 py-4 md:px-8">
-            <div className="mx-auto max-w-[760px] rounded-[14px] border border-[#e5e7eb] bg-white px-5 py-6 md:px-10">
+          <div className="min-h-0 flex-1 overflow-y-auto bg-soft px-3 py-4 md:px-8">
+            <div className="mx-auto max-w-[760px] rounded-[14px] border border-line bg-surface px-5 py-6 md:px-10">
               {!content ? (
-                <div className="space-y-2">{[0, 1, 2, 3].map((index) => <div key={index} className="h-4 animate-pulse rounded bg-[#f1f5f9]" />)}</div>
+                <div className="space-y-2">{[0, 1, 2, 3].map((index) => <div key={index} className="h-4 animate-pulse rounded bg-line-2" />)}</div>
               ) : (
                 <>
                   <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                    <h2 className="text-[18px] font-bold text-[#0f172a]">{content.title}</h2>
+                    <h2 className="text-[18px] font-bold text-ink">{content.title}</h2>
                     {canRestore ? (
                       <button
                         type="button"
@@ -310,34 +310,34 @@ export default function VersionHistoryDialog({
                             setBusy(false);
                           }
                         }}
-                        className="inline-flex h-9 items-center gap-1.5 rounded-[10px] bg-[var(--theme-primary,#2563eb)] shadow-[0_6px_16px_-8px_rgba(37,99,235,0.8)] px-4 text-[13px] font-semibold text-white hover:bg-[#1d4ed8]"
+                        className="inline-flex h-9 items-center gap-1.5 rounded-[10px] bg-[var(--theme-primary,var(--color-brand))] shadow-[0_6px_16px_-8px_rgba(var(--brand-rgb),0.8)] px-4 text-[13px] font-semibold text-white hover:bg-brand-600"
                       >
                         <LuRotateCcw className="h-4 w-4" /> Restore this version
                       </button>
                     ) : null}
                   </div>
-                  {showChanges ? <p className="mb-3 text-[12px] text-[#64748b]">Highlighted: what changed from this version to the document now (<span className="text-[#166534]">added</span>, <span className="text-[#991b1b] line-through">removed</span>).</p> : null}
-                  <div className="text-[16px] leading-[1.7] text-[#1e293b]" style={{ fontFamily: "var(--font-serif), 'Source Serif 4', Georgia, serif" }}>
+                  {showChanges ? <p className="mb-3 text-[12px] text-muted">Highlighted: what changed from this version to the document now (<span className="text-[#166534]">added</span>, <span className="text-[#991b1b] line-through">removed</span>).</p> : null}
+                  <div className="text-[16px] leading-[1.7] text-ink" style={{ fontFamily: "var(--font-serif), 'Source Serif 4', Georgia, serif" }}>
                     {lines.map((line, index) => <LineView key={index} line={line} />)}
                   </div>
                 </>
               )}
             </div>
           </div>
-          <div className="max-h-[38vh] min-h-0 shrink-0 overflow-y-auto border-b border-[#e5e7eb] md:max-h-none md:w-[300px] md:border-b-0 md:border-l">
-            {loading ? <div className="p-4 text-[13px] text-[#64748b]">Loading versions…</div> : null}
+          <div className="max-h-[38vh] min-h-0 shrink-0 overflow-y-auto border-b border-line md:max-h-none md:w-[300px] md:border-b-0 md:border-l">
+            {loading ? <div className="p-4 text-[13px] text-muted">Loading versions…</div> : null}
             {error ? <div className="m-3 rounded-xl bg-[#fef2f2] px-3 py-2 text-[13px] text-[#991b1b]">{error}</div> : null}
             {!loading && !error && versions.length === 0 ? (
-              <div className="p-4 text-[13px] text-[#64748b]">No versions yet. Versions are saved automatically while you write (every 10 minutes of changes).</div>
+              <div className="p-4 text-[13px] text-muted">No versions yet. Versions are saved automatically while you write (every 10 minutes of changes).</div>
             ) : null}
             {groups.map(([day, items]) => (
               <div key={day}>
-                <div className="sticky top-0 bg-white px-4 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wide text-[#64748b]">{day}</div>
+                <div className="sticky top-0 bg-surface px-4 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wide text-muted">{day}</div>
                 {items.map((version) => {
                   const selected = version.id === selectedId;
                   const label = versionLabel(version);
                   return (
-                    <div key={version.id} className={`group mx-2 rounded-[10px] px-3 py-2 ${selected ? 'bg-[#eff6ff]' : 'hover:bg-[#f8fafc]'}`}>
+                    <div key={version.id} className={`group mx-2 rounded-[10px] px-3 py-2 ${selected ? 'bg-brand-50' : 'hover:bg-soft'}`}>
                       {renaming === version.id ? (
                         <form
                           onSubmit={async (event) => {
@@ -348,12 +348,12 @@ export default function VersionHistoryDialog({
                             void load();
                           }}
                         >
-                          <input autoFocus value={renameValue} onChange={(event) => setRenameValue(event.target.value)} onBlur={() => setRenaming(null)} className="h-8 w-full rounded-lg border border-[#e5e7eb] px-2 text-[13px] outline-none" />
+                          <input autoFocus value={renameValue} onChange={(event) => setRenameValue(event.target.value)} onBlur={() => setRenaming(null)} className="h-8 w-full rounded-lg border border-line px-2 text-[13px] outline-none" />
                         </form>
                       ) : (
                         <button type="button" onClick={() => setSelectedId(version.id)} className="block w-full text-left">
                           <div className="flex items-center justify-between gap-2">
-                            <span className="text-[13.5px] font-medium text-[#0f172a]">{new Date(version.createdAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
+                            <span className="text-[13.5px] font-medium text-ink">{new Date(version.createdAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
                             {canRestore ? (
                               <span
                                 role="button"
@@ -364,14 +364,14 @@ export default function VersionHistoryDialog({
                                   setRenaming(version.id);
                                   setRenameValue(version.label || '');
                                 }}
-                                className="rounded-full p-1 text-[#64748b] opacity-0 hover:bg-white group-hover:opacity-100"
+                                className="rounded-full p-1 text-muted opacity-0 hover:bg-surface group-hover:opacity-100"
                               >
                                 <LuPencil className="h-3.5 w-3.5" />
                               </span>
                             ) : null}
                           </div>
                           {label ? <div className="truncate text-[12.5px] font-medium text-[var(--theme-primary-dark)]">{label}</div> : null}
-                          <div className="truncate text-[11.5px] text-[#64748b]">{version.authorName} · {version.wordCount.toLocaleString()} words</div>
+                          <div className="truncate text-[11.5px] text-muted">{version.authorName} · {version.wordCount.toLocaleString()} words</div>
                         </button>
                       )}
                     </div>

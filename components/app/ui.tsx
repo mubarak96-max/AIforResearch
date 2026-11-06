@@ -4,10 +4,10 @@ import Link from 'next/link';
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'ghost' | 'danger'; size?: 'sm' | 'md' | 'lg' };
 
 const variants = {
-  primary: 'bg-brand text-white shadow-brand hover:bg-brand-600 disabled:bg-subtle disabled:shadow-none',
-  secondary: 'border border-line bg-white text-ink hover:bg-soft disabled:text-subtle',
+  primary: 'bg-brand text-on-brand shadow-brand hover:bg-brand-600 disabled:bg-subtle disabled:shadow-none',
+  secondary: 'border border-line bg-surface text-ink hover:bg-soft disabled:text-subtle',
   ghost: 'text-ink-2 hover:bg-soft',
-  danger: 'border border-line bg-white text-red-600 hover:bg-red-50',
+  danger: 'border border-line bg-surface text-red-600 hover:bg-red-50',
 };
 const sizes = { sm: 'h-9 px-3 text-[13.5px] rounded-[10px]', md: 'h-[42px] px-[18px] text-[15px] rounded-[11px]', lg: 'h-[52px] px-6 text-[16.5px] rounded-[13px]' };
 
@@ -20,7 +20,7 @@ export function ButtonLink({ href, variant = 'secondary', size = 'md', className
 }
 
 export function Card({ className = '', children }: { className?: string; children: React.ReactNode }) {
-  return <section className={`rounded-2xl border border-line bg-white ${className}`}>{children}</section>;
+  return <section className={`rounded-2xl border border-line bg-surface ${className}`}>{children}</section>;
 }
 
 export function CardHeader({ title, description, actions }: { title: string; description?: React.ReactNode; actions?: React.ReactNode }) {
@@ -53,7 +53,7 @@ export function Segmented<T extends string>({ value, options, onChange, label }:
     <div role="tablist" aria-label={label} className="inline-flex max-w-full overflow-x-auto rounded-xl bg-line-2 p-1">
       {options.map((option) => (
         <button key={option.value} role="tab" type="button" aria-selected={option.value === value} onClick={() => onChange(option.value)}
-          className={`h-9 shrink-0 whitespace-nowrap rounded-[9px] px-3.5 text-[14px] font-semibold transition-colors ${option.value === value ? 'bg-white text-ink shadow-[0_1px_3px_rgba(15,23,42,.12)]' : 'text-muted'}`}>
+          className={`h-9 shrink-0 whitespace-nowrap rounded-[9px] px-3.5 text-[14px] font-semibold transition-colors ${option.value === value ? 'bg-surface text-ink shadow-[0_1px_3px_rgba(15,23,42,.12)]' : 'text-muted'}`}>
           {option.label}
         </button>
       ))}
@@ -64,13 +64,13 @@ export function Segmented<T extends string>({ value, options, onChange, label }:
 /** Chips like the mockups' filter chips (blue tint when on). */
 export function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button type="button" onClick={onClick} className={`inline-flex h-[30px] shrink-0 items-center gap-1.5 rounded-full border px-[11px] text-[13px] font-medium ${active ? 'border-brand-100 bg-brand-50 text-brand-600' : 'border-line bg-white text-ink-2'}`}>
+    <button type="button" onClick={onClick} className={`inline-flex h-[30px] shrink-0 items-center gap-1.5 rounded-full border px-[11px] text-[13px] font-medium ${active ? 'border-brand-100 bg-brand-50 text-brand-600' : 'border-line bg-surface text-ink-2'}`}>
       {children}
     </button>
   );
 }
 
-export const inputClass = 'h-11 w-full rounded-xl border border-line bg-white px-3.5 text-[15px] text-ink placeholder:text-subtle focus:border-brand focus:shadow-[0_0_0_4px_var(--color-brand-50)] focus:outline-none';
+export const inputClass = 'h-11 w-full rounded-xl border border-line bg-surface px-3.5 text-[15px] text-ink placeholder:text-subtle focus:border-brand focus:shadow-[0_0_0_4px_var(--color-brand-50)] focus:outline-none';
 
 export function EmptyState({ title, children, action }: { title: string; children?: React.ReactNode; action?: React.ReactNode }) {
   return (

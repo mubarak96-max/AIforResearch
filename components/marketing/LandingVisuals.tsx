@@ -10,7 +10,7 @@ function Frame({ label, children, className = '' }: { label: string; children: R
   return (
     <figure
       aria-label={label}
-      className={`relative overflow-hidden rounded-[16px] border border-line bg-white p-4 shadow-[0_18px_40px_-30px_rgba(15,23,42,.35)] sm:p-5 ${className}`}
+      className={`relative overflow-hidden rounded-[16px] border border-line bg-surface p-4 shadow-[0_18px_40px_-30px_rgba(15,23,42,.35)] sm:p-5 ${className}`}
     >
       <div aria-hidden="true">{children}</div>
     </figure>
@@ -26,12 +26,12 @@ export function AutocompleteVisual() {
         Sleep actively supports the stabilisation of new memories <span className={cite}>(Walker &amp; Stickgold, 2004)</span>.
         When sleep is restricted after learning, retention of declarative material declines
         <span className="text-slate-400"> measurably, even when study time is held constant </span>
-        <span className="whitespace-nowrap text-blue-300">(Diekelmann &amp; Born, 2010)</span>
+        <span className="whitespace-nowrap text-accent-300">(Diekelmann &amp; Born, 2010)</span>
         <span className="text-slate-400">.</span>
       </p>
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="inline-flex h-9 items-center gap-2 rounded-[10px] bg-ink px-3 text-[13px] font-semibold text-white shadow-[0_10px_24px_-12px_rgba(15,23,42,.6)]">
-          Accept <kbd className="rounded-md bg-white/15 px-1.5 py-0.5 font-sans text-[12px]">Tab</kbd>
+        <span className="inline-flex h-9 items-center gap-2 rounded-[10px] bg-ink px-3 text-[13px] font-semibold text-on-ink shadow-[0_10px_24px_-12px_rgba(15,23,42,.6)]">
+          Accept <kbd className="rounded-md bg-surface/15 px-1.5 py-0.5 font-sans text-[12px]">Tab</kbd>
           <span className="text-white/50">·</span> Refine
         </span>
         <span className="text-[12.5px] text-muted">Suggestion with a real reference</span>
@@ -57,7 +57,7 @@ const STYLES = ['APA 7', 'MLA 9', 'Chicago', 'Harvard', 'IEEE', 'Vancouver'];
 export function FindPapersVisual() {
   return (
     <Frame label="Find papers: search results with Cite buttons, and citation styles">
-      <div className="flex h-10 items-center gap-2 rounded-[11px] border border-line bg-white px-3 text-[14px] text-ink shadow-[0_1px_2px_rgba(15,23,42,.05)]">
+      <div className="flex h-10 items-center gap-2 rounded-[11px] border border-line bg-surface px-3 text-[14px] text-ink shadow-[0_1px_2px_rgba(15,23,42,.05)]">
         <LuSearch className="h-4 w-4 shrink-0 text-subtle" />
         <span className="truncate">sleep and memory consolidation</span>
       </div>
@@ -74,7 +74,7 @@ export function FindPapersVisual() {
               <p className="mt-1.5 truncate text-[14px] font-bold text-ink">{paper.title}</p>
               <p className="truncate text-[12.5px] text-muted">{paper.meta}</p>
             </div>
-            <span className="shrink-0 rounded-[9px] bg-brand px-3 py-1.5 text-[12.5px] font-semibold text-white">Cite</span>
+            <span className="shrink-0 rounded-[9px] bg-brand px-3 py-1.5 text-[12.5px] font-semibold text-on-brand">Cite</span>
           </li>
         ))}
       </ul>
@@ -92,7 +92,7 @@ export function ChatVisual() {
   return (
     <Frame label="AI Chat answering from uploaded PDFs, with the page each answer came from">
       <div className="flex justify-end">
-        <p className="max-w-[85%] rounded-[16px] rounded-br-[6px] bg-brand px-3.5 py-2.5 text-[14px] leading-snug text-white">
+        <p className="max-w-[85%] rounded-[16px] rounded-br-[6px] bg-brand px-3.5 py-2.5 text-[14px] leading-snug text-on-brand">
           What do my PDFs say about slow-wave sleep?
         </p>
       </div>
@@ -116,7 +116,7 @@ export function ChatVisual() {
       </ul>
       <div className="mt-4 flex items-center gap-2 rounded-[14px] border border-line px-3 py-2 text-[13.5px] text-subtle">
         <span className="flex-1 truncate">Ask about your papers…</span>
-        <span className="grid h-7 w-7 place-items-center rounded-full bg-brand text-white"><LuArrowUp className="h-4 w-4" /></span>
+        <span className="grid h-7 w-7 place-items-center rounded-full bg-brand text-on-brand"><LuArrowUp className="h-4 w-4" /></span>
       </div>
     </Frame>
   );
@@ -214,7 +214,7 @@ export function PhoneVisual() {
   return (
     <div className="flex justify-center" role="img" aria-label="The WriteOrbit editor on a phone">
       <div aria-hidden="true" className="w-[240px] rounded-[36px] border border-line bg-ink p-2.5 shadow-[0_30px_60px_-30px_rgba(15,23,42,.5)]">
-        <div className="overflow-hidden rounded-[30px] bg-white">
+        <div className="overflow-hidden rounded-[30px] bg-surface">
           <div className="flex items-center justify-between px-5 pt-3 text-[11px] font-semibold text-ink">
             <span>9:41</span>
             <span className="h-4 w-16 rounded-full bg-ink" />
@@ -222,7 +222,7 @@ export function PhoneVisual() {
           </div>
           <div className="flex items-center gap-2 border-b border-line-2 px-4 py-3">
             <span className="min-w-0 flex-1 truncate text-[13px] font-bold text-ink">Thesis — Chapter 2</span>
-            <span className="rounded-full bg-brand px-2 py-0.5 text-[10.5px] font-bold text-white">Saved</span>
+            <span className="rounded-full bg-brand px-2 py-0.5 text-[10.5px] font-bold text-on-brand">Saved</span>
           </div>
           <div className="px-4 py-3">
             <p className="font-serif text-[17px] font-bold leading-tight text-ink">2.1 Sleep and learning</p>
@@ -230,13 +230,13 @@ export function PhoneVisual() {
               Restricted sleep reduces recall of declarative material <span className="text-brand">(Diekelmann &amp; Born, 2010)</span>
               <span className="text-slate-400"> and slows the transfer of memories to the cortex</span>
             </p>
-            <span className="mt-2 inline-flex items-center gap-1 rounded-lg bg-ink px-2 py-1 text-[10.5px] font-semibold text-white">
+            <span className="mt-2 inline-flex items-center gap-1 rounded-lg bg-ink px-2 py-1 text-[10.5px] font-semibold text-on-ink">
               <LuSparkles className="h-3 w-3" /> Accept
             </span>
           </div>
           <div className="mt-6 grid grid-cols-5 items-end border-t border-line-2 px-2 pb-3 pt-2 text-center text-[9.5px] font-semibold text-subtle">
             <span className="text-brand">Docs</span><span>Library</span>
-            <span className="mx-auto grid h-8 w-8 place-items-center rounded-[10px] bg-brand text-[16px] text-white">+</span>
+            <span className="mx-auto grid h-8 w-8 place-items-center rounded-[10px] bg-brand text-[16px] text-on-brand">+</span>
             <span>Papers</span><span>Chat</span>
           </div>
         </div>

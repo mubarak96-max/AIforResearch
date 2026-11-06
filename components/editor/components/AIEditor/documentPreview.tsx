@@ -63,11 +63,11 @@ export function DocumentPreview({ document, compact = false, small = false }: { 
 
   if (compact) {
     return (
-      <span className="flex h-[58px] w-[46px] shrink-0 flex-col gap-1 rounded-[8px] border border-[#e5e7eb] bg-white px-1.5 py-[7px]" aria-hidden="true">
-        <i className="block h-1 w-[70%] rounded bg-[#94a3b8]" />
-        <i className="block h-1 rounded bg-[#e2e8f0]" />
-        <i className="block h-1 rounded bg-[#e2e8f0]" />
-        <i className="block h-1 rounded bg-[#e2e8f0]" />
+      <span className="flex h-[58px] w-[46px] shrink-0 flex-col gap-1 rounded-[8px] border border-line bg-surface px-1.5 py-[7px]" aria-hidden="true">
+        <i className="block h-1 w-[70%] rounded bg-subtle" />
+        <i className="block h-1 rounded bg-line" />
+        <i className="block h-1 rounded bg-line" />
+        <i className="block h-1 rounded bg-line" />
       </span>
     );
   }
@@ -75,14 +75,14 @@ export function DocumentPreview({ document, compact = false, small = false }: { 
   const serif = { fontFamily: 'var(--font-serif), "Source Serif 4", Georgia, serif' };
   return (
     <div
-      className={`overflow-hidden border-b border-[#f1f5f9] bg-[#f8fafc] ${small ? 'h-[116px] px-3.5 py-3' : 'h-[150px] px-[22px] py-[18px]'}`}
+      className={`overflow-hidden border-b border-line-2 bg-soft ${small ? 'h-[116px] px-3.5 py-3' : 'h-[150px] px-[22px] py-[18px]'}`}
       aria-hidden="true"
     >
-      <b className={`line-clamp-2 block font-bold leading-[1.3] text-[#0f172a] ${small ? 'mb-1.5 text-[12px]' : 'mb-2 text-[14px]'}`} style={serif}>
+      <b className={`line-clamp-2 block font-bold leading-[1.3] text-ink ${small ? 'mb-1.5 text-[12px]' : 'mb-2 text-[14px]'}`} style={serif}>
         {preview?.title || document.title || 'Untitled document'}
       </b>
       {preview?.text ? (
-        <span className={`line-clamp-5 block leading-[1.5] text-[#64748b] ${small ? 'text-[9px]' : 'text-[10.5px]'}`} style={serif}>
+        <span className={`line-clamp-5 block leading-[1.5] text-muted ${small ? 'text-[9px]' : 'text-[10.5px]'}`} style={serif}>
           {preview.text}
         </span>
       ) : null}

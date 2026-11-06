@@ -52,7 +52,7 @@ export function PlansSection({ data, reload, notify }: Shared) {
             const cost = price(plan);
             return (
               <button key={plan.id} type="button" onClick={() => setEditing(plan)}
-                className={`group flex flex-col rounded-2xl border bg-white p-5 text-left transition-shadow hover:shadow-[0_10px_30px_-18px_rgba(15,23,42,.45)] ${plan.featured ? 'border-brand/50' : 'border-line'}`}>
+                className={`group flex flex-col rounded-2xl border bg-surface p-5 text-left transition-shadow hover:shadow-[0_10px_30px_-18px_rgba(15,23,42,.45)] ${plan.featured ? 'border-brand/50' : 'border-line'}`}>
                 <div className="flex w-full items-start gap-2">
                   <div className="min-w-0 flex-1">
                     <p className="flex items-baseline gap-2"><span className="text-[16px] font-bold">{plan.name}</span><span className="font-mono text-[12px] text-subtle">{plan.id}</span></p>
@@ -135,7 +135,7 @@ export function SubscribersSection({ data, subscribers, reload, notify }: Shared
           <label className="relative w-full sm:w-[240px]">
             <LuSearch size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-subtle" />
             <input type="search" aria-label="Search by email" placeholder="Search by email" value={query} onChange={(event) => setQuery(event.target.value)}
-              className="h-9 w-full rounded-[10px] border border-line bg-white pl-9 pr-3 text-[14px] placeholder:text-subtle focus:border-brand focus:outline-none" />
+              className="h-9 w-full rounded-[10px] border border-line bg-surface pl-9 pr-3 text-[14px] placeholder:text-subtle focus:border-brand focus:outline-none" />
           </label>
         </div>
         {!subscribers ? (

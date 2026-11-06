@@ -30,7 +30,7 @@ function RailButton({ label, onClick, active, accent, children, badge }: {
       aria-pressed={active}
       title={label}
       className={`relative grid h-10 w-10 place-items-center rounded-[10px] transition-colors ${
-        active ? 'bg-[#eff6ff] text-[var(--theme-primary-dark,#1d4ed8)]' : accent ? 'text-[var(--theme-primary,#2563eb)] hover:bg-[#f1f5f9]' : 'text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#0f172a]'
+        active ? 'bg-brand-50 text-[var(--theme-primary-dark,var(--color-brand-600))]' : accent ? 'text-[var(--theme-primary,var(--color-brand))] hover:bg-line-2' : 'text-muted hover:bg-line-2 hover:text-ink'
       }`}
     >
       {children}
@@ -49,7 +49,7 @@ function RailButton({ label, onClick, active, accent, children, badge }: {
  */
 export default function EditorSideRail({ isOutlineVisible, onToggleOutline, activeTab, onToggleTab, onWriteWithAI, commentCount }: EditorSideRailProps) {
   return (
-    <nav aria-label="Document tools" className="ai-editor-print-hidden hidden w-[52px] shrink-0 flex-col items-center gap-1 border-l border-[#eef2f6] bg-white pt-3 md:flex">
+    <nav aria-label="Document tools" className="ai-editor-print-hidden hidden w-[52px] shrink-0 flex-col items-center gap-1 border-l border-line-2 bg-surface pt-3 md:flex">
       <RailButton label={isOutlineVisible ? 'Hide outline' : 'Outline'} active={isOutlineVisible} onClick={onToggleOutline}>
         <LuListTree className="h-[19px] w-[19px]" />
       </RailButton>
@@ -73,7 +73,7 @@ export default function EditorSideRail({ isOutlineVisible, onToggleOutline, acti
           <LuPenLine className="h-[19px] w-[19px]" />
         </RailButton>
       ) : null}
-      <div className="my-1 h-px w-6 bg-[#eef2f6]" />
+      <div className="my-1 h-px w-6 bg-line-2" />
       <RailButton label="Help" onClick={() => window.open(navLink('help'), '_blank', 'noopener')}>
         <LuCircleHelp className="h-[19px] w-[19px]" />
       </RailButton>

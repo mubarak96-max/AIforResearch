@@ -131,7 +131,7 @@ export default function FindReplaceBar({
     <div
       role="search"
       aria-label="Find in document"
-      className="ce-find-bar fixed right-4 top-[64px] z-[12300] w-[min(420px,calc(100vw-32px))] rounded-[14px] border border-[#e5e7eb] bg-white p-2.5 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)] md:top-[120px]"
+      className="ce-find-bar fixed right-4 top-[64px] z-[12300] w-[min(420px,calc(100vw-32px))] rounded-[14px] border border-line bg-surface p-2.5 shadow-[0_22px_50px_-18px_rgba(15,23,42,0.35)] md:top-[120px]"
       style={rightOffset !== null ? { right: rightOffset } : undefined}
       onKeyDown={(event) => {
         if (event.key === 'Escape') {
@@ -154,17 +154,17 @@ export default function FindReplaceBar({
             }}
             placeholder="Find in document"
             aria-label="Find"
-            className="h-9 w-full rounded-[10px] border border-[#e5e7eb] pl-3 pr-20 text-[14px] outline-none focus:border-[var(--theme-primary,#2563eb)] focus:shadow-[0_0_0_4px_#eff6ff]"
+            className="h-9 w-full rounded-[10px] border border-line pl-3 pr-20 text-[14px] outline-none focus:border-[var(--theme-primary,var(--color-brand))] focus:shadow-[0_0_0_4px_var(--color-brand-50)]"
           />
-          <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[11.5px] text-[#64748b]">{label}</span>
+          <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[11.5px] text-muted">{label}</span>
         </div>
-        <button type="button" aria-label="Previous match" onClick={() => step(-1)} className="rounded-[8px] p-1.5 text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a]"><LuChevronUp className="h-5 w-5" /></button>
-        <button type="button" aria-label="Next match" onClick={() => step(1)} className="rounded-[8px] p-1.5 text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a]"><LuChevronDown className="h-5 w-5" /></button>
-        <button type="button" aria-label="Close find" onClick={onClose} className="rounded-[8px] p-1.5 text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a]"><LuX className="h-5 w-5" /></button>
+        <button type="button" aria-label="Previous match" onClick={() => step(-1)} className="rounded-[8px] p-1.5 text-muted hover:bg-soft hover:text-ink"><LuChevronUp className="h-5 w-5" /></button>
+        <button type="button" aria-label="Next match" onClick={() => step(1)} className="rounded-[8px] p-1.5 text-muted hover:bg-soft hover:text-ink"><LuChevronDown className="h-5 w-5" /></button>
+        <button type="button" aria-label="Close find" onClick={onClose} className="rounded-[8px] p-1.5 text-muted hover:bg-soft hover:text-ink"><LuX className="h-5 w-5" /></button>
       </div>
-      <div className="mt-1.5 flex items-center justify-between gap-2 px-1 text-[12px] text-[#334155]">
+      <div className="mt-1.5 flex items-center justify-between gap-2 px-1 text-[12px] text-ink-2">
         <label className="inline-flex items-center gap-1.5">
-          <input type="checkbox" className="accent-[var(--theme-primary,#2563eb)]" checked={matchCase} onChange={(event) => setMatchCase(event.target.checked)} /> Match case
+          <input type="checkbox" className="accent-[var(--theme-primary,var(--color-brand))]" checked={matchCase} onChange={(event) => setMatchCase(event.target.checked)} /> Match case
         </label>
         {canEdit && !showReplace ? (
           <button type="button" onClick={() => setShowReplace(true)} className="font-medium text-[var(--theme-primary)] hover:underline">Replace…</button>
@@ -183,10 +183,10 @@ export default function FindReplaceBar({
             }}
             placeholder="Replace with"
             aria-label="Replace with"
-            className="h-9 min-w-0 flex-1 rounded-[10px] border border-[#e5e7eb] px-3 text-[14px] outline-none focus:border-[var(--theme-primary,#2563eb)] focus:shadow-[0_0_0_4px_#eff6ff]"
+            className="h-9 min-w-0 flex-1 rounded-[10px] border border-line px-3 text-[14px] outline-none focus:border-[var(--theme-primary,var(--color-brand))] focus:shadow-[0_0_0_4px_var(--color-brand-50)]"
           />
-          <button type="button" disabled={!state.matches.length} onClick={replaceOne} className="h-9 rounded-[10px] border border-[#e5e7eb] bg-white px-3 text-[13px] font-semibold text-[#0f172a] hover:bg-[#f8fafc] disabled:opacity-50">Replace</button>
-          <button type="button" disabled={!state.matches.length} onClick={replaceAll} className="h-9 rounded-[10px] bg-[var(--theme-primary,#2563eb)] shadow-[0_6px_16px_-8px_rgba(37,99,235,0.8)] px-3 text-[13px] font-semibold text-white hover:bg-[#1d4ed8] disabled:opacity-50">Replace all</button>
+          <button type="button" disabled={!state.matches.length} onClick={replaceOne} className="h-9 rounded-[10px] border border-line bg-surface px-3 text-[13px] font-semibold text-ink hover:bg-soft disabled:opacity-50">Replace</button>
+          <button type="button" disabled={!state.matches.length} onClick={replaceAll} className="h-9 rounded-[10px] bg-[var(--theme-primary,var(--color-brand))] shadow-[0_6px_16px_-8px_rgba(var(--brand-rgb),0.8)] px-3 text-[13px] font-semibold text-white hover:bg-brand-600 disabled:opacity-50">Replace all</button>
         </div>
       ) : null}
     </div>
