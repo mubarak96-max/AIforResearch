@@ -40,16 +40,6 @@ export function PenTick({ className = '' }: { className?: string }) {
   );
 }
 
-/** "§ 2 · Who it's for": the small-caps line above a section heading. */
-export function SectionMark({ n, children, className = '' }: { n?: number; children: ReactNode; className?: string }) {
-  return (
-    <p className={`mb-3 font-serif text-[15px] tracking-[.06em] text-accent [font-variant-caps:all-small-caps] ${className}`}>
-      {n !== undefined && <><span aria-hidden="true">§&thinsp;</span>{n}<span aria-hidden="true"> · </span><span className="sr-only">: </span></>}
-      {children}
-    </p>
-  );
-}
-
 /** "Fig. 1. …" under a product visual. */
 export function FigCaption({ n, children, className = '' }: { n: number; children: ReactNode; className?: string }) {
   return (

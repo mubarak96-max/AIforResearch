@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { LuArrowRight, LuCheck } from 'react-icons/lu';
 import type { PublicPlan } from '@/lib/billing';
-import { SectionMark } from './Marginalia';
 import { btnGhost, btnPrimary, container } from './styles';
 
 const dollars = (cents: number) => `$${(cents / 100).toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
@@ -15,10 +14,9 @@ function price(plan: PublicPlan) {
 }
 
 /** Pricing on the landing page: the live plans from Admin › Plans, three highlights each. */
-export function PricingTeaser({ plans, mark }: { plans: PublicPlan[] | null; mark?: number }) {
+export function PricingTeaser({ plans }: { plans: PublicPlan[] | null }) {
   return (
     <section id="pricing" aria-labelledby="pricing-title" className={`${container} scroll-mt-6 pt-24 md:pt-36`}>
-      <SectionMark n={mark} className="text-center">Pricing</SectionMark>
       <h2 id="pricing-title" className="mx-auto max-w-[620px] text-balance text-center font-serif text-[30px] font-semibold leading-[1.12] tracking-[-0.02em] text-ink md:text-[40px]">
         Start free. Upgrade <em>when</em> you need more.
       </h2>

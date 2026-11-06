@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Source_Serif_4 } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import { PricingDialog } from '@/components/billing/PricingDialog';
 import { ThemeSync } from '@/components/theme/theme';
@@ -10,6 +11,13 @@ import { SITE_URL } from '@/lib/site';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 // Italic too: headings stress one word in italic, and figure captions are set in italic.
 const serif = Source_Serif_4({ subsets: ['latin'], style: ['normal', 'italic'], variable: '--font-serif', display: 'swap' });
+
+// Google Tag Manager container for analytics.
+const GTM_ID = 'GTM-NDBDJNG2';
+const gtmInitScript = `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -25,6 +33,8 @@ export const metadata: Metadata = {
     ],
     apple: { url: '/apple-touch-icon.png', sizes: '180x180' },
   },
+  // Google Search Console ownership check.
+  verification: { google: 'ouHNsuO9vwbkOaI1OfA8VznYbyzCLeuYwm0Z0IN-SCo' },
 };
 
 export const viewport: Viewport = {
@@ -44,6 +54,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: authInitScript }} />
       </head>
       <body>
+        <noscript>
+          <iframe src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`} height="0" width="0" style={{ display: 'none', visibility: 'hidden' }} />
+        </noscript>
+        <Script id="gtm-init" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: gtmInitScript }} />
+        <Script id="gtm" strategy="afterInteractive" src={`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`} />
         <ThemeSync />
         {children}
         <PricingDialog />

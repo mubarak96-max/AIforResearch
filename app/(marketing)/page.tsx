@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { LuArrowRight, LuBriefcase, LuFlaskConical, LuGraduationCap, LuNewspaper, LuPlus, LuSparkles } from 'react-icons/lu';
+import { LuArrowRight, LuBriefcase, LuFlaskConical, LuGraduationCap, LuNewspaper, LuPlus } from 'react-icons/lu';
 import { HeroDemo, HeroDemoSteps } from '@/components/marketing/HeroDemo';
 import { FeatureMini } from '@/components/marketing/FeatureMinis';
 import { AuthAware } from '@/components/marketing/AuthAware';
@@ -9,7 +9,7 @@ import { pageMetadata } from '@/components/marketing/seo';
 import { container, focusRing } from '@/components/marketing/styles';
 import { ComparisonBand, FEATURES, FinalCta, STEPS, StartButton, h2, lead } from '@/components/marketing/landing';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
-import { Footnote, PageReferences, PenTick, PenUnderline, SectionMark, type ReferenceId } from '@/components/marketing/Marginalia';
+import { Footnote, PageReferences, PenTick, PenUnderline, type ReferenceId } from '@/components/marketing/Marginalia';
 
 const DESCRIPTION =
   'Write faster with AI that cites real papers. Generate APA, MLA, Chicago and AMA citations, check every claim and export to Word or LaTeX. Free to start.';
@@ -120,13 +120,10 @@ export default async function LandingPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA).replace(/</g, '\\u003c') }} />
 
       {/* Hero */}
-      <section aria-labelledby="hero-title" className="relative isolate pt-14 text-center md:pt-20" style={{ background: 'radial-gradient(900px 380px at 50% -8%, var(--color-brand-50) 0%, transparent 70%)' }}>
+      <section aria-labelledby="hero-title" className="relative isolate pt-16 text-center md:pt-24" style={{ background: 'radial-gradient(900px 380px at 50% -8%, var(--color-brand-50) 0%, transparent 70%)' }}>
         <div aria-hidden="true" className="wo-ruled absolute inset-x-0 top-0 -z-10 h-[640px]" />
         <div className={container}>
-          <p className="inline-flex h-7 items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-[12.5px] font-medium text-ink-2">
-            <LuSparkles className="h-3.5 w-3.5 text-brand" aria-hidden="true" /> For students, researchers and academics
-          </p>
-          <h1 id="hero-title" className="mx-auto mt-5 max-w-[760px] text-balance font-serif text-[34px] font-semibold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[44px] md:text-[52px]">
+          <h1 id="hero-title" className="mx-auto max-w-[760px] text-balance font-serif text-[34px] font-semibold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[44px] md:text-[52px]">
             Write faster, with a <PenUnderline>real source</PenUnderline> for <em className="font-medium">every</em> claim
           </h1>
           <p className={`mx-auto mt-5 max-w-[520px] text-balance ${lead}`}>
@@ -164,7 +161,6 @@ export default async function LandingPage() {
       <section aria-labelledby="features-title" className={`${container} pt-24 md:pt-32`}>
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between md:gap-10">
           <div>
-            <SectionMark n={1}>The editor</SectionMark>
             <h2 id="features-title" className={`max-w-[560px] ${h2}`}>Write, cite and <em>check</em> in one editor</h2>
             <p className={`mt-4 max-w-[480px] ${lead}`}>Each suggestion comes with a real reference, and each reference opens the paper behind it. No made-up sources.</p>
           </div>
@@ -181,13 +177,12 @@ export default async function LandingPage() {
                   <span className="flex items-center gap-2">
                     <span className="text-brand [&>svg]:h-4 [&>svg]:w-4" aria-hidden="true">{feature.icon}</span>
                     <h3 className="text-[16px] font-semibold text-ink">{feature.name}</h3>
-                    <span className="ml-auto font-serif text-[13px] italic text-subtle" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                    <LuArrowRight className="ml-auto h-4 w-4 text-subtle transition-[color,translate] group-hover:translate-x-0.5 group-hover:text-brand" aria-hidden="true" />
                   </span>
                   {wide && <p className="mt-2 hidden text-balance font-serif text-[22px] font-semibold leading-[1.2] tracking-[-0.01em] text-ink lg:block">{feature.title}</p>}
                   <p className={`mt-1.5 text-[14.5px] leading-[1.55] text-muted ${wide ? 'lg:mt-2' : ''}`}>
                     {wide ? <><span className="lg:hidden">{feature.short}</span><span className="hidden lg:inline">{feature.body}</span></> : feature.short}
                   </p>
-                  <span className="mt-auto inline-flex items-center gap-1 pt-4 text-[13.5px] font-medium text-brand">Learn more <LuArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" /></span>
                 </div>
               </Link>
             </li>
@@ -200,7 +195,6 @@ export default async function LandingPage() {
       <section aria-labelledby="audience-title" className="mt-24 border-y border-line-2 bg-panel py-20 md:mt-32 md:py-24">
         <div className={container}>
         <div className="text-center">
-          <SectionMark n={2}>Who it’s for</SectionMark>
           <h2 id="audience-title" className={`mx-auto max-w-[620px] ${h2}`}>Who is WriteOrbit for?</h2>
           <p className={`mx-auto mt-4 max-w-[520px] ${lead}`}>Anyone who writes with sources. It is built first for students, researchers and academics.</p>
         </div>
@@ -230,11 +224,10 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <ComparisonBand mark={3} />
+      <ComparisonBand />
 
       {/* How it works: three steps; details on /how-it-works. */}
       <section aria-labelledby="how-title" className={`${container} pt-24 text-center md:pt-32`}>
-        <SectionMark n={4}>Method</SectionMark>
         <h2 id="how-title" className={`mx-auto max-w-[620px] ${h2}`}>From blank page to <em>finished</em> paper</h2>
         <ol className="mx-auto mt-10 grid max-w-[920px] gap-8 md:mt-12 md:grid-cols-3 md:gap-10">
           {STEPS.map((step, index) => (
@@ -248,13 +241,12 @@ export default async function LandingPage() {
         <Link href="/how-it-works" className={`mt-9 ${more}`}>See how it works <LuArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
       </section>
 
-      <PricingTeaser plans={plans} mark={5} />
+      <PricingTeaser plans={plans} />
 
       {/* FAQ */}
       <section id="faq" aria-labelledby="faq-title" className={`${container} scroll-mt-6 pt-24 md:pt-36`}>
         <div className="grid gap-8 md:grid-cols-[1fr_1.6fr] md:gap-16">
           <div>
-            <SectionMark n={6}>Questions</SectionMark>
             <h2 id="faq-title" className={h2}>Common questions</h2>
             <p className="mt-3 text-[15px] text-muted">
               More in the <Link href="/help" className="text-ink underline underline-offset-4 hover:text-brand">help center</Link>.

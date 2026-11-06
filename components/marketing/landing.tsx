@@ -13,7 +13,7 @@ import {
   AutocompleteVisual, ChatVisual, CloseMark, COMPARISON_ROWS, ExportVisual, FindPapersVisual, ImportVisual, PhoneVisual, ReviewVisual,
 } from './LandingVisuals';
 import { AuthAware } from './AuthAware';
-import { PenCircle, SectionMark } from './Marginalia';
+import { PenCircle } from './Marginalia';
 import { btnGhost, btnPrimary, container } from './styles';
 
 export const h1 = 'text-balance font-serif text-[34px] font-semibold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[44px] md:text-[52px]';
@@ -170,30 +170,26 @@ export function Points({ items }: { items: string[] }) {
 }
 
 /** "Not another AI chatbot": what WriteOrbit does that a general AI chat does not. */
-/** Always dark, in both themes (it is a deliberate contrast band, so it does not follow --color-ink). */
-export function ComparisonBand({ mark }: { mark?: number }) {
+export function ComparisonBand() {
   return (
-    <section aria-labelledby="compare-title" className="px-4 pt-24 sm:px-6 md:pt-32">
-      <div className="wo-reveal mx-auto max-w-[1184px] rounded-[28px] bg-[#1c1917] px-5 py-14 text-white ring-1 ring-white/10 sm:px-10 md:py-20">
-        <SectionMark n={mark} className="text-center !text-[#f0a77a]">Why not a chatbot</SectionMark>
-        <h2 id="compare-title" className="mx-auto max-w-[620px] text-balance text-center font-serif text-[30px] font-semibold leading-[1.12] tracking-[-0.02em] md:text-[40px]">Not <em>another</em> AI chatbot</h2>
-        <p className="mx-auto mt-4 max-w-[480px] text-balance text-center text-[16px] leading-[1.6] text-slate-400">General AI chat can invent sources. WriteOrbit cites real papers, inside your document.</p>
-        <div className="mx-auto mt-10 max-w-[760px]">
-          <div className="hidden grid-cols-[1fr_1.3fr_1.3fr] gap-4 border-b border-white/10 pb-3 text-[13px] md:grid">
-            <span />
-            <span className="font-semibold text-white">WriteOrbit</span>
-            <span className="text-slate-400">General AI chat</span>
-          </div>
-          <ul>
-            {COMPARISON_ROWS.map((row) => (
-              <li key={row.label} className="grid gap-1.5 border-b border-white/10 py-4 text-[15px] md:grid-cols-[1fr_1.3fr_1.3fr] md:gap-4">
-                <span className="font-medium text-white">{row.label}</span>
-                <span className="flex gap-2 text-slate-200"><LuCheck className="mt-[3px] h-4 w-4 shrink-0 text-green-400" aria-hidden="true" /><span><span className="sr-only">WriteOrbit: </span>{row.writeorbit}</span></span>
-                <span className="flex gap-2 text-slate-400"><span className="mt-[3px]"><CloseMark /></span><span><span className="sr-only">General AI chat: </span>{row.chatbot}</span></span>
-              </li>
-            ))}
-          </ul>
+    <section aria-labelledby="compare-title" className={`${container} wo-reveal pt-24 md:pt-32`}>
+      <h2 id="compare-title" className={`mx-auto max-w-[620px] text-center ${h2}`}>Not <em>another</em> AI chatbot</h2>
+      <p className={`mx-auto mt-4 max-w-[480px] text-center ${lead}`}>General AI chat can invent sources. WriteOrbit cites real papers, inside your document.</p>
+      <div className="mx-auto mt-10 max-w-[760px]">
+        <div className="hidden grid-cols-[1fr_1.3fr_1.3fr] gap-4 border-b border-line pb-3 text-[13px] md:grid">
+          <span />
+          <span className="font-semibold text-ink">WriteOrbit</span>
+          <span className="text-muted">General AI chat</span>
         </div>
+        <ul>
+          {COMPARISON_ROWS.map((row) => (
+            <li key={row.label} className="grid gap-1.5 border-b border-line py-4 text-[15px] md:grid-cols-[1fr_1.3fr_1.3fr] md:gap-4">
+              <span className="font-medium text-ink">{row.label}</span>
+              <span className="flex gap-2 text-ink-2"><LuCheck className="mt-[3px] h-4 w-4 shrink-0 text-green-600" aria-hidden="true" /><span><span className="sr-only">WriteOrbit: </span>{row.writeorbit}</span></span>
+              <span className="flex gap-2 text-muted"><span className="mt-[3px]"><CloseMark /></span><span><span className="sr-only">General AI chat: </span>{row.chatbot}</span></span>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

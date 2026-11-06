@@ -1,9 +1,9 @@
 /**
  * The public address of the site, used for canonical URLs, the sitemap, robots.txt, Open Graph
- * and structured data. Set NEXT_PUBLIC_SITE_URL (apphosting.yaml) to the real domain: while it is
- * left at the example.com placeholder, every canonical tells search engines the pages live there.
+ * and structured data. Set by NEXT_PUBLIC_SITE_URL (apphosting.yaml); falls back to the production
+ * domain, writeorbit.app.
  */
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || process.env.PUBLIC_URL || 'https://app.example.com').replace(/\/+$/, '');
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || process.env.PUBLIC_URL || 'https://writeorbit.app').replace(/\/+$/, '');
 
 export const SITE_NAME = 'WriteOrbit';
 
