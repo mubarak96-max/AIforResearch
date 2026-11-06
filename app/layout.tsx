@@ -10,9 +10,9 @@ const serif = Source_Serif_4({ subsets: ['latin'], variable: '--font-serif', dis
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://app.example.com'),
-  title: { default: 'WriteOrbit — the AI editor for academic writing', template: '%s · WriteOrbit' },
+  title: { default: 'WriteOrbit — AI writing editor and citation generator', template: '%s · WriteOrbit' },
   description:
-    'Write your paper faster, with citations you can trust. Autocomplete with real references, 250M+ papers, AI review, Word and LaTeX export.',
+    'Write faster with AI that cites real papers. Generate citations in 10,000+ styles, check every claim and export to Word or LaTeX.',
   applicationName: 'WriteOrbit',
   manifest: '/manifest.webmanifest',
   icons: {

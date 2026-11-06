@@ -26,7 +26,7 @@ const COLUMNS = [
     links: [
       { label: 'Blog', href: '/blog' },
       { label: 'Help center', href: '/help' },
-      { label: 'Citation styles', href: '/citation-styles' },
+      { label: 'Citation generator', href: '/citation-styles' },
     ],
   },
   {
@@ -53,7 +53,7 @@ export function SiteFooter() {
             <Logo size={24} />
             <span className="sr-only">WriteOrbit home</span>
           </Link>
-          <p className="mt-3 max-w-[280px] text-[14px] leading-relaxed text-muted">The AI editor for academic writing, with citations you can trust.</p>
+          <p className="mt-3 max-w-[280px] text-[14px] leading-relaxed text-muted">The AI writing editor that cites real sources. For students, researchers and academics.</p>
         </div>
         <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-4 md:contents">
           {COLUMNS.map((column) => (

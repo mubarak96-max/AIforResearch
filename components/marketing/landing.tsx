@@ -42,62 +42,62 @@ export type Feature = { id: string; name: string; icon: ReactNode; title: string
 export const FEATURES: Feature[] = [
   {
     id: 'autocomplete',
-    name: 'Autocomplete',
+    name: 'AI autocomplete',
     icon: <LuSparkles className="h-5 w-5" />,
     title: 'Your next sentence, already cited',
-    short: 'Autocomplete that cites real papers.',
-    body: 'Press Tab to accept a suggestion that comes with a real reference.',
-    points: ['Suggestions follow your argument and tone', 'Every citation opens the paper behind it', 'Turn it off any time'],
+    short: 'Suggestions that cite real papers as you write.',
+    body: 'Pause at the end of a sentence and WriteOrbit suggests what comes next, with a real reference. Press Tab to accept it.',
+    points: ['Follows your argument and your tone', 'Every citation opens the paper behind it', 'AI Edit improves, shortens or expands a passage'],
     visual: <AutocompleteVisual />,
   },
   {
     id: 'find-papers',
-    name: 'Find papers',
+    name: 'Citation generator',
     icon: <LuSearch className="h-5 w-5" />,
-    title: 'Find papers without leaving the page',
-    short: 'Search 250M+ works and cite in one click.',
-    body: 'Search 250M+ works and cite in one click, or type @ as you write.',
-    points: ['Filters for open access, year and citations', 'APA, MLA, Chicago and 10,000+ styles', 'The reference list builds itself'],
+    title: 'Find a source and cite it in one click',
+    short: 'Search 250M+ works. Cite in APA, MLA, Chicago and more.',
+    body: 'Search 250M+ scholarly works, or type @ as you write. WriteOrbit formats each citation and builds your reference list or works cited page.',
+    points: ['APA, MLA, Chicago, Harvard, AMA, ACS and 10,000+ styles', 'Change the style and every citation updates', 'Filter by year, citation count and open access'],
     visual: <FindPapersVisual />,
   },
   {
     id: 'chat',
-    name: 'Chat with PDFs',
+    name: 'Research assistant',
     icon: <LuMessagesSquare className="h-5 w-5" />,
     title: 'Ask your papers, get the page number',
-    short: 'Chat across your PDFs, with page numbers.',
-    body: 'Chat across the PDFs in your Library. Answers point to the page.',
-    points: ['Chat with one paper or a whole folder', 'Cite a source straight from the answer', 'Import from Zotero and Mendeley'],
+    short: 'Chat with your PDFs. Answers point to the page.',
+    body: 'Upload PDFs to your Library and ask about one paper or a whole folder. Each answer shows the page it came from.',
+    points: ['Cite a source straight from the answer', 'Draft a literature review from papers you choose', 'Import from Zotero and Mendeley'],
     visual: <ChatVisual />,
   },
   {
     id: 'review',
-    name: 'AI review',
+    name: 'Claim check',
     icon: <LuSquarePen className="h-5 w-5" />,
-    title: 'A careful reviewer, tonight',
-    short: 'Major and Minor comments before you submit.',
-    body: 'Major and Minor comments on weak claims, missing citations and unclear sentences.',
-    points: ['Peer-review and source-quality checks', 'One click to fix or dismiss', 'Comments stay with your draft'],
+    title: 'Check every claim before you submit',
+    short: 'Flags unsupported claims, weak sources and unclear sentences.',
+    body: 'Claim check finds claims that are unsupported or overstated and shows where to cite. Peer review, source quality and proofreading catch the rest.',
+    points: ['Major and Minor comments, like a real referee', 'Spots retracted papers and wrong DOIs', 'Fix or dismiss each comment in one click'],
     visual: <ReviewVisual />,
   },
   {
     id: 'export',
-    name: 'Word and LaTeX',
+    name: 'Word, PDF and LaTeX',
     icon: <LuFileOutput className="h-5 w-5" />,
-    title: 'Open Word, export anything',
-    short: 'Word templates in, Word, PDF or LaTeX out.',
-    body: 'Open your university’s .docx template, then export to Word, PDF or LaTeX.',
-    points: ['Headings, tables, equations and images kept', 'References formatted in your style', 'Comments and tracked changes come with it'],
+    title: 'Open your Word template, export anything',
+    short: 'Word templates in. Word, PDF or LaTeX out.',
+    body: 'Open your university’s .docx template and keep its styles. Export to Word, PDF or LaTeX with your references formatted.',
+    points: ['Headings, tables, equations and images kept', 'Comments and tracked changes come with it', 'LaTeX export opens in Overleaf'],
     visual: <ExportVisual />,
   },
   {
     id: 'phone',
-    name: 'On your phone',
+    name: 'Write together',
     icon: <LuSmartphone className="h-5 w-5" />,
-    title: 'A real editor on your phone',
-    short: 'Write, cite and review on the go.',
-    body: 'Write, cite and review on the go. Everything syncs.',
-    points: ['Works in the browser on any device', 'Library and chat on the go', 'Share and write together'],
+    title: 'Write together, on any device',
+    short: 'Share a draft and write at the same time, anywhere.',
+    body: 'Invite co-authors, supervisors or editors and work in the same document at the same time. It works on your phone too.',
+    points: ['Editor, commenter and viewer roles', 'Comments and version history', 'Works in the browser on phone, tablet and computer'],
     visual: <PhoneVisual />,
   },
 ];
@@ -109,40 +109,40 @@ export const STEPS: Step[] = [
     id: 'start',
     icon: <LuFileInput className="h-5 w-5" />,
     title: 'Start or import',
-    short: 'A blank page, or the Word file you already have.',
-    body: 'Start blank or from a template, or open your Word file. Its styles, comments and tracked changes come with it.',
-    points: ['Templates for literature reviews, proposals and essays', 'Opens .docx, .doc, .odt and .rtf', 'Upload PDFs to your Library to cite and chat with'],
+    short: 'Start blank, pick a template, or open your Word file.',
+    body: 'Start blank or from a template, or open the Word file you already have. Its styles, comments and tracked changes come with it.',
+    points: ['Templates for literature reviews, research proposals and essays', 'Opens .docx, .doc, .odt and .rtf', 'Upload PDFs to your Library to read, cite and ask about'],
     visual: <ImportVisual />,
   },
   {
     id: 'write',
     icon: <LuSparkles className="h-5 w-5" />,
-    title: 'Write with AI beside you',
-    short: 'Autocomplete, AI Edit and chat, with @ to cite.',
-    body: 'Autocomplete suggests your next sentence with a source. AI Edit rewrites a passage; chat answers from papers and your PDFs. Type @ to cite.',
-    points: ['Tab accepts a suggestion, Refine asks again', 'AI Edit: improve, shorten, expand or make it more academic', 'Find papers and cite without leaving the page'],
+    title: 'Write with AI that cites',
+    short: 'Autocomplete, AI Edit and chat. Type @ to cite.',
+    body: 'Autocomplete suggests your next sentence with a source. AI Edit improves a passage, and chat answers from papers and your PDFs. Type @ to cite.',
+    points: ['Tab accepts a suggestion, Refine asks again', 'AI Edit: improve, shorten, expand or make it more academic', 'Find papers and cite them without leaving the page'],
     visual: <AutocompleteVisual />,
   },
   {
     id: 'review',
     icon: <LuClipboardCheck className="h-5 w-5" />,
-    title: 'Review and export',
-    short: 'Fix what the review finds, then export.',
-    body: 'Run an AI review for Major and Minor comments, fix or dismiss each one, then export to Word, PDF or LaTeX with the reference list.',
-    points: ['Comments on claims, citations and clarity', 'Version history keeps earlier drafts', 'Export in your citation style'],
+    title: 'Check and export',
+    short: 'Fix what the checks find, then export.',
+    body: 'Run Claim check and peer review, fix or dismiss each comment, then export to Word, PDF or LaTeX with your reference list.',
+    points: ['Comments on claims, sources and clarity', 'Version history keeps every earlier draft', 'References in the style you need'],
     visual: <ReviewVisual />,
   },
 ];
 
 const AUDIENCE: { icon: ReactNode; label: string }[] = [
   { icon: <LuGraduationCap className="h-4 w-4" />, label: 'Theses and dissertations' },
-  { icon: <LuNewspaper className="h-4 w-4" />, label: 'Journal articles' },
+  { icon: <LuNewspaper className="h-4 w-4" />, label: 'Journal and conference papers' },
   { icon: <LuLibrary className="h-4 w-4" />, label: 'Literature reviews' },
   { icon: <LuFlaskConical className="h-4 w-4" />, label: 'Lab reports' },
-  { icon: <LuLandmark className="h-4 w-4" />, label: 'Grant proposals' },
-  { icon: <LuBookOpen className="h-4 w-4" />, label: 'Research proposals' },
+  { icon: <LuLandmark className="h-4 w-4" />, label: 'Grant and research proposals' },
   { icon: <LuPenLine className="h-4 w-4" />, label: 'Essays and assignments' },
-  { icon: <LuMic className="h-4 w-4" />, label: 'Conference papers' },
+  { icon: <LuBookOpen className="h-4 w-4" />, label: 'Research and policy reports' },
+  { icon: <LuMic className="h-4 w-4" />, label: 'Articles and features' },
 ];
 
 /** The top of a page other than home: title, one line, optional buttons. */
@@ -177,7 +177,7 @@ export function ComparisonBand() {
     <section aria-labelledby="compare-title" className="px-4 pt-24 sm:px-6 md:pt-32">
       <div className="mx-auto max-w-[1184px] rounded-[28px] bg-ink px-5 py-14 text-on-ink sm:px-10 md:py-20">
         <h2 id="compare-title" className="mx-auto max-w-[620px] text-balance text-center text-[30px] font-semibold leading-[1.12] tracking-[-0.03em] md:text-[40px]">Not another AI chatbot</h2>
-        <p className="mx-auto mt-4 max-w-[480px] text-balance text-center text-[16px] leading-[1.6] text-slate-400">General AI chat can make up sources. WriteOrbit cites real papers, in your document.</p>
+        <p className="mx-auto mt-4 max-w-[480px] text-balance text-center text-[16px] leading-[1.6] text-slate-400">General AI chat can invent sources. WriteOrbit cites real papers, inside your document.</p>
         <div className="mx-auto mt-10 max-w-[760px]">
           <div className="hidden grid-cols-[1fr_1.3fr_1.3fr] gap-4 border-b border-white/10 pb-3 text-[13px] md:grid">
             <span />
@@ -202,7 +202,7 @@ export function ComparisonBand() {
 export function AudienceSection() {
   return (
     <section aria-labelledby="audience-title" className={`${container} pt-24 text-center md:pt-32`}>
-      <h2 id="audience-title" className={`mx-auto max-w-[620px] ${h2}`}>For every kind of academic writing</h2>
+      <h2 id="audience-title" className={`mx-auto max-w-[620px] ${h2}`}>For students, researchers and anyone who writes with sources</h2>
       <ul className="mx-auto mt-8 flex max-w-[820px] flex-wrap justify-center gap-2.5">
         {AUDIENCE.map((item) => (
           <li key={item.label} className="inline-flex h-10 items-center gap-2 rounded-full border border-line bg-surface px-4 text-[14px] text-ink-2">
@@ -218,8 +218,8 @@ export function AudienceSection() {
 export function FinalCta({ signedIn }: { signedIn: boolean }) {
   return (
     <section aria-labelledby="cta-title" className={`${container} pb-20 pt-28 text-center md:pb-28 md:pt-36`}>
-      <h2 id="cta-title" className="mx-auto max-w-[640px] text-balance text-[32px] font-semibold leading-[1.08] tracking-[-0.035em] text-ink md:text-[48px]">Your next draft starts here</h2>
-      <p className={`mx-auto mt-4 max-w-[440px] ${lead}`}>Free to start. Upgrade when WriteOrbit is saving you hours.</p>
+      <h2 id="cta-title" className="mx-auto max-w-[640px] text-balance text-[32px] font-semibold leading-[1.08] tracking-[-0.035em] text-ink md:text-[48px]">Write your next paper with real sources</h2>
+      <p className={`mx-auto mt-4 max-w-[440px] ${lead}`}>Free to start, no credit card needed. Upgrade when you need more AI.</p>
       <div className="mt-7 flex flex-wrap justify-center gap-3">
         <StartButton signedIn={signedIn} />
         <Link href="/pricing" className={`${btnGhost} h-11 rounded-[10px] px-5 text-[15px]`}>See pricing</Link>

@@ -35,7 +35,7 @@ export async function generateMetadata() {
   return pageMetadata({
     title: 'Developers',
     path: '/developers',
-    description: 'One WriteOrbit key for scholarly papers, full text, research tools, AI review and Word export. Pay only for what you use.',
+    description: 'One WriteOrbit API key for scholarly papers, full text, research tools, reference checks, AI review and Word export. Pay only for what you use.',
   });
 }
 
@@ -43,10 +43,10 @@ const SERVICES = [
   { icon: LuSearch, title: 'Papers', text: 'Search and look up scholarly works, authors and journals from CitedEvidence Scholar.', code: 'GET /v1/oa/works' },
   { icon: LuFileText, title: 'Full text and PDFs', text: 'Archived full text, XML and PDFs where a copy is available, with source and licence.', code: 'GET /v1/files/pdf/{id}' },
   { icon: LuWrench, title: 'Research tools', text: 'Multi-source search, citation networks and recommendations, over MCP or JSON.', code: 'POST /v1/mcp' },
-  { icon: LuShieldCheck, title: 'Reference checks', text: 'Confirm DOIs and PubMed IDs exist before they go in a reference list.', code: 'validate_citations' },
+  { icon: LuShieldCheck, title: 'Reference checks', text: 'Check that DOIs and PubMed IDs exist before they go in a reference list.', code: 'validate_citations' },
   { icon: LuBot, title: 'AI', text: 'OpenAI-compatible chat completions on DeepSeek. Works with any OpenAI SDK.', code: 'POST /v1/chat/completions' },
   { icon: LuBookOpenCheck, title: 'AI review', text: 'A structured peer review of a manuscript: strengths, problems by severity, a recommendation.', code: 'POST /v1/review' },
-  { icon: LuFileType2, title: 'Word, LaTeX and PDF', text: 'Turn editor documents into .docx, PDF or a LaTeX project.', code: 'POST /v1/convert' },
+  { icon: LuFileType2, title: 'Word, LaTeX and PDF', text: 'Turn editor documents into a .docx, a PDF or a LaTeX project.', code: 'POST /v1/convert' },
 ];
 
 const number = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 2 });
@@ -73,7 +73,7 @@ export default async function DevelopersPage() {
             One key for papers, full text and AI
           </h1>
           <p className="mx-auto mt-3.5 max-w-[640px] text-balance text-[16px] text-muted sm:text-[17px]">
-            The WriteOrbit developer API gives your own app the same papers, full text and AI the editor uses. Pay only for what you use.
+            Give your own app the same papers, full text and AI that power the WriteOrbit editor. Pay only for what you use.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Link href="/developers/keys" className={`${btnPrimary} h-12 px-6 text-[16px]`}>Get a key</Link>
@@ -106,7 +106,7 @@ export default async function DevelopersPage() {
             </div>
             <div className="rounded-2xl border border-line bg-surface p-5">
               <p className="text-[28px] font-bold tracking-[-0.02em] text-ink">{number(starter)} credits to start</p>
-              <p className="mt-1 text-[14.5px] text-ink-2">On your first key, to try AI, reviews and exports. Confirm your email to get both.</p>
+              <p className="mt-1 text-[14.5px] text-ink-2">On your first key, to try AI, reviews and exports. Confirm your email to get both allowances.</p>
             </div>
           </div>
           {prices && (
@@ -185,7 +185,7 @@ reply = client.chat.completions.create(
           <div className="rounded-3xl border border-line bg-soft p-6 md:p-10">
             <span className="grid size-10 place-items-center rounded-xl bg-surface text-brand shadow-card"><LuGraduationCap size={20} /></span>
             <h2 id="institutions" className={`${sectionTitle} mt-4`}>For universities and research groups</h2>
-            <p className="mt-3 max-w-[720px] text-[16px] leading-relaxed text-muted">Run WriteOrbit for a whole department or university in a Firebase project your institution owns, with your own sign-in rules, plans and providers.</p>
+            <p className="mt-3 max-w-[720px] text-[16px] leading-relaxed text-muted">Run WriteOrbit for a whole department or university, in a Firebase project your institution owns, with your own sign-in rules, plans and providers.</p>
             {contactEmail && <a href={contact} className={`${btnPrimary} mt-6 h-12 px-6 text-[16px]`}>Talk to us</a>}
           </div>
         </section>

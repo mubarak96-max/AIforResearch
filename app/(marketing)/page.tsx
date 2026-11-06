@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { LuArrowRight, LuPlus, LuShieldCheck, LuSparkles, LuSquarePen } from 'react-icons/lu';
+import { LuArrowRight, LuBriefcase, LuCheck, LuFlaskConical, LuGraduationCap, LuNewspaper, LuPlus, LuShieldCheck, LuSparkles, LuSquarePen } from 'react-icons/lu';
 import { AutocompleteVisual } from '@/components/marketing/LandingVisuals';
 import { AuthAware } from '@/components/marketing/AuthAware';
 import { PricingTeaser } from '@/components/marketing/PricingTeaser';
@@ -10,11 +10,11 @@ import { container, focusRing } from '@/components/marketing/styles';
 import { FEATURES, FinalCta, STEPS, StartButton, h2, isSignedIn, lead } from '@/components/marketing/landing';
 
 const DESCRIPTION =
-  'Write your paper faster, with citations you can trust. Autocomplete with real references, 250M+ papers, AI review before you submit, and Word and LaTeX export. Free to start.';
+  'Write faster with AI that cites real papers. Generate APA, MLA, Chicago and AMA citations, check every claim and export to Word or LaTeX. Free to start.';
 
 export const revalidate = 300;
 
-export const metadata = pageMetadata({ title: 'WriteOrbit — the AI editor for academic writing', absolute: true, path: '/', description: DESCRIPTION });
+export const metadata = pageMetadata({ title: 'WriteOrbit — AI writing editor and citation generator', absolute: true, path: '/', description: DESCRIPTION });
 
 // Rendered per request (signed-in visitors see Dashboard); the plans themselves are cached for 5 minutes.
 export const dynamic = 'force-dynamic';
@@ -22,18 +22,47 @@ export const dynamic = 'force-dynamic';
 const FACTS = [
   { value: '250M+', label: 'Scholarly works to cite' },
   { value: '10,000+', label: 'Citation styles' },
-  { value: 'Any device', label: 'Phone, tablet, desktop' },
+  { value: '$0', label: 'To start, no card needed' },
+];
+
+const AUDIENCES = [
+  {
+    icon: <LuGraduationCap className="h-5 w-5" />,
+    title: 'Students',
+    text: 'Essays, assignments, theses and dissertations, cited correctly the first time.',
+    points: ['APA, MLA, Chicago or Harvard in one click', 'Open your university’s Word template', 'Free plan, no credit card'],
+  },
+  {
+    icon: <LuFlaskConical className="h-5 w-5" />,
+    title: 'Researchers and academics',
+    text: 'Journal articles, literature reviews and grant proposals, with sources you can defend.',
+    points: ['Search 250M+ works and chat with your PDFs', 'Peer review and source checks before you submit', 'Export to Word or LaTeX for Overleaf'],
+  },
+  {
+    icon: <LuNewspaper className="h-5 w-5" />,
+    title: 'Journalists and editors',
+    text: 'Articles and features where every claim needs to stand up.',
+    points: ['Claim check flags statements with no source', 'A neutral, objective tone check', 'Comment and edit with your desk in real time'],
+  },
+  {
+    icon: <LuBriefcase className="h-5 w-5" />,
+    title: 'Analysts and report writers',
+    text: 'Research reports, policy briefs and white papers backed by real evidence.',
+    points: ['Draft sections from the sources you choose', 'References in the style your client needs', 'Share with reviewers as commenters or viewers'],
+  },
 ];
 
 const FAQ = [
-  { q: 'Is it free to start?', a: 'Yes. The free plan includes the full editor and a daily AI allowance. Upgrade when you need more.' },
-  { q: 'Are the citations real?', a: 'Yes. Papers come from scholarly databases, not the AI’s memory. Click any citation to open the paper.' },
-  { q: 'Will my writing be used to train AI?', a: 'WriteOrbit does not train AI on your documents. They stay private to you and the people you share them with.' },
+  { q: 'Is WriteOrbit free?', a: 'Yes. The free plan includes the full editor, the citation generator and a daily AI allowance. You don’t need a credit card.' },
+  { q: 'Are the citations real?', a: 'Yes. Every citation comes from a scholarly database, not from the AI’s memory. Click a citation to open the paper.' },
+  { q: 'Which citation styles can I use?', a: 'APA 7, MLA 9, Chicago, Harvard, AMA, ACS, IEEE, Vancouver, Turabian, Bluebook and over 10,000 journal styles. Change the style and every citation and the reference list update.' },
+  { q: 'Can WriteOrbit check my claims?', a: 'Yes. Claim check reads your draft, flags claims that are unsupported or overstated, and shows where you need a citation. Source quality spots retracted papers and wrong DOIs.' },
+  { q: 'Is it only for academic writing?', a: 'It is built for students, researchers and academics. It also works for any writing that needs sources, such as reports, articles and features.' },
+  { q: 'Will my writing be used to train AI?', a: 'No. WriteOrbit does not train AI on your documents. They stay private to you and the people you share them with.' },
   { q: "Can I use my university's Word template?", a: 'Yes. Open the .docx and WriteOrbit keeps its styles, headers and page setup when you export.' },
-  { q: 'Which citation styles are there?', a: 'APA, MLA, Chicago, Harvard, IEEE, Vancouver and over 10,000 more journal styles.' },
-  { q: 'Can I cancel any time?', a: 'Yes. Cancel from your account; your plan stays until the end of the period you paid for.' },
-  { q: 'Does it work on my phone?', a: 'Yes. WriteOrbit runs in the browser on phones, tablets and computers, with your work synced.' },
-  { q: 'Can I write with others?', a: 'Yes. Share a document by link and write together in real time, with comments.' },
+  { q: 'Can I write with others?', a: 'Yes. Invite people as editors, commenters or viewers and write in the same document at the same time.' },
+  { q: 'Does it work on my phone?', a: 'Yes. WriteOrbit runs in the browser on phones, tablets and computers, and your work syncs between them.' },
+  { q: 'Can I cancel any time?', a: 'Yes. Cancel from your account. Your plan stays active until the end of the period you paid for.' },
 ];
 
 
@@ -66,14 +95,14 @@ export default async function LandingPage() {
       <section aria-labelledby="hero-title" className="pt-14 text-center md:pt-20" style={{ background: 'radial-gradient(900px 380px at 50% -8%, var(--color-brand-50) 0%, transparent 70%)' }}>
         <div className={container}>
           <p className="inline-flex h-7 items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-[12.5px] font-medium text-ink-2">
-            <LuSparkles className="h-3.5 w-3.5 text-brand" aria-hidden="true" /> The AI editor for academic writing
+            <LuSparkles className="h-3.5 w-3.5 text-brand" aria-hidden="true" /> For students, researchers and academics
           </p>
           <h1 id="hero-title" className="mx-auto mt-5 max-w-[760px] text-balance font-serif text-[34px] font-semibold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[44px] md:text-[52px]">
-            Write your paper faster, with{' '}
-            <span className="bg-[linear-gradient(transparent_62%,var(--color-brand-100)_62%)] px-1">citations you can trust</span>
+            Write faster, with{' '}
+            <span className="bg-[linear-gradient(transparent_62%,var(--color-brand-100)_62%)] px-1">a real source for every claim</span>
           </h1>
           <p className={`mx-auto mt-5 max-w-[520px] text-balance ${lead}`}>
-            Autocomplete with real references, 250M+ papers to cite and an AI review before you submit. Export to Word or LaTeX.
+            AI that writes with real citations, a citation generator for APA, MLA, Chicago and 10,000+ styles, and a claim check before you submit.
           </p>
           <div className="mt-7 flex justify-center"><StartButton signedIn={signedIn} /></div>
           <AuthAware initial={signedIn} signedIn={null} signedOut={<p className="mt-3 text-[13px] text-subtle">Free plan · No credit card</p>} />
@@ -129,8 +158,8 @@ export default async function LandingPage() {
       <section aria-labelledby="features-title" className={`${container} pt-24 md:pt-32`}>
         <div className="grid items-center gap-10 md:grid-cols-[1fr_1.1fr] md:gap-14">
           <div>
-            <h2 id="features-title" className={h2}>Everything you need to write a paper</h2>
-            <p className={`mt-4 max-w-[440px] ${lead}`}>Every suggestion comes with a real reference, and every reference opens the paper behind it.</p>
+            <h2 id="features-title" className={h2}>Write, cite and check in one editor</h2>
+            <p className={`mt-4 max-w-[440px] ${lead}`}>Each suggestion comes with a real reference, and each reference opens the paper behind it. No made-up sources.</p>
             <Link href="/features" className={`mt-6 ${more}`}>See all features <LuArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
           </div>
           <div className="min-w-0 rounded-[24px] bg-[#f4f5f7] p-4 sm:p-7"><AutocompleteVisual /></div>
@@ -149,9 +178,33 @@ export default async function LandingPage() {
         </ul>
       </section>
 
+      {/* Who it is for: the main audiences, academic first. */}
+      <section aria-labelledby="audience-title" className={`${container} pt-24 md:pt-32`}>
+        <div className="text-center">
+          <h2 id="audience-title" className={`mx-auto max-w-[620px] ${h2}`}>Who is WriteOrbit for?</h2>
+          <p className={`mx-auto mt-4 max-w-[520px] ${lead}`}>Anyone who writes with sources. It is built first for students, researchers and academics.</p>
+        </div>
+        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 md:mt-12">
+          {AUDIENCES.map((audience) => (
+            <li key={audience.title} className="flex flex-col rounded-[20px] border border-line bg-surface p-5">
+              <span className="grid size-10 place-items-center rounded-xl bg-brand-50 text-brand" aria-hidden="true">{audience.icon}</span>
+              <h3 className="mt-4 text-[16px] font-semibold text-ink">{audience.title}</h3>
+              <p className="mt-1 text-[14.5px] leading-[1.55] text-muted">{audience.text}</p>
+              <ul className="mt-4 flex flex-col gap-2 border-t border-line-2 pt-4 text-[14px] text-ink-2">
+                {audience.points.map((point) => (
+                  <li key={point} className="flex gap-2">
+                    <LuCheck className="mt-[3px] h-4 w-4 shrink-0 text-green-600" aria-hidden="true" />{point}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       {/* How it works: three steps; details on /how-it-works. */}
       <section aria-labelledby="how-title" className={`${container} pt-24 text-center md:pt-32`}>
-        <h2 id="how-title" className={`mx-auto max-w-[620px] ${h2}`}>From blank page to cited paper</h2>
+        <h2 id="how-title" className={`mx-auto max-w-[620px] ${h2}`}>From blank page to finished paper</h2>
         <ol className="mx-auto mt-10 grid max-w-[920px] gap-8 md:mt-12 md:grid-cols-3 md:gap-10">
           {STEPS.map((step, index) => (
             <li key={step.id}>
@@ -170,7 +223,7 @@ export default async function LandingPage() {
       <section id="faq" aria-labelledby="faq-title" className={`${container} scroll-mt-6 pt-24 md:pt-36`}>
         <div className="grid gap-8 md:grid-cols-[1fr_1.6fr] md:gap-16">
           <div>
-            <h2 id="faq-title" className={h2}>Questions</h2>
+            <h2 id="faq-title" className={h2}>Common questions</h2>
             <p className="mt-3 text-[15px] text-muted">
               More in the <Link href="/help" className="text-ink underline underline-offset-4 hover:text-brand">help center</Link>.
             </p>

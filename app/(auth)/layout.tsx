@@ -3,7 +3,7 @@ import { LuArrowLeft, LuCheck } from 'react-icons/lu';
 import { Logo } from '@/components/Logo';
 import { focusRing } from '@/components/marketing/styles';
 
-const HIGHLIGHTS = ['Autocomplete that cites real papers', '250M+ papers to find and cite', 'Word, PDF and LaTeX export'];
+const HIGHLIGHTS = ['AI suggestions that cite real papers', 'Citations in APA, MLA, Chicago and 10,000+ styles', 'Claim check before you submit', 'Word, PDF and LaTeX export'];
 
 /**
  * Sign-in pages: the brand column on the left (wide screens),
@@ -20,7 +20,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="hidden max-w-[500px] py-10 lg:block">
           <p className="mb-5 text-[12px] font-semibold uppercase tracking-[0.2em] text-muted">Your writing workspace</p>
           <p className="text-[clamp(36px,3.4vw,50px)] font-bold leading-[1.08] tracking-[-0.035em]">From first draft<br />to final paper.</p>
-          <p className="mt-5 text-[17px] leading-relaxed text-ink-2">Write, cite and review in one place.</p>
+          <p className="mt-5 text-[17px] leading-relaxed text-ink-2">Write, cite and check your work in one place.</p>
           <ul className="mt-7 flex flex-col gap-3 border-t border-line pt-7 text-[15px] text-ink-2">
             {HIGHLIGHTS.map((item) => (
               <li key={item} className="flex items-center gap-2.5">

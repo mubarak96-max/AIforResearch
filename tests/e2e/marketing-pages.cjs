@@ -9,8 +9,8 @@ const OUT = process.env.OUT || '/shots';
 const results = [];
 const check = (name, ok, extra = '') => { results.push(ok); console.log(`${ok ? 'PASS' : 'FAIL'} ${name}${extra ? ` | ${extra}` : ''}`); };
 const PAGES = [
-  { path: '/', menu: null, heading: 'Write your paper faster' },
-  { path: '/features', menu: 'Features', heading: 'Everything you need to write a paper' },
+  { path: '/', menu: null, heading: 'Write faster, with a real source for every claim' },
+  { path: '/features', menu: 'Features', heading: 'Everything you need to write, cite and submit' },
   { path: '/how-it-works', menu: 'How it works', heading: 'From blank page to cited paper' },
   { path: '/pricing', menu: 'Pricing', heading: null },
 ];
@@ -63,7 +63,7 @@ const PAGES = [
       if (device === 'desktop' && state === 'out') {
         // Home teaser cards and links go to the new pages.
         await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
-        await page.getByRole('link', { name: /Find papers/ }).first().click();
+        await page.getByRole('link', { name: /Citation generator/ }).first().click();
         await page.waitForURL(/\/features#find-papers$/, { timeout: 10000 }).catch(() => {});
         check('home card opens /features#find-papers', page.url().endsWith('/features#find-papers'), page.url().replace(BASE, ''));
         await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });

@@ -1,7 +1,7 @@
 {
   "name": "WriteOrbit",
   "short_name": "WriteOrbit",
-  "description": "The AI editor for academic writing",
+  "description": "The AI writing editor that cites real sources",
   "start_url": "/editor",
   "display": "standalone",
   "background_color": "#ffffff",

@@ -4,10 +4,10 @@ import { container, focusRing } from '@/components/marketing/styles';
 import { AudienceSection, ComparisonBand, FEATURES, FinalCta, PageIntro, Points, StartButton, isSignedIn } from '@/components/marketing/landing';
 
 export const metadata = pageMetadata({
-  title: 'Features',
+  title: 'Features: AI research assistant, citations and claim check',
   path: '/features',
   description:
-    'Autocomplete that cites real papers, Find papers across 250M+ works, chat with your PDFs, AI review with Major and Minor comments, Word, PDF and LaTeX export, and a real editor on your phone.',
+    'AI autocomplete that cites real papers, a citation generator for 10,000+ styles, an AI research assistant for your PDFs, claim check before you submit, and Word, PDF and LaTeX export.',
 });
 
 // Signed-in visitors see "Open your documents".
@@ -17,7 +17,7 @@ export default async function FeaturesPage() {
   const signedIn = await isSignedIn();
   return (
     <>
-      <PageIntro title="Everything you need to write a paper" intro="Write, cite, review and export in one editor, with every reference a real paper.">
+      <PageIntro title="Everything you need to write, cite and submit" intro="One editor to write, cite, check and export. Every reference is a real paper you can open.">
         <StartButton signedIn={signedIn} />
       </PageIntro>
 
@@ -52,7 +52,7 @@ export default async function FeaturesPage() {
       <AudienceSection />
 
       <p className={`${container} pt-12 text-center text-[15px] text-muted`}>
-        See the steps in <Link href="/how-it-works" className="text-ink underline underline-offset-4 hover:text-brand">How it works</Link>, or every shortcut in the <Link href="/help" className="text-ink underline underline-offset-4 hover:text-brand">help center</Link>.
+        See the three steps in <Link href="/how-it-works" className="text-ink underline underline-offset-4 hover:text-brand">How it works</Link>, or every shortcut in the <Link href="/help" className="text-ink underline underline-offset-4 hover:text-brand">help center</Link>.
       </p>
 
       <FinalCta signedIn={signedIn} />

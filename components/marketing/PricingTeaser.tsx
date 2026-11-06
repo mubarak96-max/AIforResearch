@@ -7,7 +7,7 @@ const dollars = (cents: number) => `$${(cents / 100).toLocaleString('en-US', { m
 
 /** The price line of a plan card: per month billed yearly when there is a yearly price. */
 function price(plan: PublicPlan) {
-  if (plan.checkout === 'contact') return { amount: 'Custom', unit: '', note: 'For labs and departments' };
+  if (plan.checkout === 'contact') return { amount: 'Custom', unit: '', note: 'For departments and teams' };
   if (!plan.monthly_cents && !plan.yearly_cents) return { amount: '$0', unit: 'forever', note: 'No credit card' };
   if (plan.yearly_cents) return { amount: dollars(Math.round(plan.yearly_cents / 12)), unit: '/ month', note: `Billed yearly · ${dollars(plan.monthly_cents)} monthly` };
   return { amount: dollars(plan.monthly_cents), unit: '/ month', note: 'Billed monthly' };
@@ -18,9 +18,9 @@ export function PricingTeaser({ plans }: { plans: PublicPlan[] | null }) {
   return (
     <section id="pricing" aria-labelledby="pricing-title" className={`${container} scroll-mt-6 pt-24 md:pt-36`}>
       <h2 id="pricing-title" className="mx-auto max-w-[620px] text-balance text-center text-[30px] font-semibold leading-[1.12] tracking-[-0.03em] text-ink md:text-[40px]">
-        Free to start. Simple plans.
+        Start free. Upgrade when you need more.
       </h2>
-      <p className="mx-auto mt-4 max-w-[460px] text-balance text-center text-[16px] leading-[1.6] text-muted md:text-[17px]">The full editor is free, with a daily AI allowance. Paid plans lift the limits.</p>
+      <p className="mx-auto mt-4 max-w-[460px] text-balance text-center text-[16px] leading-[1.6] text-muted md:text-[17px]">The full editor and citation generator are free, with a daily AI allowance. Paid plans raise the limits.</p>
       {plans && plans.length > 0 && (
         <ul className={`mt-10 grid gap-4 md:mt-12 md:grid-cols-2 ${plans.length >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
           {plans.map((plan) => {

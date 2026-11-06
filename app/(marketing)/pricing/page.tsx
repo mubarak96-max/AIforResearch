@@ -42,10 +42,10 @@ export default async function PricingPage() {
         <div className={container}>
           <div className="pt-10 text-center md:pt-[46px]">
             <h1 className="text-balance font-serif text-[34px] font-semibold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[44px] lg:text-[52px]">
-              Simple pricing. Write more, worry less.
+              Start free. Pay only when you need more.
             </h1>
             <p className="mt-3.5 text-balance text-[16px] text-muted sm:text-[17px]">
-              Start free. Upgrade when WriteOrbit is saving you hours.
+              The full editor and citation generator are free. Paid plans give you more AI writing, more checks and LaTeX export.
             </p>
           </div>
           <PricingPlans initialPlans={plans} />

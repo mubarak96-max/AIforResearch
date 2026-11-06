@@ -12,11 +12,11 @@ import { hasSession } from '@/lib/session';
 import { openPricing } from '@/lib/billing';
 
 export const NAV_LINKS = [
-  { label: 'Features', href: '/features', hint: 'Autocomplete, papers, review', Icon: LuLayers },
-  { label: 'How it works', href: '/how-it-works', hint: 'From blank page to export', Icon: LuListChecks },
+  { label: 'Features', href: '/features', hint: 'AI writing, citations, claim check', Icon: LuLayers },
+  { label: 'How it works', href: '/how-it-works', hint: 'Three steps to a finished paper', Icon: LuListChecks },
   { label: 'Pricing', href: '/pricing', hint: 'Free and paid plans', Icon: LuTag },
   { label: 'Blog', href: '/blog', hint: 'Guides for writers', Icon: LuNewspaper },
-  { label: 'Help', href: '/help', hint: 'Product how-tos', Icon: LuCircleHelp },
+  { label: 'Help', href: '/help', hint: 'Guides and shortcuts', Icon: LuCircleHelp },
 ];
 
 /** Signed-in people get the pricing pop-up instead of leaving the page. */

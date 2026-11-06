@@ -7,7 +7,7 @@ export const metadata = pageMetadata({
   title: 'How it works',
   path: '/how-it-works',
   description:
-    'From blank page to cited paper in three steps: start or open your Word file, write with cited autocomplete, AI Edit and chat, then review and export to Word, PDF or LaTeX.',
+    'Write a research paper with AI in three steps: start or open your Word file, write with AI that cites real papers, then check your claims and export to Word, PDF or LaTeX.',
 });
 
 // Signed-in visitors see "Open your documents".
@@ -17,7 +17,7 @@ export default async function HowItWorksPage() {
   const signedIn = await isSignedIn();
   return (
     <>
-      <PageIntro title="From blank page to cited paper" intro="Three steps, one editor. Start from your own file, write with AI that cites real papers, and hand in a clean export.">
+      <PageIntro title="From blank page to cited paper" intro="Three steps in one editor. Start from your own file, write with AI that cites real papers, then check your claims and export.">
         <StartButton signedIn={signedIn} />
       </PageIntro>
 

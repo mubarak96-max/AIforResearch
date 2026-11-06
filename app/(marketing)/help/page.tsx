@@ -5,7 +5,7 @@ import { container, focusRing } from '@/components/marketing/styles';
 export const metadata = pageMetadata({
   title: 'Help center',
   path: '/help',
-  description: 'How to write, cite, review and export with WriteOrbit: autocomplete, citations, Library, AI Chat, review checks, Word/PDF/LaTeX export and shortcuts.',
+  description: 'How to write, cite, check and export in WriteOrbit: autocomplete, citations, Library, AI Chat, Claim check, Word, PDF and LaTeX export, and keyboard shortcuts.',
 });
 
 type Topic = { id: string; title: string; items: [string, React.ReactNode][] };
@@ -17,56 +17,56 @@ const TOPICS: Topic[] = [
     id: 'start',
     title: 'Getting started',
     items: [
-      ['New document', <>Start blank, from a template (literature review, research proposal, essay) or open a Word file. Formatting, comments and tracked changes come with it.</>],
-      ['Saving', <>Everything saves as you type. File › Version history shows earlier versions; name one or restore it.</>],
-      ['Sharing', <>Share invites people by email as editors, commenters or viewers, or turns on a link.</>],
+      ['New document', <>Start blank, pick a template (literature review, research proposal or essay), or open a Word file. Its formatting, comments and tracked changes come with it.</>],
+      ['Saving', <>Your work saves as you type. File › Version history shows earlier versions. You can name a version or restore it.</>],
+      ['Sharing', <>Click Share to invite people by email as editors, commenters or viewers, or to turn on a link.</>],
     ],
   },
   {
     id: 'ai',
     title: 'Writing with AI',
     items: [
-      ['Autocomplete', <>Turn it on in the toolbar. Pause at the end of a paragraph and grey text appears with sources. {kbd('Tab')} accepts, Refine asks again, Conclude writes a closing sentence and the next heading.</>],
-      ['AI suggest and Cite', <>The small bar at the cursor writes from exactly there, or opens citation search.</>],
-      ['Autocomplete sources', <>The arrow next to Autocomplete: web or Library papers, a folder of your Library, publication years, citation counts, preprints.</>],
-      ['Write with AI', <>In the side rail or the AI menu. Give a topic and choose papers, your Library or both; it drafts the document section by section with citations, and you accept each part.</>],
-      ['A paragraph', <>Hover a paragraph and use ✦: edit with AI, find citations for it, ask about it, review or comment.</>],
+      ['Autocomplete', <>Turn it on in the toolbar. Pause at the end of a paragraph and a grey suggestion appears, with its sources. {kbd('Tab')} accepts, Refine asks again, Conclude writes a closing sentence and the next heading.</>],
+      ['AI suggest and Cite', <>The small bar at the cursor writes from that exact spot, or opens citation search.</>],
+      ['Autocomplete sources', <>Use the arrow next to Autocomplete to choose where suggestions come from: web or Library papers, one Library folder, publication years, citation counts and preprints.</>],
+      ['Write with AI', <>Open it from the side rail or the AI menu. Give a topic and choose papers, your Library or both. It drafts the document section by section with citations, and you accept each part.</>],
+      ['A paragraph', <>Hover over a paragraph and click ✦ to edit it with AI, find citations for it, ask about it, review it or comment.</>],
     ],
   },
   {
     id: 'cite',
     title: 'Citations and references',
     items: [
-      ['Cite', <>Type {kbd('@')} or use Cite in the toolbar, then search your Library and published papers. The reference list builds itself under References.</>],
-      ['Style', <>Pick the style in the status bar (APA, MLA, Chicago, Harvard, IEEE, Vancouver and more); every citation and reference updates. <Link href="/citation-styles" className="text-brand underline-offset-4 hover:underline">All styles</Link></>],
-      ['A citation', <>Click it to open the paper, save it to your Library, switch to Author (Year) or edit it.</>],
+      ['Cite', <>Type {kbd('@')} or use Cite in the toolbar, then search your Library and published papers. WriteOrbit builds the reference list under References.</>],
+      ['Style', <>Pick a style in the status bar (APA, MLA, Chicago, Harvard, AMA, ACS, IEEE, Vancouver and more). Every citation and reference updates. <Link href="/citation-styles" className="text-brand underline-offset-4 hover:underline">See all styles</Link></>],
+      ['A citation', <>Click a citation to open the paper, save it to your Library, switch to Author (Year) or edit it.</>],
     ],
   },
   {
     id: 'library',
     title: 'Library, Find papers and AI Chat',
     items: [
-      ['Library', <>Upload PDFs and keep them in collections. Cite them, or Ask to chat about one.</>],
-      ['Find papers', <>Search scholarly papers with year, citation and open-access filters. Cite into your document or save to your Library.</>],
-      ['AI Chat', <>Answers cite real papers. Choose Web, Library and Document as sources, and add context with @.</>],
+      ['Library', <>Upload PDFs and sort them into collections. Cite them, or click Ask to chat about one.</>],
+      ['Find papers', <>Search 250M+ scholarly works and filter by year, citation count and open access. Cite a paper in your document or save it to your Library.</>],
+      ['AI Chat', <>Answers cite real papers. Choose Web, Library or Document as sources, and add context with @.</>],
     ],
   },
   {
     id: 'review',
     title: 'Review',
     items: [
-      ['Checks', <>Claim check, peer review, source quality, proofread and tone, on the whole document or a selection.</>],
-      ['Changes', <>Proofread and claim fixes can be shown as tracked changes in the text. Accept or reject them one by one or all at once.</>],
-      ['Comments', <>Select text and add a comment ({kbd('Ctrl+Alt+M')}). Reply, resolve or delete in the Comments panel.</>],
+      ['Checks', <>Run Claim check, peer review, source quality, proofread or tone on the whole document or on a selection.</>],
+      ['Changes', <>Proofread and Claim check fixes can appear as tracked changes. Accept or reject them one at a time or all at once.</>],
+      ['Comments', <>Select text and add a comment ({kbd('Ctrl+Alt+M')}). Reply to, resolve or delete comments in the Comments panel.</>],
     ],
   },
   {
     id: 'export',
     title: 'Export',
     items: [
-      ['Word', <>File › Download Word gives a .docx for Microsoft Word with headings, footnotes, comments, tracked changes, equations, tables and images.</>],
-      ['PDF', <>File › Download PDF. Page size, margins, running head and page numbers come from File › Page setup.</>],
-      ['LaTeX', <>File › Download LaTeX gives a zip for Overleaf: main.tex, references.bib and figures.</>],
+      ['Word', <>File › Download Word saves a .docx with headings, footnotes, comments, tracked changes, equations, tables and images.</>],
+      ['PDF', <>File › Download PDF. Set the page size, margins, running head and page numbers in File › Page setup.</>],
+      ['LaTeX', <>File › Download LaTeX saves a zip you can open in Overleaf, with main.tex, references.bib and your figures.</>],
     ],
   },
 ];
@@ -95,7 +95,7 @@ export default function HelpPage() {
     <div className={container}>
       <div className="pb-6 pt-10 md:pt-[46px]">
         <h1 className="text-[34px] font-bold tracking-[-0.03em] text-ink sm:text-[42px]">Help center</h1>
-        <p className="mt-2 text-[17px] text-ink-2">How to write, cite, review and export with WriteOrbit.</p>
+        <p className="mt-2 text-[17px] text-ink-2">Short answers on how to write, cite, check and export in WriteOrbit.</p>
       </div>
       <div className="grid gap-10 pb-20 md:grid-cols-[200px_minmax(0,1fr)] md:gap-14">
         <nav aria-label="Topics" className="hidden md:block">

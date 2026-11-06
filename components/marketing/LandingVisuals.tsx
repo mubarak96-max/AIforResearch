@@ -247,9 +247,10 @@ export function PhoneVisual() {
 
 /** "Not another chatbot": what WriteOrbit does that a general AI chat does not. */
 export const COMPARISON_ROWS: { label: string; writeorbit: string; chatbot: string }[] = [
-  { label: 'References', writeorbit: 'Real papers you can open', chatbot: 'Can be made up' },
+  { label: 'References', writeorbit: 'Real papers you can open', chatbot: 'Can be invented' },
   { label: 'Where you write', writeorbit: 'In your document', chatbot: 'Copy and paste' },
   { label: 'Citation style', writeorbit: 'APA, MLA and 10,000+ more', chatbot: 'Formatted by hand' },
+  { label: 'Checking claims', writeorbit: 'Flags claims that need a source', chatbot: 'Not built in' },
   { label: 'Your PDFs', writeorbit: 'Answers with page numbers', chatbot: 'No page references' },
   { label: 'Word and LaTeX', writeorbit: 'Export with the reference list', chatbot: 'Not available' },
 ];
