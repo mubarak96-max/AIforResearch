@@ -5,14 +5,11 @@ import type { CountLimit, PublicPlan } from '@/lib/billing';
  * This file turns them into the comparison table and the page description.
  */
 
-import { getApp } from '@/lib/server';
-
-/** Asks the API in this same process (it runs in the app's route handlers). */
-const callApi = (path: string) => getApp().request(path);
-
 export async function loadPublicPlans(): Promise<PublicPlan[] | null> {
   try {
-    const response = await callApi('/api/plans');
+    // Keep server initialization inside the fallback: some runtimes cannot load its dependencies.
+    const { getApp } = await import('@/lib/server');
+    const response = await getApp().request('/api/plans');
     if (!response.ok) return null;
     return ((await response.json()) as { plans: PublicPlan[] }).plans;
   } catch {
