@@ -20,7 +20,7 @@ export const metadata = pageMetadata({ title: 'WriteOrbit — AI writing editor 
 export const revalidate = 300;
 
 const FACTS: { value: string; label: string; source?: ReferenceId }[] = [
-  { value: '250M+', label: 'Scholarly works to cite', source: 'openalex' },
+  { value: '300M+', label: 'Scholarly works to cite', source: 'openalex' },
   { value: '10,000+', label: 'Citation styles', source: 'csl' },
   { value: '$0', label: 'To start, no card needed' },
 ];
