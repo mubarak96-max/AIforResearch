@@ -117,6 +117,9 @@ export type AssistSource = {
   url?: string | null;
   venue?: string | null;
   abstract?: string;
+  /** Passages the answer drew on (Library papers), with their pages. */
+  evidence?: string[];
+  evidence_pages?: (number | null)[];
   bibtex: string;
   source_type: string;
   library_document_id?: string | null;
@@ -425,4 +428,61 @@ export function renameVersion(documentId: string, versionId: string, label: stri
 
 export function restoreVersion(documentId: string, versionId: string) {
   return request<DocumentVersionContent>(`${versionsPath(documentId)}/${encodeURIComponent(versionId)}/restore`, { method: 'POST' }, 'This version could not be restored.');
+}
+
+// ---------------------------------------------------------------- evidence check
+
+export type EvidenceCitationInput = {
+  placeholder: string;
+  label: string;
+  library_document_id?: string | null;
+  doi?: string | null;
+  title?: string | null;
+  evidence_quote?: string | null;
+  evidence_page?: number | null;
+};
+
+export type EvidenceSummary = {
+  sentences: number;
+  cited: number;
+  checked: number;
+  supported: number;
+  partly: number;
+  notSupported: number;
+  tooClose: number;
+  uncitedOverlap: number;
+  basis: { full_text: number; abstract: number; none: number };
+};
+
+/** Does each cited source say what the sentence says, and is any sentence copied? (Review › Evidence) */
+export function evidenceCheck(payload: { blocks: { id: string; text: string; citations: EvidenceCitationInput[] }[]; language?: string; library?: boolean }) {
+  return request<{ comments: ReviewComment[]; summary: EvidenceSummary }>('/api/ai-editor/evidence', {
+    method: 'POST',
+    json: { blocks: payload.blocks, language: payload.language, library: payload.library ?? true },
+  }, 'The evidence check could not finish. Try again.');
+}
+
+// ---------------------------------------------------------------- writing activity
+
+export type WritingActivity = {
+  session_id: string;
+  started_at: number;
+  last_at: number;
+  active_seconds: number;
+  typed: number;
+  pasted_external: number;
+  pasted_internal: number;
+  ai_inserted: number;
+  deleted: number;
+  pastes: { at: number; chars: number; hash: string; internal: boolean }[];
+};
+
+/** A session's running totals for the authorship record. `keepalive` lets it finish as the tab closes. */
+export async function sendWritingActivity(documentId: string, activity: WritingActivity, keepalive = false) {
+  await fetch(`/api/ai-editor/documents/${encodeURIComponent(documentId)}/activity`, {
+    method: 'POST',
+    keepalive,
+    headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+    body: JSON.stringify(activity),
+  });
 }

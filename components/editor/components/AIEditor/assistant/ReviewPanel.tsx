@@ -4,13 +4,14 @@ import React, { useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { toast } from 'react-hot-toast';
-import { LuArrowLeft, LuBookCheck, LuCircleAlert, LuCircleCheck, LuCopy, LuEye, LuPlay, LuRotateCw, LuShieldCheck, LuSpeech, LuSpellCheck, LuTriangleAlert, LuUsers } from 'react-icons/lu';
+import { LuArrowLeft, LuBookCheck, LuFileSearch, LuCircleAlert, LuCircleCheck, LuCopy, LuEye, LuPlay, LuRotateCw, LuShieldCheck, LuSpeech, LuSpellCheck, LuTriangleAlert, LuUsers } from 'react-icons/lu';
 import type { AIEditorComment } from '../../../types/ai-editor';
 import type { SourceCheck } from '../../../lib/aiEditor/assistApi';
 import { CHECK_CATEGORIES, TONES, type CheckId, type CheckRun, type ReviewMemory } from './reviewChecks';
 
 const CHECKS: { id: CheckId; title: string; description: string; icon: React.ReactNode }[] = [
   { id: 'claims', title: 'Claim check', description: 'Finds unsupported or overstated claims and where to cite.', icon: <LuShieldCheck className="h-4 w-4" /> },
+  { id: 'evidence', title: 'Evidence check', description: 'Checks each cited sentence against the source it cites, and flags text copied from a paper.', icon: <LuFileSearch className="h-4 w-4" /> },
   { id: 'peer', title: 'Peer review', description: 'A referee report: strengths, major and minor issues.', icon: <LuUsers className="h-4 w-4" /> },
   { id: 'sources', title: 'Source quality', description: 'Checks citations for retractions, preprints and wrong DOIs.', icon: <LuBookCheck className="h-4 w-4" /> },
   { id: 'proofread', title: 'Proofread', description: 'Grammar, punctuation, word choice and repetition.', icon: <LuSpellCheck className="h-4 w-4" /> },
@@ -110,7 +111,7 @@ export default function ReviewPanel({
         <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-5 pt-1">
           {state?.running ? (
             <div className="space-y-2 pt-2" aria-label="Checking">
-              <p className="text-[13px] text-muted">{open === 'peer' ? 'Reading the whole document…' : open === 'sources' ? 'Looking up each source…' : 'Checking every paragraph…'}</p>
+              <p className="text-[13px] text-muted">{open === 'peer' ? 'Reading the whole document…' : open === 'sources' ? 'Looking up each source…' : open === 'evidence' ? 'Reading each cited source…' : 'Checking every paragraph…'}</p>
               {[0, 1, 2].map((index) => <div key={index} className="h-10 animate-pulse rounded-[10px] bg-soft" />)}
             </div>
           ) : state?.error ? (
@@ -125,9 +126,10 @@ export default function ReviewPanel({
             <PeerReport report={memory.peer.report} recommendation={memory.peer.recommendation} truncated={memory.peer.truncated} />
           ) : open === 'sources' && memory.sources ? (
             <SourceResults results={memory.sources.results} labels={memory.sources.labels} />
-          ) : open === 'claims' || open === 'proofread' || open === 'tone' ? (
+          ) : open === 'claims' || open === 'evidence' || open === 'proofread' || open === 'tone' ? (
             <div>
               {open === 'tone' ? <ToneSelect tone={tone} onChange={onToneChange} /> : null}
+              {open === 'evidence' && memory.evidence ? <EvidenceSummaryView summary={memory.evidence} /> : null}
               {memory.scope?.[open] === 'selection' ? <span className="mb-1.5 inline-block rounded-md bg-line-2 px-1.5 py-0.5 text-[11.5px] font-medium text-ink-3">Selected text only</span> : null}
               <p className="mt-1 text-[13px] text-ink-2">
                 {total(open) ? `${total(open)} suggestion${total(open) === 1 ? '' : 's'} to look at.` : aiChangeCount ? 'All suggestions are in the text.' : 'Nothing to change. Looks good.'}
@@ -226,6 +228,29 @@ export default function ReviewPanel({
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function EvidenceSummaryView({ summary }: { summary: NonNullable<ReviewMemory['evidence']> }) {
+  const unchecked = summary.basis.none;
+  return (
+    <div className="mb-3 rounded-[10px] bg-soft px-3 py-2.5 text-[12.5px] leading-[1.5] text-ink-3">
+      <p>
+        <span className="font-semibold text-ink">{summary.cited}</span> cited sentence{summary.cited === 1 ? '' : 's'}:
+        {' '}<span className="font-semibold text-[#15803d]">{summary.supported} supported</span>
+        {summary.partly ? <>, <span className="font-semibold text-[#b45309]">{summary.partly} partly</span></> : null}
+        {summary.notSupported ? <>, <span className="font-semibold text-[#b91c1c]">{summary.notSupported} not supported</span></> : null}.
+      </p>
+      <p className="mt-1">
+        Read against {summary.basis.full_text} full text{summary.basis.full_text === 1 ? '' : 's'} and {summary.basis.abstract} abstract{summary.basis.abstract === 1 ? '' : 's'}.
+        {unchecked ? ` ${unchecked} could not be checked: add those papers' PDFs to your Library.` : ''}
+      </p>
+      {summary.tooClose || summary.uncitedOverlap ? (
+        <p className="mt-1 font-medium text-[#b91c1c]">
+          {summary.tooClose + summary.uncitedOverlap} sentence{summary.tooClose + summary.uncitedOverlap === 1 ? '' : 's'} too close to a source&apos;s wording.
+        </p>
+      ) : null}
     </div>
   );
 }

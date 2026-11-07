@@ -88,6 +88,11 @@ export const aiEditorCitationInlineContentSpec = createReactInlineContentSpec(
       locator: { default: '' },
       prefix: { default: '' },
       suffix: { default: '' },
+      // What the citation was written from, for the Evidence check: the Library paper, and the
+      // passage (with its page) autocomplete drew on. Empty for citations added by hand.
+      libraryDocumentId: { default: '' },
+      evidencePage: { default: '' },
+      evidenceQuote: { default: '' },
     },
   },
   {
@@ -107,6 +112,9 @@ export const aiEditorCitationInlineContentSpec = createReactInlineContentSpec(
         locator: element.getAttribute('data-locator') ?? '',
         prefix: element.getAttribute('data-prefix') ?? '',
         suffix: element.getAttribute('data-suffix') ?? '',
+        libraryDocumentId: element.getAttribute('data-library-document-id') ?? '',
+        evidencePage: element.getAttribute('data-evidence-page') ?? '',
+        evidenceQuote: element.getAttribute('data-evidence-quote') ?? '',
       };
     },
     render: ({ inlineContent }) => {
@@ -125,6 +133,9 @@ export const aiEditorCitationInlineContentSpec = createReactInlineContentSpec(
           data-locator={inlineContent.props.locator || undefined}
           data-prefix={inlineContent.props.prefix || undefined}
           data-suffix={inlineContent.props.suffix || undefined}
+          data-library-document-id={inlineContent.props.libraryDocumentId || undefined}
+          data-evidence-page={inlineContent.props.evidencePage || undefined}
+          data-evidence-quote={inlineContent.props.evidenceQuote || undefined}
           className="citation-token inline-flex items-center rounded-sm border-b border-[var(--theme-primary-border)] bg-[var(--theme-primary-tint)] px-1 align-middle text-[0.95em] font-medium text-[var(--theme-primary-dark)]"
           title={bibliography}
           onMouseDown={(event) => {

@@ -35,10 +35,15 @@ export async function deleteUserData(uid: string) {
     }
   }
 
+  // Their writing activity in documents other people own (their own documents went above).
+  await deleteQuery(db().collectionGroup(C.writingSessions).where('user_id', '==', uid));
+
   const library = await col(C.libraryDocuments).where('user_id', '==', uid).select().get();
   for (const item of library.docs) await deleteDeep(item.ref);
   await deletePrefix(`library/${uid}`);
-  for (const name of [C.libraryFolders, C.chatThreads, C.libraryConnections, C.libraryImportJobs]) {
+  const matrices = await col(C.reviewMatrices).where('user_id', '==', uid).select().get();
+  for (const matrix of matrices.docs) await deleteDeep(matrix.ref);
+  for (const name of [C.libraryFolders, C.chatThreads, C.libraryConnections, C.libraryImportJobs, C.authorshipReports]) {
     await deleteQuery(col(name).where('user_id', '==', uid));
   }
   // DOI and source-id markers are keyed `{uid}__…`.

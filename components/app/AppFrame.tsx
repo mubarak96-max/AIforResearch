@@ -28,6 +28,7 @@ const ICONS = {
   library: icon(<path d="M4 19V5M8 19V5M12 19l4-14 4 14" />),
   papers: icon(<><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></>),
   chat: icon(<path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.6A8 8 0 1 1 21 12z" />),
+  matrix: icon(<><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 10h18M9 4v16" /></>),
   keys: icon(<><circle cx="8" cy="15" r="4" /><path d="m11 12 8-8M16 7l2 2M14 9l2 2" /></>),
   admin: icon(<path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z" />),
   tutorials: icon(<><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m10 9 5 3-5 3z" /></>),
@@ -88,6 +89,7 @@ export function AppFrame({ title, actions, children, wide = false }: { title: st
         {tool('library', 'Library', ICONS.library, <span className="ml-auto text-subtle">›</span>)}
         {tool('papers', 'Find papers', ICONS.papers)}
         {tool('chat', 'AI Chat', ICONS.chat)}
+        {item('/matrix', 'Review matrix', ICONS.matrix)}
         {recent.length > 0 && (
           <>
             <p className="px-2.5 pt-5 pb-1 text-[12px] font-medium text-subtle">Recent</p>

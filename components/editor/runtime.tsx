@@ -37,12 +37,12 @@ export type WriteOrbitEditorConfig = {
    */
   renderNavigation?: () => React.ReactNode;
   /** Host routes the built-in navigation links to (defaults: /library, /papers, /chat, /account, /help, /pricing, /admin). */
-  navLinks?: Partial<Record<'home' | 'library' | 'papers' | 'chat' | 'account' | 'help' | 'pricing' | 'admin', string>>;
+  navLinks?: Partial<Record<'home' | 'library' | 'papers' | 'chat' | 'account' | 'help' | 'pricing' | 'admin' | 'authorship' | 'matrix', string>>;
 };
 
 /** Host route for one of the built-in navigation links. */
 export function navLink(name: keyof NonNullable<WriteOrbitEditorConfig['navLinks']>): string {
-  const defaults = { home: '/', library: '/library', papers: '/papers', chat: '/chat', account: '/account', help: '/help', pricing: '/pricing', admin: '/admin' };
+  const defaults = { home: '/', library: '/library', papers: '/papers', chat: '/chat', account: '/account', help: '/help', pricing: '/pricing', admin: '/admin', authorship: '/authorship', matrix: '/matrix' };
   return currentConfig.navLinks?.[name] || defaults[name];
 }
 

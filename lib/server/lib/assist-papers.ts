@@ -301,6 +301,8 @@ export type AssistSource = {
   venue: string | null;
   abstract: string;
   evidence: string[];
+  /** The page of each evidence passage (Library PDFs), null when unknown. */
+  evidence_pages?: (number | null)[];
   bibtex: string;
   source_type: string;
   library_document_id: string | null;
@@ -342,6 +344,7 @@ function librarySource(hit: LibraryHit): SourceCandidate {
     venue: doc.publisher || metadata.journal || null,
     abstract: (doc.abstract || '').slice(0, 900),
     evidence: hit.passages.slice(0, 2).map((passage) => passage.content.slice(0, 700)),
+    evidence_pages: hit.passages.slice(0, 2).map((passage) => passage.page ?? null),
     // Without authors and year the item cannot become a proper citation; it still informs the answer.
     bibtex: libraryBibtex(doc) || '',
     source_type: 'library',

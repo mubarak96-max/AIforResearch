@@ -34,7 +34,12 @@ listeners (your own profile, documents you are a member of) and denies everythin
 | `chat_threads/{id}` | `chat_threads` | `document_id, user_id, title, messages, created_at, updated_at`. |
 | `assets/{id}` | `assets` | Image metadata; bytes in Storage `assets/{id}`. |
 
-Deleting a document: `deleteDeep(documents/{id})` (members, versions) + `deleteDocumentFiles(id)`.
+| `documents/{id}/writing_sessions/{sessionId}` | (new) | The authorship record: `user_id, user_name, started_at, last_at` (ms), running totals `active_seconds, typed, pasted_external, pasted_internal, ai_inserted, deleted`, and `pastes[]` (`at, chars, hash, internal`: pastes of 200+ characters, a SHA-256 of the text, never the text). Sent by the editor every 45 s (`useWritingActivity`); totals never go down. |
+| `authorship_reports/{token}` | (new) | A frozen authorship report: `user_id, document_id, payload, hash` (SHA-256 of the canonical payload JSON), `created_at`. The token (random, 20 characters) is the public link `/verify/{token}`; the API is the only reader. |
+
+Versions with `daily_key` (`YYYY-MM-DD`) are the day's snapshot for the authorship record and are never pruned, like named ones.
+
+Deleting a document: `deleteDeep(documents/{id})` (members, versions) + `deleteDocumentFiles(id)`. Writing sessions go with it (a subcollection); issued authorship reports stay with their author until withdrawn or the account is deleted.
 
 ## Library
 
@@ -49,6 +54,9 @@ Deleting a document: `deleteDeep(documents/{id})` (members, versions) + `deleteD
 
 PDF text extraction runs in the **`onLibraryPdfUploaded` Storage trigger** (functions/), not in
 the upload request.
+
+| `review_matrices/{id}` | (new) | Literature review matrix: `user_id, title, columns[{id, label, prompt}], document_ids[]` (Library documents, row order), `created_at, updated_at`. |
+| `review_matrices/{id}/rows/{libraryDocumentId}` | (new) | `cells: { [columnId]: { value, quote, page, status (done/empty/error), basis (full_text/abstract/none/writer), edited, updated_at } }`. A cell with `edited` is the writer's own and is never refilled. |
 
 ## Cloud API, billing, admin
 

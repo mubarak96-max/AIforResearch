@@ -22,6 +22,8 @@ export type VersionRow = {
   id: string; created_at: Date; author_name: string; reason: VersionReason; label: string | null;
   title: string; word_count: number; block_count: number; blocks_hash?: string;
   author_user_id?: string | null; word_settings?: Record<string, any> | null;
+  /** YYYY-MM-DD: the day's snapshot for the authorship record, kept like a named version. */
+  daily_key?: string | null;
 };
 
 export const versionsRef = (documentId: string) => documentRef(documentId).collection(C.versions);
@@ -96,10 +98,10 @@ export async function createVersion(document: DocumentRow, user: AuthUser | null
   return { id, ...version } as VersionRow;
 }
 
-/** Keep named versions forever and the newest unnamed ones. */
+/** Keep named versions and daily snapshots forever, and the newest unnamed ones. */
 async function pruneVersions(documentId: string) {
   const all = await listVersions(documentId, 1000);
-  const extra = all.filter((version) => !version.label).slice(KEEP_UNNAMED);
+  const extra = all.filter((version) => !version.label && !version.daily_key).slice(KEEP_UNNAMED);
   if (!extra.length) return;
   const batch = db().batch();
   for (const version of extra) batch.delete(versionsRef(documentId).doc(version.id));
@@ -112,4 +114,24 @@ export async function maybeAutoVersion(document: DocumentRow, user: AuthUser) {
   const [latest] = await listVersions(document.id, 1);
   if (latest && Date.now() - new Date(latest.created_at).getTime() < AUTO_INTERVAL_MS) return null;
   return createVersion(document, user, 'auto');
+}
+
+export const dayKey = (date = new Date()) => date.toISOString().slice(0, 10);
+
+/**
+ * One snapshot a day while someone writes, kept forever (pruning skips it), so the authorship
+ * record can show how the document grew over weeks and months, not only the last hours.
+ * Cheap when today's exists: one indexed query, and the blocks are only read when needed.
+ */
+export async function ensureDailyVersion(documentId: string, user: AuthUser, load: () => Promise<DocumentRow | null>) {
+  const today = dayKey();
+  const existing = await versionsRef(documentId).where('daily_key', '==', today).limit(1).get();
+  if (!existing.empty) return null;
+  const document = await load();
+  if (!document) return null;
+  const version = await createVersion(document, user, 'auto');
+  // Same content as an older day's snapshot: nothing changed today worth keeping separately.
+  if (version.daily_key) return version;
+  await versionsRef(documentId).doc(version.id).update({ daily_key: today });
+  return { ...version, daily_key: today };
 }

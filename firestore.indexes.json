@@ -643,6 +643,39 @@
           "queryScope": "COLLECTION_GROUP"
         }
       ]
+    },
+    {
+      "collectionGroup": "writing_sessions",
+      "fieldPath": "user_id",
+      "indexes": [
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "DESCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "writing_sessions",
+      "fieldPath": "pastes",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "authorship_reports",
+      "fieldPath": "payload",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "rows",
+      "fieldPath": "cells",
+      "indexes": []
     }
   ]
 }

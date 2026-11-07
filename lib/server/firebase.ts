@@ -67,6 +67,10 @@ export const C = {
   libraryConnections: 'library_connections',
   libraryImportJobs: 'library_import_jobs',
   rateLimits: 'rate_limits',
+  reviewMatrices: 'review_matrices',
+  matrixRows: 'rows',              // review_matrices/{id}/rows/{libraryDocumentId}
+  writingSessions: 'writing_sessions', // documents/{id}/writing_sessions/{sessionId}
+  authorshipReports: 'authorship_reports',
 } as const;
 
 export const col = (name: string) => db().collection(name);

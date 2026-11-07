@@ -9,7 +9,7 @@ import { HostThemeToggle } from '../../lib/aiEditor/hostTheme';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { Block, BlockNoteEditor } from '@blocknote/core';
-import { LuAlignCenter, LuAlignJustify, LuAlignLeft, LuAlignRight, LuArrowDownUp, LuArrowLeft, LuBaseline, LuBold, LuCheck, LuChevronDown, LuChevronRight, LuChevronUp, LuCloud, LuCopy, LuDownload, LuEllipsisVertical, LuEye, LuFileText, LuFolder, LuFolderInput, LuGlobe, LuHistory, LuImage, LuIndentDecrease, LuIndentIncrease, LuItalic, LuLibrary, LuLink, LuList, LuListChecks, LuListOrdered, LuMenu, LuMessageSquare, LuMessageSquarePlus, LuMinus, LuPaintBucket, LuPaintbrush, LuPencil, LuPlus, LuPrinter, LuQuote, LuRedo2, LuRefreshCw, LuRemoveFormatting, LuSearch, LuSettings, LuShieldCheck, LuSlidersHorizontal, LuSparkles, LuSpellCheck, LuStrikethrough, LuSubscript, LuSuperscript, LuText, LuType, LuUnderline, LuUndo2, LuUsers, LuWrench, LuX, LuZap } from 'react-icons/lu';
+import { LuAlignCenter, LuAlignJustify, LuAlignLeft, LuAlignRight, LuArrowDownUp, LuArrowLeft, LuBaseline, LuBold, LuCheck, LuChevronDown, LuChevronRight, LuChevronUp, LuCloud, LuCopy, LuDownload, LuEllipsisVertical, LuEye, LuFileText, LuFingerprint, LuFolder, LuFolderInput, LuGlobe, LuHistory, LuImage, LuIndentDecrease, LuIndentIncrease, LuItalic, LuLibrary, LuLink, LuList, LuListChecks, LuListOrdered, LuMenu, LuMessageSquare, LuMessageSquarePlus, LuMinus, LuPaintBucket, LuPaintbrush, LuPencil, LuPlus, LuPrinter, LuQuote, LuRedo2, LuRefreshCw, LuRemoveFormatting, LuSearch, LuSettings, LuShieldCheck, LuSlidersHorizontal, LuSparkles, LuSpellCheck, LuStrikethrough, LuSubscript, LuSuperscript, LuText, LuType, LuUnderline, LuUndo2, LuUsers, LuWrench, LuX, LuZap } from 'react-icons/lu';
 import type {
   AIEditorAccessRole,
   AIEditorCollaborator,
@@ -460,6 +460,7 @@ const topMenuItems: Record<string, MenuItem[]> = {
     { label: 'Rename', shortcut: 'F2' },
     { label: 'Move to trash', dividerAfter: true },
     { label: 'Version history', description: 'See version history' },
+    { label: 'Authorship report', description: 'Show how you wrote this document' },
     { label: 'Details' },
     { label: 'Language', description: 'Document language' },
     { label: 'Page setup' },
@@ -3922,6 +3923,9 @@ export default function GoogleDocsHeader({
       if (item.label === 'Version history') {
         onVersionHistoryClick();
       }
+      if (item.label === 'Authorship report' && documentId) {
+        window.open(`${navLink('authorship')}/${encodeURIComponent(documentId)}`, '_blank', 'noopener');
+      }
       if (item.label === 'Copy as Markdown') {
         void handleCopyAsMarkdown();
       }
@@ -4539,6 +4543,7 @@ export default function GoogleDocsHeader({
                   { label: 'Download PDF', command: DOWNLOAD_PDF_LABEL, icon: <LuDownload className="h-4 w-4" /> },
                   { label: 'Copy to clipboard', command: 'Copy document', icon: <LuCopy className="h-4 w-4" /> },
                   { label: 'Version history', command: 'Version history', icon: <LuHistory className="h-4 w-4" /> },
+                  { label: 'Authorship report', command: 'Authorship report', icon: <LuFingerprint className="h-4 w-4" /> },
                   { label: 'Document settings', command: 'Page setup', icon: <LuSlidersHorizontal className="h-4 w-4" /> },
                 ] as { label: string; command?: string; icon: React.ReactNode; run?: () => void }[]).map((item) => (
                   <button

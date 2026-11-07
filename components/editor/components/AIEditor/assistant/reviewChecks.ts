@@ -1,10 +1,10 @@
-import type { PeerReviewResult, SourceCheck } from '../../../lib/aiEditor/assistApi';
+import type { EvidenceSummary, PeerReviewResult, SourceCheck } from '../../../lib/aiEditor/assistApi';
 
 /** The Review panel's checks: each runs on the whole document. */
-export type CheckId = 'claims' | 'peer' | 'sources' | 'proofread' | 'tone';
+export type CheckId = 'claims' | 'evidence' | 'peer' | 'sources' | 'proofread' | 'tone';
 
 /** Checks whose results arrive as AI comments, with the categories each can return. */
-export const CHECK_CATEGORIES: Record<'claims' | 'proofread' | 'tone', [string, string][]> = {
+export const CHECK_CATEGORIES: Record<'claims' | 'evidence' | 'proofread' | 'tone', [string, string][]> = {
   claims: [
     ['unsupported', 'Unsupported'],
     ['weakly_supported', 'Weakly supported'],
@@ -12,6 +12,12 @@ export const CHECK_CATEGORIES: Record<'claims' | 'proofread' | 'tone', [string, 
     ['unverifiable', 'Unverifiable'],
     ['contradicted', 'Contradicted'],
     ['misrepresented', 'Misrepresented'],
+  ],
+  evidence: [
+    ['not_supported', 'Source does not say this'],
+    ['partly_supported', 'Source says less than this'],
+    ['too_close', 'Too close to the source'],
+    ['uncited_overlap', 'Copied from an uncited paper'],
   ],
   proofread: [
     ['grammar', 'Grammar'],
@@ -37,6 +43,7 @@ export type ReviewMemory = {
   tone?: string;
   peer?: PeerReviewResult;
   sources?: { results: SourceCheck[]; labels: Record<string, string> };
+  evidence?: EvidenceSummary;
 };
 
 export type CheckRun = { running: boolean; error: string | null };

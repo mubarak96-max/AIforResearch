@@ -85,8 +85,9 @@ import VersionHistoryDialog from './assistant/VersionHistoryDialog';
 import CreditsUpsell from './assistant/CreditsUpsell';
 import CitationEditPopover from './assistant/CitationEditPopover';
 import { AI_BLOCK_TYPES, AIEditBox, BlockAIMenu, BlockSideMenu, blockWords, useUnfreezeSideMenu, type AIEditResult, type BlockAIAction } from './assistant/BlockAITools';
-import { AssistError, DEFAULT_AUTOCOMPLETE_SETTINGS, aiCommentReply, lookupPaper, peerReview, reviewBlocks, saveAIVersion, sourceQuality, type AssistSource, type AutocompleteSettings, type ChatMessage, type DocumentVersionContent, type Paper } from '../../lib/aiEditor/assistApi';
+import { AssistError, DEFAULT_AUTOCOMPLETE_SETTINGS, aiCommentReply, evidenceCheck, lookupPaper, peerReview, reviewBlocks, saveAIVersion, sourceQuality, type AssistSource, type EvidenceCitationInput, type AutocompleteSettings, type ChatMessage, type DocumentVersionContent, type Paper } from '../../lib/aiEditor/assistApi';
 import { aiTextToInline, replaceSourceMarkersInBlocks, serializeInlineForAI, visibleText } from '../../lib/aiEditor/aiText';
+import { noteAIInsertion, useWritingActivity } from '../../hooks/useWritingActivity';
 import { useAutocomplete } from '../../lib/aiEditor/useAutocomplete';
 import { decorateInText } from '../../lib/aiEditor/citationText';
 import { editorPrompt } from '../../lib/aiEditor/editorDialogs';
@@ -4427,6 +4428,7 @@ export default function AIEditorWorkspace() {
             bibliography: formatted.bibliography,
             style: citationFormat.style,
             url: citationUrl ?? '',
+            libraryDocumentId: resolved.document.id,
           },
         } as any;
         if (selectedText) editor.insertInlineContent([' ', citation, ' ']);
@@ -4449,7 +4451,7 @@ export default function AIEditorWorkspace() {
 
   /** aiCitation items for BibTeX entries, numbered after the citations already in the document. */
   const buildCitationItems = useCallback(
-    (entries: { bibtex: string; id?: string; url?: string }[]) => {
+    (entries: { bibtex: string; id?: string; url?: string; libraryDocumentId?: string | null; evidenceQuote?: string | null; evidencePage?: number | null }[]) => {
       const numbering = new Map<string, number>();
       editor.forEachBlock((block) => {
         (Array.isArray(block.content) ? block.content : []).forEach((item) => {
@@ -4477,6 +4479,10 @@ export default function AIEditorWorkspace() {
             bibliography: citationFormat.formatted.bibliography,
             style: citationFormat.style,
             url: entry.url || '',
+            libraryDocumentId: entry.libraryDocumentId || '',
+            // A short stretch is enough to find the passage again; the full text stays in the Library.
+            evidenceQuote: (entry.evidenceQuote || '').replace(/\s+/g, ' ').trim().slice(0, 400),
+            evidencePage: entry.evidencePage ? String(entry.evidencePage) : '',
           },
         });
       });
@@ -4492,6 +4498,9 @@ export default function AIEditorWorkspace() {
           bibtex: source.bibtex,
           id: source.library_document_id || source.doi || undefined,
           url: source.url || '',
+          libraryDocumentId: source.library_document_id || null,
+          evidenceQuote: source.evidence?.[0] || null,
+          evidencePage: source.evidence_pages?.[0] ?? null,
         })),
       ),
     [buildCitationItems],
@@ -4659,8 +4668,11 @@ export default function AIEditorWorkspace() {
   );
 
   // Accepted AI text goes into the version history as WriteOrbit AI (after the copy is saved).
+  useWritingActivity(editor, documentId, Boolean(canEdit));
   const recordAIEdit = useCallback(() => {
     if (!documentId || !canEdit) return;
+    // The authorship record counts the text just inserted as WriteOrbit AI's, not typed.
+    noteAIInsertion();
     window.setTimeout(() => {
       void flushBlocks(getEditorBlocks(editor))
         .then(() => saveAIVersion(documentId))
@@ -4707,6 +4719,45 @@ export default function AIEditorWorkspace() {
     return [...sources.values()].slice(0, 150);
   }, [editor]);
 
+  /**
+   * Paragraphs for the Evidence check: text with [[CITATION_n]] placeholders, and for each
+   * placeholder what the citation points at (Library paper, DOI, title, the passage it came from).
+   */
+  const collectEvidenceBlocks = useCallback(
+    (blockIds?: string[]) => {
+      const managed = new Set(getManagedBibliographyBlocks(getEditorBlocks(editor)).map((block) => block.id));
+      const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const out: { id: string; text: string; citations: EvidenceCitationInput[] }[] = [];
+      editor.forEachBlock((block) => {
+        if (managed.has(block.id) || (blockIds && !blockIds.includes(block.id))) return true;
+        if (!AI_BLOCK_TYPES.has(block.type) || block.type === 'heading' || !Array.isArray(block.content)) return true;
+        const { text, items } = serializeInlineForAI(block.content);
+        if (text.trim().length < 25) return true;
+        const citations: EvidenceCitationInput[] = [];
+        for (const [placeholder, item] of items) {
+          if (!placeholder.startsWith('[[CITATION_')) continue;
+          const props = (item as any)?.props || {};
+          const payload = props.base64 ? getDecodedCitationPayload(props.base64) : null;
+          const meta = payload?.bibtex ? parseBibtexToMetadata(payload.bibtex) : null;
+          const page = Number.parseInt(String(props.evidencePage || ''), 10);
+          citations.push({
+            placeholder,
+            label: String(props.displayText || meta?.title || 'the cited source').slice(0, 300),
+            library_document_id: props.libraryDocumentId || (uuid.test(String(props.citationId || '')) ? props.citationId : null),
+            doi: (meta?.doi || '').replace(/^https?:\/\/(dx\.)?doi\.org\//i, '').trim() || null,
+            title: meta?.title?.trim()?.slice(0, 2000) || null,
+            evidence_quote: props.evidenceQuote || null,
+            evidence_page: Number.isFinite(page) && page > 0 ? page : null,
+          });
+        }
+        out.push({ id: block.id, text: text.slice(0, 12000), citations: citations.slice(0, 60) });
+        return true;
+      });
+      return out.slice(0, 2000);
+    },
+    [editor],
+  );
+
   // The paragraphs of the last real selection, for checks run on "Selection".
   const [selectionBlockIds, setSelectionBlockIds] = useState<string[]>([]);
   useEffect(
@@ -4747,6 +4798,32 @@ export default function AIEditorWorkspace() {
             ...current,
             sources: { results, labels: Object.fromEntries(sources.map((source) => [source.key, source.label])) },
             ranAt: { ...current.ranAt, sources: Date.now() },
+          }));
+        } else if (check === 'evidence') {
+          const blocks = collectEvidenceBlocks(scopeIds ?? undefined);
+          if (!blocks.length) {
+            done(scopeIds ? 'The selection has no text to check.' : 'There is nothing to check yet: write a few paragraphs first.');
+            return;
+          }
+          const response = await evidenceCheck({ blocks });
+          comments
+            .filter((comment) => comment.kind === 'ai-review' && comment.check === 'evidence' && comment.status !== 'resolved')
+            .filter((comment) => !scopeIds || (comment.blockId && scopeIds.includes(comment.blockId)))
+            .forEach((comment) => deleteComment(comment.id));
+          addAIReviewComments(response.comments.map((comment) => ({
+            blockId: comment.blockId,
+            quote: comment.quote,
+            comment: comment.comment,
+            severity: comment.severity,
+            category: comment.category,
+            suggestion: null,
+            check: 'evidence',
+          })));
+          updateReviewMemory((current) => ({
+            ...current,
+            evidence: response.summary,
+            ranAt: { ...current.ranAt, evidence: Date.now() },
+            scope: { ...current.scope, evidence: scopeIds ? 'selection' : 'document' },
           }));
         } else {
           const blocks = collectReviewBlocks(scopeIds ?? undefined);
@@ -4790,7 +4867,7 @@ export default function AIEditorWorkspace() {
         );
       }
     },
-    [addAIReviewComments, collectDocumentSources, collectReviewBlocks, comments, deleteComment, documentTitle, getDocumentText, reviewMemory.tone, selectionBlockIds, updateReviewMemory],
+    [addAIReviewComments, collectDocumentSources, collectEvidenceBlocks, collectReviewBlocks, comments, deleteComment, documentTitle, getDocumentText, reviewMemory.tone, selectionBlockIds, updateReviewMemory],
   );
 
   /** A check's fixes as tracked changes in the text (red removed, green added). */
