@@ -16,7 +16,8 @@ setGlobalOptions({ region: process.env.FUNCTIONS_REGION || 'us-central1', maxIns
 const LIBRARY_PDF = /^library\/([^/]+)\/([^/]+)\.pdf$/;
 
 /** A Library PDF was saved: read its text into searchable chunks (via services/convert). */
-export const onLibraryPdfUploaded = onObjectFinalized({ timeoutSeconds: 300, memory: '1GiB' }, async (event) => {
+// 540 s (the most for an event function): text extraction, then embeddings until processPdf's deadline.
+export const onLibraryPdfUploaded = onObjectFinalized({ timeoutSeconds: 540, memory: '1GiB' }, async (event) => {
   const match = LIBRARY_PDF.exec(event.data.name || '');
   if (!match) return;
   await ready();

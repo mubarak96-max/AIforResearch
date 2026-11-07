@@ -30,9 +30,10 @@ const json = (body: unknown, status = 200) => new Response(JSON.stringify(body),
 // ------------------------------------------------------------------ LLM provider selection
 
 describe('LLM provider selection', () => {
-  it('defaults to DeepSeek, and reports a missing key without throwing', () => {
+  it('defaults to DeepSeek through OpenRouter, and reports a missing key without throwing', () => {
     const config = resolveLlmConfig(llmSettings());
-    expect(config).toMatchObject({ provider: 'deepseek', baseURL: 'https://api.deepseek.com', models: { fast: 'deepseek-chat', review: 'deepseek-chat' }, unavailable: NOT_CONFIGURED_MESSAGE });
+    expect(config).toMatchObject({ provider: 'openrouter', baseURL: 'https://openrouter.ai/api/v1', models: { fast: 'deepseek/deepseek-chat', review: 'deepseek/deepseek-chat' }, unavailable: NOT_CONFIGURED_MESSAGE });
+    expect(resolveLlmConfig(llmSettings({ llmProvider: 'deepseek', llmApiKey: 'k' }))).toMatchObject({ baseURL: 'https://api.deepseek.com', models: { fast: 'deepseek-chat' } });
     expect(resolveLlmConfig(llmSettings({ llmApiKey: 'sk-test' })).unavailable).toBeNull();
   });
 
@@ -76,8 +77,8 @@ describe('LLM slot', () => {
     const slot = createLlmSlot({ settings: llmSettings({ llmApiKey: 'sk-test' }), fetch: fetchMock as any });
     const result = await slot.complete({ messages: [{ role: 'user', content: 'Review this' }], task: 'review', maxTokens: 2200, temperature: 0.1, json: true });
     expect(result).toEqual({ text: '{"issues": []}', usage: { inputTokens: 42, outputTokens: 7 } });
-    expect(requests[0]).toMatchObject({ model: 'deepseek-chat', max_tokens: 4096, temperature: 0.1, response_format: { type: 'json_object' } });
-    expect(String(fetchMock.mock.calls[0][0])).toBe('https://api.deepseek.com/chat/completions');
+    expect(requests[0]).toMatchObject({ model: 'deepseek/deepseek-chat', max_tokens: 4096, temperature: 0.1, response_format: { type: 'json_object' } });
+    expect(String(fetchMock.mock.calls[0][0])).toBe('https://openrouter.ai/api/v1/chat/completions');
   });
 
   it('estimates usage (~4 characters per token) when the API leaves it out', async () => {

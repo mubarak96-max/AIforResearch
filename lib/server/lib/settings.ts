@@ -8,7 +8,8 @@ import { env } from '../env.js';
  * back in full (only whether they are set and their last 4 characters).
  */
 export const SETTING_FIELDS = [
-  { key: 'llmProvider', group: 'ai', label: 'AI provider', secret: false, options: ['', 'deepseek', 'openai', 'anthropic', 'openrouter', 'ollama'] },
+  { key: 'llmProvider', group: 'ai', label: 'AI provider', secret: false, options: ['', 'openrouter', 'deepseek', 'openai', 'anthropic', 'ollama'],
+    labels: { '': 'OpenRouter, DeepSeek model (default)', openrouter: 'OpenRouter', deepseek: 'DeepSeek API', openai: 'OpenAI', anthropic: 'Anthropic', ollama: 'Ollama' } },
   { key: 'llmApiKey', group: 'ai', label: 'AI API key', secret: true },
   { key: 'llmModel', group: 'ai', label: 'Fast model (autocomplete, edits, chat)', secret: false },
   { key: 'llmReviewModel', group: 'ai', label: 'Review model', secret: false },

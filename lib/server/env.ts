@@ -12,8 +12,10 @@ export const env = {
   internalSecret: read('INTERNAL_SECRET'),
   /** The collab service (services/collab on Cloud Run): live text and presence. */
   collabUrl: read('COLLAB_URL', 'http://localhost:4200').replace(/\/+$/, ''),
-  /** Library embeddings for Firestore vector search: '' (word search only) | openai. */
+  /** Library embeddings for Firestore vector search: '' (word search only) | local (the converter's /embed) | openai. */
   embeddingsProvider: read('EMBEDDINGS_PROVIDER'),
+  /** The service answering POST /embed for `local`: its own Cloud Run service, else the converter. */
+  embedUrl: read('EMBED_URL').replace(/\/+$/, ''),
   embeddingsApiKey: read('EMBEDDINGS_API_KEY'),
   embeddingsModel: read('EMBEDDINGS_MODEL', 'text-embedding-3-small'),
 
@@ -48,6 +50,11 @@ export const env = {
    * themselves are set up in Firebase console › Authentication; client ids live there.
    */
   signinPassword: read('SIGNIN_PASSWORD', 'on'),
+  /**
+   * App Check (reCAPTCHA Enterprise) on public endpoints such as /api/auth/legacy-login:
+   * 'on' refuses requests without a valid token; anything else lets them through.
+   */
+  appCheckEnforce: read('APP_CHECK_ENFORCE') === 'on',
   googleRedirectUri: read('GOOGLE_REDIRECT_URI'),
   /** Zotero sign-in (optional OAuth app from zotero.org/oauth/apps; API keys work without it). */
   zoteroClientKey: read('ZOTERO_CLIENT_KEY'),

@@ -29,7 +29,20 @@ gcloud run deploy convert --source services/convert --region us-central1 \
   --ingress internal --no-allow-unauthenticated
 ```
 
-Then set `CONVERT_URL` (the service URL) for App Hosting and Functions. Cloud Run scales it to
+Deploy the same image a second time as **`embed`**, which only answers Library search's
+`POST /embed`. Embedding keeps every core busy for seconds per paper. On its own service it never
+slows down Word and PDF conversions, and it scales (and idles at zero) on its own:
+
+```sh
+gcloud run deploy embed --source services/convert --region us-central1 \
+  --port 4100 --memory 1Gi --cpu 2 --concurrency 16 --timeout 300 --cpu-boost \
+  --set-env-vars CONVERT_EMBED_WARM=1 \
+  --ingress internal --no-allow-unauthenticated
+```
+
+Then set `CONVERT_URL` (the converter's URL) and `EMBED_URL` (the embed service's URL) for App
+Hosting and Functions. Without `EMBED_URL` the converter answers `/embed` itself; it loads the
+model only on the first such request. Cloud Run scales it to
 zero when idle; the first conversion after a quiet spell takes a few extra seconds while
 LibreOffice starts. (`--source` builds the default image, tests included, which is harmless; build with
 `--build-arg WITH_TESTS=0` yourself and deploy with `--image` for a leaner one.)
@@ -72,6 +85,17 @@ with pdflatex, which the image doesn't include.
 | `CONVERT_PDF_TEXT_TIMEOUT` | `120` | pypdfium2 text extraction (s). |
 | `CONVERT_ALLOW_PUBLIC_IMAGES` | `1` | `0` = never fetch public https images named in an export. |
 | `CONVERT_ASSET_FETCH_BASES` | *(empty)* | Comma-separated URL prefixes. If set, an export's `asset_fetch_base` must start with one of them. |
+| `CONVERT_EMBED_MODEL` | `BAAI/bge-small-en-v1.5` | The `/embed` model (any fastembed text model with **384** dimensions, to match the Firestore index). Set it with the `EMBED_MODEL` build arg so the image bakes that model in. |
+| `CONVERT_EMBED_THREADS` | `0` | ONNX Runtime threads per batch (`0` = all cores). |
+| `CONVERT_EMBED_BATCH` | `8` | Texts per model run. Between runs a waiting search query goes first, so a query waits at most one run (about a second) behind an upload. |
+| `CONVERT_EMBED_WARM` | `0` | `1` = load the model at start-up (the `embed` service); `0` = on the first `/embed`. |
+
+Build args: `WITH_EMBEDDINGS=1` (default) installs fastembed (`requirements-embed.txt`) and downloads
+the model into the image at build time; `0` leaves `/embed` out (it answers `501`). For writers who
+work in other languages, build with
+`--build-arg EMBED_MODEL=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` (50+ languages,
+220 MB). Changing the model makes earlier vectors unsearchable until their PDFs are re-processed:
+each chunk records the model that embedded it, and search only compares vectors from the same model.
 
 ### Process discipline
 
@@ -253,6 +277,29 @@ strings (`Title`, `Author`, `Subject`, `Keywords`, `Creator`, `Producer`, `Creat
 | 413 | `PDFs up to 50 MB can be read` |
 | 504 | `Reading this PDF took too long.` (120 s) |
 
+### `POST /embed`
+
+JSON `{"texts": ["...", ...], "kind": "passage" | "query"}`: 1 to 128 texts, each cut to 8,000
+characters (the model reads about the first 512 tokens). Use `passage` for stored Library chunks
+and `query` for a search. The model runs on this service's CPU (fastembed, ONNX Runtime), one run
+of `CONVERT_EMBED_BATCH` texts at a time, with waiting queries ahead of waiting passages. Measured on
+a laptop CPU: 64 chunks of 1,800 characters in about 9 s.
+
+`200` `application/json`:
+
+```json
+{"model": "BAAI/bge-small-en-v1.5", "dimensions": 384, "vectors": [[0.0123, -0.0456, ...], ...]}
+```
+
+Vectors are L2-normalised, in the order of `texts`.
+
+| Status | When (`detail`) |
+|---|---|
+| 422 | No texts, more than 128, or an unknown `kind` |
+| 501 | `Embeddings are not installed in this converter image.` (built with `WITH_EMBEDDINGS=0`) |
+| 503 | The model could not be loaded |
+| 504 | `Embedding took too long. Please try again.` |
+
 ## How the API server uses it
 
 These are the routes the browser calls, as they appear in `wordApi.ts` and `GoogleDocsHeader.tsx`.
@@ -283,7 +330,11 @@ These are the routes the browser calls, as they appear in `wordApi.ts` and `Goog
   - On GET: validate the name, and send `Cache-Control: private, max-age=31536000, immutable`
     and `X-Content-Type-Options: nosniff`. For SVG, also send
     `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'`.
-- **Library / PDF chat**: send PDFs to `/pdf/text` and chunk `pages[].text`.
+- **Library / PDF chat**: send PDFs to `/pdf/text` and chunk `pages[].text`. With
+  `EMBEDDINGS_PROVIDER=local`, chunks go to `/embed` on `EMBED_URL` (`passage`, 64 per request)
+  before the old chunks are replaced, until the PDF job's deadline; chunks past it keep word search
+  only. Each Library search sends its query (`query`, 4 s timeout). Any failure falls back to word
+  search.
 - **Timeouts:**
   - Allow at least the converter's `CONVERT_JOB_TIMEOUT` (600 s) for import, export and
     conversion calls, and 5 s for `/health`.

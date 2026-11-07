@@ -123,7 +123,7 @@ def test_health(client):
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "ok" and body["service"] == "writeorbit-convert" and body["version"]
-    assert set(body) == {"status", "service", "version", "libreoffice", "workers", "busy"}
+    assert set(body) == {"status", "service", "version", "libreoffice", "embeddings", "workers", "busy"}
 
 
 # ------------------------------------------------------------------ LibreOffice formats

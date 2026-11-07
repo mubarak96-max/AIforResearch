@@ -5,6 +5,7 @@ import { env } from '../env.js';
 import { bearer, decodeToken, forgetUser, requireUser, type AppVariables } from '../auth.js';
 import { adminAuth, C, col, getRow } from '../firebase.js';
 import { rateLimit } from '../lib/rateLimit.js';
+import { requireAppCheck } from '../lib/appCheck.js';
 import { methodsFor, PROVIDER_IDS, PROVIDERS, type Provider } from '../lib/signin.js';
 import { publicUser, signedIn, userByEmail, type UserDoc } from '../lib/users.js';
 import { forgetLegacyPassword, legacyPassword, verifyLegacyPassword } from '../lib/legacyPasswords.js';
@@ -62,7 +63,7 @@ export function authRoutes() {
    * calls this when Firebase refuses the password; on success the same password is set in
    * Firebase Auth and the browser signs in again with it.
    */
-  app.post('/legacy-login', rateLimit({ key: 'legacy-login', limit: 20, windowSeconds: 900 }), async (c) => {
+  app.post('/legacy-login', requireAppCheck, rateLimit({ key: 'legacy-login', limit: 20, windowSeconds: 900 }), async (c) => {
     const parsed = loginBody.safeParse(await c.req.json().catch(() => ({})));
     if (!parsed.success) throw new HTTPException(422, { message: 'Enter your email and password.' });
     const { email, password } = parsed.data;

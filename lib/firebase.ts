@@ -2,7 +2,7 @@
 
 import { getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth, type Auth } from 'firebase/auth';
-import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
+import { getToken, initializeAppCheck, ReCaptchaEnterpriseProvider, type AppCheck } from 'firebase/app-check';
 
 /**
  * Firebase in the browser: Authentication (every sign-in method) and, when a reCAPTCHA
@@ -24,6 +24,7 @@ const config = {
 
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
+let appCheck: AppCheck | null = null;
 
 export function firebaseApp(): FirebaseApp {
   if (app) return app;
@@ -32,12 +33,27 @@ export function firebaseApp(): FirebaseApp {
   if (siteKey && typeof window !== 'undefined') {
     if (process.env.NEXT_PUBLIC_APP_CHECK_DEBUG === '1') (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN = true;
     try {
-      initializeAppCheck(app, { provider: new ReCaptchaEnterpriseProvider(siteKey), isTokenAutoRefreshEnabled: true });
+      appCheck = initializeAppCheck(app, { provider: new ReCaptchaEnterpriseProvider(siteKey), isTokenAutoRefreshEnabled: true });
     } catch (error) {
       console.warn('App Check could not start', error);
     }
   }
   return app;
+}
+
+/**
+ * The App Check header for calls to the API ({} when App Check is off or cannot get a token,
+ * so the server decides: APP_CHECK_ENFORCE=on refuses those requests).
+ */
+export async function appCheckHeader(): Promise<Record<string, string>> {
+  firebaseApp();
+  if (!appCheck) return {};
+  try {
+    const { token } = await getToken(appCheck);
+    return { 'X-Firebase-AppCheck': token };
+  } catch {
+    return {};
+  }
 }
 
 export function firebaseAuth(): Auth {

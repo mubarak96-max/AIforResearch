@@ -42,6 +42,20 @@ MAX_TASKS_PER_WORKER = _int("CONVERT_MAX_TASKS_PER_WORKER", 50)
 # The longest one request may wait for its job, queueing included.
 JOB_TIMEOUT = _int("CONVERT_JOB_TIMEOUT", 600)
 
+# Library search embeddings (POST /embed). The model must output 384 dimensions to match the
+# Firestore vector index; BAAI/bge-small-en-v1.5 (English, 67 MB) and
+# sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 (50+ languages, 220 MB) both do.
+EMBED_MODEL = os.environ.get("CONVERT_EMBED_MODEL", "BAAI/bge-small-en-v1.5")
+# Where the model files live; the image bakes them in here so nothing downloads at run time.
+EMBED_CACHE_DIR = os.environ.get("CONVERT_EMBED_CACHE_DIR", "")
+EMBED_THREADS = _int("CONVERT_EMBED_THREADS", 0)  # 0 = ONNX Runtime's default (all cores)
+# Texts per model run. Small, so a search query waits at most one slice (~1 s) behind an upload.
+EMBED_BATCH = _int("CONVERT_EMBED_BATCH", 8)
+# 1 = load the model when the service starts (the dedicated embed service); 0 = on first /embed.
+EMBED_WARM = os.environ.get("CONVERT_EMBED_WARM", "0") == "1"
+MAX_EMBED_TEXTS = 128  # texts in one request
+MAX_EMBED_CHARS = 8000  # characters per text (the model reads ~512 tokens anyway)
+
 # Image URLs in imported blocks are <asset_url_prefix><name>; the default matches the editor.
 DEFAULT_ASSET_URL_PREFIX = "/api/ai-editor/assets/"
 # Fetch public https images named in an export (with private/loopback addresses refused).

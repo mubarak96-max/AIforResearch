@@ -23,7 +23,7 @@ from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from starlette.datastructures import UploadFile as StarletteUploadFile
 
-from . import __version__, config, jobs
+from . import __version__, config, embeddings, jobs
 from .process import ConvertError, soffice_path
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -48,6 +48,9 @@ def body_limit(path: str) -> int:
         return config.MAX_EXPORT_BYTES + (config.MAX_EXPORT_BYTES * 4) // 3 + FORM_SLACK
     if path in ("/convert/docx-to-pdf", "/pdf/text"):
         return config.MAX_EXPORT_BYTES + FORM_SLACK
+    if path == "/embed":
+        # JSON-escaped UTF-8 takes up to ~6 bytes per character.
+        return config.MAX_EMBED_TEXTS * config.MAX_EMBED_CHARS * 6 + FORM_SLACK
     return FORM_SLACK
 
 
@@ -161,7 +164,12 @@ async def lifespan(_app: FastAPI):
             _get_pool().submit(_warm)  # start a worker (imports take a second) before the first request
         except Exception:
             logger.warning("Could not warm the worker pool", exc_info=True)
+    # Only the embed service loads the model up front; the converter never spends memory on it unused.
+    warm = config.EMBED_WARM and embeddings.available()
+    warming = asyncio.create_task(asyncio.to_thread(embeddings.warm)) if warm else None
     yield
+    if warming is not None and not warming.done():
+        warming.cancel()
     _reset_pool()
 
 
@@ -185,6 +193,7 @@ async def health() -> Dict[str, Any]:
         "service": "writeorbit-convert",
         "version": __version__,
         "libreoffice": soffice_path() is not None,
+        "embeddings": config.EMBED_MODEL if embeddings.available() else None,
         "workers": config.WORKERS,
         "busy": _pending,
     }
@@ -321,3 +330,26 @@ async def pdf_text(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="Upload a PDF file.")
     body = await run_job(jobs.pdf_text_job, data)
     return Response(content=body, media_type="application/json")
+
+
+class EmbedRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    texts: List[str] = Field(min_length=1, max_length=config.MAX_EMBED_TEXTS)
+    kind: str = Field(default="passage", pattern="^(passage|query)$")
+
+
+@app.post("/embed")
+async def embed(request: EmbedRequest) -> Dict[str, Any]:
+    """Texts -> normalised vectors for Library search (fastembed, on this service's CPU)."""
+    if not embeddings.available():
+        raise HTTPException(status_code=501, detail="Embeddings are not installed in this converter image.")
+    texts = [text[: config.MAX_EMBED_CHARS] or " " for text in request.texts]
+    try:
+        vectors = await asyncio.wait_for(asyncio.to_thread(embeddings.embed, texts, request.kind),
+                                         timeout=config.JOB_TIMEOUT)
+    except embeddings.EmbeddingsUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=504, detail="Embedding took too long. Please try again.")
+    return {"model": config.EMBED_MODEL, "dimensions": len(vectors[0]) if vectors else 0, "vectors": vectors}

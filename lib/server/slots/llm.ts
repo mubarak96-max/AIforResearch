@@ -56,7 +56,8 @@ const DEFAULTS: Record<LlmProvider, { baseURL: string; fast: string; review: str
 /** Which provider, endpoint, key and models the settings select. Pure, for tests. */
 export function resolveLlmConfig(settings: LlmSettings = env): LlmConfig {
   const requested = settings.llmProvider.toLowerCase();
-  const provider = requested || 'deepseek';
+  // Default: DeepSeek's model, reached through OpenRouter (one key, several upstream hosts).
+  const provider = requested || 'openrouter';
   if (!(LLM_PROVIDERS as readonly string[]).includes(provider)) {
     return {
       provider,

@@ -38,8 +38,13 @@ env:
     availability: [BUILD, RUNTIME]
   # App Check (reCAPTCHA Enterprise site key); leave empty to turn App Check off.
   - variable: NEXT_PUBLIC_RECAPTCHA_SITE_KEY
-    value: ""
+    value: 6LeIYxQuAAAAAM-Uf1Lx6PlT9zDTt8B-TmJavlUk
     availability: [BUILD, RUNTIME]
+  # 'on' = /api/auth/legacy-login refuses requests without a valid App Check token.
+  # Turn on once App Check metrics show verified requests.
+  - variable: APP_CHECK_ENFORCE
+    value: "off"
+    availability: [RUNTIME]
   # services/collab on Cloud Run.
   # The public domain of the site (canonical URLs, sitemap, robots.txt, Open Graph).
   - variable: NEXT_PUBLIC_SITE_URL
@@ -65,9 +70,15 @@ env:
   - variable: SUPPORT_EMAIL
     value: ""
   - variable: LLM_PROVIDER
-    value: deepseek
+    value: openrouter
   - variable: PAPERS_PROVIDER
     value: scholar
+  # Library search by meaning, from the converter's POST /embed (no API key, no per-token fees).
+  - variable: EMBEDDINGS_PROVIDER
+    value: local
+  # The `embed` Cloud Run service (services/convert README); empty = the converter answers /embed.
+  - variable: EMBED_URL
+    value: https://embed-xxxxx.a.run.app
   - variable: BILLING_LIVE
     value: "0"
 
@@ -88,5 +99,6 @@ env:
     secret: STRIPE_SECRET_KEY
   - variable: STRIPE_WEBHOOK_SECRET
     secret: STRIPE_WEBHOOK_SECRET
-  - variable: EMBEDDINGS_API_KEY
-    secret: EMBEDDINGS_API_KEY
+  # Only with EMBEDDINGS_PROVIDER=openai:
+  # - variable: EMBEDDINGS_API_KEY
+  #   secret: EMBEDDINGS_API_KEY

@@ -118,19 +118,29 @@ async function adoptDoi(userId: string, documentId: string, doi: string, tx: Fir
 
 type ChunkInput = { page: number | null; content: string };
 
-/** Replaces a document's chunks (with embeddings when they are on). Returns the count. */
-export async function writeChunks(userId: string, documentId: string, chunks: ChunkInput[]): Promise<number> {
+/** How long writeChunks may spend on embeddings when the caller gives no deadline. */
+const DEFAULT_EMBED_BUDGET_MS = 60_000;
+
+/**
+ * Replaces a document's chunks (with embeddings when they are on). Returns the count.
+ * The vectors are made first, while the old chunks stay searchable, and only until `deadline`:
+ * chunks past it are stored with their words only, so a huge book never loses its search to a
+ * timeout (re-processing the PDF fills in the rest).
+ */
+export async function writeChunks(userId: string, documentId: string, chunks: ChunkInput[], options: { deadline?: number } = {}): Promise<number> {
   const chunksRef = libraryDoc(documentId).collection(C.chunks);
+  const deadline = options.deadline ?? Date.now() + DEFAULT_EMBED_BUDGET_MS;
+  const vectors = await embed(chunks.map((chunk) => chunk.content), 'passage', { deadline });
   await db().recursiveDelete(chunksRef);
-  const vectors = await embed(chunks.map((chunk) => chunk.content));
   for (let start = 0; start < chunks.length; start += 300) {
     const batch = db().batch();
     chunks.slice(start, start + 300).forEach((chunk, offset) => {
       const index = start + offset;
+      const vector = vectors?.vectors[index];
       batch.set(chunksRef.doc(String(index)), {
         user_id: userId, document_id: documentId, chunk_index: index, page: chunk.page, content: chunk.content,
         terms: searchTerms(chunk.content, 200),
-        ...(vectors ? { embedding: FieldValue.vector(vectors.vectors[index]), embedding_model: vectors.model } : {}),
+        ...(vector ? { embedding: FieldValue.vector(vector), embedding_model: vectors!.model } : {}),
       });
     });
     await batch.commit();
@@ -139,7 +149,14 @@ export async function writeChunks(userId: string, documentId: string, chunks: Ch
 }
 
 /** Extracts a PDF's text through the converter and stores it as searchable chunks. */
+/**
+ * Embeddings stop this long after processPdf starts. The function may run 540 s; the rest is
+ * room for deleting the old chunks, writing the new ones and the final update.
+ */
+const PDF_EMBED_DEADLINE_MS = 470_000;
+
 export async function processPdf(documentId: string, fileKey: string) {
+  const started = Date.now();
   const ref = libraryDoc(documentId);
   try {
     const current = row<LibraryRow>(await ref.get());
@@ -157,7 +174,7 @@ export async function processPdf(documentId: string, fileKey: string) {
     const authors = pdfAuthors(result.metadata?.Author);
     const doi = pdfDoi(result.pages?.[0]?.text || '');
     const chunks = chunkPages(result.pages || []);
-    const count = await writeChunks(current.user_id, documentId, chunks);
+    const count = await writeChunks(current.user_id, documentId, chunks, { deadline: started + PDF_EMBED_DEADLINE_MS });
     await db().runTransaction(async (tx) => {
       const snapshot = await tx.get(ref);
       if (!snapshot.exists) return;

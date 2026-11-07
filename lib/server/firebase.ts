@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { getApps, initializeApp, applicationDefault, type App } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
+import { getAppCheck } from 'firebase-admin/app-check';
 import {
   getFirestore, FieldValue, Timestamp,
   type DocumentSnapshot, type Firestore, type QuerySnapshot,
@@ -35,6 +36,7 @@ export function db(): Firestore {
 }
 
 export const adminAuth = () => getAuth(app());
+export const adminAppCheck = () => getAppCheck(app());
 type Bucket = ReturnType<ReturnType<typeof getStorage>['bucket']>;
 export const bucket = (): Bucket => getStorage(app()).bucket();
 

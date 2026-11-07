@@ -5,7 +5,7 @@ import {
   createUserWithEmailAndPassword, onIdTokenChanged, sendEmailVerification, signInWithEmailAndPassword, signOut, updateProfile,
   type User,
 } from 'firebase/auth';
-import { firebaseAuth, firebaseCode, firebaseMessage } from '@/lib/firebase';
+import { appCheckHeader, firebaseAuth, firebaseCode, firebaseMessage } from '@/lib/firebase';
 
 /**
  * The signed-in person. Firebase Authentication keeps the sign-in (and refreshes the ID token
@@ -152,7 +152,7 @@ async function freshToken(force = false): Promise<string | null> {
 /** Calls the WriteOrbit API with the ID token; throws an Error with the server's message. */
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const send = async (token: string | null) => {
-    const headers: Record<string, string> = { ...(init.headers as Record<string, string> | undefined) };
+    const headers: Record<string, string> = { ...(await appCheckHeader()), ...(init.headers as Record<string, string> | undefined) };
     if (init.body && !(init.body instanceof FormData) && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
     if (token) headers.Authorization = `Bearer ${token}`;
     return fetch(path, { ...init, headers });
@@ -193,7 +193,7 @@ export async function signIn(email: string, password: string) {
     const code = firebaseCode(error);
     if (code !== 'auth/invalid-credential' && code !== 'auth/user-not-found' && code !== 'auth/wrong-password') throw friendly(error);
     const moved = await fetch('/api/auth/legacy-login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }),
+      method: 'POST', headers: { 'Content-Type': 'application/json', ...(await appCheckHeader()) }, body: JSON.stringify({ email, password }),
     }).then((response) => response.ok).catch(() => false);
     if (!moved) throw friendly(error);
     try {

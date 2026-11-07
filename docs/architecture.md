@@ -79,7 +79,8 @@ Firestore has no full-text index:
 - **Documents** keep `search_terms`, up to 400 words of the title and text, queried with `array-contains`.
 - **Library passages** keep `terms`, queried with `array-contains-any` and ranked in memory.
   With `EMBEDDINGS_PROVIDER` set, they also get a 384-dimension embedding and are searched with
-  Firestore vector search (`findNearest`).
+  Firestore vector search (`findNearest`). `local` gets the vectors from the converter's
+  `POST /embed` (BAAI/bge-small-en-v1.5 on its CPU); `openai` from OpenAI's API.
 
 For ranked full-text search across everything, add Typesense or Algolia; both have Firebase
 extensions.

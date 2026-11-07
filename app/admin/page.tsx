@@ -25,7 +25,7 @@ const GROUPS: Record<string, { title: string; nav: string; subtitle: string; ico
   storage: { title: 'Storage', nav: 'Storage', subtitle: 'Uploads, images and Word files.', icon: LuHardDrive, test: 'storage' },
   email: { title: 'Email', nav: 'Email', subtitle: 'Password resets and email confirmation.', icon: LuMail, test: 'email', testLabel: 'Send test email' },
   newsletter: { title: 'Newsletter', nav: 'Newsletter', subtitle: 'People with a confirmed email, kept in step with MailCheap.', icon: LuNewspaper, test: 'newsletter' },
-  ai: { title: 'AI', nav: 'AI', subtitle: 'DeepSeek by default. Changes apply at once.', icon: LuSparkles, test: 'ai' },
+  ai: { title: 'AI', nav: 'AI', subtitle: 'DeepSeek through OpenRouter by default. Changes apply at once.', icon: LuSparkles, test: 'ai' },
   papers: { title: 'Papers', nav: 'Papers', subtitle: 'Scholar works without a key; a free key adds full text and research tools.', icon: LuBookOpen, test: 'papers' },
   billing: { title: 'Billing', nav: 'Billing', subtitle: 'Stripe, test mode for now.', icon: LuCreditCard, test: 'stripe' },
   cloud: { title: 'Cloud', nav: 'Cloud', subtitle: 'A WriteOrbit key for this install, and the gateway this server runs.', icon: LuCloud },

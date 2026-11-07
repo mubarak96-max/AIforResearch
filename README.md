@@ -85,9 +85,9 @@ Each service is a slot with its own provider. Set them in `apphosting.yaml` (sec
 
 | Slot | Options | Settings |
 | --- | --- | --- |
-| **AI** | DeepSeek (default), OpenAI, Anthropic, OpenRouter, Ollama | `LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL`, `LLM_REVIEW_MODEL`, `LLM_BASE_URL` |
+| **AI** | OpenRouter running DeepSeek (default), DeepSeek API, OpenAI, Anthropic, Ollama | `LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL`, `LLM_REVIEW_MODEL`, `LLM_BASE_URL` |
 | **Papers** | [CitedEvidence Scholar](#papers-from-scholar) (default), OpenAlex | `PAPERS_PROVIDER`, `SCHOLAR_API_KEY`, `OPENALEX_EMAIL` |
-| **Library search** | Word search (default), or embeddings with Firestore vector search | `EMBEDDINGS_PROVIDER` (`openai`), `EMBEDDINGS_API_KEY` |
+| **Library search** | Word search, or embeddings with Firestore vector search: from the converter's own model (`local`, no per-token fees) or OpenAI | `EMBEDDINGS_PROVIDER` (`local` \| `openai`), `EMBEDDINGS_API_KEY` (OpenAI only) |
 | **Email** | SMTP or Resend (invitations and credit notices; Firebase sends sign-in emails itself) | `MAIL_PROVIDER`, `MAIL_FROM`, `SMTP_*`, `RESEND_API_KEY` |
 | **Newsletter** | MailCheap (keeps a list in step with confirmed accounts) | `NEWSLETTER_PROVIDER`, `MAILCHEAP_API_KEY` |
 | **Payments** | Stripe, if you sell plans or credits yourself | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `BILLING_LIVE=1` for live keys |
