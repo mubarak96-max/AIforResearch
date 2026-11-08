@@ -4,7 +4,7 @@ import { deleteDocumentFiles } from './documentStore.js';
 import { deletePrefix } from './storage.js';
 import type { UserDoc } from './users.js';
 import { syncMemberIndex } from './documents.js';
-import { stripeClient } from './stripeBilling.js';
+import { dodoClient, isNotFound } from './dodoBilling.js';
 
 /**
  * Removes a person's data: their documents (with members, versions and Storage files), their
@@ -12,7 +12,7 @@ import { stripeClient } from './stripeBilling.js';
  * account when nobody else uses it. Safe to run twice: DELETE /api/auth/me runs it, then the
  * Auth `onDelete` trigger (functions/) runs it again.
  *
- * A plan subscription is cancelled at once (no further charges); the Stripe customer stays,
+ * A plan subscription is cancelled at once (no further charges); the Dodo customer stays,
  * so past invoices remain available.
  */
 export async function deleteUserData(uid: string) {
@@ -67,14 +67,15 @@ export async function deleteUserData(uid: string) {
 async function cancelPlanSubscription(accountId: string) {
   const account = await getRow<{ plan_subscription_id?: string | null; plan_status?: string }>(C.accounts, accountId);
   const subscriptionId = account?.plan_subscription_id;
-  if (!subscriptionId || account?.plan_status === 'canceled') return;
-  const stripe = stripeClient();
-  if (!stripe) return;
+  if (!subscriptionId || ['cancelled', 'expired', 'failed'].includes(account?.plan_status ?? '')) return;
+  const dodo = dodoClient();
+  if (!dodo) return;
   try {
-    await stripe.subscriptions.cancel(subscriptionId);
+    // Cancelled now, not at the end of the period: nobody is left to use the plan.
+    await dodo.subscriptions.update(subscriptionId, { status: 'cancelled' });
   } catch (error) {
-    // Already cancelled or deleted in Stripe: nothing left to stop.
-    if ((error as { code?: string }).code === 'resource_missing') return;
+    // Unknown to Dodo (deleted, or from the other mode): nothing left to stop.
+    if (isNotFound(error)) return;
     throw error;
   }
 }

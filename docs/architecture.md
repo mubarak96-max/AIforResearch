@@ -34,8 +34,8 @@ data (pricing, developer prices) call the app in-process (`getApp().request(...)
 Google, Microsoft, Apple) and sends the reset and confirmation emails. The browser keeps the
 latest ID token (`lib/session.ts`) and sends it as `Authorization: Bearer`. The API
 verifies it with the Admin SDK (`lib/server/auth.ts`). On a person's first request it
-creates their `users/{uid}` and `accounts/{id}` documents (`lib/users.ts`). Admins are the
-`ADMIN_EMAILS` whose email Firebase reports as verified.
+creates their `users/{uid}` and `accounts/{id}` documents (`lib/users.ts`). There are no admin
+accounts: the app has no admin page.
 
 **Firestore and Storage.** All data lives here; see [data-model.md](data-model.md). Browsers
 never write either one. Every change goes through the API, which checks access, plan limits and
@@ -68,9 +68,8 @@ The functions import the same `lib/server` code. `functions/build.mjs` bundles i
 ## Settings
 
 Environment variables (`apphosting.yaml`, the Cloud Run services' variables, and
-`functions/.env`) set the defaults. Admin › Settings overrides them, stored encrypted with
-`SETTINGS_KEY` in `app_settings`. Every instance watches that collection, so a change applies
-everywhere within a second.
+`functions/.env`) are the only settings (`lib/server/env.ts`); change one and redeploy. Plans
+and prices are code: `lib/server/lib/plans.ts` and `lib/server/lib/prices.ts`.
 
 ## Search
 

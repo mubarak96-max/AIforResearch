@@ -48,7 +48,7 @@ const SECTIONS: LegalSection[] = [
         <p>We do not sell your personal data. We share it only with the service providers that run WriteOrbit for us, and only as far as each one needs:</p>
         <ul>
           <li>Google Cloud and Firebase: hosting, sign-in, database and file storage.</li>
-          <li>Stripe: payments.</li>
+          <li>Dodo Payments: payments, as merchant of record (it receives your billing details and card, not your writing).</li>
           <li>Our AI provider: answering AI requests, as described above.</li>
           <li>Our email provider: account emails and, if you subscribe, the newsletter.</li>
           <li>Scholarly databases: we send your search terms (not your documents) to find papers to cite.</li>

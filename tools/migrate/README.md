@@ -50,7 +50,7 @@ events, audit), `files`. Try it against the emulators first: set `FIRESTORE_EMUL
 - **Passkeys** do not move (Firebase has no passkeys). People who only used a passkey sign in
   with "Forgot password?" once.
 - Admins: `is_admin` is copied. `SETTINGS_KEY` must be the **same** as the old install's, or
-  the keys saved in Admin (AI, Stripe, …) cannot be decrypted.
+  the keys saved in Admin (AI, payments, …) cannot be decrypted.
 
 ## What does not move
 

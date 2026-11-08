@@ -3,10 +3,10 @@ import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 import { C, col } from '../firebase.js';
 import { requireUser, type AppVariables } from '../auth.js';
-import { stripeClient } from '../lib/stripeBilling.js';
+import { dodoClient } from '../lib/dodoBilling.js';
 import { loadPlans, publicPlan, usageSummary } from '../lib/plans.js';
 import {
-  completeCheckout, listCards, listInvoices, payInvoice, removeCard, renewPlan, setCancelAtPeriodEnd,
+  billingPortal, completeCheckout, ensureCustomer, listCards, listInvoices, removeCard, renewPlan, setCancelAtPeriodEnd,
   setDefaultCard, startAddCard, startPlanPurchase,
 } from '../lib/planBilling.js';
 
@@ -20,17 +20,13 @@ export function planRoutes() {
   return app;
 }
 
-function stripeOr503() {
-  try {
-    const stripe = stripeClient();
-    if (stripe) return stripe;
-  } catch (error) {
-    throw new HTTPException(503, { message: (error as Error).message });
-  }
+function dodoOr503() {
+  const dodo = dodoClient();
+  if (dodo) return dodo;
   throw new HTTPException(503, { message: 'Payments are not set up yet.' });
 }
 
-/** Turns Stripe and validation errors into a message the account page can show. */
+/** Turns Dodo and validation errors into a message the account page can show. */
 async function friendly<T>(work: () => Promise<T>): Promise<T> {
   try {
     return await work();
@@ -54,18 +50,21 @@ export function billingRoutes() {
       col(C.libraryDocuments).where('user_id', '==', c.get('user')!.id).count().get().then((snapshot) => ({ count: snapshot.data().count })),
       col(C.accounts).doc(accountId).get(),
     ]);
-    const account = accountSnapshot.data() as { stripe_customer_id?: string | null } | undefined;
+    const account = accountSnapshot.data() as { dodo_customer_id?: string | null; dodo_payment_method_id?: string | null } | undefined;
     let cards: Awaited<ReturnType<typeof listCards>> = [];
     let invoices: Awaited<ReturnType<typeof listInvoices>> = [];
     let payments = true;
     try {
-      const stripe = stripeClient();
-      if (stripe && account?.stripe_customer_id) {
-        [cards, invoices] = await Promise.all([listCards(stripe, account.stripe_customer_id), listInvoices(stripe, account.stripe_customer_id)]);
+      const dodo = dodoClient();
+      if (dodo && account?.dodo_customer_id) {
+        [cards, invoices] = await Promise.all([
+          listCards(dodo, account.dodo_customer_id, account.dodo_payment_method_id ?? null),
+          listInvoices(dodo, account.dodo_customer_id),
+        ]);
       }
-      payments = Boolean(stripe);
+      payments = Boolean(dodo);
     } catch (error) {
-      console.warn('billing summary: Stripe unavailable', (error as Error).message);
+      console.warn('billing summary: Dodo Payments unavailable', (error as Error).message);
       payments = false;
     }
     const { plan, limits, account: state, counts } = summary;
@@ -80,7 +79,6 @@ export function billingRoutes() {
       library: { used: library.count, limit: limits.library_pdfs },
       cards,
       invoices,
-      open_invoices: invoices.filter((invoice) => invoice.status === 'open'),
       payments_enabled: payments,
     });
   });
@@ -88,57 +86,58 @@ export function billingRoutes() {
   app.post('/checkout', async (c) => {
     const body = z.object({ plan: z.string().min(1).max(40), interval: z.enum(['month', 'year']) }).safeParse(await c.req.json().catch(() => ({})));
     if (!body.success) throw new HTTPException(422, { message: 'Choose a plan and monthly or yearly.' });
-    const stripe = stripeOr503();
-    return c.json(await friendly(() => startPlanPurchase(stripe, accountOf(c), body.data.plan, body.data.interval)));
+    const dodo = dodoOr503();
+    return c.json(await friendly(() => startPlanPurchase(dodo, accountOf(c), body.data.plan, body.data.interval)));
   });
 
-  /** Back from Stripe Checkout (a plan or a card): saves the result straight away. */
+  /** Back from Dodo's checkout (a plan, or a new card on it): saves the result straight away. */
   app.post('/checkout/complete', async (c) => {
-    const body = z.object({ session: z.string().min(5).max(300) }).safeParse(await c.req.json().catch(() => ({})));
-    if (!body.success) throw new HTTPException(422, { message: 'Missing checkout session.' });
-    const stripe = stripeOr503();
-    return c.json(await friendly(() => completeCheckout(stripe, accountOf(c), body.data.session)));
+    const body = z.object({ subscription: z.string().min(5).max(300) }).safeParse(await c.req.json().catch(() => ({})));
+    if (!body.success) throw new HTTPException(422, { message: 'Missing subscription.' });
+    const dodo = dodoOr503();
+    return c.json(await friendly(() => completeCheckout(dodo, accountOf(c), body.data.subscription)));
   });
 
+  /** Dodo's page to add a card (on the plan subscription when there is one). */
   app.post('/cards', async (c) => {
-    const stripe = stripeOr503();
-    return c.json({ url: await friendly(() => startAddCard(stripe, accountOf(c))) });
+    const dodo = dodoOr503();
+    return c.json({ url: await friendly(() => startAddCard(dodo, accountOf(c))) });
   });
 
   app.post('/cards/:id/default', async (c) => {
-    const stripe = stripeOr503();
-    await friendly(() => setDefaultCard(stripe, accountOf(c), c.req.param('id')));
+    const dodo = dodoOr503();
+    await friendly(() => setDefaultCard(dodo, accountOf(c), c.req.param('id')));
     return c.json({ ok: true });
   });
 
   app.delete('/cards/:id', async (c) => {
-    const stripe = stripeOr503();
-    await friendly(() => removeCard(stripe, accountOf(c), c.req.param('id')));
+    const dodo = dodoOr503();
+    await friendly(() => removeCard(dodo, accountOf(c), c.req.param('id')));
     return c.json({ ok: true });
+  });
+
+  /** Dodo's customer portal: receipts, cards and the subscription. */
+  app.post('/portal', async (c) => {
+    const dodo = dodoOr503();
+    return c.json({ url: await friendly(async () => billingPortal(dodo, await ensureCustomer(dodo, accountOf(c)))) });
   });
 
   app.post('/cancel', async (c) => {
     const body = z.object({ reason: z.string().max(500).optional() }).safeParse(await c.req.json().catch(() => ({})));
-    const stripe = stripeOr503();
-    await friendly(() => setCancelAtPeriodEnd(stripe, accountOf(c), true, body.success ? body.data.reason : undefined));
+    const dodo = dodoOr503();
+    await friendly(() => setCancelAtPeriodEnd(dodo, accountOf(c), true, body.success ? body.data.reason : undefined));
     return c.json({ ok: true });
   });
 
   app.post('/resume', async (c) => {
-    const stripe = stripeOr503();
-    await friendly(() => setCancelAtPeriodEnd(stripe, accountOf(c), false));
+    const dodo = dodoOr503();
+    await friendly(() => setCancelAtPeriodEnd(dodo, accountOf(c), false));
     return c.json({ ok: true });
   });
 
   app.post('/renew', async (c) => {
-    const stripe = stripeOr503();
-    return c.json(await friendly(() => renewPlan(stripe, accountOf(c))));
-  });
-
-  app.post('/invoices/:id/pay', async (c) => {
-    const body = z.object({ card: z.string().max(100).optional() }).safeParse(await c.req.json().catch(() => ({})));
-    const stripe = stripeOr503();
-    return c.json(await friendly(() => payInvoice(stripe, accountOf(c), c.req.param('id'), body.success ? body.data.card : undefined)));
+    const dodo = dodoOr503();
+    return c.json(await friendly(() => renewPlan(dodo, accountOf(c))));
   });
 
   return app;

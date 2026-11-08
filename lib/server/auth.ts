@@ -65,15 +65,6 @@ export const requireUser: MiddlewareHandler<{ Variables: AppVariables }> = async
   await next();
 };
 
-/** Rejects with 403 unless the signed-in person is an admin. */
-export const requireAdmin: MiddlewareHandler<{ Variables: AppVariables }> = async (c, next) => {
-  const user = c.get('user') ?? (await userFromToken(bearer(c)));
-  if (!user) throw new HTTPException(401, { message: 'Sign in to continue.' });
-  if (!user.is_admin) throw new HTTPException(403, { message: 'Admins only.' });
-  c.set('user', user);
-  await next();
-};
-
 /** Calls from the converter, the collab service and Cloud Functions carry INTERNAL_SECRET. */
 export const requireInternal: MiddlewareHandler = async (c, next) => {
   const sent = c.req.header('x-internal-secret') || '';

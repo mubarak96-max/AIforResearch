@@ -14,7 +14,7 @@ const nextConfig = {
   reactStrictMode: true,
   // Node-only packages the API uses load from node_modules at run time (jsdom, under
   // isomorphic-dompurify, reads its own files).
-  serverExternalPackages: ['firebase-admin', 'nodemailer', 'stripe', 'isomorphic-dompurify', 'jsdom'],
+  serverExternalPackages: ['firebase-admin', 'nodemailer', 'dodopayments', 'isomorphic-dompurify', 'jsdom'],
   poweredByHeader: false,
   // lib/server imports its files with .js extensions (it also runs under Node in functions/ and
   // services/collab); let webpack find the .ts source.

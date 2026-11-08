@@ -68,7 +68,7 @@ function PricingDialogBody({ reason }: { reason: string | null }) {
                   {[0, 1, 2, 3].map((index) => <div key={index} className="h-[420px] animate-pulse rounded-[20px] bg-surface" />)}
                 </div>
               )}
-              <p className="mt-5 text-center text-[13px] text-subtle">Secure payment by Stripe · Cancel any time</p>
+              <p className="mt-5 text-center text-[13px] text-subtle">Secure checkout by Dodo Payments · Cancel any time</p>
             </>
           )}
         </div>

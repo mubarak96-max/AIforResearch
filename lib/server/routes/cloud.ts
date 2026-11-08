@@ -5,20 +5,16 @@ import { C, col, db, rows } from '../firebase.js';
 import { requireUser, type AppVariables } from '../auth.js';
 import { createApiKey, forgetApiKeys } from '../lib/apiKeys.js';
 import { CREDIT_PACKS, publicPrices } from '../lib/prices.js';
-import { billingMode, stripeClient } from '../lib/stripeBilling.js';
+import { billingMode, dodoClient } from '../lib/dodoBilling.js';
 import { completeCreditCheckout, creditOverview, dailyFreeCredits, grantStarter, startCreditCheckout, starterCredits, topUp, wallet } from '../lib/credits.js';
 
 /**
  * Developer API account pages: API keys, credits (balance, free credits today, packs, automatic
  * top-up) and usage per service this month.
  */
-function stripeOr503() {
-  try {
-    const stripe = stripeClient();
-    if (stripe) return stripe;
-  } catch (error) {
-    throw new HTTPException(503, { message: (error as Error).message });
-  }
+function dodoOr503() {
+  const dodo = dodoClient();
+  if (dodo) return dodo;
   throw new HTTPException(503, { message: 'Payments are not set up yet.' });
 }
 
@@ -99,9 +95,9 @@ export function cloudRoutes() {
   app.post('/credits/checkout', async (c) => {
     const parsed = z.object({ pack: z.enum(CREDIT_PACKS.map((pack) => pack.id) as [string, ...string[]]) }).safeParse(await c.req.json().catch(() => ({})));
     if (!parsed.success) throw new HTTPException(422, { message: 'Choose a credit pack.' });
-    const stripe = stripeOr503();
+    const dodo = dodoOr503();
     try {
-      return c.json(await startCreditCheckout(stripe, accountOf(c), parsed.data.pack));
+      return c.json(await startCreditCheckout(dodo, accountOf(c), parsed.data.pack));
     } catch (error) {
       if (error instanceof HTTPException) throw error;
       throw new HTTPException(422, { message: (error as Error).message || 'The payment page could not open.' });
@@ -110,9 +106,9 @@ export function cloudRoutes() {
 
   /** Back from Checkout: the credits are added straight away (the webhook does the same, once). */
   app.post('/credits/complete', async (c) => {
-    const parsed = z.object({ session: z.string().min(5).max(300) }).safeParse(await c.req.json().catch(() => ({})));
-    if (!parsed.success) throw new HTTPException(422, { message: 'Missing checkout session.' });
-    return c.json(await completeCreditCheckout(stripeOr503(), accountOf(c), parsed.data.session));
+    const parsed = z.object({ payment: z.string().min(5).max(300) }).safeParse(await c.req.json().catch(() => ({})));
+    if (!parsed.success) throw new HTTPException(422, { message: 'Missing payment.' });
+    return c.json(await completeCreditCheckout(dodoOr503(), accountOf(c), parsed.data.payment));
   });
 
   app.put('/topup', async (c) => {
@@ -126,8 +122,8 @@ export function cloudRoutes() {
     const pack = CREDIT_PACKS.find((item) => item.id === parsed.data.pack)!;
     if (parsed.data.enabled && pack.cents > parsed.data.monthly_limit_usd * 100) throw new HTTPException(422, { message: 'The monthly limit must cover at least one pack.' });
     if (parsed.data.enabled) {
-      const account = (await col(C.accounts).doc(accountOf(c)).get()).data() as { stripe_customer_id?: string | null } | undefined;
-      if (!account?.stripe_customer_id) throw new HTTPException(422, { message: 'Buy credits once first: that card is used for top-ups.' });
+      const account = (await col(C.accounts).doc(accountOf(c)).get()).data() as { dodo_payment_method_id?: string | null; dodo_billing?: unknown } | undefined;
+      if (!account?.dodo_payment_method_id || !account.dodo_billing) throw new HTTPException(422, { message: 'Buy credits once first: that card is used for top-ups.' });
     }
     await col(C.accounts).doc(accountOf(c)).update({
       topup_enabled: parsed.data.enabled, topup_threshold: parsed.data.threshold, topup_pack: parsed.data.pack,

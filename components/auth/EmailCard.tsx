@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { LuMailCheck, LuNewspaper } from 'react-icons/lu';
 import { Button, Card, CardHeader, StatusPill } from '@/components/app/ui';
-import { Switch } from '@/components/admin/SettingsSection';
+import { Switch } from '@/components/app/Switch';
 import { sendEmailVerification } from 'firebase/auth';
 import { firebaseAuth } from '@/lib/firebase';
 import { api, friendly, refreshSession } from '@/lib/session';

@@ -196,7 +196,7 @@ export function AuthEntry() {
     <div className="w-full">
       {plan && (
         <p className="mb-6 rounded-xl border border-brand-100 bg-brand-50 px-3.5 py-2.5 text-center text-sm text-brand-600">
-          <strong className="font-semibold">{planName} plan selected.</strong> Sign in or create your account, then pay securely with Stripe.
+          <strong className="font-semibold">{planName} plan selected.</strong> Sign in or create your account, then pay securely with Dodo Payments.
         </p>
       )}
       <h1 className="text-center text-[28px] font-bold leading-[1.15] tracking-[-0.025em] sm:text-[30px]">{title}</h1>

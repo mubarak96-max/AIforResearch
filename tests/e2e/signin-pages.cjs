@@ -124,9 +124,9 @@ const check = (name, ok, extra = '') => { results.push(ok); console.log(`${ok ? 
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByLabel('Password').fill(PASSWORD);
     await page.getByRole('button', { name: 'Create account' }).click();
-    await page.waitForURL(/\/account|checkout\.stripe\.com/, { timeout: 30000 }).catch(() => {});
+    await page.waitForURL(/\/account|checkout\.dodopayments\.com/, { timeout: 30000 }).catch(() => {});
     const url = page.url();
-    check('new account goes on to the chosen plan', /\/account|checkout\.stripe\.com/.test(url), url.replace(BASE, '').slice(0, 80));
+    check('new account goes on to the chosen plan', /\/account|checkout\.dodopayments\.com/.test(url), url.replace(BASE, '').slice(0, 80));
     await context.close();
   }
   {

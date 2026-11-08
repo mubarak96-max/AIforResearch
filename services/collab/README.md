@@ -21,20 +21,36 @@ has viewers, this service listens to `documents/{id}` and its `members` in Fires
 
 Rooms, presence and Hocuspocus documents live in this process's memory. Two instances would split
 the people editing one document between them, so they would not see each other. Deploy with
-**`--max-instances=1`** (and `--min-instances=1` so a cold start doesn't drop live editors). To
-scale out later, add Hocuspocus's Redis extension and move presence to Redis, or route each
-document to one instance.
+**`--max-instances=1`**. To scale out later, add Hocuspocus's Redis extension and move presence to
+Redis, or route each document to one instance.
+
+The Dockerfile bundles `lib/server`, so build the image from the repository root
+([cloudbuild.yaml](cloudbuild.yaml)), then deploy it:
 
 ```bash
+gcloud artifacts repositories create writeorbit --repository-format=docker --location=us-central1  # once
+gcloud builds submit --config services/collab/cloudbuild.yaml .
+
 gcloud run deploy collab \
-  --source . --region us-central1 \
-  --max-instances=1 --min-instances=1 --no-cpu-throttling \
-  --timeout=3600 --session-affinity \
+  --image us-central1-docker.pkg.dev/<project>/writeorbit/collab:latest --region us-central1 \
+  --min-instances=0 --max-instances=1 \
+  --timeout=3600 --session-affinity --allow-unauthenticated \
   --service-account=<the App Hosting service account, or one with Firestore + Storage access> \
-  --set-env-vars=FIREBASE_PROJECT_ID=<project>,FIREBASE_STORAGE_BUCKET=<bucket>,ADMIN_EMAILS=...
+  --set-env-vars=FIREBASE_PROJECT_ID=<project>,FIREBASE_STORAGE_BUCKET=<bucket>
 ```
 
-- `--no-cpu-throttling`: Hocuspocus saves in the background (debounced), between messages.
+That scales to zero: it bills only while someone has a document open (each open socket is a
+request), and the first editor after a quiet spell waits a few seconds for a cold start. Once there
+are real users, switch to an always-on instance (about $45/month):
+
+```bash
+gcloud run services update collab --region us-central1 --min-instances=1 --no-cpu-throttling
+```
+
+- `--allow-unauthenticated`: browsers connect directly; the service checks their Firebase ID token.
+- `--no-cpu-throttling`: Hocuspocus saves in the background (debounced, 1.5–8 s), between
+  messages. Without it, the last seconds of typing before everyone leaves can be saved late, or
+  lost if Cloud Run stops the instance first. Acceptable while testing; turn it on for users.
 - `--timeout=3600`: Cloud Run closes WebSockets at the request timeout. The editor reconnects
   automatically, so this is the longest a socket stays open before that happens.
 - Point the web app at it with `NEXT_PUBLIC_REALTIME_URL=wss://collab-….run.app/collab`. The

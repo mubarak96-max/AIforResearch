@@ -61,7 +61,7 @@ const SECTIONS: LegalSection[] = [
     title: 'Plans, billing and cancelling',
     body: (
       <>
-        <p>The free plan is free. Paid plans renew automatically each month or year until you cancel, and are charged through Stripe. Prices and limits are on the <Link href="/pricing" className={link}>pricing page</Link>; if we change a price, the new price applies from your next renewal after we tell you.</p>
+        <p>The free plan is free. Paid plans renew automatically each month or year until you cancel, and are sold and charged by Dodo Payments, our merchant of record, which also handles sales tax, receipts and refunds of the payment. Prices and limits are on the <Link href="/pricing" className={link}>pricing page</Link>; if we change a price, the new price applies from your next renewal after we tell you.</p>
         <p>You can cancel any time from Account. Your plan stays active until the end of the period you paid for. Where the law gives you a right to a refund, we honour it.</p>
       </>
     ),

@@ -10,7 +10,7 @@ import { existsSync } from 'node:fs';
  * Packages with native code, or that Firebase provides, stay external. lib/server's other
  * imports (hono, zod, …) resolve from the root node_modules, so run `pnpm install` at the root first.
  */
-const external = ['firebase-admin', 'firebase-functions', '@node-rs/argon2', 'nodemailer', 'stripe', 'openai'];
+const external = ['firebase-admin', 'firebase-functions', '@node-rs/argon2', 'nodemailer', 'openai'];
 
 await rm('dist', { recursive: true, force: true });
 await mkdir('dist', { recursive: true });

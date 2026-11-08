@@ -40,8 +40,6 @@ export const env = {
   cloudDailyFreeCredits: read('CLOUD_DAILY_FREE_CREDITS', '1000'),
   cloudStarterCredits: read('CLOUD_STARTER_CREDITS', '100'),
 
-  /** People who may open the admin page (comma-separated emails). */
-  adminEmails: read('ADMIN_EMAILS').toLowerCase().split(',').map((value) => value.trim()).filter(Boolean),
   /** Encrypts keys saved from the admin page (32+ characters). */
   settingsKey: read('SETTINGS_KEY'),
 
@@ -92,9 +90,10 @@ export const env = {
   mailcheapApiKey: read('MAILCHEAP_API_KEY'),
   mailcheapNewsletter: read('MAILCHEAP_NEWSLETTER'),
 
-  stripeSecretKey: read('STRIPE_SECRET_KEY'),
-  stripeWebhookSecret: read('STRIPE_WEBHOOK_SECRET'),
-  /** Real payments: only with BILLING_LIVE=1 in the server's environment (never from the admin page). */
+  /** Dodo Payments (merchant of record): the API key and the webhook signing secret. */
+  dodoApiKey: read('DODO_PAYMENTS_API_KEY'),
+  dodoWebhookSecret: read('DODO_PAYMENTS_WEBHOOK_KEY'),
+  /** Real payments (Dodo live mode): only with BILLING_LIVE=1 in the server's environment (never from the admin page). */
   billingLive: read('BILLING_LIVE') === '1',
 };
 

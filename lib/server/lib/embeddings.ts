@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { env } from '../env.js';
 import { settings } from './settings.js';
+import { serviceAuthHeaders } from './serviceAuth.js';
 
 /**
  * Optional embeddings for Library search (Firestore vector search on chunk `embedding`).
@@ -57,7 +58,7 @@ async function embedBatch(current: Config, texts: string[], kind: Kind, timeoutM
   }
   const response = await fetch(current.url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...(await serviceAuthHeaders(current.url)) },
     body: JSON.stringify({ texts, kind }),
     signal: AbortSignal.timeout(timeoutMs),
   });

@@ -6,8 +6,8 @@ When testing, please don't access other people's data, run load tests or use soc
 
 ## Running your own copy safely
 
-- Keep `SETTINGS_KEY`, `INTERNAL_SECRET` and your other secrets in Secret Manager, never in the repository. `SETTINGS_KEY` encrypts the provider keys admins save in the browser.
+- Keep `SETTINGS_KEY`, `INTERNAL_SECRET` and your other secrets in Secret Manager, never in the repository. `SETTINGS_KEY` encrypts the Zotero and Mendeley tokens people connect.
 - Browsers never write Firestore or Storage directly: `firestore.rules` and `storage.rules` deny client writes, and the API checks every request. Keep it that way.
-- People become admins only from `ADMIN_EMAILS` after confirming their email.
-- Live Stripe keys work only with `BILLING_LIVE=1` in the server's environment, so payments can't be switched on from the browser.
+- There is no admin page: every setting comes from the environment, so nothing about the server can be changed from a browser.
+- Dodo Payments runs in live mode only with `BILLING_LIVE=1` in the server's environment.
 - Keep the converter (`services/convert`) on internal ingress only.

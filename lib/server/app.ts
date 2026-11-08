@@ -17,11 +17,9 @@ import { evidenceRoutes } from './routes/evidence.js';
 import { matrixRoutes } from './routes/matrix.js';
 import { authorshipDocumentRoutes, authorshipRoutes } from './routes/authorship.js';
 import { generateRoutes } from './routes/generate.js';
-import { adminRoutes } from './routes/admin.js';
-import { stripeWebhookRoutes } from './routes/stripeWebhook.js';
+import { dodoWebhookRoutes } from './routes/dodoWebhook.js';
 import { billingRoutes, planRoutes } from './routes/billing.js';
 import { newsletterRoutes } from './routes/newsletter.js';
-import { adminAccountRoutes, adminPlanRoutes } from './routes/adminPlans.js';
 import { createSlots } from './slots/index.js';
 import { PlanLimitError } from './lib/plans.js';
 import { ready } from './ready.js';
@@ -55,13 +53,10 @@ export function createApp() {
   app.route('/api/library', libraryRoutes(slots));
   app.route('/api/cloud/prices', cloudPriceRoutes());
   app.route('/api/cloud', cloudRoutes());
-  app.route('/api/admin/plans', adminPlanRoutes());
-  app.route('/api/admin/accounts', adminAccountRoutes());
-  app.route('/api/admin', adminRoutes(slots));
   app.route('/api/plans', planRoutes());
   app.route('/api/newsletter', newsletterRoutes());
   app.route('/api/billing', billingRoutes());
-  app.route('/api/stripe', stripeWebhookRoutes());
+  app.route('/api/dodo', dodoWebhookRoutes());
   app.route('/v1', gatewayRoutes(slots));
 
   app.onError((error, c) => {

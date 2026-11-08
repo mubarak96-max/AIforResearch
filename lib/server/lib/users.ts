@@ -45,17 +45,6 @@ export async function userByEmail(email: string): Promise<UserDoc | null> {
   return found[0] ?? null;
 }
 
-/**
- * People listed in ADMIN_EMAILS become admins once Firebase says their email is confirmed (by
- * the confirmation link or by Google, Microsoft or Apple). Without that check anyone could
- * sign up with the admin's address first.
- */
-async function syncAdmin(user: AuthUser, emailVerified: boolean): Promise<AuthUser> {
-  if (user.is_admin || !emailVerified || !env.adminEmails.includes(user.email.toLowerCase())) return user;
-  await col(C.users).doc(user.id).update({ is_admin: true });
-  return { ...user, is_admin: true };
-}
-
 /** Attaches document invitations sent to this email before the person had an account. */
 export async function claimInvitations(user: AuthUser) {
   const pending = await db().collectionGroup(C.members)
@@ -123,7 +112,6 @@ export async function signedIn(user: AuthUser, emailVerified: boolean): Promise<
     if (doc && !doc.email_verified_at) { update.email_verified_at = new Date(); queueNewsletterSync(); }
   }
   await col(C.users).doc(user.id).update(update);
-  const admin = await syncAdmin(user, emailVerified);
-  if (emailVerified) await claimInvitations(admin);
-  return admin;
+  if (emailVerified) await claimInvitations(user);
+  return user;
 }

@@ -20,7 +20,6 @@ export type Billing = {
   library: { used: number; limit: number | null };
   cards: SavedCard[];
   invoices: Invoice[];
-  open_invoices: Invoice[];
   payments_enabled: boolean;
 };
 
@@ -53,20 +52,23 @@ export function BillingSection() {
     try { setBilling(await api<Billing>('/api/billing')); } catch (caught) { setError((caught as Error).message); }
   }, []);
 
-  // Back from Stripe (a plan or a card), or straight from sign-up with a plan chosen.
+  // Back from Dodo Payments (a plan or a card), or straight from sign-up with a plan chosen.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const outcome = params.get('billing');
-    const session = params.get('session');
+    // Dodo adds the subscription id on the way back.
+    const subscription = params.get('subscription_id');
     const upgrade = params.get('upgrade');
     const clean = () => window.history.replaceState(null, '', `${window.location.pathname}${window.location.hash}`);
     (async () => {
-      if (outcome && session) {
+      if (outcome && outcome !== 'cancelled' && subscription) {
         clean();
         setBusy('return');
         try {
-          const done = await api<{ kind: string }>('/api/billing/checkout/complete', { method: 'POST', body: JSON.stringify({ session }) });
-          setNotice(done.kind === 'card' ? 'Card added.' : done.kind === 'subscription' ? 'Payment received. Your new plan is on.' : null);
+          const done = await api<{ kind: string }>('/api/billing/checkout/complete', { method: 'POST', body: JSON.stringify({ subscription }) });
+          setNotice(outcome === 'card' ? 'Card updated.'
+            : done.kind === 'subscription' ? 'Payment received. Your new plan is on.'
+            : 'Payment is still processing. Your plan turns on as soon as it clears.');
           await refreshSession().catch(() => undefined);
         } catch (caught) { setError((caught as Error).message); }
         setBusy(null);
@@ -96,23 +98,21 @@ export function BillingSection() {
     setBusy(null);
   };
   const go = async (key: string, path: string, body?: unknown) => run(key, async () => {
-    const result = await api<{ url?: string; renewed?: boolean; paid?: boolean; hosted_url?: string | null; error?: string }>(path, { method: 'POST', body: JSON.stringify(body ?? {}) });
+    const result = await api<{ url?: string }>(path, { method: 'POST', body: JSON.stringify(body ?? {}) });
     if (result.url) { window.location.assign(result.url); await new Promise(() => {}); }
-    if (result.paid === false) {
-      if (result.hosted_url) { window.location.assign(result.hosted_url); await new Promise(() => {}); }
-      throw new Error(result.error || 'The payment did not go through.');
-    }
   });
 
   if (!billing) {
     return (
-      <Card><div className="flex h-40 items-center justify-center text-[14px] text-muted" aria-busy="true">{error || (busy === 'return' ? 'Finishing up with Stripe…' : 'Loading billing…')}</div></Card>
+      <Card><div className="flex h-40 items-center justify-center text-[14px] text-muted" aria-busy="true">{error || (busy === 'return' ? 'Finishing up with Dodo Payments…' : 'Loading billing…')}</div></Card>
     );
   }
 
   const sub = billing.subscription;
-  const paying = Boolean(sub && sub.source === 'stripe' && LIVE.includes(sub.status));
-  const lapsed = Boolean(sub && sub.source === 'stripe' && sub.plan_id && !LIVE.includes(sub.status) && sub.status !== 'none');
+  const paying = Boolean(sub && sub.source === 'dodo' && LIVE.includes(sub.status));
+  const lapsed = Boolean(sub && sub.source === 'dodo' && sub.plan_id && !LIVE.includes(sub.status) && sub.status !== 'none');
+  // A renewal that failed: Dodo holds the subscription until a card pays what is due.
+  const onHold = Boolean(lapsed && sub?.status === 'on_hold');
   const lapsedPlan = lapsed ? plans?.find((plan) => plan.id === sub!.plan_id) : null;
   const shown = plans?.find((plan) => plan.id === billing.plan.id);
   const interval: Interval = sub?.interval === 'year' ? 'year' : 'month';
@@ -127,7 +127,6 @@ export function BillingSection() {
   const periodLine = paying && sub?.period_end
     ? sub.cancel_at_period_end ? `Ends ${day(sub.period_end)}, then Free` : `${sub.status === 'trialing' ? 'Trial ends' : 'Renews'} ${day(sub.period_end)}`
     : null;
-  const openInvoices = billing.open_invoices;
 
   return (
     <div className="flex flex-col gap-5">
@@ -145,13 +144,17 @@ export function BillingSection() {
             </div>
             {(price || periodLine) && <p className="mt-1 text-[14px] text-muted">{[price, periodLine].filter(Boolean).join(' · ')}</p>}
             {lapsed && (
-              <p className="mt-1 text-[14px] text-muted">Your {lapsedPlan?.name || 'paid'} plan ended{sub?.period_end ? ` on ${day(sub.period_end)}` : ''}.</p>
+              <p className="mt-1 text-[14px] text-muted">
+                {onHold
+                  ? `Your ${lapsedPlan?.name || 'paid'} plan is paused: the last renewal could not be charged.`
+                  : `Your ${lapsedPlan?.name || 'paid'} plan ended${sub?.period_end ? ` on ${day(sub.period_end)}` : ''}.`}
+              </p>
             )}
           </div>
           <div className="flex flex-wrap gap-2">
             {lapsed && billing.payments_enabled && (
               <Button variant="primary" disabled={busy !== null} onClick={() => void go('renew', '/api/billing/renew')}>
-                {busy === 'renew' ? 'Renewing…' : `Renew ${lapsedPlan?.name || 'plan'}`}
+                {busy === 'renew' ? 'Opening…' : onHold ? 'Update card and pay' : `Renew ${lapsedPlan?.name || 'plan'}`}
               </Button>
             )}
             {paying && sub?.cancel_at_period_end && (
@@ -169,11 +172,11 @@ export function BillingSection() {
           </div>
         </div>
 
-        {sub?.status === 'past_due' && openInvoices.length > 0 && (
+        {sub?.status === 'past_due' && (
           <div className="mx-5 mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-            <p className="min-w-0 flex-1 text-[14px] text-red-800">Your last payment failed. Pay now to keep {billing.plan.name}.</p>
-            <Button variant="primary" size="sm" disabled={busy !== null} onClick={() => void go(`pay-${openInvoices[0].id}`, `/api/billing/invoices/${openInvoices[0].id}/pay`)}>
-              {busy === `pay-${openInvoices[0].id}` ? 'Paying…' : `Pay ${money(openInvoices[0].amount_due, openInvoices[0].currency, true)}`}
+            <p className="min-w-0 flex-1 text-[14px] text-red-800">Your last payment failed. Update your card to keep {billing.plan.name}.</p>
+            <Button variant="primary" size="sm" disabled={busy !== null} onClick={() => void go('fix-card', '/api/billing/cards')}>
+              {busy === 'fix-card' ? 'Opening…' : 'Update card'}
             </Button>
           </div>
         )}
@@ -249,14 +252,18 @@ export function BillingSection() {
             <button type="button" disabled={busy !== null} onClick={() => void go('add-card', '/api/billing/cards')}
               className="flex aspect-[1.586] w-full max-w-[380px] flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-line text-[14.5px] font-semibold text-ink-2 hover:border-brand hover:text-brand disabled:opacity-60">
               <LuPlus className="h-6 w-6" aria-hidden="true" />
-              {busy === 'add-card' ? 'Opening Stripe…' : 'Add card'}
+              {busy === 'add-card' ? 'Opening Dodo Payments…' : paying ? 'Change card' : 'Add card'}
             </button>
           </div>
         )}
       </Card>
 
       <Card>
-        <CardHeader title="Invoices" />
+        <CardHeader title="Invoices" actions={billing.payments_enabled && billing.invoices.length > 0 ? (
+          <Button variant="ghost" size="sm" disabled={busy !== null} onClick={() => void go('portal', '/api/billing/portal')}>
+            <LuExternalLink className="h-4 w-4" aria-hidden="true" />{busy === 'portal' ? 'Opening…' : 'Billing portal'}
+          </Button>
+        ) : undefined} />
         {billing.invoices.length === 0 ? (
           <EmptyState title="No invoices yet" />
         ) : (
@@ -268,19 +275,11 @@ export function BillingSection() {
                   <tr key={invoice.id} className="h-12 border-t border-line-2 text-[13.5px]">
                     <td className="whitespace-nowrap text-muted">{day(invoice.created)}</td>
                     <td className="max-w-[220px] truncate pr-3">{invoice.number || invoice.description || 'Invoice'}</td>
-                    <td className="tabular-nums">{money(invoice.status === 'open' ? invoice.amount_due : invoice.total, invoice.currency, true)}</td>
+                    <td className="tabular-nums">{money(invoice.total, invoice.currency, true)}</td>
                     <td><InvoiceStatus status={invoice.status} /></td>
                     <td className="whitespace-nowrap text-right">
-                      {invoice.status === 'open' && (
-                        <Button variant="primary" size="sm" disabled={busy !== null} onClick={() => void go(`pay-${invoice.id}`, `/api/billing/invoices/${invoice.id}/pay`)}>
-                          {busy === `pay-${invoice.id}` ? 'Paying…' : 'Pay now'}
-                        </Button>
-                      )}
-                      {invoice.status !== 'open' && invoice.pdf && (
+                      {invoice.status === 'paid' && invoice.pdf && (
                         <a href={invoice.pdf} target="_blank" rel="noreferrer" aria-label="Download invoice PDF" className="inline-grid h-9 w-9 place-items-center rounded-[10px] text-muted hover:bg-soft hover:text-ink"><LuDownload className="h-4 w-4" /></a>
-                      )}
-                      {invoice.hosted_url && (
-                        <a href={invoice.hosted_url} target="_blank" rel="noreferrer" aria-label="Open invoice on Stripe" className="inline-grid h-9 w-9 place-items-center rounded-[10px] text-muted hover:bg-soft hover:text-ink"><LuExternalLink className="h-4 w-4" /></a>
                       )}
                     </td>
                   </tr>
@@ -296,9 +295,9 @@ export function BillingSection() {
 
 function InvoiceStatus({ status }: { status: string | null }) {
   if (status === 'paid') return <StatusPill tone="positive">Paid</StatusPill>;
-  if (status === 'open') return <StatusPill tone="negative">Due</StatusPill>;
-  if (status === 'void') return <StatusPill>Void</StatusPill>;
-  if (status === 'uncollectible') return <StatusPill tone="warning">Unpaid</StatusPill>;
+  if (status === 'failed') return <StatusPill tone="negative">Failed</StatusPill>;
+  if (status === 'processing') return <StatusPill tone="warning">Processing</StatusPill>;
+  if (status === 'void') return <StatusPill>Cancelled</StatusPill>;
   return <StatusPill>{status || '—'}</StatusPill>;
 }
 

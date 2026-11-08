@@ -2,10 +2,11 @@ import { Hono, type Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { randomUUID } from 'node:crypto';
 import { env } from '../env.js';
+import { serviceAuthHeaders } from '../lib/serviceAuth.js';
 import { findApiKey, type ApiKeyRow } from '../lib/apiKeys.js';
 import { settings } from '../lib/settings.js';
 import { resolveLlmConfig } from '../slots/llm.js';
-import { billingMode } from '../lib/stripeBilling.js';
+import { billingMode } from '../lib/dodoBilling.js';
 import { assertCanSpend, charge, wallet, CreditsError } from '../lib/credits.js';
 import type { ServiceName } from '../lib/prices.js';
 import type { Slots } from '../slots/types.js';
@@ -375,7 +376,7 @@ export function gatewayRoutes(slots: Slots) {
     await can(c, 'conversions');
     const form = new FormData();
     form.append('payload', JSON.stringify({ title: parsed.data.title, blocks: parsed.data.blocks, comments: [], settings: parsed.data.settings || {}, format: parsed.data.format, author: '' }));
-    const response = await fetch(`${env.convertUrl}/word/export`, { method: 'POST', body: form, signal: AbortSignal.timeout(600_000) }).catch(() => null);
+    const response = await fetch(`${env.convertUrl}/word/export`, { method: 'POST', headers: await serviceAuthHeaders(env.convertUrl), body: form, signal: AbortSignal.timeout(600_000) }).catch(() => null);
     if (!response) throw new HTTPException(503, { message: 'The converter is not available right now.' });
     if (!response.ok) {
       const detail: any = await response.json().catch(() => null);

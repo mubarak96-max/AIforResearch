@@ -64,7 +64,7 @@ export function usePlans(initial?: PublicPlan[]) {
   return { plans, error };
 }
 
-/** Starts (or switches) a plan: Stripe Checkout for a new subscription, an in-place change otherwise. */
+/** Starts (or switches) a plan: Dodo's checkout for a new subscription, an in-place change otherwise. */
 export async function startCheckout(plan: string, interval: Interval): Promise<'redirected' | 'changed'> {
   const result = await api<{ url?: string; changed?: boolean }>('/api/billing/checkout', { method: 'POST', body: JSON.stringify({ plan, interval }) });
   if (result.url) {

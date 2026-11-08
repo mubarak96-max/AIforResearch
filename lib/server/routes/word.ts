@@ -3,6 +3,7 @@ import { HTTPException } from 'hono/http-exception';
 import { createHash, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { env } from '../env.js';
+import { serviceAuthHeaders } from '../lib/serviceAuth.js';
 import { requireUser, type AppVariables, type AuthUser } from '../auth.js';
 import { C, col } from '../firebase.js';
 import { resolveAccess, displayName, EDIT_ROLES, type DocumentRow } from '../lib/access.js';
@@ -40,7 +41,7 @@ async function converterError(response: Response, fallback: string): Promise<nev
 
 /** Forwards a multipart body to the converter as is (docx → PDF). */
 async function forward(c: Context, target: string) {
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = await serviceAuthHeaders(env.convertUrl);
   const type = c.req.header('content-type');
   if (type) headers['content-type'] = type;
   // Node's fetch needs duplex: 'half' to stream a request body.
@@ -86,7 +87,7 @@ export function wordRoutes() {
     outgoing.append('file', file, file.name);
     outgoing.append('asset_url_prefix', ASSET_PREFIX);
     outgoing.append('include_source', 'true');
-    const response = await fetch(`${env.convertUrl}/word/import`, { method: 'POST', body: outgoing, signal: AbortSignal.timeout(600_000) }).catch(() => null);
+    const response = await fetch(`${env.convertUrl}/word/import`, { method: 'POST', headers: await serviceAuthHeaders(env.convertUrl), body: outgoing, signal: AbortSignal.timeout(600_000) }).catch(() => null);
     if (!response) throw new HTTPException(503, { message: 'The document converter is not available right now.' });
     if (!response.ok) await converterError(response, 'This file could not be opened.');
     const result = (await response.json()) as ImportResult;
@@ -164,7 +165,7 @@ export function wordRoutes() {
       author: displayName(user), asset_url_prefix: ASSET_PREFIX, asset_fetch_base: `${env.internalUrl}${ASSET_PREFIX}`,
     }));
     if (template) form.append('source', new Blob([new Uint8Array(template)], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), 'template.docx');
-    const response = await fetch(`${env.convertUrl}/word/export`, { method: 'POST', body: form, signal: AbortSignal.timeout(600_000) }).catch(() => null);
+    const response = await fetch(`${env.convertUrl}/word/export`, { method: 'POST', headers: await serviceAuthHeaders(env.convertUrl), body: form, signal: AbortSignal.timeout(600_000) }).catch(() => null);
     if (!response) throw new HTTPException(503, { message: 'The document converter is not available right now.' });
     if (!response.ok) await converterError(response, 'The document could not be exported.');
     await recordUsage({ accountId: user.account_id, service: 'conversions', quantity: 1, requestId: randomUUID(), metadata: { format: body.format } });

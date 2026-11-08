@@ -23,7 +23,7 @@
 
 ## What it costs to run
 
-You pay Google Cloud for what your Firebase project uses (the free tier covers small groups) and the providers you connect: an AI provider such as DeepSeek or OpenAI, and optionally a Scholar key, Stripe and an email service. You can sell plans and developer-API credits to your own users with Stripe.
+You pay Google Cloud for what your Firebase project uses (the free tier covers small groups) and the providers you connect: an AI provider such as DeepSeek or OpenAI, and optionally a Scholar key, Dodo Payments and an email service. You can sell plans and developer-API credits to your own users with Dodo Payments (merchant of record: it handles sales tax and receipts).
 
 ---
 
@@ -60,14 +60,13 @@ You need a Firebase project on the **Blaze** plan (App Hosting, Functions and Cl
    ```
    Then turn on the TTL policy for `rate_limits.expires_at` (Firestore › TTL).
 3. **Converter and collab on Cloud Run:** see [services/convert](services/convert/README.md) (internal ingress) and [services/collab](services/collab/README.md) (one instance, WebSockets).
-4. **Web app on App Hosting:** create a backend from your GitHub repo (app root directory: the repository root). Fill in [`apphosting.yaml`](apphosting.yaml) (Firebase web config, `PUBLIC_URL`, `CONVERT_URL`, `NEXT_PUBLIC_REALTIME_URL`, `ADMIN_EMAILS`) and add the secrets it names:
+4. **Web app on App Hosting:** create a backend from your GitHub repo (app root directory: the repository root). Fill in [`apphosting.yaml`](apphosting.yaml) (Firebase web config, `PUBLIC_URL`, `CONVERT_URL`, `NEXT_PUBLIC_REALTIME_URL`) and add the secrets it names:
    ```bash
    firebase apphosting:secrets:set SETTINGS_KEY
    firebase apphosting:secrets:set INTERNAL_SECRET
-   firebase apphosting:secrets:set LLM_API_KEY      # and SCHOLAR_API_KEY, STRIPE_SECRET_KEY, … as you use them
+   firebase apphosting:secrets:set LLM_API_KEY      # and SCHOLAR_API_KEY, DODO_PAYMENTS_API_KEY, … as you use them
    ```
-   Every push to the branch deploys.
-5. **Sign up** with an address from `ADMIN_EMAILS` and confirm it from the email: you get **Admin** in the menu, where the settings below can be changed without a redeploy.
+   Every push to the branch deploys. All settings live there and in Secret Manager; plans and prices are in code ([`plans.ts`](lib/server/lib/plans.ts), [`prices.ts`](lib/server/lib/prices.ts)). There is no admin page.
 
 **Coming from the Postgres (Docker) version of this app?** [tools/migrate](tools/migrate/README.md) copies Postgres and the files into Firestore, Storage and Firebase Auth. People keep their ids and their passwords.
 
@@ -81,7 +80,7 @@ You need a Firebase project on the **Blaze** plan (App Hosting, Functions and Cl
 
 ### Connect services
 
-Each service is a slot with its own provider. Set them in `apphosting.yaml` (secrets in Secret Manager) or in **Admin** (the admin page wins, and applies to every instance within a second).
+Each service is a slot with its own provider. Set them in `apphosting.yaml` (secrets in Secret Manager) and redeploy.
 
 | Slot | Options | Settings |
 | --- | --- | --- |
@@ -90,10 +89,17 @@ Each service is a slot with its own provider. Set them in `apphosting.yaml` (sec
 | **Library search** | Word search, or embeddings with Firestore vector search: from the converter's own model (`local`, no per-token fees) or OpenAI | `EMBEDDINGS_PROVIDER` (`local` \| `openai`), `EMBEDDINGS_API_KEY` (OpenAI only) |
 | **Email** | SMTP or Resend (invitations and credit notices; Firebase sends sign-in emails itself) | `MAIL_PROVIDER`, `MAIL_FROM`, `SMTP_*`, `RESEND_API_KEY` |
 | **Newsletter** | MailCheap (keeps a list in step with confirmed accounts) | `NEWSLETTER_PROVIDER`, `MAILCHEAP_API_KEY` |
-| **Payments** | Stripe, if you sell plans or credits yourself | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `BILLING_LIVE=1` for live keys |
-| **Sign-in** | Email and password, Google, Microsoft, Apple (Firebase Authentication), App Check | Firebase console › Authentication; on/off in Admin › Sign-in |
+| **Payments** | Dodo Payments, if you sell plans or credits yourself | `DODO_PAYMENTS_API_KEY`, `DODO_PAYMENTS_WEBHOOK_KEY`, `BILLING_LIVE=1` for live mode |
+| **Sign-in** | Email and password, Google, Microsoft, Apple (Firebase Authentication), App Check | Firebase console › Authentication; on/off with `SIGNIN_PASSWORD`, `SIGNIN_GOOGLE`, `SIGNIN_MICROSOFT`, `SIGNIN_APPLE` |
 
 [`.env.example`](.env.example) lists every setting with a short note. Files live in the project's Cloud Storage bucket.
+
+### Payments with Dodo Payments
+
+1. In the Dodo dashboard (test mode), create an API key and set it as `DODO_PAYMENTS_API_KEY`.
+2. Add a webhook (Developer › Webhooks) to `PUBLIC_URL/api/dodo/webhook` with the events listed in [`dodoWebhook.ts`](lib/server/routes/dodoWebhook.ts), and set its secret as `DODO_PAYMENTS_WEBHOOK_KEY`.
+3. That's all: the Dodo products for plans and credit packs are created on the first checkout, from the prices in code. Change a price in code and the next checkout makes a new product (current subscribers keep theirs).
+4. For real payments: a live-mode key and webhook, and `BILLING_LIVE=1`.
 
 ### Papers from Scholar
 
@@ -101,7 +107,7 @@ Papers come from [CitedEvidence Scholar](https://scholar.citedevidence.com): 250
 
 1. Sign in at [scholar.citedevidence.com](https://scholar.citedevidence.com/account/api-keys) and open **API keys**.
 2. Turn on **Metadata**, **Files** and **Research** for your key.
-3. Paste it in **Admin › Papers** (or `SCHOLAR_API_KEY`). **Test** shows what the key reaches.
+3. Set it as the `SCHOLAR_API_KEY` secret and redeploy.
 
 If Scholar is busy, searches fall back to [OpenAlex](https://openalex.org) automatically.
 
@@ -109,7 +115,7 @@ If Scholar is busy, searches fall back to [OpenAlex](https://openalex.org) autom
 
 ## Developer API
 
-Your deployment can offer its services to other apps at `/v1`: people create keys at `/developers/keys` and pay in credits (Stripe). The API calls the same providers you connected above, using the upstream keys in **Admin › Developer API**. Prices and free allowances are defaults you can change in [`lib/server/lib/prices.ts`](lib/server/lib/prices.ts) and Admin.
+Your deployment can offer its services to other apps at `/v1`: people create keys at `/developers/keys` and pay in credits (Dodo Payments). The API calls the same providers you connected above, using the upstream keys `CLOUD_DEEPSEEK_API_KEY` and `CLOUD_SCHOLAR_API_KEY`. Prices are in [`lib/server/lib/prices.ts`](lib/server/lib/prices.ts); free allowances are `CLOUD_DAILY_FREE_CREDITS` and `CLOUD_STARTER_CREDITS`.
 
 | Service | Endpoint | Credits |
 | --- | --- | --- |

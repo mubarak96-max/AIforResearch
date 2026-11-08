@@ -20,7 +20,7 @@ export function usePlanChoice(interval: Interval, onChanged?: (plan: PublicPlan)
     try {
       const billing = await api<{ plan: { id: string }; subscription: { status: string; source: string; interval: string | null } | null }>('/api/billing');
       const sub = billing.subscription;
-      const paying = Boolean(sub && sub.source === 'stripe' && LIVE.includes(sub.status));
+      const paying = Boolean(sub && sub.source === 'dodo' && LIVE.includes(sub.status));
       setCurrent({ planId: billing.plan.id, interval: paying ? sub!.interval : null, paying, source: sub?.source ?? 'default' });
     } catch {
       setCurrent(user.plan ? { planId: user.plan, interval: null, paying: false, source: 'default' } : null);
@@ -39,7 +39,7 @@ export function usePlanChoice(interval: Interval, onChanged?: (plan: PublicPlan)
         onChanged?.(plan);
         setBusy(null);
       }
-      // 'redirected': Stripe's page is loading; keep the spinner.
+      // 'redirected': Dodo's checkout is loading; keep the spinner.
     } catch (caught) {
       setError((caught as Error).message);
       setBusy(null);

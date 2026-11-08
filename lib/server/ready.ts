@@ -1,21 +1,10 @@
-import { loadSettings, watchSettings } from './lib/settings.js';
-import { seedPlans } from './lib/plans.js';
-
 /**
- * Work the old server did once at start (it had a `main`; route handlers and functions do not):
- * load admin settings and keep them current across instances, and create the default plans
- * on an empty project. Runs once per process, on the first request.
+ * Work to do once per process, on the first request. Settings come from the environment and
+ * plans from code, so there is nothing to load today; kept so callers have one place to wait on.
  */
 let started: Promise<void> | null = null;
 
 export function ready(): Promise<void> {
-  started ??= (async () => {
-    await loadSettings();
-    watchSettings();
-    if (await seedPlans()) console.log('default plans created');
-  })().catch((error) => {
-    started = null;
-    throw error;
-  });
+  started ??= Promise.resolve();
   return started;
 }

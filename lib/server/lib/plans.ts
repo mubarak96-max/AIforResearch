@@ -5,8 +5,8 @@ import { C, col, db, increment, rows } from '../firebase.js';
 import { env } from '../env.js';
 
 /**
- * Plans and what each one allows. Plans live in the database (Admin › Plans); the limit KEYS
- * live here because the server enforces them. A count limit is { amount, per }, amount null
+ * Plans and what each one allows, all defined in this file (PLANS below): prices, limits and the
+ * feature list on the pricing page. The server enforces the limits. A count limit is { amount, per }, amount null
  * meaning unlimited; a total is a number or null; a feature is true/false.
  */
 export const LIMIT_DEFS = {
@@ -48,8 +48,8 @@ type TotalKey = 'library_pdfs' | 'upload_mb' | 'upload_batch';
 export type PlanRow = {
   id: string; name: string; tagline: string; sort_order: number; is_default: boolean; is_public: boolean; featured: boolean;
   checkout: 'self_serve' | 'contact'; contact_url: string | null; monthly_cents: number; yearly_cents: number; currency: string;
-  trial_days: number; limits: Partial<Limits>; stripe_product_id: string | null; stripe_monthly_price_id: string | null;
-  stripe_yearly_price_id: string | null; stripe_mode: string | null;
+  trial_days: number; limits: Partial<Limits>; dodo_monthly_product_id: string | null; dodo_yearly_product_id: string | null;
+  dodo_mode: string | null;
 };
 export type PlanFeature = { label: string; included: boolean };
 
@@ -89,7 +89,7 @@ export function normalizeLimits(raw: unknown): Limits {
 }
 
 /** The plans WriteOrbit starts with: Free, Plus, Pro and Team. Prices in cents. */
-export const DEFAULT_PLANS: (Omit<PlanRow, 'stripe_product_id' | 'stripe_monthly_price_id' | 'stripe_yearly_price_id' | 'stripe_mode' | 'limits'> & { limits: Limits; features: PlanFeature[] })[] = [
+export const DEFAULT_PLANS: (Omit<PlanRow, 'dodo_monthly_product_id' | 'dodo_yearly_product_id' | 'dodo_mode' | 'limits'> & { limits: Limits; features: PlanFeature[] })[] = [
   {
     id: 'free', name: 'Free', tagline: 'Try everything, with daily limits', sort_order: 0, is_default: true, is_public: true, featured: false,
     checkout: 'self_serve', contact_url: null, monthly_cents: 0, yearly_cents: 0, currency: 'usd', trial_days: 0,
@@ -156,30 +156,24 @@ export const DEFAULT_PLANS: (Omit<PlanRow, 'stripe_product_id' | 'stripe_monthly
   },
 ];
 
-/** Creates the default plans the first time (an empty plans table). */
-export async function seedPlans() {
-  const existing = await col(C.plans).limit(1).get();
-  if (!existing.empty) return false;
-  const now = new Date();
-  // create() fails if another instance seeded the same plan first; that is fine.
-  const results = await Promise.allSettled(DEFAULT_PLANS.map((plan) => col(C.plans).doc(plan.id).create({
-    name: plan.name, tagline: plan.tagline, sort_order: plan.sort_order, is_default: plan.is_default, is_public: plan.is_public,
-    featured: plan.featured, checkout: plan.checkout, contact_url: plan.contact_url, monthly_cents: plan.monthly_cents,
-    yearly_cents: plan.yearly_cents, currency: plan.currency, trial_days: plan.trial_days, limits: plan.limits,
-    features: plan.features.map((feature, index) => ({ ...feature, sort_order: index })),
-    stripe_product_id: null, stripe_monthly_price_id: null, stripe_yearly_price_id: null, stripe_mode: null,
-    created_at: now, updated_at: now,
-  })));
-  return results.some((result) => result.status === 'fulfilled');
+/** The plans, defined here in code (change a price here and redeploy). */
+export const PLANS = DEFAULT_PLANS;
+
+/**
+ * The Dodo product a plan is sold with, per billing interval: `billing_products/plan_{id}_{interval}`.
+ * Products are made on the first checkout (planBilling.syncPlanToDodo). One whose price, currency,
+ * trial or mode no longer matches the code is ignored, so a price change here gets a new product.
+ */
+export type StoredPlanProduct = { product_id: string; cents: number; currency: string; trial_days: number; mode: string };
+export const planProductKey = (planId: string, interval: 'month' | 'year') => `plan_${planId}_${interval}`;
+const billingModeNow = () => (env.billingLive ? 'live' : 'test');
+
+export function productMatches(stored: Partial<StoredPlanProduct> | undefined, plan: { currency: string; trial_days: number }, cents: number) {
+  return Boolean(stored?.product_id) && stored!.mode === billingModeNow() && stored!.cents === cents
+    && stored!.currency === plan.currency && (stored!.trial_days ?? 0) === plan.trial_days;
 }
 
-/** A plan's embedded feature list, in order. */
-export function planFeatures(plan: { features?: unknown }): PlanFeature[] {
-  const list = Array.isArray(plan.features) ? (plan.features as { label: string; included: boolean; sort_order?: number }[]) : [];
-  return [...list].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)).map((feature) => ({ label: String(feature.label), included: Boolean(feature.included) }));
-}
-
-// Plans change rarely: a short cache keeps every AI request from reading them.
+// Product ids change rarely: a short cache keeps every AI request from reading them.
 let cache: { at: number; plans: PlanRow[]; features: Map<string, PlanFeature[]> } | null = null;
 export function forgetPlans() {
   cache = null;
@@ -187,10 +181,20 @@ export function forgetPlans() {
 
 export async function loadPlans() {
   if (cache && Date.now() - cache.at < 30_000) return cache;
-  const plans = rows<PlanRow & { features?: unknown }>(await col(C.plans).get())
-    .sort((a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id));
-  const features = new Map<string, PlanFeature[]>();
-  for (const plan of plans) features.set(plan.id, planFeatures(plan));
+  const stored = new Map((await col(C.billingProducts).where('kind', '==', 'plan').get()).docs.map((doc) => [doc.id, doc.data() as StoredPlanProduct]));
+  const productFor = (plan: { id: string; currency: string; trial_days: number }, interval: 'month' | 'year', cents: number) => {
+    const found = stored.get(planProductKey(plan.id, interval));
+    return cents > 0 && productMatches(found, plan, cents) ? found!.product_id : null;
+  };
+  const plans: PlanRow[] = [...PLANS]
+    .sort((a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id))
+    .map(({ features: _features, ...plan }) => ({
+      ...plan,
+      dodo_monthly_product_id: productFor(plan, 'month', plan.monthly_cents),
+      dodo_yearly_product_id: productFor(plan, 'year', plan.yearly_cents),
+      dodo_mode: billingModeNow(),
+    }));
+  const features = new Map<string, PlanFeature[]>(PLANS.map((plan) => [plan.id, plan.features]));
   cache = { at: Date.now(), plans, features };
   return cache;
 }
@@ -200,7 +204,7 @@ export type AccountPlan = {
   plan_cancel_at_period_end: boolean; plan_subscription_id: string | null;
 };
 
-/** Subscriptions in these states keep their plan (past_due: Stripe is still retrying the card). */
+/** Subscriptions in these states keep their plan (past_due: Dodo is still retrying the card; trialing: active inside its trial days). */
 export const LIVE_STATUSES = ['active', 'trialing', 'past_due'];
 
 /** The plan an account has right now: a live subscription, a plan an admin gave, a carried-over plan, or the default. */
@@ -208,10 +212,10 @@ export async function effectivePlan(accountId: string): Promise<{ plan: PlanRow;
   const { plans } = await loadPlans();
   const account = await accountPlan(accountId);
   const fallback = plans.find((plan) => plan.is_default) ?? plans[0];
-  // 'legacy': a plan carried over from a previous app without a Stripe subscription, active until its end date.
+  // 'legacy': a plan carried over from a previous app without a paid subscription, active until its end date.
   const legacyActive = account?.plan_source === 'legacy' && account.plan_status === 'active'
     && (!account.plan_period_end || account.plan_period_end.getTime() > Date.now());
-  const chosen = account && (account.plan_source === 'admin' || legacyActive || (account.plan_source === 'stripe' && LIVE_STATUSES.includes(account.plan_status)))
+  const chosen = account && (account.plan_source === 'admin' || legacyActive || (account.plan_source === 'dodo' && LIVE_STATUSES.includes(account.plan_status)))
     ? plans.find((plan) => plan.id === account.plan_id)
     : undefined;
   const plan = chosen ?? fallback;
@@ -336,8 +340,9 @@ export function publicPlan(plan: PlanRow, features: PlanFeature[]) {
     id: plan.id, name: plan.name, tagline: plan.tagline, featured: plan.featured, is_default: plan.is_default, checkout: plan.checkout,
     contact_url: plan.contact_url, monthly_cents: plan.monthly_cents, yearly_cents: plan.yearly_cents, currency: plan.currency,
     trial_days: plan.trial_days, limits: normalizeLimits(plan.limits), features,
-    purchasable: plan.checkout === 'self_serve' && !plan.is_default && Boolean(plan.stripe_monthly_price_id || plan.stripe_yearly_price_id),
-    has_monthly: Boolean(plan.stripe_monthly_price_id) || plan.is_default, has_yearly: Boolean(plan.stripe_yearly_price_id) || plan.is_default,
+    // A paid plan can be bought as soon as it has a price: its Dodo products are made at the first checkout.
+    purchasable: plan.checkout === 'self_serve' && !plan.is_default && (plan.monthly_cents > 0 || plan.yearly_cents > 0),
+    has_monthly: plan.monthly_cents > 0 || plan.is_default, has_yearly: plan.yearly_cents > 0 || plan.is_default,
   };
 }
 

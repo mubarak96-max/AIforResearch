@@ -149,7 +149,6 @@ export default function EditorAppNav({ recentDocuments, activeDocumentId, onCrea
 
       <div className="min-h-4 flex-1" />
       <a href={navLink('account')} className={`${itemClass} ${itemIdle}`}>{NAV_ICONS.keys}Account</a>
-      {account?.isAdmin ? <a href={navLink('admin')} className={`${itemClass} ${itemIdle}`}>{NAV_ICONS.admin}Admin</a> : null}
       <a href={navLink('help')} className={`${itemClass} ${itemIdle}`}>{NAV_ICONS.help}Help</a>
       {showPlan ? (
         <div className="mt-2 flex shrink-0 items-center justify-between rounded-[10px] bg-surface/70 px-2.5 py-2">

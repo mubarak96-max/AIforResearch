@@ -1,7 +1,7 @@
 # Firebase App Hosting: the web app and its API (app/api, app/v1).
 # Create the backend from GitHub with the app root directory left at the repository root.
 # App Hosting runs `pnpm install` and `pnpm build` (next build). Secrets: `firebase apphosting:secrets:set NAME`.
-# Admin › settings override most of these at run time (stored encrypted in Firestore).
+# These are the only settings: there is no admin page. Change a value here (or a secret) and redeploy.
 
 runConfig:
   cpu: 1
@@ -65,8 +65,6 @@ env:
     value: https://convert-xxxxx.a.run.app
   - variable: COLLAB_URL
     value: https://collab-xxxxx.a.run.app
-  - variable: ADMIN_EMAILS
-    value: you@example.com
   - variable: SUPPORT_EMAIL
     value: ""
   - variable: LLM_PROVIDER
@@ -88,17 +86,17 @@ env:
   - variable: INTERNAL_SECRET
     secret: INTERNAL_SECRET
   # Moved from the self-hosted version without a SETTINGS_KEY? Add the old JWT_SECRET as a
-  # secret too (a fallback for reading saved Admin keys):
+  # secret too (a fallback for reading reference-manager tokens saved then):
   # - variable: JWT_SECRET
   #   secret: JWT_SECRET
   - variable: LLM_API_KEY
     secret: LLM_API_KEY
   - variable: SCHOLAR_API_KEY
     secret: SCHOLAR_API_KEY
-  - variable: STRIPE_SECRET_KEY
-    secret: STRIPE_SECRET_KEY
-  - variable: STRIPE_WEBHOOK_SECRET
-    secret: STRIPE_WEBHOOK_SECRET
+  - variable: DODO_PAYMENTS_API_KEY
+    secret: DODO_PAYMENTS_API_KEY
+  - variable: DODO_PAYMENTS_WEBHOOK_KEY
+    secret: DODO_PAYMENTS_WEBHOOK_KEY
   # Only with EMBEDDINGS_PROVIDER=openai:
   # - variable: EMBEDDINGS_API_KEY
   #   secret: EMBEDDINGS_API_KEY

@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
 const app = JSON.parse(await readFile(join(here, '../../package.json'), 'utf8'));
 // Native code, packages lib/server must share one copy of, and large ones.
-const external = ['@hocuspocus/server', '@hocuspocus/extension-database', 'ws', 'yjs', 'firebase-admin', '@node-rs/argon2', 'nodemailer', 'stripe', 'openai'];
+const external = ['@hocuspocus/server', '@hocuspocus/extension-database', 'ws', 'yjs', 'firebase-admin', '@node-rs/argon2', 'nodemailer', 'openai'];
 const dist = join(here, 'dist');
 
 await rm(dist, { recursive: true, force: true });

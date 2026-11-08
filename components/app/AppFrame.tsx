@@ -100,7 +100,6 @@ export function AppFrame({ title, actions, children, wide = false }: { title: st
         )}
         <div className="flex-1" />
         {item('/account', 'Account', ICONS.keys)}
-        {user?.is_admin && item('/admin', 'Admin', ICONS.admin)}
         {item('/help', 'Help', ICONS.help)}
         {isFree && (
           <div className="mt-2 flex items-center justify-between rounded-[10px] bg-surface/70 px-2.5 py-2">

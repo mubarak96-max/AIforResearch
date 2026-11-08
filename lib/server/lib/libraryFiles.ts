@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { C, col, db, deleteDeep, FieldValue, newId, row, searchTerms } from '../firebase.js';
 import { env } from '../env.js';
+import { serviceAuthHeaders } from './serviceAuth.js';
 import { pdfAuthors, pdfDoi, pdfTitle } from './pdfMetadata.js';
 import { deleteFile, keyFromRef, readFileBytes, saveFile } from './storage.js';
 import { embed } from './embeddings.js';
@@ -166,7 +167,7 @@ export async function processPdf(documentId: string, fileKey: string) {
     const bytes = await readFileBytes(fileKey);
     if (!bytes) throw new Error('The PDF file is missing.');
     form.append('file', new Blob([new Uint8Array(bytes)], { type: 'application/pdf' }), 'document.pdf');
-    const response = await fetch(`${env.convertUrl}/pdf/text`, { method: 'POST', body: form, signal: AbortSignal.timeout(180_000) });
+    const response = await fetch(`${env.convertUrl}/pdf/text`, { method: 'POST', headers: await serviceAuthHeaders(env.convertUrl), body: form, signal: AbortSignal.timeout(180_000) });
     if (!response.ok) throw new Error(`text extraction failed (${response.status})`);
     const result = (await response.json()) as { pages: { page: number; text: string }[]; title?: string | null; metadata?: Record<string, unknown> };
     // The PDF's own title, authors and DOI, when they look real (the upload starts with the file name).

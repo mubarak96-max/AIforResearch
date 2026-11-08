@@ -4,6 +4,8 @@ FROM node:22-slim AS build
 WORKDIR /repo
 RUN corepack enable
 COPY package.json pnpm-lock.yaml ./
+# package.json's pnpm.patchedDependencies points here; install fails without it.
+COPY patches patches
 RUN pnpm install --frozen-lockfile --ignore-scripts
 COPY lib/server lib/server
 COPY services/collab services/collab

@@ -19,15 +19,29 @@ calls this service.
 
 ## Deploy to Cloud Run
 
-The API and the Library PDF function call this service; nothing else should. Deploy it with
-internal ingress and reach it over Serverless VPC Access (or Direct VPC egress) from App Hosting
-(`runConfig.vpcAccess` in `apphosting.yaml`) and from Cloud Functions (`vpcConnector`):
+The API and the Library PDF function call this service; nothing else should. Deploy it
+**private** (`--no-allow-unauthenticated`): Cloud Run then accepts only requests carrying a Google
+ID token for an account with `roles/run.invoker`. On Google Cloud the API attaches one
+automatically (`lib/server/lib/serviceAuth.ts`), so no VPC connector is needed and an idle
+converter costs nothing:
 
 ```sh
 gcloud run deploy convert --source services/convert --region us-central1 \
   --port 4100 --memory 2Gi --cpu 2 --concurrency 4 --timeout 300 \
-  --ingress internal --no-allow-unauthenticated
+  --min-instances=0 --max-instances=2 --no-allow-unauthenticated
+
+# Let the web app (App Hosting) and Cloud Functions call it:
+for sa in firebase-app-hosting-compute@<project>.iam.gserviceaccount.com \
+          <project-number>-compute@developer.gserviceaccount.com; do
+  gcloud run services add-iam-policy-binding convert --region us-central1 \
+    --member="serviceAccount:$sa" --role=roles/run.invoker
+done
 ```
+
+(If your Functions run as another service account, grant that one instead.) For network-level
+isolation as well, add `--ingress internal` and reach it over Direct VPC egress or Serverless VPC
+Access (`runConfig.vpcAccess` in `apphosting.yaml`, `vpcConnector` for Functions); a Serverless
+VPC Access connector bills for its VMs even when idle.
 
 Deploy the same image a second time as **`embed`**, which only answers Library search's
 `POST /embed`. Embedding keeps every core busy for seconds per paper. On its own service it never
@@ -37,8 +51,11 @@ slows down Word and PDF conversions, and it scales (and idles at zero) on its ow
 gcloud run deploy embed --source services/convert --region us-central1 \
   --port 4100 --memory 1Gi --cpu 2 --concurrency 16 --timeout 300 --cpu-boost \
   --set-env-vars CONVERT_EMBED_WARM=1 \
-  --ingress internal --no-allow-unauthenticated
+  --min-instances=0 --no-allow-unauthenticated
 ```
+
+Grant it `roles/run.invoker` for the same accounts. While traffic is low, skip `embed` and leave
+`EMBED_URL` empty.
 
 Then set `CONVERT_URL` (the converter's URL) and `EMBED_URL` (the embed service's URL) for App
 Hosting and Functions. Without `EMBED_URL` the converter answers `/embed` itself; it loads the

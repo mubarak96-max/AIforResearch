@@ -54,13 +54,13 @@ export default function DeveloperKeysPage() {
   useEffect(() => {
     if (loading) return;
     if (!user) { router.replace('/login?next=/developers/keys'); return; }
-    // Back from Stripe: add the credits at once (the webhook does the same, only once).
+    // Back from Dodo Payments: add the credits at once (the webhook does the same, only once).
     const params = new URLSearchParams(window.location.search);
-    const session = params.get('session');
+    const payment = params.get('payment_id');
     const outcome = params.get('credits');
     if (outcome) window.history.replaceState(null, '', '/developers/keys');
-    if (outcome === 'paid' && session) {
-      api<{ paid: boolean }>('/api/cloud/credits/complete', { method: 'POST', body: JSON.stringify({ session }) })
+    if (outcome === 'paid' && payment) {
+      api<{ paid: boolean }>('/api/cloud/credits/complete', { method: 'POST', body: JSON.stringify({ payment }) })
         .then((result) => setNotice(result.paid ? 'Payment received. Your credits are ready.' : 'Payment is still processing. Credits appear when it clears.'))
         .catch((caught) => setError((caught as Error).message))
         .finally(() => void load());

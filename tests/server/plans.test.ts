@@ -24,37 +24,46 @@ const db = {
 
 import { Hono } from 'hono';
 import {
-  DEFAULT_PLANS, PlanLimitError, checkLibraryRoom, checkQuota, countUse, effectivePlan, forgetPlans, loadPlans, planQuota, requireFeature, seedPlans,
+  PlanLimitError, checkLibraryRoom, checkQuota, countUse, effectivePlan, forgetPlans, loadPlans, planQuota, publicPlan, requireFeature,
 } from '../../lib/server/lib/plans.js';
 
 const ACCOUNT = 'acc-1';
 
 beforeEach(() => {
   fake.clear();
-  for (const { features, ...plan } of DEFAULT_PLANS) {
-    fake.put(`plans/${plan.id}`, { ...plan, features: features.map((feature, index) => ({ ...feature, sort_order: index })), stripe_product_id: null, stripe_monthly_price_id: null, stripe_yearly_price_id: null, stripe_mode: null });
-  }
   db.state.account = { plan_id: 'free', plan_status: 'none', plan_source: 'default', plan_interval: null, plan_period_end: null, plan_cancel_at_period_end: false, plan_subscription_id: null };
   db.state.libraryPdfs = 0;
   forgetPlans();
 });
 
-describe('plans in Firestore', () => {
-  it('seeds the default plans once, with their features embedded in order', async () => {
-    fake.clear();
-    expect(await seedPlans()).toBe(true);
-    expect(await seedPlans()).toBe(false);
-    forgetPlans();
+describe('plans in code', () => {
+  it('come from plans.ts in order, with their features, and paid ones can be bought before any Dodo product exists', async () => {
     const { plans, features } = await loadPlans();
     expect(plans.map((plan) => plan.id)).toEqual(['free', 'plus', 'pro', 'team']);
     expect(features.get('free')?.[0]).toEqual({ label: 'The full editor, on any device', included: true });
+    const plus = plans.find((plan) => plan.id === 'plus')!;
+    expect(plus.dodo_monthly_product_id).toBeNull();
+    expect(publicPlan(plus, [])).toMatchObject({ purchasable: true, has_monthly: true, has_yearly: true });
+    expect(publicPlan(plans.find((plan) => plan.id === 'team')!, []).purchasable).toBe(false);
+  });
+
+  it('use a stored Dodo product only while its price, trial and mode match the code', async () => {
+    const product = { kind: 'plan', currency: 'usd', trial_days: 0, mode: 'test' };
+    fake.put('billing_products/plan_plus_month', { ...product, product_id: 'pdt_plus_month', cents: 1200 });
+    fake.put('billing_products/plan_plus_year', { ...product, product_id: 'pdt_plus_year_old', cents: 9000 }); // an old price
+    fake.put('billing_products/plan_pro_month', { ...product, product_id: 'pdt_pro_live', cents: 2900, mode: 'live' }); // the other mode
+    const plans = (await loadPlans()).plans;
+    const plus = plans.find((plan) => plan.id === 'plus')!;
+    expect(plus.dodo_monthly_product_id).toBe('pdt_plus_month');
+    expect(plus.dodo_yearly_product_id).toBeNull();
+    expect(plans.find((plan) => plan.id === 'pro')!.dodo_monthly_product_id).toBeNull();
   });
 });
 
 describe('which plan an account has', () => {
   it('is the default plan without a subscription, the subscribed plan while it is live, and the default again once it ends', async () => {
     expect((await effectivePlan(ACCOUNT)).plan.id).toBe('free');
-    db.state.account = { ...db.state.account, plan_id: 'pro', plan_source: 'stripe', plan_status: 'active' };
+    db.state.account = { ...db.state.account, plan_id: 'pro', plan_source: 'dodo', plan_status: 'active' };
     expect((await effectivePlan(ACCOUNT)).plan.id).toBe('pro');
     db.state.account = { ...db.state.account, plan_status: 'past_due' };
     expect((await effectivePlan(ACCOUNT)).plan.id).toBe('pro');
@@ -78,7 +87,7 @@ describe('counted limits', () => {
   });
 
   it('counts Plus by the month and never limits Pro', async () => {
-    db.state.account = { ...db.state.account, plan_id: 'plus', plan_source: 'stripe', plan_status: 'active' };
+    db.state.account = { ...db.state.account, plan_id: 'plus', plan_source: 'dodo', plan_status: 'active' };
     expect(await checkQuota(ACCOUNT, 'chat')).toBe(500);
     await countUse(ACCOUNT, 'chat', 500);
     await expect(checkQuota(ACCOUNT, 'chat')).rejects.toThrow("this month's 500 AI chat messages on the Plus plan");
@@ -95,7 +104,7 @@ describe('features and totals', () => {
     await expect(checkLibraryRoom(ACCOUNT, 'user-1')).resolves.toBeUndefined();
     db.state.libraryPdfs = 10;
     await expect(checkLibraryRoom(ACCOUNT, 'user-1')).rejects.toThrow('Your Free plan includes 10 PDFs in your Library');
-    db.state.account = { ...db.state.account, plan_id: 'plus', plan_source: 'stripe', plan_status: 'trialing' };
+    db.state.account = { ...db.state.account, plan_id: 'plus', plan_source: 'dodo', plan_status: 'trialing' };
     await expect(requireFeature(ACCOUNT, 'latex_export')).resolves.toBeUndefined();
     await expect(checkLibraryRoom(ACCOUNT, 'user-1')).resolves.toBeUndefined();
   });

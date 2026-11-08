@@ -1,12 +1,12 @@
-import Stripe from 'stripe';
+import type DodoPayments from 'dodopayments';
 import { createHash } from 'node:crypto';
 import { HTTPException } from 'hono/http-exception';
 import { AggregateField } from 'firebase-admin/firestore';
 import { C, col, db, rows } from '../firebase.js';
 import { settings } from './settings.js';
 import { CREDIT_PACKS, SERVICES, costMilli, packById, publicPrices, type ServiceName } from './prices.js';
-import { stripeClient } from './stripeBilling.js';
-import { ensureCustomer, setDefaultCard } from './planBilling.js';
+import { dodoClient, ensureOneTimeProduct, type Dodo } from './dodoBilling.js';
+import { ensureCustomer } from './planBilling.js';
 import { mailReady, sendMail } from './mail.js';
 import { lowCreditsEmail, topUpFailedEmail } from './emails.js';
 
@@ -18,7 +18,7 @@ import { lowCreditsEmail, topUpFailedEmail } from './emails.js';
  *
  * Firestore: the balance is `accounts/{id}.credits_milli`; the day's free use is
  * `accounts/{id}/credit_daily_free/{YYYY-MM-DD}`; grants are `accounts/{id}/credit_ledger/ref_<hash>`
- * (the id comes from the grant's reference, so each Stripe session is credited once). Every
+ * (the id comes from the grant's reference, so each Dodo payment is credited once). Every
  * change to a balance runs in a transaction.
  */
 
@@ -161,7 +161,7 @@ export async function charge(event: Charge): Promise<{ free: number; paid: numbe
   return result;
 }
 
-/** Adds credits once per reference (a Stripe session or payment, the starter grant, an admin grant). */
+/** Adds credits once per reference (a Dodo payment, the starter grant, an admin grant). */
 export async function grantCredits(input: {
   accountId: string; kind: 'purchase' | 'topup' | 'starter' | 'grant' | 'refund'; credits: number;
   amountCents?: number | null; reference: string; note?: string | null; createdBy?: string | null;
@@ -201,49 +201,75 @@ export async function grantStarter(accountId: string) {
 
 // ------------------------------------------------------------------ buying credits
 
-export async function startCreditCheckout(stripe: Stripe, accountId: string, packId: string) {
+type Payment = DodoPayments.Payments.Payment;
+const CREDIT_KINDS = ['credits', 'credits_topup'];
+
+/** The Dodo product of a credit pack (made on first use, remade when its price changes). */
+const packProduct = (dodo: Dodo, pack: (typeof CREDIT_PACKS)[number]) =>
+  ensureOneTimeProduct(dodo, `pack_${pack.id}`, { name: `${pack.credits.toLocaleString('en-US')} WriteOrbit credits`, cents: pack.cents });
+
+export async function startCreditCheckout(dodo: Dodo, accountId: string, packId: string) {
   const pack = packById(packId);
   if (!pack) throw new HTTPException(422, { message: 'Choose a credit pack.' });
-  const customer = await ensureCustomer(stripe, accountId);
-  const metadata = { writeorbit_kind: 'credits', writeorbit_account_id: accountId, pack: pack.id };
-  const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
-    customer,
-    allowed_payment_method_types: ['card'],
-    line_items: [{ quantity: 1, price_data: { currency: 'usd', unit_amount: pack.cents, product_data: { name: `${pack.credits.toLocaleString('en-US')} WriteOrbit credits` } } }],
-    // The card is kept for automatic top-ups (only if the owner turns them on).
-    payment_intent_data: { setup_future_usage: 'off_session', metadata },
-    metadata,
-    client_reference_id: accountId,
-    success_url: consoleUrl('?credits=paid&session={CHECKOUT_SESSION_ID}'),
+  const [customer, product] = await Promise.all([ensureCustomer(dodo, accountId), packProduct(dodo, pack)]);
+  const session = await dodo.checkoutSessions.create({
+    product_cart: [{ product_id: product, quantity: 1 }],
+    customer: { customer_id: customer },
+    show_saved_payment_methods: true,
+    metadata: { writeorbit_kind: 'credits', writeorbit_account_id: accountId, pack: pack.id },
+    // Dodo adds ?payment_id=…&status=… on the way back.
+    return_url: consoleUrl('?credits=paid'),
     cancel_url: consoleUrl('?credits=cancelled'),
   });
-  return { url: session.url! };
+  if (!session.checkout_url) throw new HTTPException(422, { message: 'The payment page could not open.' });
+  return { url: session.checkout_url };
 }
 
-const idOf = (value: string | { id: string } | null | undefined) => (typeof value === 'string' ? value : value?.id ?? null);
-
-/** Credits for a paid Checkout session (from the webhook or the return page; whichever comes first). */
-export async function grantForSession(session: Stripe.Checkout.Session) {
-  if (session.metadata?.writeorbit_kind !== 'credits' || session.payment_status !== 'paid') return { granted: false };
-  const accountId = session.metadata.writeorbit_account_id;
-  const pack = packById(session.metadata.pack ?? '');
+/**
+ * Credits for a paid credit purchase or automatic top-up (from the webhook or the return page;
+ * whichever comes first), once per payment. The card and billing address are kept for top-ups.
+ */
+export async function grantForPayment(payment: Payment) {
+  const kind = String(payment.metadata?.writeorbit_kind ?? '');
+  if (!CREDIT_KINDS.includes(kind) || payment.status !== 'succeeded') return { granted: false };
+  const accountId = String(payment.metadata.writeorbit_account_id ?? '');
+  const pack = packById(String(payment.metadata.pack ?? ''));
   if (!accountId || !pack) return { granted: false };
-  return grantCredits({ accountId, kind: 'purchase', credits: pack.credits, amountCents: session.amount_total, reference: `checkout:${session.id}`, note: `${pack.credits.toLocaleString('en-US')} credits` });
+  const account = await accountRef(accountId).get();
+  const customer = account.get('dodo_customer_id') as string | null | undefined;
+  if (!account.exists || (customer && customer !== payment.customer.customer_id)) return { granted: false };
+  await rememberCard(accountId, payment);
+  const topup = kind === 'credits_topup';
+  if (topup) await accountRef(accountId).update({ topup_pending_at: null });
+  return grantCredits({
+    accountId, kind: topup ? 'topup' : 'purchase', credits: pack.credits, amountCents: payment.total_amount,
+    reference: `payment:${payment.payment_id}`, note: topup ? 'Automatic top-up' : `${pack.credits.toLocaleString('en-US')} credits`,
+  });
 }
 
-/** Back from Checkout: credit the account at once and keep the card for top-ups. */
-export async function completeCreditCheckout(stripe: Stripe, accountId: string, sessionId: string) {
-  const session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ['payment_intent'] });
-  const account = (await accountRef(accountId).get()).data() as { stripe_customer_id?: string | null } | undefined;
-  if (!account?.stripe_customer_id || idOf(session.customer as any) !== account.stripe_customer_id || session.metadata?.writeorbit_account_id !== accountId) {
+/** Keeps the card and billing address of a paid checkout for automatic top-ups (the first card stays the default). */
+export async function rememberCard(accountId: string, payment: Payment) {
+  const ref = accountRef(accountId);
+  await db().runTransaction(async (tx) => {
+    const snapshot = await tx.get(ref);
+    if (!snapshot.exists) return;
+    const changes: Record<string, unknown> = {};
+    if (payment.payment_method_id && !snapshot.get('dodo_payment_method_id')) changes.dodo_payment_method_id = payment.payment_method_id;
+    if (payment.billing?.country) changes.dodo_billing = { ...payment.billing };
+    if (!snapshot.get('dodo_customer_id')) changes.dodo_customer_id = payment.customer.customer_id;
+    if (Object.keys(changes).length) tx.update(ref, changes);
+  });
+}
+
+/** Back from checkout: credit the account at once (the webhook does the same, once). */
+export async function completeCreditCheckout(dodo: Dodo, accountId: string, paymentId: string) {
+  const payment = await dodo.payments.retrieve(paymentId);
+  const account = (await accountRef(accountId).get()).data() as { dodo_customer_id?: string | null } | undefined;
+  if (!account?.dodo_customer_id || payment.customer.customer_id !== account.dodo_customer_id || payment.metadata?.writeorbit_account_id !== accountId) {
     throw new HTTPException(403, { message: 'This payment belongs to another account.' });
   }
-  if (session.payment_status !== 'paid') return { paid: false, ...(await wallet(accountId)) };
-  await grantForSession(session);
-  const intent = session.payment_intent && typeof session.payment_intent === 'object' ? (session.payment_intent as Stripe.PaymentIntent) : null;
-  const card = idOf(intent?.payment_method as any);
-  if (card) await setDefaultCard(stripe, accountId, card, { onlyIfNone: true }).catch((error) => console.warn('keeping card failed', (error as Error).message));
+  if (payment.status !== 'succeeded') return { paid: false, ...(await wallet(accountId)) };
+  await grantForPayment(payment);
   return { paid: true, ...(await wallet(accountId)) };
 }
 
@@ -253,23 +279,29 @@ const toppingUp = new Set<string>();
 
 type TopUpAccount = {
   topup_enabled: boolean; topup_threshold: number; topup_pack: string; topup_monthly_limit_cents: number;
-  credits_milli: number; stripe_customer_id: string | null; low_balance_noticed_at: Date | null; topup_error: string | null;
+  credits_milli: number; dodo_customer_id: string | null; dodo_payment_method_id: string | null;
+  dodo_billing: DodoPayments.Payments.BillingAddress | null; low_balance_noticed_at: Date | null; topup_error: string | null;
+  topup_pending_at: Date | null;
 };
+
+const asDate = (value: any): Date | null => (value ? (typeof value.toDate === 'function' ? value.toDate() : new Date(value)) : null);
 
 async function topUpAccount(accountId: string): Promise<TopUpAccount | null> {
   const snapshot = await accountRef(accountId).get();
   if (!snapshot.exists) return null;
   const data = snapshot.data() as Record<string, any>;
-  const noticed = data.low_balance_noticed_at;
   return {
     topup_enabled: Boolean(data.topup_enabled),
     topup_threshold: num(data.topup_threshold ?? 500),
     topup_pack: data.topup_pack ?? 'credits_2000',
     topup_monthly_limit_cents: num(data.topup_monthly_limit_cents ?? 10000),
     credits_milli: num(data.credits_milli),
-    stripe_customer_id: data.stripe_customer_id ?? null,
+    dodo_customer_id: data.dodo_customer_id ?? null,
+    dodo_payment_method_id: data.dodo_payment_method_id ?? null,
+    dodo_billing: data.dodo_billing?.country ? data.dodo_billing : null,
     topup_error: data.topup_error ?? null,
-    low_balance_noticed_at: noticed ? (typeof noticed.toDate === 'function' ? noticed.toDate() : new Date(noticed)) : null,
+    low_balance_noticed_at: asDate(data.low_balance_noticed_at),
+    topup_pending_at: asDate(data.topup_pending_at),
   };
 }
 
@@ -294,9 +326,19 @@ async function afterSpend(accountId: string, balance: number) {
 }
 
 async function stopTopUp(accountId: string, reason: string) {
-  await accountRef(accountId).update({ topup_enabled: false, topup_error: reason });
+  await accountRef(accountId).update({ topup_enabled: false, topup_error: reason, topup_pending_at: null });
   const email = mailReady() ? await ownerEmail(accountId) : null;
   if (email) await sendMail(topUpFailedEmail(email, reason, consoleUrl())).catch((error) => console.error('top-up email failed', (error as Error).message));
+}
+
+/** A failed top-up the webhook reports: top-ups stop until the owner buys credits by hand. */
+export async function topUpFailed(payment: Payment) {
+  if (payment.metadata?.writeorbit_kind !== 'credits_topup') return;
+  const accountId = String(payment.metadata.writeorbit_account_id ?? '');
+  if (!accountId || !(await accountRef(accountId).get()).exists) return;
+  await stopTopUp(accountId, payment.status === 'requires_customer_action'
+    ? 'your bank asked for a confirmation we cannot do automatically. Buy credits once by hand.'
+    : 'the card was declined.');
 }
 
 /** Top-ups charged this month, in cents. */
@@ -305,46 +347,51 @@ async function topUpCentsThisMonth(accountId: string) {
   return snapshot.docs.filter((doc) => doc.get('kind') === 'topup').reduce((sum, doc) => sum + num(doc.get('amount_cents')), 0);
 }
 
+/** A top-up started this long ago with no result is treated as lost, and may start again. */
+const TOPUP_PENDING_MS = 15 * 60_000;
+const pendingNow = (value: Date | null) => Boolean(value && Date.now() - value.getTime() < TOPUP_PENDING_MS);
+
 /**
  * Charges the saved card for the chosen pack when the balance is under the threshold (within the
- * monthly limit). `toppingUp` stops repeats inside one instance; across instances the Stripe
- * idempotency key (account, month total, 10-minute window) and the ledger reference stop doubles.
+ * monthly limit). Dodo charges the card without a checkout page and reports the result by
+ * webhook: payment.succeeded adds the credits, payment.failed turns top-ups off. `topup_pending_at`,
+ * claimed in a transaction, stops a second charge while one is on its way (across instances).
  */
 export async function topUp(accountId: string) {
   if (toppingUp.has(accountId)) return { started: false };
   toppingUp.add(accountId);
   try {
     const account = await topUpAccount(accountId);
-    if (!account?.topup_enabled || credits(account.credits_milli) >= account.topup_threshold) return { started: false };
+    if (!account?.topup_enabled || credits(account.credits_milli) >= account.topup_threshold || pendingNow(account.topup_pending_at)) return { started: false };
     const pack = packById(account.topup_pack) ?? CREDIT_PACKS[0];
-    const month = { cents: await topUpCentsThisMonth(accountId) };
-    if (month.cents + pack.cents > account.topup_monthly_limit_cents) {
+    const month = await topUpCentsThisMonth(accountId);
+    if (month + pack.cents > account.topup_monthly_limit_cents) {
       await stopTopUp(accountId, `this month's top-up limit of $${(account.topup_monthly_limit_cents / 100).toFixed(2)} is reached.`);
       return { started: false };
     }
-    const stripe = stripeClient();
-    if (!stripe || !account.stripe_customer_id) {
+    const dodo = dodoClient();
+    if (!dodo || !account.dodo_customer_id || !account.dodo_payment_method_id || !account.dodo_billing) {
       await stopTopUp(accountId, 'there is no saved card.');
       return { started: false };
     }
-    const customer = await stripe.customers.retrieve(account.stripe_customer_id);
-    const card = 'deleted' in customer ? null : idOf(customer.invoice_settings?.default_payment_method as any);
-    if (!card) {
-      await stopTopUp(accountId, 'there is no saved card.');
-      return { started: false };
-    }
+    const claimed = await db().runTransaction(async (tx) => {
+      const snapshot = await tx.get(accountRef(accountId));
+      if (pendingNow(asDate(snapshot.get('topup_pending_at')))) return false;
+      tx.update(accountRef(accountId), { topup_pending_at: new Date() });
+      return true;
+    });
+    if (!claimed) return { started: false };
     try {
-      const intent = await stripe.paymentIntents.create({
-        amount: pack.cents, currency: 'usd', customer: account.stripe_customer_id, payment_method: card,
-        off_session: true, confirm: true, description: `${pack.credits.toLocaleString('en-US')} WriteOrbit credits (automatic top-up)`,
+      await dodo.checkoutSessions.create({
+        product_cart: [{ product_id: await packProduct(dodo, pack), quantity: 1 }],
+        customer: { customer_id: account.dodo_customer_id },
+        payment_method_id: account.dodo_payment_method_id,
+        billing_address: account.dodo_billing,
+        confirm: true,
         metadata: { writeorbit_kind: 'credits_topup', writeorbit_account_id: accountId, pack: pack.id },
-      }, { idempotencyKey: `topup:${accountId}:${month.cents}:${Math.floor(Date.now() / 600_000)}` });
-      if (intent.status === 'succeeded') {
-        await grantCredits({ accountId, kind: 'topup', credits: pack.credits, amountCents: intent.amount, reference: `payment:${intent.id}`, note: 'Automatic top-up' });
-        return { started: true, paid: true };
-      }
-      await stopTopUp(accountId, 'your bank asked for a confirmation we cannot do automatically. Buy credits once by hand.');
-      return { started: true, paid: false };
+        return_url: consoleUrl('?credits=paid'),
+      });
+      return { started: true };
     } catch (error) {
       await stopTopUp(accountId, (error as Error).message || 'the card was declined.');
       return { started: true, paid: false };
@@ -352,15 +399,6 @@ export async function topUp(accountId: string) {
   } finally {
     toppingUp.delete(accountId);
   }
-}
-
-/** Credits for a top-up payment the webhook reports (if the direct grant above was missed). */
-export async function grantForPayment(intent: Stripe.PaymentIntent) {
-  if (intent.metadata?.writeorbit_kind !== 'credits_topup' || intent.status !== 'succeeded') return { granted: false };
-  const pack = packById(intent.metadata.pack ?? '');
-  const accountId = intent.metadata.writeorbit_account_id;
-  if (!pack || !accountId) return { granted: false };
-  return grantCredits({ accountId, kind: 'topup', credits: pack.credits, amountCents: intent.amount, reference: `payment:${intent.id}`, note: 'Automatic top-up' });
 }
 
 // ------------------------------------------------------------------ the console
@@ -409,7 +447,7 @@ export async function creditOverview(accountId: string) {
     topUpAccount(accountId),
   ]);
   let payments = false;
-  try { payments = Boolean(stripeClient()); } catch { payments = false; }
+  try { payments = Boolean(dodoClient()); } catch { payments = false; }
   return {
     wallet: current,
     starter_credits: starterCredits(),

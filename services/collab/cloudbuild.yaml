@@ -1,0 +1,20 @@
+# Builds the collab image with Cloud Build. The Dockerfile bundles lib/server, so the build runs
+# from the repository root:
+#   gcloud builds submit --config services/collab/cloudbuild.yaml .
+# Files in .gitignore (node_modules, .env*, service-account*.json) are not uploaded.
+# Needs an Artifact Registry Docker repository named by _REPO, once:
+#   gcloud artifacts repositories create writeorbit --repository-format=docker --location=us-central1
+substitutions:
+  _REGION: us-central1
+  _REPO: writeorbit
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -f
+      - services/collab/Dockerfile
+      - -t
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/collab:latest
+      - .
+images:
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/collab:latest

@@ -56,10 +56,8 @@ export const C = {
   assets: 'assets',
   apiKeys: 'api_keys',
   usageEvents: 'usage_events',
-  appSettings: 'app_settings',
-  adminAudit: 'admin_audit',
-  stripeEvents: 'stripe_events',
-  plans: 'plans',
+  billingEvents: 'billing_events',
+  billingProducts: 'billing_products',
   planUsage: 'plan_usage',         // accounts/{id}/plan_usage
   creditLedger: 'credit_ledger',   // accounts/{id}/credit_ledger
   creditDailyFree: 'credit_daily_free', // accounts/{id}/credit_daily_free

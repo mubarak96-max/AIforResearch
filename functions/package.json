@@ -19,7 +19,6 @@
     "firebase-functions": "7.4.0",
     "@node-rs/argon2": "2.2.2",
     "nodemailer": "10.1.1",
-    "stripe": "23.0.1",
     "openai": "4.104.0"
   },
   "devDependencies": {
