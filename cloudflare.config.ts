@@ -35,6 +35,13 @@ export default defineConfig({
       NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: bindings.text(env("NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID")),
       NEXT_PUBLIC_FIREBASE_PROJECT_ID: bindings.text(env("NEXT_PUBLIC_FIREBASE_PROJECT_ID")),
       NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: bindings.text(env("NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET")),
+      NEXT_PUBLIC_REALTIME_URL: bindings.text(env("NEXT_PUBLIC_REALTIME_URL")),
+      COLLAB_URL: bindings.text(env("COLLAB_URL")),
+      CONVERT_URL: bindings.text(env("CONVERT_URL")),
+      // Set as encrypted secrets on the Worker (dashboard "Secret" type or `wrangler secret put`),
+      // never as plain-text vars — plain vars are printed in deploy diffs.
+      DODO_PAYMENTS_API_KEY: bindings.secret(),
+      DODO_PAYMENTS_WEBHOOK_KEY: bindings.secret(),
     },
   }),
 });
