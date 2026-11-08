@@ -1,4 +1,5 @@
 import { importPKCS8, SignJWT } from 'jose';
+import { serviceAccount } from '../google/credentials.js';
 
 /**
  * Google ID tokens for calling private Cloud Run services (services/convert and embed, deployed
@@ -20,23 +21,10 @@ const cache = new Map<string, { token: string; expires: number }>();
 let warned = false;
 
 type ServiceAccountKey = { client_email: string; private_key: string };
-let keyPromise: Promise<ServiceAccountKey | null> | null = null;
 
-function serviceAccountKey(): Promise<ServiceAccountKey | null> {
-  keyPromise ??= (async () => {
-    const inline = process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.trim();
-    const path = process.env.GOOGLE_APPLICATION_CREDENTIALS?.trim();
-    let text = inline || '';
-    if (!text && path) {
-      const { readFile } = await import('node:fs/promises');
-      text = await readFile(path, 'utf8').catch(() => '');
-    }
-    if (!text) return null;
-    const key = JSON.parse(text) as Partial<ServiceAccountKey>;
-    return key.client_email && key.private_key ? { client_email: key.client_email, private_key: key.private_key } : null;
-  })().catch(() => null);
-  return keyPromise;
-}
+/** The same key lookup as Firestore/Storage use, so on Cloudflare the Worker secret is found
+ * even when it is not copied into process.env. */
+const serviceAccountKey = (): Promise<ServiceAccountKey | null> => serviceAccount().catch(() => null);
 
 async function fromMetadata(audience: string): Promise<string> {
   const response = await fetch(`${METADATA}?audience=${encodeURIComponent(audience)}`, {
