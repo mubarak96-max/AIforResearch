@@ -24,22 +24,25 @@ export const NAV_ICONS = {
   help: icon(<><circle cx="12" cy="12" r="9" /><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6M12 17h.01" /></>),
 };
 
-/** The WriteOrbit wordmark (same as the host app's logo). */
+/**
+ * The WriteOrbit logo (mirrors the host app's components/Logo.tsx): a tile with a monoline W
+ * over a line ending in a full stop; the tile doubles as the "W", so it reads [W]riteOrbit.
+ */
 export function WriteOrbitLogo({ size = 32 }: { size?: number }) {
   return (
-    <span className="inline-flex items-center gap-2.5 text-ink">
+    <span className="inline-flex items-center text-ink" style={{ gap: Math.max(2, Math.round(size * 0.08)) }} aria-hidden="true">
       <span
-        className="grid shrink-0 place-items-center rounded-[9px] bg-gradient-to-br from-primary-500 to-brand-600 shadow-[0_4px_12px_-4px_rgba(var(--brand-rgb),.6)]"
+        className="grid shrink-0 place-items-center rounded-[22%] bg-gradient-to-br from-primary-500 to-brand-600 shadow-[0_4px_12px_-4px_rgba(var(--brand-rgb),.6)]"
         style={{ width: size, height: size }}
-        aria-hidden="true"
       >
-        <svg viewBox="0 0 24 24" width={size * 0.6} height={size * 0.6} fill="none" stroke="#fff" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M3.5 6.5c2.8-1.2 5.8-1 8.5 1 2.7-2 5.7-2.2 8.5-1v11.5c-2.8-1.2-5.8-1-8.5 1-2.7-2-5.7-2.2-8.5-1z" />
-          <path d="M12 7.5v11.5" />
+        <svg viewBox="0 0 24 24" width={size * 0.62} height={size * 0.62} fill="none" stroke="var(--color-on-brand, #fff)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 4.5 L8 14.5 L12 7.5 L16 14.5 L20 4.5" />
+          <path d="M4 19.8 H13" />
+          <circle cx="17.6" cy="19.8" r="1.95" fill="var(--color-on-brand, #fff)" stroke="none" />
         </svg>
       </span>
       <span className="font-extrabold tracking-[-0.02em] leading-none" style={{ fontSize: Math.round(size * 0.56) }}>
-        Research<span className="text-brand">Cove</span>
+        rite<span className="text-brand">Orbit</span>
       </span>
     </span>
   );
