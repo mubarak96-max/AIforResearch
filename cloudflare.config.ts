@@ -42,6 +42,8 @@ export default defineConfig({
       // never as plain-text vars — plain vars are printed in deploy diffs.
       DODO_PAYMENTS_API_KEY: bindings.secret(),
       DODO_PAYMENTS_WEBHOOK_KEY: bindings.secret(),
+      // Firebase Admin's credentials on the Worker (the service-account key file's JSON).
+      GOOGLE_SERVICE_ACCOUNT_JSON: bindings.secret(),
     },
   }),
 });

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { getApps, initializeApp, applicationDefault, type App } from 'firebase-admin/app';
+import { getApps, initializeApp, applicationDefault, cert, type App, type Credential } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getAppCheck } from 'firebase-admin/app-check';
 import {
@@ -18,20 +18,39 @@ import { getStorage } from 'firebase-admin/storage';
  * so a row and a document read the same in code.
  */
 
+/**
+ * Hosts without a Google runtime (Cloudflare Workers) have no default credentials: there the
+ * service-account key's JSON comes in GOOGLE_SERVICE_ACCOUNT_JSON (a Worker secret).
+ */
+function serviceAccount(): { credential: Credential; projectId?: string } | null {
+  const text = process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.trim();
+  if (!text) return null;
+  const key = JSON.parse(text) as { project_id?: string; client_email: string; private_key: string };
+  return {
+    credential: cert({ projectId: key.project_id, clientEmail: key.client_email, privateKey: key.private_key.replace(/\\n/g, '\n') }),
+    projectId: key.project_id,
+  };
+}
+
 function app(): App {
   const existing = getApps()[0];
   if (existing) return existing;
-  const projectId = process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT;
-  const storageBucket = process.env.FIREBASE_STORAGE_BUCKET || (projectId ? `${projectId}.firebasestorage.app` : undefined);
+  const account = serviceAccount();
+  const projectId = process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT
+    || account?.projectId || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  const storageBucket = process.env.FIREBASE_STORAGE_BUCKET || process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    || (projectId ? `${projectId}.firebasestorage.app` : undefined);
   const emulated = Boolean(process.env.FIRESTORE_EMULATOR_HOST || process.env.FIREBASE_AUTH_EMULATOR_HOST);
-  return initializeApp({ projectId, storageBucket, ...(emulated ? {} : { credential: applicationDefault() }) });
+  const credential = emulated ? undefined : (account?.credential ?? applicationDefault());
+  return initializeApp({ projectId, storageBucket, ...(credential ? { credential } : {}) });
 }
 
 let firestore: Firestore | null = null;
 export function db(): Firestore {
   if (firestore) return firestore;
   firestore = getFirestore(app());
-  firestore.settings({ ignoreUndefinedProperties: true });
+  // gRPC needs raw sockets/HTTP2, which Workers lack; REST works everywhere (listeners aren't used server-side).
+  firestore.settings({ ignoreUndefinedProperties: true, preferRest: Boolean(process.env.GOOGLE_SERVICE_ACCOUNT_JSON) });
   return firestore;
 }
 
