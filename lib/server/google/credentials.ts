@@ -24,11 +24,38 @@ function assertAvailable() {
   if (process.env.VINEXT_PRERENDER === '1') throw new Error('Google services are not available while prerendering');
 }
 
+let workerBindings: Promise<Record<string, unknown> | null> | null = null;
+/**
+ * The Worker's bindings, from `cloudflare:workers` (null elsewhere). Secrets are always there,
+ * whether or not the runtime also copied them into process.env.
+ */
+function cloudflareEnv(): Promise<Record<string, unknown> | null> {
+  workerBindings ??= (async () => {
+    if (typeof navigator === 'undefined' || navigator.userAgent !== 'Cloudflare-Workers') return null;
+    // A variable specifier, so bundlers for Node (Next.js, esbuild) leave the import alone.
+    const specifier = 'cloudflare:workers';
+    try {
+      return ((await import(/* webpackIgnore: true */ /* @vite-ignore */ specifier)) as { env?: Record<string, unknown> }).env ?? null;
+    } catch {
+      return null;
+    }
+  })();
+  return workerBindings;
+}
+
+/** A setting from process.env, or on Cloudflare Workers from the Worker's bindings. */
+export async function setting(name: string): Promise<string | undefined> {
+  const fromProcess = process.env[name]?.trim();
+  if (fromProcess) return fromProcess;
+  const value = (await cloudflareEnv())?.[name];
+  return typeof value === 'string' && value.trim() ? value.trim() : undefined;
+}
+
 let accountPromise: Promise<ServiceAccount | null> | null = null;
 /** The service-account key (from the environment or a key file), or null on a Google runtime. */
 export function serviceAccount(): Promise<ServiceAccount | null> {
   accountPromise ??= (async () => {
-    const text = process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.trim();
+    const text = await setting('GOOGLE_SERVICE_ACCOUNT_JSON');
     if (text) return parseAccount(text);
     const file = process.env.GOOGLE_APPLICATION_CREDENTIALS?.trim();
     if (file) {
@@ -37,6 +64,8 @@ export function serviceAccount(): Promise<ServiceAccount | null> {
     }
     return null;
   })();
+  // Only a found key is kept: a miss is looked up again next time.
+  void accountPromise.then((account) => { if (!account) accountPromise = null; }, () => { accountPromise = null; });
   return accountPromise;
 }
 
@@ -47,7 +76,7 @@ function parseAccount(text: string): ServiceAccount {
 
 async function metadata(path: string): Promise<string> {
   const response = await fetch(`${METADATA}/${path}`, { headers: { 'Metadata-Flavor': 'Google' } });
-  if (!response.ok) throw new Error(`No Google credentials: set GOOGLE_SERVICE_ACCOUNT_JSON (metadata server answered ${response.status})`);
+  if (!response.ok) throw new Error(`No Google credentials: GOOGLE_SERVICE_ACCOUNT_JSON is not set${typeof navigator !== 'undefined' && navigator.userAgent === 'Cloudflare-Workers' ? ` (Worker bindings ${(await cloudflareEnv()) ? 'read, key absent' : 'not readable'})` : ''} and there is no metadata server (${response.status})`);
   return response.text();
 }
 
