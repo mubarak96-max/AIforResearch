@@ -1,8 +1,7 @@
 import type DodoPayments from 'dodopayments';
 import { createHash } from 'node:crypto';
 import { HTTPException } from 'hono/http-exception';
-import { AggregateField } from 'firebase-admin/firestore';
-import { C, col, db, rows } from '../firebase.js';
+import { AggregateField, C, col, db, rows } from '../firebase.js';
 import { settings } from './settings.js';
 import { CREDIT_PACKS, SERVICES, costMilli, packById, publicPrices, type ServiceName } from './prices.js';
 import { dodoClient, ensureOneTimeProduct, type Dodo } from './dodoBilling.js';

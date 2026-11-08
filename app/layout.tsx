@@ -53,7 +53,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <script dangerouslySetInnerHTML={{ __html: authInitScript }} />
       </head>
-      <body>
+      {/* Extensions (Grammarly, LanguageTool, ColorZilla…) add attributes to <body> before hydration. */}
+      <body suppressHydrationWarning>
         <noscript>
           <iframe src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`} height="0" width="0" style={{ display: 'none', visibility: 'hidden' }} />
         </noscript>

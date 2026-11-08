@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { sendWritingActivity, type WritingActivity } from '../lib/aiEditor/assistApi';
 import { AI_AUTHOR } from '../lib/aiEditor/suggestions';
+import { safeView } from '../lib/aiEditor/editorPlugins';
 
 /**
  * Records how the writer adds text, for the authorship report: characters typed, pasted from
@@ -101,7 +102,20 @@ export function useWritingActivity(editor: any, documentId: string | null | unde
     };
 
     // The clipboard is only readable in the paste event, before ProseMirror's transaction.
-    const dom: HTMLElement | null = tiptap.view?.dom ?? null;
+    // Tiptap's `view` throws until the editor is mounted, so attach on mount too (and follow
+    // remounts: the DOM node can change).
+    let dom: HTMLElement | null = null;
+    const attach = () => {
+      detach();
+      dom = safeView(editor)?.dom ?? null;
+      dom?.addEventListener('paste', onPaste, true);
+      dom?.addEventListener('drop', onDrop, true);
+    };
+    const detach = () => {
+      dom?.removeEventListener('paste', onPaste, true);
+      dom?.removeEventListener('drop', onDrop, true);
+      dom = null;
+    };
     const onPaste = (event: ClipboardEvent) => {
       const data = event.clipboardData;
       if (!data) return;
@@ -112,8 +126,9 @@ export function useWritingActivity(editor: any, documentId: string | null | unde
       const data = event.dataTransfer;
       lastPaste = { internal: Boolean(data && Array.from(data.types || []).includes('blocknote/html')), text: data?.getData('text/plain') || '' };
     };
-    dom?.addEventListener('paste', onPaste, true);
-    dom?.addEventListener('drop', onDrop, true);
+    attach();
+    tiptap.on('mount', attach);
+    tiptap.on('unmount', detach);
 
     const onTransaction = ({ transaction }: { transaction: any }) => {
       if (!transaction?.docChanged) return;
@@ -189,8 +204,9 @@ export function useWritingActivity(editor: any, documentId: string | null | unde
       window.removeEventListener('pagehide', onHide);
       aiListeners.delete(onAI);
       tiptap.off?.('transaction', onTransaction);
-      dom?.removeEventListener('paste', onPaste, true);
-      dom?.removeEventListener('drop', onDrop, true);
+      tiptap.off?.('mount', attach);
+      tiptap.off?.('unmount', detach);
+      detach();
     };
   }, [documentId, editor, enabled]);
 }

@@ -1,5 +1,4 @@
-import { FieldPath } from 'firebase-admin/firestore';
-import { C, col, db, deleteDeep, deleteQuery, FieldValue, getRow } from '../firebase.js';
+import { C, col, db, deleteDeep, deleteQuery, FieldPath, FieldValue, getRow } from '../firebase.js';
 import { deleteDocumentFiles } from './documentStore.js';
 import { deletePrefix } from './storage.js';
 import type { UserDoc } from './users.js';

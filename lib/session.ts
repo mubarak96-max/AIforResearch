@@ -59,9 +59,13 @@ export function getToken(): string | null {
   return tokenExpiry(token) > Date.now() + 10_000 ? token : null;
 }
 
-/** True when this browser has a session (also while an hour-old token is being refreshed). */
+/**
+ * True when this browser has a session (also while an hour-old token is being refreshed).
+ * Requires the profile, not just a token: a token whose /api/auth/me failed is not a usable
+ * session, and counting it made the marketing pages look signed in while the app was not.
+ */
 export function hasSession(): boolean {
-  return Boolean(getToken() || read<SessionUser>(USER_KEY));
+  return Boolean(read<SessionUser>(USER_KEY));
 }
 
 /** Stores the token and profile (called whenever Firebase gives a new token). */

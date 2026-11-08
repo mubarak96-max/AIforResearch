@@ -1,6 +1,6 @@
-import { Readable } from 'node:stream';
+import { Buffer } from 'node:buffer';
 import { randomUUID } from 'node:crypto';
-import { bucket } from '../firebase.js';
+import { bucketName, deleteObject, deletePrefixed, downloadObject, objectMetadata, signedReadUrl, uploadObject } from '../google/storage.js';
 
 /**
  * Uploaded files, in the project's Cloud Storage for Firebase bucket. Files are addressed by a
@@ -27,53 +27,44 @@ export function keyFromRef(ref: string | null | undefined): string | null {
   try { return checkKey(key); } catch { return null; }
 }
 
-const file = (key: string) => bucket().file(checkKey(key));
-
 export async function saveFile(key: string, bytes: Uint8Array, contentType: string) {
-  await file(key).save(Buffer.from(bytes), { contentType, resumable: bytes.byteLength > 8 * 1024 * 1024 });
+  await uploadObject(checkKey(key), bytes, contentType);
 }
 
 export async function openFile(key: string): Promise<StoredFile | null> {
-  const target = file(key);
-  const [metadata] = await target.getMetadata().catch(() => [null] as const);
-  if (!metadata) return null;
+  const response = await downloadObject(checkKey(key));
+  if (!response?.body) return null;
+  const length = response.headers.get('content-length');
   return {
-    body: Readable.toWeb(target.createReadStream()) as ReadableStream<Uint8Array>,
-    size: metadata.size === undefined ? null : Number(metadata.size),
-    contentType: metadata.contentType ?? null,
+    body: response.body,
+    size: length === null ? null : Number(length),
+    contentType: response.headers.get('content-type'),
   };
 }
 
 export async function readFileBytes(key: string): Promise<Buffer | null> {
-  try {
-    const [bytes] = await file(key).download();
-    return bytes;
-  } catch (error) {
-    if ((error as { code?: number }).code === 404) return null;
-    throw error;
-  }
+  const response = await downloadObject(checkKey(key));
+  return response ? Buffer.from(await response.arrayBuffer()) : null;
 }
 
 export async function fileExists(key: string): Promise<boolean> {
-  const [exists] = await file(key).exists();
-  return exists;
+  return (await objectMetadata(checkKey(key))) !== null;
 }
 
 export async function deleteFile(key: string) {
-  await file(key).delete({ ignoreNotFound: true }).catch((error) => console.error(`storage: delete ${key} failed: ${(error as Error).message}`));
+  await deleteObject(checkKey(key)).catch((error) => console.error(`storage: delete ${key} failed: ${(error as Error).message}`));
 }
 
 /** Removes every file under a prefix (a deleted document's blocks, versions and Yjs state). */
 export async function deletePrefix(prefix: string) {
-  await bucket().deleteFiles({ prefix: checkKey(prefix.replace(/\/+$/, '')) + '/', force: true }).catch((error) => {
+  await deletePrefixed(checkKey(prefix.replace(/\/+$/, '')) + '/').catch((error) => {
     console.error(`storage: delete ${prefix}/ failed: ${(error as Error).message}`);
   });
 }
 
 /** A short-lived download link (for the converter, or a browser that needs the raw file). */
 export async function signedUrl(key: string, minutes = 15): Promise<string> {
-  const [url] = await file(key).getSignedUrl({ action: 'read', expires: Date.now() + minutes * 60_000 });
-  return url;
+  return signedReadUrl(checkKey(key), minutes * 60);
 }
 
 /** Saves, reads back and deletes a small file (Admin › Storage "Test"). */
@@ -85,7 +76,7 @@ export async function testStorage() {
   const read = await readFileBytes(key);
   await deleteFile(key);
   if (!read || read.toString('utf8') !== new TextDecoder().decode(body)) throw new Error('The test file could not be read back.');
-  return { provider: 'firebase' as const, bucket: bucket().name, ms: Date.now() - started };
+  return { provider: 'firebase' as const, bucket: await bucketName(), ms: Date.now() - started };
 }
 
 const TYPES: Record<string, string> = {

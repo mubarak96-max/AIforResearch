@@ -42,8 +42,16 @@ export default defineConfig({
       // never as plain-text vars — plain vars are printed in deploy diffs.
       DODO_PAYMENTS_API_KEY: bindings.secret(),
       DODO_PAYMENTS_WEBHOOK_KEY: bindings.secret(),
-      // Firebase Admin's credentials on the Worker (the service-account key file's JSON).
+      // Google credentials on the Worker (the service-account key file's JSON); lib/server/google
+      // uses it for Firestore, Auth and Storage over their REST APIs.
       GOOGLE_SERVICE_ACCOUNT_JSON: bindings.secret(),
+      // Local runs against the Firebase emulators: start `vite dev` with these set. Never set in
+      // deploy builds, so production never has them.
+      ...Object.fromEntries(
+        ["FIRESTORE_EMULATOR_HOST", "FIREBASE_AUTH_EMULATOR_HOST", "FIREBASE_STORAGE_EMULATOR_HOST", "FIREBASE_PROJECT_ID"]
+          .filter((name) => process.env[name] && process.env.FIRESTORE_EMULATOR_HOST)
+          .map((name) => [name, bindings.text(process.env[name]!)]),
+      ),
     },
   }),
 });

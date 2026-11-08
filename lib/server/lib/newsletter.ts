@@ -1,5 +1,4 @@
-import { AggregateField } from 'firebase-admin/firestore';
-import { C, chunked, col, db } from '../firebase.js';
+import { AggregateField, C, chunked, col, db } from '../firebase.js';
 import { settings, type EffectiveSettings } from './settings.js';
 
 /**

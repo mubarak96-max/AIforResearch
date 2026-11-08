@@ -19,10 +19,17 @@ export type AppVariables = { user: AuthUser | null };
 const verified = new Map<string, { user: AuthUser; until: number }>();
 const CACHE_MS = 60_000;
 
+// Local development only: why the last token was refused, added to the 401 so it shows in the browser.
+const DEV = process.env.NODE_ENV !== 'production';
+let lastRefusal = '';
+
 export async function decodeToken(token: string): Promise<DecodedIdToken | null> {
   try {
     return await adminAuth().verifyIdToken(token);
-  } catch {
+  } catch (error) {
+    // Refused tokens are normal (expired, signed out); log why, so a setup problem is visible.
+    lastRefusal = (error as Error).message;
+    console.warn(`auth: ID token refused: ${lastRefusal}`);
     return null;
   }
 }
@@ -31,10 +38,12 @@ export async function userFromToken(token: string | null | undefined): Promise<A
   if (!token) return null;
   const cached = verified.get(token);
   if (cached && cached.until > Date.now()) return cached.user;
+  lastRefusal = '';
   const decoded = await decodeToken(token);
+  if (decoded && !decoded.email) lastRefusal = 'the token has no email';
   if (!decoded || !decoded.email) return null;
   const user = (await activeUser(decoded.uid)) ?? (await ensureUser(decoded));
-  if (!user) return null;
+  if (!user) { lastRefusal = 'the account is disabled'; return null; }
   if (verified.size > 5000) verified.clear();
   verified.set(token, { user, until: Math.min(Date.now() + CACHE_MS, decoded.exp * 1000) });
   return user;
@@ -60,7 +69,7 @@ export const optionalUser: MiddlewareHandler<{ Variables: AppVariables }> = asyn
 /** Rejects with 401 unless a valid ID token is present. */
 export const requireUser: MiddlewareHandler<{ Variables: AppVariables }> = async (c, next) => {
   const user = c.get('user') ?? (await userFromToken(bearer(c)));
-  if (!user) throw new HTTPException(401, { message: 'Sign in to continue.' });
+  if (!user) throw new HTTPException(401, { message: DEV && lastRefusal ? `Sign in to continue. (dev: ${lastRefusal})` : 'Sign in to continue.' });
   c.set('user', user);
   await next();
 };

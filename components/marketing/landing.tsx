@@ -29,7 +29,7 @@ const cta = `${btnPrimary} h-11 rounded-[10px] px-5 text-[15px]`;
 export function StartButton({ label = 'Start writing free' }: { label?: string }) {
   return (
     <AuthAware
-      signedIn={<Link href="/editor" className={cta}>Open your documents <LuArrowRight className="h-4 w-4" aria-hidden="true" /></Link>}
+      signedIn={<Link href="/editor" className={cta}>Open your documents  <LuArrowRight className="h-4 w-4" aria-hidden="true" /></Link>}
       signedOut={<Link href="/signup" className={cta}>{label} <LuArrowRight className="h-4 w-4" aria-hidden="true" /></Link>}
     />
   );

@@ -1,67 +1,47 @@
 import { randomUUID } from 'node:crypto';
-import { getApps, initializeApp, applicationDefault, cert, type App, type Credential } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
-import { getAppCheck } from 'firebase-admin/app-check';
+import type * as Admin from 'firebase-admin/firestore';
 import {
-  getFirestore, FieldValue, Timestamp,
-  type DocumentSnapshot, type Firestore, type QuerySnapshot,
-} from 'firebase-admin/firestore';
-import { getStorage } from 'firebase-admin/storage';
+  AggregateField as RestAggregateField, FieldPath as RestFieldPath, FieldValue as RestFieldValue,
+  Firestore as RestFirestore, Timestamp as RestTimestamp,
+} from './google/firestore.js';
+import { createUser, deleteUser, getUser, updateUser, verifyAppCheckToken, verifyIdToken } from './google/auth.js';
 
 /**
- * Firebase Admin, shared by the API (Next.js route handlers), the collab service and Cloud
- * Functions. On Firebase App Hosting, Cloud Run and Functions the credentials come from the
- * runtime's service account; locally, the emulators (FIRESTORE_EMULATOR_HOST etc.) or
- * GOOGLE_APPLICATION_CREDENTIALS.
+ * Firebase for the API (Next.js route handlers on Cloudflare Workers), the collab service and
+ * Cloud Functions: Firestore, Auth and Storage over their REST APIs (lib/server/google), because
+ * firebase-admin's Firestore client cannot run on Workers (protobufjs compiles code at runtime).
+ * The objects keep firebase-admin's API and types, so code reads the same as with the SDK.
+ *
+ * Credentials (lib/server/google/credentials.ts): the emulators, GOOGLE_SERVICE_ACCOUNT_JSON
+ * (the Worker secret), GOOGLE_APPLICATION_CREDENTIALS, or a Google runtime's service account.
  *
  * Data model: docs/data-model.md. Field names are the old Postgres column names (snake_case),
  * so a row and a document read the same in code.
  */
 
-/**
- * Hosts without a Google runtime (Cloudflare Workers) have no default credentials: there the
- * service-account key's JSON comes in GOOGLE_SERVICE_ACCOUNT_JSON (a Worker secret).
- */
-function serviceAccount(): { credential: Credential; projectId?: string } | null {
-  const text = process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.trim();
-  if (!text) return null;
-  const key = JSON.parse(text) as { project_id?: string; client_email: string; private_key: string };
-  return {
-    credential: cert({ projectId: key.project_id, clientEmail: key.client_email, privateKey: key.private_key.replace(/\\n/g, '\n') }),
-    projectId: key.project_id,
-  };
-}
+export type Firestore = Admin.Firestore;
+export type DocumentSnapshot = Admin.DocumentSnapshot;
+export type QuerySnapshot = Admin.QuerySnapshot;
 
-function app(): App {
-  const existing = getApps()[0];
-  if (existing) return existing;
-  // The build prerenders pages without the Worker's secrets. Firestore's credential lookup would
-  // fail in a background promise, which vinext's prerender rethrows and the build dies; fail here
-  // instead, synchronously, so callers' error handling (fallback values) applies.
-  if (process.env.VINEXT_PRERENDER === '1') throw new Error('Firebase is not available while prerendering');
-  const account = serviceAccount();
-  const projectId = process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT
-    || account?.projectId || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-  const storageBucket = process.env.FIREBASE_STORAGE_BUCKET || process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-    || (projectId ? `${projectId}.firebasestorage.app` : undefined);
-  const emulated = Boolean(process.env.FIRESTORE_EMULATOR_HOST || process.env.FIREBASE_AUTH_EMULATOR_HOST);
-  const credential = emulated ? undefined : (account?.credential ?? applicationDefault());
-  return initializeApp({ projectId, storageBucket, ...(credential ? { credential } : {}) });
-}
-
-let firestore: Firestore | null = null;
+// One client per isolate/process (it caches the project id and access token).
+const cache = globalThis as typeof globalThis & { __writeorbitFirestore?: RestFirestore };
 export function db(): Firestore {
-  if (firestore) return firestore;
-  firestore = getFirestore(app());
-  // gRPC needs raw sockets/HTTP2, which Workers lack; REST works everywhere (listeners aren't used server-side).
-  firestore.settings({ ignoreUndefinedProperties: true, preferRest: Boolean(process.env.GOOGLE_SERVICE_ACCOUNT_JSON) });
-  return firestore;
+  cache.__writeorbitFirestore ??= new RestFirestore();
+  return cache.__writeorbitFirestore as unknown as Firestore;
 }
 
-export const adminAuth = () => getAuth(app());
-export const adminAppCheck = () => getAppCheck(app());
-type Bucket = ReturnType<ReturnType<typeof getStorage>['bucket']>;
-export const bucket = (): Bucket => getStorage(app()).bucket();
+/** The parts of firebase-admin's Auth that lib/server uses. */
+export const adminAuth = () => ({ verifyIdToken, getUser, createUser, updateUser, deleteUser });
+/** The part of firebase-admin's App Check that lib/server uses. */
+export const adminAppCheck = () => ({ verifyToken: verifyAppCheckToken });
+
+export const FieldValue = RestFieldValue as unknown as typeof Admin.FieldValue;
+export type FieldValue = Admin.FieldValue;
+export const Timestamp = RestTimestamp as unknown as typeof Admin.Timestamp;
+export type Timestamp = Admin.Timestamp;
+export const FieldPath = RestFieldPath as unknown as typeof Admin.FieldPath;
+export type FieldPath = Admin.FieldPath;
+export const AggregateField = RestAggregateField as unknown as typeof Admin.AggregateField;
 
 /** Collection names, one place. */
 export const C = {
@@ -96,7 +76,6 @@ export const C = {
 
 export const col = (name: string) => db().collection(name);
 export const newId = () => randomUUID();
-export { FieldValue, Timestamp };
 export const serverNow = () => FieldValue.serverTimestamp();
 export const increment = (by: number) => FieldValue.increment(by);
 
