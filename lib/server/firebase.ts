@@ -35,6 +35,10 @@ function serviceAccount(): { credential: Credential; projectId?: string } | null
 function app(): App {
   const existing = getApps()[0];
   if (existing) return existing;
+  // The build prerenders pages without the Worker's secrets. Firestore's credential lookup would
+  // fail in a background promise, which vinext's prerender rethrows and the build dies; fail here
+  // instead, synchronously, so callers' error handling (fallback values) applies.
+  if (process.env.VINEXT_PRERENDER === '1') throw new Error('Firebase is not available while prerendering');
   const account = serviceAccount();
   const projectId = process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT
     || account?.projectId || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
