@@ -20,6 +20,7 @@ import { generateRoutes } from './routes/generate.js';
 import { dodoWebhookRoutes } from './routes/dodoWebhook.js';
 import { billingRoutes, planRoutes } from './routes/billing.js';
 import { newsletterRoutes } from './routes/newsletter.js';
+import { toolRoutes } from './routes/tools.js';
 import { createSlots } from './slots/index.js';
 import { PlanLimitError } from './lib/plans.js';
 import { ready } from './ready.js';
@@ -54,6 +55,7 @@ export function createApp() {
   app.route('/api/cloud/prices', cloudPriceRoutes());
   app.route('/api/cloud', cloudRoutes());
   app.route('/api/plans', planRoutes());
+  app.route('/api/tools', toolRoutes(slots));
   app.route('/api/newsletter', newsletterRoutes());
   app.route('/api/billing', billingRoutes());
   app.route('/api/dodo', dodoWebhookRoutes());

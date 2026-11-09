@@ -49,7 +49,12 @@ export async function appCheckHeader(): Promise<Record<string, string>> {
   firebaseApp();
   if (!appCheck) return {};
   try {
-    const { token } = await getToken(appCheck);
+    // A blocked reCAPTCHA script (content blockers, strict networks) leaves getToken pending
+    // forever; give up after 4 s so requests still go out (routes that need App Check refuse them).
+    const { token } = await Promise.race([
+      getToken(appCheck),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('App Check timed out')), 4000)),
+    ]);
     return { 'X-Firebase-AppCheck': token };
   } catch {
     return {};

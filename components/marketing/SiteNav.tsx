@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { LuCircleHelp, LuLayers, LuListChecks, LuNewspaper, LuTag } from 'react-icons/lu';
+import { LuCircleHelp, LuLayers, LuListChecks, LuNewspaper, LuTag, LuWrench } from 'react-icons/lu';
 import { Logo } from '@/components/Logo';
 import { CloseIcon, MenuIcon } from './icons';
 import { AuthAware } from './AuthAware';
@@ -13,7 +13,9 @@ import { openPricing } from '@/lib/billing';
 
 export const NAV_LINKS = [
   { label: 'Features', href: '/features', hint: 'AI writing, citations, claim check', Icon: LuLayers },
-  { label: 'How it works', href: '/how-it-works', hint: 'Three steps to a finished paper', Icon: LuListChecks },
+  { label: 'Free tools', href: '/tools', hint: 'Citation generator, paraphraser and more', Icon: LuWrench },
+  // Desktop shows it from lg up only: six links crowd the bar at tablet widths.
+  { label: 'How it works', href: '/how-it-works', hint: 'Three steps to a finished paper', Icon: LuListChecks, wideOnly: true },
   { label: 'Pricing', href: '/pricing', hint: 'Free and paid plans', Icon: LuTag },
   { label: 'Blog', href: '/blog', hint: 'Guides for writers', Icon: LuNewspaper },
   { label: 'Help', href: '/help', hint: 'Guides and shortcuts', Icon: LuCircleHelp },
@@ -68,7 +70,7 @@ export function SiteNav() {
               href={link.href}
               onClick={(event) => pricingClick(link.href, event)}
               aria-current={current ? 'page' : undefined}
-              className={`relative rounded-md transition-colors hover:text-ink ${current ? 'text-ink after:absolute after:inset-x-0 after:-bottom-[22px] after:h-0.5 after:rounded-full after:bg-ink' : 'text-muted'} ${focusRing}`}
+              className={`relative rounded-md transition-colors hover:text-ink ${'wideOnly' in link ? 'hidden lg:inline' : ''} ${current ? 'text-ink after:absolute after:inset-x-0 after:-bottom-[22px] after:h-0.5 after:rounded-full after:bg-ink' : 'text-muted'} ${focusRing}`}
             >
               {link.label}
             </Link>

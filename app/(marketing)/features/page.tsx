@@ -3,6 +3,8 @@ import { pageMetadata } from '@/components/marketing/seo';
 import { container, focusRing } from '@/components/marketing/styles';
 import { AudienceSection, ComparisonBand, FEATURES, FinalCta, PageIntro, Points, StartButton, h2Item, visualPanel } from '@/components/marketing/landing';
 import { FigCaption } from '@/components/marketing/Marginalia';
+import { FeatureCard } from '@/components/marketing/FeatureLanding';
+import { activeFeatureCategories, FEATURE_PAGES } from '@/lib/features';
 
 export const metadata = pageMetadata({
   title: 'Features: AI writing, citations and claim check',
@@ -47,6 +49,23 @@ export default function FeaturesPage() {
           </section>
         ))}
       </div>
+
+      {/* One page per feature */}
+      <section aria-labelledby="all-features-title" className={`${container} pt-24 md:pt-32`}>
+        <h2 id="all-features-title" className="text-balance font-serif text-[30px] font-semibold leading-[1.12] tracking-[-0.02em] text-ink md:text-[40px]">Every feature, in detail</h2>
+        <div className="mt-10 flex flex-col gap-12">
+          {activeFeatureCategories().map((category) => (
+            <div key={category.id}>
+              <h3 className="text-[18px] font-semibold text-ink">{category.name}</h3>
+              <p className="mt-1 text-[14.5px] text-muted">{category.blurb}</p>
+              <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {FEATURE_PAGES.filter((page) => page.category === category.id).map((page) => <li key={page.slug}><FeatureCard page={page} headingLevel="h3" /></li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <p className="mt-10 text-[15px] text-muted">Want to try something without an account? See the <Link href="/tools" className="text-ink underline underline-offset-4 hover:text-brand">free tools</Link>.</p>
+      </section>
 
       <ComparisonBand />
       <AudienceSection />

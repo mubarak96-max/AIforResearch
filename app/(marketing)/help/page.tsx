@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { pageMetadata } from '@/components/marketing/seo';
 import { container, focusRing } from '@/components/marketing/styles';
+import { HelpSearch } from '@/components/marketing/HelpSearch';
 
 export const metadata = pageMetadata({
   title: 'Help center: writing, citations and export',
@@ -69,6 +70,46 @@ const TOPICS: Topic[] = [
       ['LaTeX', <>File › Download LaTeX saves a zip you can open in Overleaf, with main.tex, references.bib and your figures.</>],
     ],
   },
+  {
+    id: 'tools',
+    title: 'Free tools',
+    items: [
+      ['What they are', <>The <Link href="/tools" className="text-brand underline-offset-4 hover:underline">free tools</Link> work on their own page: a citation generator, literature review and gap finder, proposal and essay drafts, a paraphraser, statistics and PDF tools.</>],
+      ['Without an account', <>AI tools give 3 free runs a day without an account. The citation generator, writing pattern checker, statistics and PDF tools have no limit.</>],
+      ['Into the editor', <>Click Open in the editor on a result to make it a document. Its citations stay live and the reference list builds itself.</>],
+      ['Private tools', <>The statistics, PDF and writing pattern tools run in your browser. Your files and data are not uploaded.</>],
+    ],
+  },
+  {
+    id: 'sources',
+    title: 'Sources and citation reliability',
+    items: [
+      ['Where papers come from', <>From a scholarly index of over 250 million works built on OpenAlex. Records come from publishers, Crossref, PubMed and repositories.</>],
+      ['Are citations real?', <>Yes. AI features cite papers from search results or your Library, never from the model’s memory. The text around a citation is still AI-written: check that the source says what the sentence claims.</>],
+      ['Abstract only', <>Many records have only a title and abstract. AI answers built on them say less than the full paper might. Upload the PDF to your Library to ask about the full text.</>],
+      ['Wrong details', <>Click a citation to edit it. Records in the index are corrected by OpenAlex, not by WriteOrbit.</>],
+    ],
+  },
+  {
+    id: 'plans',
+    title: 'Plans, limits and payments',
+    items: [
+      ['Limits', <>The Free plan has daily limits for AI features; paid plans have monthly limits or none. <Link href="/pricing" className="text-brand underline-offset-4 hover:underline">See every plan</Link>.</>],
+      ['When limits reset', <>Daily limits reset each day; monthly limits each month.</>],
+      ['Failed runs', <>If an AI feature fails or returns an error, it does not count against your limit. Try again, or try a shorter text.</>],
+      ['Payments', <>Payments are handled by Dodo Payments, our merchant of record, which also issues receipts and handles sales tax. Manage your plan in Account › Billing.</>],
+      ['Cancelling', <>Cancel in Account › Billing. Your plan stays active until the end of the period you paid for, then moves to Free. Your documents stay.</>],
+    ],
+  },
+  {
+    id: 'account',
+    title: 'Account and privacy',
+    items: [
+      ['Forgotten password', <>Use <Link href="/forgot-password" className="text-brand underline-offset-4 hover:underline">Forgot password</Link> on the sign-in page. We email you a link to set a new one.</>],
+      ['Your data', <>Your documents and Library are private unless you share them, and are never used to train AI. Read the <Link href="/privacy" className="text-brand underline-offset-4 hover:underline">privacy policy</Link>, <Link href="/ai-use" className="text-brand underline-offset-4 hover:underline">how we use AI</Link> and <Link href="/cookies" className="text-brand underline-offset-4 hover:underline">cookies and storage</Link>.</>],
+      ['Delete your account', <>Account › Delete account removes your documents and profile. Copies in backups go when the backups expire.</>],
+    ],
+  },
 ];
 
 const SHORTCUTS: [string, string][] = [
@@ -108,12 +149,13 @@ export default function HelpPage() {
           </ul>
         </nav>
         <div className="space-y-12">
+          <HelpSearch />
           {TOPICS.map((topic) => (
-            <section key={topic.id} id={topic.id} aria-labelledby={`${topic.id}-title`} className="scroll-mt-24">
+            <section key={topic.id} id={topic.id} data-help-section aria-labelledby={`${topic.id}-title`} className="scroll-mt-24">
               <h2 id={`${topic.id}-title`} className="mb-4 text-[24px] font-bold tracking-[-0.02em] text-ink">{topic.title}</h2>
               <dl className="divide-y divide-line-2 rounded-2xl border border-line">
                 {topic.items.map(([term, detail]) => (
-                  <div key={term} className="grid gap-1 px-5 py-4 sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-6">
+                  <div key={term} data-help-item className="grid gap-1 px-5 py-4 sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-6">
                     <dt className="text-[15px] font-semibold text-ink">{term}</dt>
                     <dd className="text-[15px] leading-relaxed text-ink-2">{detail}</dd>
                   </div>
@@ -121,12 +163,12 @@ export default function HelpPage() {
               </dl>
             </section>
           ))}
-          <section id="shortcuts" aria-labelledby="shortcuts-title" className="scroll-mt-24">
+          <section id="shortcuts" data-help-section aria-labelledby="shortcuts-title" className="scroll-mt-24">
             <h2 id="shortcuts-title" className="mb-4 text-[24px] font-bold tracking-[-0.02em] text-ink">Keyboard shortcuts</h2>
             <p className="mb-3 text-[14px] text-muted">On a Mac, use ⌘ for Ctrl and ⌥ for Alt.</p>
             <dl className="grid gap-x-8 rounded-2xl border border-line px-5 py-2 sm:grid-cols-2">
               {SHORTCUTS.map(([action, keys]) => (
-                <div key={action} className="flex items-center justify-between gap-4 border-b border-line-2 py-2.5 last:border-b-0 sm:[&:nth-last-child(2)]:border-b-0">
+                <div key={action} data-help-item className="flex items-center justify-between gap-4 border-b border-line-2 py-2.5 last:border-b-0 sm:[&:nth-last-child(2)]:border-b-0">
                   <dt className="text-[14.5px] text-ink-2">{action}</dt>
                   <dd className="shrink-0 text-right">{kbd(keys)}</dd>
                 </div>
