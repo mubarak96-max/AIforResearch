@@ -9,21 +9,21 @@ export const metadata = pageMetadata({
     'Free citation generator for APA 7, MLA 9, Chicago, Harvard, AMA, ACS, Bluebook and 10,000+ styles. Find the source, cite it, and your reference list is done.',
 });
 
-const STYLES: { name: string; kind: string; inText: string; field: string }[] = [
-  { name: 'APA 7th', kind: 'Author–date', inText: '(Walker & Stickgold, 2005)', field: 'Psychology, education, social sciences' },
+const STYLES: { name: string; kind: string; inText: string; field: string; page?: string }[] = [
+  { name: 'APA 7th', kind: 'Author–date', inText: '(Walker & Stickgold, 2005)', field: 'Psychology, education, social sciences', page: '/tools/citation-generator/apa' },
   { name: 'APA 6th', kind: 'Author–date', inText: '(Walker & Stickgold, 2005)', field: 'Courses that still ask for APA 6' },
-  { name: 'MLA 9th', kind: 'Author–page', inText: '(Walker and Stickgold)', field: 'Literature, languages, humanities' },
-  { name: 'Chicago (Author-Date)', kind: 'Author–date', inText: '(Walker and Stickgold 2005)', field: 'Sciences and social sciences' },
-  { name: 'Chicago (Notes)', kind: 'Notes', inText: 'Footnote', field: 'History, arts, humanities' },
-  { name: 'Turabian', kind: 'Notes', inText: 'Footnote', field: 'Student papers in the humanities' },
-  { name: 'Harvard', kind: 'Author–date', inText: '(Walker and Stickgold, 2005)', field: 'Many UK and Australian universities' },
-  { name: 'IEEE', kind: 'Numbered', inText: '[1]', field: 'Engineering, computer science' },
-  { name: 'Vancouver', kind: 'Numbered', inText: '(1)', field: 'Medicine, health sciences' },
-  { name: 'AMA', kind: 'Numbered', inText: 'Superscript ¹', field: 'Medicine, nursing, public health' },
-  { name: 'ACS', kind: 'Numbered', inText: 'Superscript ¹', field: 'Chemistry' },
+  { name: 'MLA 9th', kind: 'Author–page', inText: '(Walker and Stickgold)', field: 'Literature, languages, humanities', page: '/tools/citation-generator/mla' },
+  { name: 'Chicago (Author-Date)', kind: 'Author–date', inText: '(Walker and Stickgold 2005)', field: 'Sciences and social sciences', page: '/tools/citation-generator/chicago' },
+  { name: 'Chicago (Notes)', kind: 'Notes', inText: 'Footnote', field: 'History, arts, humanities', page: '/tools/citation-generator/chicago' },
+  { name: 'Turabian', kind: 'Notes', inText: 'Footnote', field: 'Student papers in the humanities', page: '/tools/citation-generator/turabian' },
+  { name: 'Harvard', kind: 'Author–date', inText: '(Walker and Stickgold, 2005)', field: 'Many UK and Australian universities', page: '/tools/citation-generator/harvard' },
+  { name: 'IEEE', kind: 'Numbered', inText: '[1]', field: 'Engineering, computer science', page: '/tools/citation-generator/ieee' },
+  { name: 'Vancouver', kind: 'Numbered', inText: '(1)', field: 'Medicine, health sciences', page: '/tools/citation-generator/vancouver' },
+  { name: 'AMA', kind: 'Numbered', inText: 'Superscript ¹', field: 'Medicine, nursing, public health', page: '/tools/citation-generator/ama' },
+  { name: 'ACS', kind: 'Numbered', inText: 'Superscript ¹', field: 'Chemistry', page: '/tools/citation-generator/acs' },
   { name: 'Nature', kind: 'Numbered', inText: 'Superscript ¹', field: 'Natural sciences' },
   { name: 'Science', kind: 'Numbered', inText: '(1)', field: 'Natural sciences' },
-  { name: 'Bluebook', kind: 'Notes', inText: 'Footnote', field: 'Law (US)' },
+  { name: 'Bluebook', kind: 'Notes', inText: 'Footnote', field: 'Law (US)', page: '/tools/citation-generator/bluebook' },
   { name: 'OSCOLA', kind: 'Notes', inText: 'Footnote', field: 'Law (UK)' },
 ];
 
@@ -57,7 +57,9 @@ export default function CitationStylesPage() {
           <tbody>
             {STYLES.map((style) => (
               <tr key={style.name} className="border-t border-line-2">
-                <th scope="row" className="px-5 py-3 font-semibold text-ink">{style.name}</th>
+                <th scope="row" className="px-5 py-3 font-semibold text-ink">
+                  {style.page ? <Link href={style.page} className="underline decoration-line-3 underline-offset-4 hover:text-brand">{style.name}</Link> : style.name}
+                </th>
                 <td className="px-5 py-3 text-ink-2">{style.kind}</td>
                 <td className="px-5 py-3 font-serif text-ink-2">{style.inText}</td>
                 <td className="px-5 py-3 text-ink-2">{style.field}</td>
