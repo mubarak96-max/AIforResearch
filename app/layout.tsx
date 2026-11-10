@@ -13,7 +13,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'sw
 const serif = Source_Serif_4({ subsets: ['latin'], style: ['normal', 'italic'], variable: '--font-serif', display: 'swap' });
 
 // Google Tag Manager container for analytics.
-const GTM_ID = 'GTM-NDBDJNG2';
+const GTM_ID = 'GTM-THRFTJ7T';
 const gtmInitScript = `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     apple: { url: '/apple-touch-icon.png', sizes: '180x180' },
   },
   // Google Search Console ownership check.
-  verification: { google: 'ouHNsuO9vwbkOaI1OfA8VznYbyzCLeuYwm0Z0IN-SCo' },
+  verification: { google: 'qpi2MhfXKt0eozZZJecJFkA5LbzhcolfCosZSXcuAl4' },
 };
 
 export const viewport: Viewport = {
