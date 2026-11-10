@@ -1,4 +1,4 @@
-# WriteOrbit messaging
+# AI for Research messaging
 
 The reference for all site copy. When you change a page, check it against this file first.
 
@@ -13,7 +13,7 @@ The reference for all site copy. When you change a page, check it against this f
 
 Short form (taglines, footer, manifest): *The AI writing editor that cites real sources.*
 
-Why this promise: general AI chat invents references. WriteOrbit's difference is that every suggestion, answer and citation points to a real paper you can open, and the editor checks your claims before you submit.
+Why this promise: general AI chat invents references. AI for Research's difference is that every suggestion, answer and citation points to a real paper you can open, and the editor checks your claims before you submit.
 
 ## Pillars (in order)
 
@@ -31,7 +31,7 @@ Supporting points (use these in lists, not as headlines): research assistant (ch
 Formal and friendly. Use plain, direct words.
 
 - Say what the feature does in one sentence. Lead with the verb ("Find", "Cite", "Check", "Export").
-- Talk to the reader as "you". Talk about the product as "WriteOrbit", not "we", except in the help and auth flows.
+- Talk to the reader as "you". Talk about the product as "AI for Research", not "we", except in the help and auth flows.
 - Short sentences. One idea per sentence.
 - No hype words: *revolutionary, supercharge, seamless, unlock, effortless, game-changing, cutting-edge*.
 - Don't promise what the product doesn't do (see "Not yet" below).

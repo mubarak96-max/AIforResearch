@@ -25,8 +25,8 @@ export const NAV_ICONS = {
 };
 
 /**
- * The WriteOrbit logo (mirrors the host app's components/Logo.tsx): a tile with a monoline W
- * over a line ending in a full stop; the tile doubles as the "W", so it reads [W]riteOrbit.
+ * The AI for Research logo (mirrors the host app's components/Logo.tsx): a tile with a monoline A
+ * over a line ending in a full stop, followed by the name.
  */
 export function WriteOrbitLogo({ size = 32 }: { size?: number }) {
   return (
@@ -36,13 +36,14 @@ export function WriteOrbitLogo({ size = 32 }: { size?: number }) {
         style={{ width: size, height: size }}
       >
         <svg viewBox="0 0 24 24" width={size * 0.62} height={size * 0.62} fill="none" stroke="var(--color-on-brand, #fff)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M4 4.5 L8 14.5 L12 7.5 L16 14.5 L20 4.5" />
+          <path d="M5 15.5 L12 4 L19 15.5" />
+          <path d="M8 10.5 H16" />
           <path d="M4 19.8 H13" />
           <circle cx="17.6" cy="19.8" r="1.95" fill="var(--color-on-brand, #fff)" stroke="none" />
         </svg>
       </span>
       <span className="font-extrabold tracking-[-0.02em] leading-none" style={{ fontSize: Math.round(size * 0.56) }}>
-        rite<span className="text-brand">Orbit</span>
+        <span className="text-brand">AI</span> for Research
       </span>
     </span>
   );
@@ -101,7 +102,7 @@ export default function EditorAppNav({ recentDocuments, activeDocumentId, onCrea
       className={`ai-editor-print-hidden h-full w-[232px] shrink-0 flex-col overflow-y-auto border-r border-line bg-soft px-3 pb-3 pt-4 ${className}`}
     >
       <div className="flex items-start justify-between pb-[18px] pl-2">
-        <a href={navLink('home')} className="block" aria-label="WriteOrbit home">
+        <a href={navLink('home')} className="block" aria-label="AI for Research home">
           <WriteOrbitLogo size={32} />
         </a>
         {onCollapse ? (

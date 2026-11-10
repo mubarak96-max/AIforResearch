@@ -206,9 +206,9 @@ closed a school in 2009.
 | 9 | What happens next | New source, new day ("Wednesday"), concrete dates |
 | 10 | Tail | Background; an editor can cut it |
 
-## Writing and checking a news story in WriteOrbit
+## Writing and checking a news story in AI for Research
 
-WriteOrbit is an AI writing editor that runs in any browser, including on a phone, which makes it workable from a meeting room or a courthouse hallway. It does not have a news story template, so paste the example structure above into a new document.
+AI for Research is an AI writing editor that runs in any browser, including on a phone, which makes it workable from a meeting room or a courthouse hallway. It does not have a news story template, so paste the example structure above into a new document.
 
 Three steps where it helps:
 
@@ -216,9 +216,9 @@ Three steps where it helps:
 2. **Check before filing.** Run AI review. Claim checks, source-quality flags (retracted papers, preprints, wrong DOIs), proofreading and tone notes appear as comments on the exact sentences.
 3. **Hand off to your editor.** Share the document. Edits come back as suggestions (tracked changes) you accept or reject, with comments beside them and version history underneath.
 
-<!-- SCREENSHOT: WriteOrbit Library Ask on a single district-report PDF, answering "What does the district report say about enrollment since 2016?" with a page-number citation, next to the draft story -->
+<!-- SCREENSHOT: AI for Research Library Ask on a single district-report PDF, answering "What does the district report say about enrollment since 2016?" with a page-number citation, next to the draft story -->
 
-WriteOrbit does not check AP style rules or write headlines for you; use the tables above and your stylebook for that. The free plan covers the full editor with daily AI limits; see [pricing](/pricing).
+AI for Research does not check AP style rules or write headlines for you; use the tables above and your stylebook for that. The free plan covers the full editor with daily AI limits; see [pricing](/pricing).
 
 ## FAQ
 

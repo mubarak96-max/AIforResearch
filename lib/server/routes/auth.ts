@@ -14,7 +14,7 @@ import { deleteUserData } from '../lib/accountDeletion.js';
 /**
  * Account endpoints. Signing in, signing up, password reset and email confirmation happen in
  * the browser with Firebase Authentication; these routes cover what Firebase cannot know:
- * the person's WriteOrbit profile and plan, which methods this site offers, passwords carried
+ * the person's AI for Research profile and plan, which methods this site offers, passwords carried
  * over from the self-hosted version, and deleting an account with its data.
  */
 

@@ -157,7 +157,7 @@ export default function MatrixPage() {
     const bold = (value: string) => [{ type: 'text', text: value, styles: { bold: true } }];
     const blocks = [
       { type: 'heading', props: { level: 1 }, content: text(matrix.title) },
-      { type: 'paragraph', content: text(`Literature review matrix of ${matrix.rows.length} papers, made with WriteOrbit. Check each cell against the paper before citing it.`) },
+      { type: 'paragraph', content: text(`Literature review matrix of ${matrix.rows.length} papers, made with AI for Research. Check each cell against the paper before citing it.`) },
       {
         type: 'table',
         content: {
@@ -376,7 +376,7 @@ function CellDialog({ row, column, cell, onClose, onSave }: { row: Row; column: 
       onClose={onClose}
       footer={(
         <>
-          {cell?.edited ? <Button variant="ghost" disabled={busy} onClick={() => void save('')} className="mr-auto">Let WriteOrbit fill it</Button> : null}
+          {cell?.edited ? <Button variant="ghost" disabled={busy} onClick={() => void save('')} className="mr-auto">Let AI for Research fill it</Button> : null}
           <Button onClick={onClose}>Cancel</Button>
           <Button variant="primary" disabled={busy || !value.trim() || value.trim() === cell?.value} onClick={() => void save(value)}>Save</Button>
         </>

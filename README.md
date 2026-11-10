@@ -1,8 +1,8 @@
-# WriteOrbit
+# AI for Research
 
 **The AI editor for academic writing.** Autocomplete that cites real papers, @-cite from 250M+ scholarly works, chat with your PDFs, a careful AI reviewer, and Word, LaTeX and PDF in and out.
 
-![The WriteOrbit editor](docs/images/editor.png)
+![The AI for Research editor](docs/images/editor.png)
 
 - **Run it:** this repo deploys to your own Firebase project (App Hosting, Firestore, Storage, Authentication, Cloud Functions) plus two small Cloud Run services.
 - **Build on it:** the editor is a React package, and the [developer API](#developer-api) gives other apps papers, full text, research tools and AI through keys you issue.
@@ -46,12 +46,12 @@ More in [docs/architecture.md](docs/architecture.md) and [docs/data-model.md](do
 You need a Firebase project on the **Blaze** plan (App Hosting, Functions and Cloud Run need billing; small groups stay inside the free tier), the [Firebase CLI](https://firebase.google.com/docs/cli) and `gcloud`.
 
 1. **Create the project** and, in the Firebase console, turn on:
-   - **Authentication** › Sign-in method: Email/Password, and Google, Microsoft, Apple as you like (each provider's redirect URL is `https://<project>.firebaseapp.com/__/auth/handler`). Under **Templates**, set the action URL to `https://<your site>/auth/action` so reset and confirmation links open WriteOrbit's own pages. Add your domain under **Authorized domains**.
+   - **Authentication** › Sign-in method: Email/Password, and Google, Microsoft, Apple as you like (each provider's redirect URL is `https://<project>.firebaseapp.com/__/auth/handler`). Under **Templates**, set the action URL to `https://<your site>/auth/action` so reset and confirmation links open AI for Research's own pages. Add your domain under **Authorized domains**.
    - **Firestore** (Native mode) and **Storage**.
    - Optional: **App Check** with reCAPTCHA Enterprise, enforced for Authentication.
 2. **Rules, indexes and functions:**
    ```bash
-   git clone <your repository URL> && cd WriteOrbit
+   git clone <your repository URL> && cd AI for Research
    pnpm install:all                          # the app, functions/ and tools/migrate
    cp .firebaserc.example .firebaserc        # put your project id in it
    cp functions/.env.example functions/.env  # CONVERT_URL, PUBLIC_URL
@@ -175,6 +175,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) to send a change and [SECURITY.md](SECURI
 
 ## Licence
 
-Copyright © 2026 WriteOrbit. All rights reserved. This is proprietary software; it is not licensed for use, copying or distribution without written permission.
+Copyright © 2026 AI for Research. All rights reserved. This is proprietary software; it is not licensed for use, copying or distribution without written permission.
 
 Third-party software and the code this project is derived from are credited, with their licences, in [NOTICE](NOTICE).

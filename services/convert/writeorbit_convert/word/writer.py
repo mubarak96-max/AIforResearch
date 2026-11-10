@@ -119,7 +119,7 @@ def parse_bibtex(bibtex: str) -> dict:
 
 class WordWriter:
     def __init__(self, blocks: List[dict], settings: Optional[dict], comments: Optional[List[dict]], title: str,
-                 source: Optional[bytes], image_loader: Optional[ImageLoader] = None, author: str = "WriteOrbit"):
+                 source: Optional[bytes], image_loader: Optional[ImageLoader] = None, author: str = "AI for Research"):
         self.blocks = blocks or []
         self.settings = settings or {}
         self.comments = [c for c in (comments or []) if c.get("text")]
@@ -1020,5 +1020,5 @@ class WordWriter:
 
 
 def write_docx(blocks: List[dict], settings: Optional[dict] = None, comments: Optional[List[dict]] = None, title: str = "Document",
-               source: Optional[bytes] = None, image_loader: Optional[ImageLoader] = None, author: str = "WriteOrbit") -> bytes:
+               source: Optional[bytes] = None, image_loader: Optional[ImageLoader] = None, author: str = "AI for Research") -> bytes:
     return WordWriter(blocks, settings, comments, title, source, image_loader, author).write()

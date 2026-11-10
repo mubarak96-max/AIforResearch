@@ -1,5 +1,5 @@
 """Shared fixtures: the service under TestClient (with its real worker pool) and a small HTTP
-server standing in for the WriteOrbit API's internal asset endpoint."""
+server standing in for the AI for Research API's internal asset endpoint."""
 
 import shutil
 import threading

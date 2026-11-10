@@ -139,7 +139,7 @@ def export_job(request: dict, source: Optional[bytes]) -> Tuple[bytes, str, str,
             data = write_latex(request.get("blocks") or [], settings, title, author or None, loader)
         else:
             data = write_docx(request.get("blocks") or [], settings, request.get("comments"), title, source, loader,
-                              author or "WriteOrbit")
+                              author or "AI for Research")
         if fmt == "pdf":
             data = libreoffice_convert(data, "docx", "pdf", timeout=config.PDF_EXPORT_TIMEOUT)
     except LibreOfficeTimeout:

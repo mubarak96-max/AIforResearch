@@ -2,7 +2,7 @@ import { handle } from 'hono/vercel';
 import { getApp } from '@/lib/server';
 
 /**
- * The WriteOrbit API (lib/server, a Hono app) answering inside Next.js. The paths are the
+ * The AI for Research API (lib/server, a Hono app) answering inside Next.js. The paths are the
  * full URL paths (/api/... and /v1/...), so the editor package calls the same URLs as before.
  */
 export const runtime = 'nodejs';

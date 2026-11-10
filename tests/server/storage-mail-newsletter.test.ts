@@ -34,7 +34,7 @@ describe('file keys', () => {
 });
 
 describe('email', () => {
-  const s = (overrides: Partial<typeof env>) => ({ ...base, mailFrom: 'WriteOrbit <hello@example.test>', ...overrides });
+  const s = (overrides: Partial<typeof env>) => ({ ...base, mailFrom: 'AI for Research <hello@example.test>', ...overrides });
 
   it('needs a provider, its settings and a From address', () => {
     expect(mailProvider(s({ mailProvider: '' }))).toBeNull();
@@ -53,7 +53,7 @@ describe('email', () => {
   it('sends through Resend with the key and reply-to', () => {
     const mail = passwordResetEmail('a@b.test', 'https://example.test/reset-password#token=x');
     expect(resendBody(mail, s({ mailReplyTo: 'support@example.test' }))).toEqual({
-      from: 'WriteOrbit <hello@example.test>', to: ['a@b.test'], subject: 'Reset your WriteOrbit password', html: mail.html, text: mail.text, reply_to: 'support@example.test',
+      from: 'AI for Research <hello@example.test>', to: ['a@b.test'], subject: 'Reset your AI for Research password', html: mail.html, text: mail.text, reply_to: 'support@example.test',
     });
   });
 

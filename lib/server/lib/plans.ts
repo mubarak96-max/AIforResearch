@@ -88,7 +88,7 @@ export function normalizeLimits(raw: unknown): Limits {
   };
 }
 
-/** The plans WriteOrbit starts with: Free, Plus, Pro and Team. Prices in cents. */
+/** The plans AI for Research starts with: Free, Plus, Pro and Team. Prices in cents. */
 export const DEFAULT_PLANS: (Omit<PlanRow, 'dodo_monthly_product_id' | 'dodo_yearly_product_id' | 'dodo_mode' | 'limits'> & { limits: Limits; features: PlanFeature[] })[] = [
   {
     id: 'free', name: 'Free', tagline: 'Try everything, with daily limits', sort_order: 0, is_default: true, is_public: true, featured: false,
@@ -145,7 +145,7 @@ export const DEFAULT_PLANS: (Omit<PlanRow, 'dodo_monthly_product_id' | 'dodo_yea
   },
   {
     id: 'team', name: 'Team', tagline: 'For labs, departments and writing groups', sort_order: 3, is_default: false, is_public: true, featured: false,
-    checkout: 'contact', contact_url: env.supportEmail ? `mailto:${env.supportEmail}?subject=WriteOrbit%20Team` : null, monthly_cents: 0, yearly_cents: 0, currency: 'usd', trial_days: 0,
+    checkout: 'contact', contact_url: env.supportEmail ? `mailto:${env.supportEmail}?subject=AI for Research%20Team` : null, monthly_cents: 0, yearly_cents: 0, currency: 'usd', trial_days: 0,
     limits: UNLIMITED_LIMITS,
     features: [
       { label: 'Everything in Pro for each member', included: true },

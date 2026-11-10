@@ -1,9 +1,9 @@
-# WriteOrbit on LinkedIn: 30 posts and articles
+# AI for Research on LinkedIn: 30 posts and articles
 
 23 short posts and 7 long-form LinkedIn articles, set out as a six-week calendar (5 a week). Each one comes with an image prompt.
 
 **Before you publish**
-- Replace `[NAME]` with the person posting. Founder-voice posts do better than company-page posts, so post from a personal profile and reshare from the WriteOrbit page.
+- Replace `[NAME]` with the person posting. Founder-voice posts do better than company-page posts, so post from a personal profile and reshare from the AI for Research page.
 - LinkedIn shows posts with outside links to fewer people. Put the link in the **first comment** and write "Link in the first comment" in the post. Links inside articles are fine.
 - The paper count isn't consistent on the site: the homepage says **300M+** and the feature pages say **250M+**. These posts use 250M+. Pick one figure and use it everywhere.
 - Where a post says "screenshot", use a real capture from the app (`docs/images/editor.png`, `public/screenshots/`) rather than an AI image. AI-generated UI looks fake, and it misrepresents the product.
@@ -42,7 +42,7 @@ Every AI writing tool can write you a paragraph.
 
 Very few can tell you where that paragraph came from.
 
-That's why I built WriteOrbit, an AI editor for academic writing with one rule: every claim needs a real source.
+That's why I built AI for Research, an AI editor for academic writing with one rule: every claim needs a real source.
 
 What it does:
 → Suggests your next sentence and cites the paper it came from
@@ -80,7 +80,7 @@ This happens all the time. A language model writes text that *looks* like a cita
 
 The fix isn't "use AI less". It's to keep the citations out of the AI's memory altogether.
 
-In WriteOrbit, every citation comes from a scholarly database. The AI can suggest the sentence, but the reference is a real record you can click to open the paper.
+In AI for Research, every citation comes from a scholarly database. The AI can suggest the sentence, but the reference is a real record you can click to open the paper.
 
 If you can't click through to it, it doesn't go in your reference list.
 
@@ -98,7 +98,7 @@ Autocomplete for code changed how developers work.
 
 Academic writing never got its own version. Until now.
 
-In WriteOrbit, you start typing and the editor suggests your next sentence, *with the citation it's based on*.
+In AI for Research, you start typing and the editor suggests your next sentence, *with the citation it's based on*.
 
 → Press Tab to accept
 → Refine it if it's close but not quite right
@@ -149,9 +149,9 @@ The worst part is that checking afterwards takes a long time. You have to search
 
 **5. Keep a record of how you used AI.** More universities and journals now ask for an AI-use statement. It's much easier to write one honestly if your tools have kept a record as you worked.
 
-### How WriteOrbit does this
+### How AI for Research does this
 
-I built WriteOrbit around that workflow. The AI can suggest your next sentence, but every citation it attaches comes from a database of 250M+ scholarly works, and each one opens the paper behind it. Chat with your PDFs and answers quote the passage and give the page. Before you submit, the claim check flags unsupported or overstated claims, retracted papers, preprints and wrong DOIs, as comments in your text. An authorship report can show a supervisor how the document was written.
+I built AI for Research around that workflow. The AI can suggest your next sentence, but every citation it attaches comes from a database of 250M+ scholarly works, and each one opens the paper behind it. Chat with your PDFs and answers quote the passage and give the page. Before you submit, the claim check flags unsupported or overstated claims, retracted papers, preprints and wrong DOIs, as comments in your text. An authorship report can show a supervisor how the document was written.
 
 It's free to start at writeorbit.app.
 
@@ -171,7 +171,7 @@ Let the AI help with the writing, but always take the reference from a real data
 
 Small feature, big time saver:
 
-Type **@** in WriteOrbit and start typing a topic, author or title.
+Type **@** in AI for Research and start typing a topic, author or title.
 
 You're searching 250M+ scholarly works without leaving your sentence.
 
@@ -197,7 +197,7 @@ What's your current citing setup? I'm curious how many people still format refer
 
 That question used to take an afternoon.
 
-In WriteOrbit, upload your PDFs (or import them) and just ask. One paper or a whole folder.
+In AI for Research, upload your PDFs (or import them) and just ask. One paper or a whole folder.
 
 The part I care about most: **every answer quotes the passage it used and gives the page number.**
 
@@ -248,7 +248,7 @@ Before you submit anything, here are four things worth checking that most people
 3. **Retracted papers.** They're still cited thousands of times after retraction.
 4. **Wrong DOIs and preprints.** A typo'd DOI, or a preprint presented as peer-reviewed.
 
-WriteOrbit's claim and source check looks for all four and leaves comments right in your text, the way a careful co-author would.
+AI for Research's claim and source check looks for all four and leaves comments right in your text, the way a careful co-author would.
 
 It doesn't rewrite your argument. It points to the weak spots.
 
@@ -297,7 +297,7 @@ Here is the checklist I wish I'd had.
 
 ### Do it faster
 
-Doing this by hand takes most of a day, and that's why it often gets skipped. I built WriteOrbit's review tools for exactly this step:
+Doing this by hand takes most of a day, and that's why it often gets skipped. I built AI for Research's review tools for exactly this step:
 
 - **AI peer review** gives referee-style major and minor comments on argument, methods, evidence and clarity, placed in your text.
 - **Claim check** flags unsupported or overstated claims and citations the source doesn't back up.
@@ -322,7 +322,7 @@ Try it free at writeorbit.app.
 
 More and more students, freelancers and researchers are being asked this, and an AI detector score isn't a fair answer. They get it wrong, and they disproportionately flag non-native English writers.
 
-So WriteOrbit takes the opposite approach: **show how the document was written.**
+So AI for Research takes the opposite approach: **show how the document was written.**
 
 The authorship report shows:
 → Time spent writing
@@ -352,7 +352,7 @@ Things academic writers shouldn't have to do in 2026:
 ✗ Copy-paste from Google Docs into Word and fix every heading
 ✗ Re-type equations and tables to move to Overleaf
 
-In WriteOrbit:
+In AI for Research:
 ✓ Open your .docx template and it keeps its styles, headers and page setup
 ✓ Export to Word, PDF, or a **full LaTeX project** for Overleaf
 ✓ Headings, tables, equations and references come with it
@@ -376,7 +376,7 @@ Researchers have built these in Excel for decades because it works: once you can
 
 The problem is filling it in. 40 papers × 6 columns is 240 cells of careful reading.
 
-WriteOrbit's review matrix fills the cells from your PDFs, **with the quote and page number for every cell** so you can check each one.
+AI for Research's review matrix fills the cells from your PDFs, **with the quote and page number for every cell** so you can check each one.
 
 Then it drafts your literature review from the matrix, with real citations.
 
@@ -437,7 +437,7 @@ Your gap should come straight out of the matrix: the empty cells, the under-stud
 
 ### Doing this faster
 
-The method is old and it works, but filling in 200+ cells is the bottleneck. In WriteOrbit's literature review tool you add your PDFs, choose your columns, and the matrix fills from the papers, **with the quote and page for every cell**, so you check the evidence rather than trust a summary. From there it can draft the review with real citations in your style, for you to edit into your own argument.
+The method is old and it works, but filling in 200+ cells is the bottleneck. In AI for Research's literature review tool you add your PDFs, choose your columns, and the matrix fills from the papers, **with the quote and page for every cell**, so you check the evidence rather than trust a summary. From there it can draft the review with real citations in your style, for you to edit into your own argument.
 
 There's also a free research gap finder at writeorbit.app/tools/research-gap-finder if you want a first pass at the gaps in a topic.
 
@@ -482,7 +482,7 @@ Try it on your topic and tell me if it found something you hadn't seen.
 
 Fair. Nobody wants to rebuild 600 references.
 
-So you don't have to. WriteOrbit imports from **Zotero, Mendeley, BibTeX and RIS**.
+So you don't have to. AI for Research imports from **Zotero, Mendeley, BibTeX and RIS**.
 
 Once they're in:
 → Cite any of them in 10,000+ styles
@@ -514,7 +514,7 @@ There's a better question than "did they use AI?":
 
 **"Can they show me how they wrote it, and do their sources hold up?"**
 
-Two things in WriteOrbit help with exactly that:
+Two things in AI for Research help with exactly that:
 
 1. **Authorship report.** The student shares a link showing writing time, typed vs. pasted text, and AI-accepted text. You open it without an account.
 2. **Real citations only.** References come from scholarly databases and open the source, so a made-up reference can't get in through the tool.
@@ -550,7 +550,7 @@ Here's a workflow that satisfies all three and makes life easier for the student
 
 **Keep a record as you go.** Writing an AI-use statement from memory at the end is hard and often inaccurate. Use tools that log how the document was written.
 
-**Write a specific disclosure.** "I used AI" says nothing. Better: "I used WriteOrbit's paper search to find sources, the PDF chat to summarise six papers before reading them in full, and the proofreading tool for grammar suggestions, which I reviewed individually."
+**Write a specific disclosure.** "I used AI" says nothing. Better: "I used AI for Research's paper search to find sources, the PDF chat to summarise six papers before reading them in full, and the proofreading tool for grammar suggestions, which I reviewed individually."
 
 ### For supervisors and teachers
 
@@ -560,16 +560,16 @@ Here's a workflow that satisfies all three and makes life easier for the student
 
 **Talk to them.** A ten-minute conversation about the argument confirms authorship better than any software.
 
-### Where WriteOrbit fits
+### Where AI for Research fits
 
-I built WriteOrbit with this workflow in mind:
+I built AI for Research with this workflow in mind:
 
 - **Citations come from scholarly databases** (250M+ works), never from the AI's memory, and every one opens the source.
 - **The authorship report** records writing time and typed, pasted and AI-accepted text. The student decides when to share the link, and the supervisor opens it without an account.
 - **The AI writing pattern checker** helps students find stock AI phrasing in their own drafts. It's an editing aid, deliberately not a detector.
 - **Your documents are not used to train AI.**
 
-There's a full page on how WriteOrbit handles AI use at writeorbit.app/ai-use.
+There's a full page on how AI for Research handles AI use at writeorbit.app/ai-use.
 
 *Supervisors: what would make you trust a student's AI disclosure? Students: what makes the rules confusing? Both views welcome below.*
 
@@ -611,7 +611,7 @@ Now the hard part nobody warns you about: turning an 80-page chapter into an 8,0
 
 It's not just cutting. The structure is different, the audience is different, and the "why this matters" has to land in two paragraphs, not twenty pages.
 
-WriteOrbit's **thesis-to-manuscript** tool takes a chapter and gives you:
+AI for Research's **thesis-to-manuscript** tool takes a chapter and gives you:
 → A tighter IMRaD structure
 → A target word count per section
 → A clear list: what to cut, what to keep, what to add
@@ -632,7 +632,7 @@ Grant writing is a strange genre: part research, part sales, all deadline.
 
 The structure is fairly standard (summary, aims, significance, approach, outcomes, timeline), so a first draft shouldn't take a week.
 
-WriteOrbit's grant proposal writer drafts that structure from your idea, and the **significance section comes with real citations**, because that's the part reviewers check first.
+AI for Research's grant proposal writer drafts that structure from your idea, and the **significance section comes with real citations**, because that's the part reviewers check first.
 
 Then you open it in the editor and rewrite it to your funder's rules and your own voice.
 
@@ -696,7 +696,7 @@ Journal scope, word limits and reference style should shape the draft, not come 
 
 Ask a colleague, or a tool, to review it as a referee would. Fix the major comments before a real reviewer finds them.
 
-### How WriteOrbit helps
+### How AI for Research helps
 
 The **thesis-to-manuscript** tool takes your chapter and proposes a tighter IMRaD structure, a target word count per section, and a list of what to cut, keep and add. You then write the article in the editor with your citations intact. Change the reference style to your journal's (10,000+ available) in one click, run **AI peer review** for referee-style comments, and export Word or LaTeX for submission.
 
@@ -716,7 +716,7 @@ Academic writing is rarely solo, but the tools usually assume it is.
 
 Five co-authors. One Word file called `manuscript_FINAL_v7_JS_edits_REAL.docx`. You know how this goes.
 
-WriteOrbit is built for the way labs actually write:
+AI for Research is built for the way labs actually write:
 → Real-time editing in the same document
 → Comments and suggestions (tracked changes)
 → Version history
@@ -735,7 +735,7 @@ There's a **Team plan** for labs, departments and writing groups. If you run one
 
 Some of my best paragraphs got written on a train.
 
-Most "mobile apps" for writing are viewers that let you fix a typo. WriteOrbit on your phone is **the full editor**:
+Most "mobile apps" for writing are viewers that let you fix a typo. AI for Research on your phone is **the full editor**:
 
 → Write and edit
 → Cite with @
@@ -759,7 +759,7 @@ A question I get a lot: "Will my thesis be used to train AI?"
 
 No.
 
-WriteOrbit doesn't train AI on your documents. Your drafts stay private to you and the people you choose to share them with.
+AI for Research doesn't train AI on your documents. Your drafts stay private to you and the people you choose to share them with.
 
 This matters more in academia than most places:
 → Unpublished findings are your competitive edge
@@ -820,11 +820,11 @@ That's where most citation errors happen, and where AI now helps or hurts depend
 5. **Pre-submission checks.** Retractions, preprints, DOIs, unsupported claims.
 6. **Your target format.** Word templates, LaTeX for Overleaf, 10,000+ styles.
 
-### Where WriteOrbit fits
+### Where AI for Research fits
 
-WriteOrbit isn't trying to replace your reference manager. It's the writing environment around it. Import your Zotero or Mendeley library (or BibTeX/RIS), then @-cite while you write, search 250M+ works, chat with your PDFs with page numbers, check claims and sources before you submit, and export Word, PDF or LaTeX.
+AI for Research isn't trying to replace your reference manager. It's the writing environment around it. Import your Zotero or Mendeley library (or BibTeX/RIS), then @-cite while you write, search 250M+ works, chat with your PDFs with page numbers, check claims and sources before you submit, and export Word, PDF or LaTeX.
 
-Many people keep Zotero for collecting and use WriteOrbit for writing. That's a perfectly good setup.
+Many people keep Zotero for collecting and use AI for Research for writing. That's a perfectly good setup.
 
 Free to start at writeorbit.app.
 
@@ -842,7 +842,7 @@ Free to start at writeorbit.app.
 
 Need a quick t-test for a report and don't want to open SPSS?
 
-WriteOrbit has a free **quick data analysis** tool:
+AI for Research has a free **quick data analysis** tool:
 
 Upload a CSV → get:
 → Descriptive statistics
@@ -868,7 +868,7 @@ Not a replacement for R or a proper stats package on a big study. Very handy for
 
 For edtech builders, research-tool developers and anyone building with AI:
 
-WriteOrbit has a **developer API**: one key for:
+AI for Research has a **developer API**: one key for:
 
 → Scholarly paper search and lookup
 → Full text and PDFs (where a copy is available, with source and licence)
@@ -894,7 +894,7 @@ If you're building an AI agent that cites sources, the reference-check endpoint 
 
 Every academic has dropped a PDF into a random "free PDF merger" site and quietly wondered where it went.
 
-WriteOrbit's free PDF tools let you:
+AI for Research's free PDF tools let you:
 → Merge
 → Split
 → Extract pages
@@ -957,7 +957,7 @@ Keep notes linking each claim to its source. When an editor, client or reader as
 
 ### Tools that help
 
-I built WriteOrbit for writing with sources. For fact-checking it helps in three ways:
+I built AI for Research for writing with sources. For fact-checking it helps in three ways:
 
 - **Claim check** reads your draft and flags claims that are unsupported or overstated, and shows where a citation is needed.
 - **Source quality** flags retracted papers, preprints and wrong DOIs.
@@ -977,7 +977,7 @@ More on this at writeorbit.app/blog/ai-fact-checker. Free to start.
 
 ## 30 · Post · Founder note
 
-Six weeks ago I started posting about WriteOrbit here. Thank you to everyone who tried it, broke it and told me.
+Six weeks ago I started posting about AI for Research here. Thank you to everyone who tried it, broke it and told me.
 
 A quick recap of what it is:
 

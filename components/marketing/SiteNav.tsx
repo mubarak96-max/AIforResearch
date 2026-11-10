@@ -115,7 +115,7 @@ export function SiteNav() {
           <div className="flex h-14 shrink-0 items-center px-4">
             <Link href="/" onClick={() => setOpen(false)} className={`rounded-lg ${focusRing}`}>
               <Logo size={26} />
-              <span className="sr-only">WriteOrbit home</span>
+              <span className="sr-only">AI for Research home</span>
             </Link>
             <button
               type="button"

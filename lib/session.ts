@@ -10,7 +10,7 @@ import { appCheckHeader, firebaseAuth, firebaseCode, firebaseMessage } from '@/l
 /**
  * The signed-in person. Firebase Authentication keeps the sign-in (and refreshes the ID token
  * every hour); this module mirrors it for the app: the latest ID token for synchronous callers
- * (the editor's fetch helpers), the person's WriteOrbit profile from /api/auth/me, and the
+ * (the editor's fetch helpers), the person's AI for Research profile from /api/auth/me, and the
  * `writeorbit_signed_in` cookie the server uses to render signed-in pages without a flash.
  */
 
@@ -153,7 +153,7 @@ async function freshToken(force = false): Promise<string | null> {
   return token;
 }
 
-/** Calls the WriteOrbit API with the ID token; throws an Error with the server's message. */
+/** Calls the AI for Research API with the ID token; throws an Error with the server's message. */
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const send = async (token: string | null) => {
     const headers: Record<string, string> = { ...(await appCheckHeader()), ...(init.headers as Record<string, string> | undefined) };

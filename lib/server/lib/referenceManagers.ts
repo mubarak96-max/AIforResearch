@@ -127,7 +127,7 @@ export async function zoteroAuthorizeUrl(userId: string, next: string) {
   for (const [key, value] of pendingZotero) if (Date.now() - value.at > 15 * 60_000) pendingZotero.delete(key);
   pendingZotero.set(token, { userId, secret, next, at: Date.now() });
   const url = new URL('https://www.zotero.org/oauth/authorize');
-  url.search = new URLSearchParams({ oauth_token: token, name: 'WriteOrbit', library_access: '1', notes_access: '0', write_access: '0', all_groups: 'none' }).toString();
+  url.search = new URLSearchParams({ oauth_token: token, name: 'AI for Research', library_access: '1', notes_access: '0', write_access: '0', all_groups: 'none' }).toString();
   return url.toString();
 }
 

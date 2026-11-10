@@ -71,7 +71,7 @@ export async function signedUrl(key: string, minutes = 15): Promise<string> {
 export async function testStorage() {
   const started = Date.now();
   const key = `writeorbit-check/${randomUUID()}.txt`;
-  const body = new TextEncoder().encode(`WriteOrbit storage check ${new Date().toISOString()}`);
+  const body = new TextEncoder().encode(`AI for Research storage check ${new Date().toISOString()}`);
   await saveFile(key, body, 'text/plain');
   const read = await readFileBytes(key);
   await deleteFile(key);

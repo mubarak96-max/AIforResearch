@@ -6,7 +6,7 @@ import { HelpSearch } from '@/components/marketing/HelpSearch';
 export const metadata = pageMetadata({
   title: 'Help center: writing, citations and export',
   path: '/help',
-  description: 'How to write, cite, check and export in WriteOrbit: autocomplete, citations, Library, AI Chat, Claim check, Word, PDF and LaTeX export, and keyboard shortcuts.',
+  description: 'How to write, cite, check and export in AI for Research: autocomplete, citations, Library, AI Chat, Claim check, Word, PDF and LaTeX export, and keyboard shortcuts.',
 });
 
 type Topic = { id: string; title: string; items: [string, React.ReactNode][] };
@@ -38,7 +38,7 @@ const TOPICS: Topic[] = [
     id: 'cite',
     title: 'Citations and references',
     items: [
-      ['Cite', <>Type {kbd('@')} or use Cite in the toolbar, then search your Library and published papers. WriteOrbit builds the reference list under References.</>],
+      ['Cite', <>Type {kbd('@')} or use Cite in the toolbar, then search your Library and published papers. AI for Research builds the reference list under References.</>],
       ['Style', <>Pick a style in the status bar (APA, MLA, Chicago, Harvard, AMA, ACS, IEEE, Vancouver and more). Every citation and reference updates. <Link href="/citation-styles" className="text-brand underline-offset-4 hover:underline">See all styles</Link></>],
       ['A citation', <>Click a citation to open the paper, save it to your Library, switch to Author (Year) or edit it.</>],
     ],
@@ -87,7 +87,7 @@ const TOPICS: Topic[] = [
       ['Where papers come from', <>From a scholarly index of over 250 million works built on OpenAlex. Records come from publishers, Crossref, PubMed and repositories.</>],
       ['Are citations real?', <>Yes. AI features cite papers from search results or your Library, never from the model’s memory. The text around a citation is still AI-written: check that the source says what the sentence claims.</>],
       ['Abstract only', <>Many records have only a title and abstract. AI answers built on them say less than the full paper might. Upload the PDF to your Library to ask about the full text.</>],
-      ['Wrong details', <>Click a citation to edit it. Records in the index are corrected by OpenAlex, not by WriteOrbit.</>],
+      ['Wrong details', <>Click a citation to edit it. Records in the index are corrected by OpenAlex, not by AI for Research.</>],
     ],
   },
   {
@@ -136,7 +136,7 @@ export default function HelpPage() {
     <div className={container}>
       <div className="pb-6 pt-10 md:pt-[46px]">
         <h1 className="text-[34px] font-bold tracking-[-0.03em] text-ink sm:text-[42px]">Help center</h1>
-        <p className="mt-2 text-[17px] text-ink-2">Short answers on how to write, cite, check and export in WriteOrbit.</p>
+        <p className="mt-2 text-[17px] text-ink-2">Short answers on how to write, cite, check and export in AI for Research.</p>
       </div>
       <div className="grid gap-10 pb-20 md:grid-cols-[200px_minmax(0,1fr)] md:gap-14">
         <nav aria-label="Topics" className="hidden md:block">

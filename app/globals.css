@@ -3,7 +3,7 @@
 @source "../components/editor";
 
 /*
- * WriteOrbit design tokens: "Ink & Paper" (light) with a "Nocturne" dark theme.
+ * AI for Research design tokens: "Ink & Paper" (light) with a "Nocturne" dark theme.
  * Colours come only from these. Components use the token utilities (bg-surface, text-ink,
  * border-line, bg-brand + text-on-brand ...) or var(--color-*), so both themes follow.
  * Light values live in @theme; dark values override the same variables below.

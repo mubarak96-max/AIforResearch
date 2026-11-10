@@ -6,7 +6,7 @@ import { pageMetadata } from '@/components/marketing/seo';
 export const metadata = pageMetadata({
   title: 'Cookies and browser storage',
   path: '/cookies',
-  description: 'The cookies and browser storage WriteOrbit uses: what each is for, how long it lasts and how to clear it.',
+  description: 'The cookies and browser storage AI for Research uses: what each is for, how long it lasts and how to clear it.',
 });
 
 const row = (name: string, purpose: string, kept: string) => (
@@ -35,10 +35,10 @@ const table = (rows: ReactNode) => (
 const SECTIONS: LegalSection[] = [
   {
     id: 'needed',
-    title: 'Needed to run WriteOrbit',
+    title: 'Needed to run AI for Research',
     body: (
       <>
-        <p>These keep you signed in and keep the service secure. WriteOrbit does not work without them.</p>
+        <p>These keep you signed in and keep the service secure. AI for Research does not work without them.</p>
         {table([
           row('writeorbit_signed_in', 'A cookie that only says you are signed in, so pages show the right buttons before they load. It holds no password or token.', 'Until you sign out'),
           row('Firebase Authentication', 'Your sign-in session, kept by Google’s Firebase in your browser’s storage.', 'Until you sign out'),
@@ -69,8 +69,8 @@ const SECTIONS: LegalSection[] = [
     title: 'Analytics',
     body: (
       <>
-        <p>We use Google Tag Manager to load Google Analytics, which sets cookies (such as <code>_ga</code>) to count visits and see which pages are used. This helps us improve WriteOrbit. It does not read your documents.</p>
-        <p>You can block these cookies in your browser settings or with a content blocker; WriteOrbit keeps working.</p>
+        <p>We use Google Tag Manager to load Google Analytics, which sets cookies (such as <code>_ga</code>) to count visits and see which pages are used. This helps us improve AI for Research. It does not read your documents.</p>
+        <p>You can block these cookies in your browser settings or with a content blocker; AI for Research keeps working.</p>
       </>
     ),
   },
@@ -87,5 +87,5 @@ const SECTIONS: LegalSection[] = [
 ];
 
 export default function CookiesPage() {
-  return <LegalPage title="Cookies and browser storage" updated="2026-11-09" intro={<p>What WriteOrbit stores in your browser, and why.</p>} sections={SECTIONS} />;
+  return <LegalPage title="Cookies and browser storage" updated="2026-11-09" intro={<p>What AI for Research stores in your browser, and why.</p>} sections={SECTIONS} />;
 }

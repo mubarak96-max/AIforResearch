@@ -31,7 +31,7 @@ export function SiteHeader() {
         <div className={`${container} flex h-14 items-center md:h-16`}>
           <Link href="/" className={`shrink-0 rounded-lg ${focusRing}`}>
             <Logo size={26} />
-            <span className="sr-only">WriteOrbit home</span>
+            <span className="sr-only">AI for Research home</span>
           </Link>
           <SiteNav />
         </div>

@@ -1,4 +1,4 @@
-# Moving a self-hosted WriteOrbit to Firebase
+# Moving a self-hosted AI for Research to Firebase
 
 `migrate.ts` reads the old PostgreSQL database and files folder and writes Firestore, Cloud
 Storage and Firebase Authentication as described in [docs/data-model.md](../../docs/data-model.md).

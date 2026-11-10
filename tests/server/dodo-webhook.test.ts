@@ -97,7 +97,7 @@ describe('Dodo Payments webhook', () => {
     expect(ledger()).toHaveLength(0);
   });
 
-  it('ignores payments that are not WriteOrbit credits, or not paid', async () => {
+  it('ignores payments that are not AI for Research credits, or not paid', async () => {
     await send(event('payment.succeeded', payment('pay_6', { metadata: {} })));
     await send(event('payment.succeeded', payment('pay_7', { status: 'processing', metadata: { writeorbit_kind: 'credits', writeorbit_account_id: 'acc_3', pack: 'credits_2000' } })));
     expect(ledger()).toHaveLength(0);

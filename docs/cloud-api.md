@@ -1,4 +1,4 @@
-# WriteOrbit developer API
+# AI for Research developer API
 
 One key for scholarly papers, full text, research tools, AI, peer review and document conversion. Base URL `https://<your site>/v1`. Every request sends the key as a Bearer token:
 
@@ -6,7 +6,7 @@ One key for scholarly papers, full text, research tools, AI, peer review and doc
 Authorization: Bearer vm_live_…
 ```
 
-Create keys and buy credits at `https://<your site>/developers/keys`. Every WriteOrbit deployment runs the same gateway at `<your PUBLIC_URL>/v1`.
+Create keys and buy credits at `https://<your site>/developers/keys`. Every AI for Research deployment runs the same gateway at `<your PUBLIC_URL>/v1`.
 
 ## Credits
 

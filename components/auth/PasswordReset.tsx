@@ -66,7 +66,7 @@ export function ForgotPasswordForm() {
       <AuthCard title="Check your email">
         <div className="-mt-1 flex flex-col items-center text-center">
           <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand"><LuMailCheck size={22} aria-hidden="true" /></span>
-          <p className="mt-4 text-[15px] leading-[1.6] text-ink-2">If <strong className="font-semibold text-ink">{sent}</strong> has a WriteOrbit account, a reset link is on its way.</p>
+          <p className="mt-4 text-[15px] leading-[1.6] text-ink-2">If <strong className="font-semibold text-ink">{sent}</strong> has an AI for Research account, a reset link is on its way.</p>
         </div>
         <button type="button" onClick={() => setSent(null)} className={`${btnGhost} mt-6 h-12 w-full text-base`}>Use another email</button>
         <BackToSignIn />
@@ -186,7 +186,7 @@ export function ConfirmEmail() {
         <span className="grid h-12 w-12 place-items-center rounded-2xl bg-green-50 text-green-600"><LuCircleCheck size={22} aria-hidden="true" /></span>
         <p className="mt-4 text-[15px] leading-[1.6] text-ink-2">Your email address is confirmed.</p>
       </div>
-      <Link href="/editor" className={`${btnPrimary} mt-6 h-12 w-full text-base`}>Open WriteOrbit</Link>
+      <Link href="/editor" className={`${btnPrimary} mt-6 h-12 w-full text-base`}>Open AI for Research</Link>
     </AuthCard>
   );
 }

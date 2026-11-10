@@ -5,7 +5,7 @@ import { pageMetadata } from '@/components/marketing/seo';
 export const metadata = pageMetadata({
   title: 'Terms of service',
   path: '/terms',
-  description: 'The terms for using WriteOrbit: your account, your content, plans and billing, fair use of the AI features, and what to check before you submit.',
+  description: 'The terms for using AI for Research: your account, your content, plans and billing, fair use of the AI features, and what to check before you submit.',
 });
 
 const link = 'text-ink underline underline-offset-4 hover:text-brand';
@@ -13,8 +13,8 @@ const link = 'text-ink underline underline-offset-4 hover:text-brand';
 const SECTIONS: LegalSection[] = [
   {
     id: 'agreement',
-    title: 'Using WriteOrbit',
-    body: <p>By creating an account or using WriteOrbit you agree to these terms and to our <Link href="/privacy" className={link}>privacy policy</Link>. If you use WriteOrbit for an organization, you confirm you may accept these terms for it. You must be at least 13, and old enough to agree to these terms where you live.</p>,
+    title: 'Using AI for Research',
+    body: <p>By creating an account or using AI for Research you agree to these terms and to our <Link href="/privacy" className={link}>privacy policy</Link>. If you use AI for Research for an organization, you confirm you may accept these terms for it. You must be at least 13, and old enough to agree to these terms where you live.</p>,
   },
   {
     id: 'account',
@@ -37,7 +37,7 @@ const SECTIONS: LegalSection[] = [
     body: (
       <>
         <p>AI suggestions, reviews and claim checks can be wrong or incomplete. Citations point to real records in scholarly databases, but you are responsible for reading your sources, checking that they support what you write, and following the rules of your school, journal or publication on AI use and plagiarism.</p>
-        <p>WriteOrbit is a writing tool, not legal, medical or professional advice.</p>
+        <p>AI for Research is a writing tool, not legal, medical or professional advice.</p>
       </>
     ),
   },
@@ -46,7 +46,7 @@ const SECTIONS: LegalSection[] = [
     title: 'Acceptable use',
     body: (
       <>
-        <p>Do not use WriteOrbit to:</p>
+        <p>Do not use AI for Research to:</p>
         <ul>
           <li>break the law or infringe anyone&rsquo;s rights, including copyright;</li>
           <li>harass people or create content meant to deceive or harm;</li>
@@ -69,7 +69,7 @@ const SECTIONS: LegalSection[] = [
   {
     id: 'api',
     title: 'Developer API',
-    body: <p>Use of the <Link href="/developers" className={link}>WriteOrbit API</Link> is billed as you go and must follow these terms. Keep your API keys secret; you are responsible for usage under them.</p>,
+    body: <p>Use of the <Link href="/developers" className={link}>AI for Research API</Link> is billed as you go and must follow these terms. Keep your API keys secret; you are responsible for usage under them.</p>,
   },
   {
     id: 'termination',
@@ -79,12 +79,12 @@ const SECTIONS: LegalSection[] = [
   {
     id: 'liability',
     title: 'Warranty and liability',
-    body: <p>We work hard to keep WriteOrbit available and your work safe, but the service is provided &ldquo;as is&rdquo;. Keep your own copies of important work (Word, PDF or LaTeX export makes this easy). To the extent the law allows, {COMPANY.name} is not liable for indirect or consequential losses, and our total liability is limited to what you paid us in the 12 months before the claim. Nothing in these terms limits rights you have under consumer law.</p>,
+    body: <p>We work hard to keep AI for Research available and your work safe, but the service is provided &ldquo;as is&rdquo;. Keep your own copies of important work (Word, PDF or LaTeX export makes this easy). To the extent the law allows, {COMPANY.name} is not liable for indirect or consequential losses, and our total liability is limited to what you paid us in the 12 months before the claim. Nothing in these terms limits rights you have under consumer law.</p>,
   },
   {
     id: 'changes',
     title: 'Changes and contact',
-    body: <p>If we change these terms in a way that matters, we will tell you before the change applies; if you keep using WriteOrbit after that, the new terms apply. Questions? <ContactLine />.</p>,
+    body: <p>If we change these terms in a way that matters, we will tell you before the change applies; if you keep using AI for Research after that, the new terms apply. Questions? <ContactLine />.</p>,
   },
 ];
 
@@ -93,7 +93,7 @@ export default function TermsPage() {
     <LegalPage
       title="Terms of service"
       updated="2026-11-06"
-      intro={<p>These terms are the agreement between you and {COMPANY.name} for using WriteOrbit. We have kept them short and plain.</p>}
+      intro={<p>These terms are the agreement between you and {COMPANY.name} for using AI for Research. We have kept them short and plain.</p>}
       sections={SECTIONS}
     />
   );

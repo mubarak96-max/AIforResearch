@@ -3,9 +3,9 @@ import { ContactLine, LegalPage, type LegalSection } from '@/components/marketin
 import { pageMetadata } from '@/components/marketing/seo';
 
 export const metadata = pageMetadata({
-  title: 'How WriteOrbit uses AI',
+  title: 'How AI for Research uses AI',
   path: '/ai-use',
-  description: 'Where WriteOrbit uses AI, what it sends to AI providers, what AI cannot do, and how to use it with integrity. Your documents are never used to train AI.',
+  description: 'Where AI for Research uses AI, what it sends to AI providers, what AI cannot do, and how to use it with integrity. Your documents are never used to train AI.',
 });
 
 const link = 'text-ink underline underline-offset-4 hover:text-brand';
@@ -72,5 +72,5 @@ const SECTIONS: LegalSection[] = [
 ];
 
 export default function AiUsePage() {
-  return <LegalPage title="How WriteOrbit uses AI" updated="2026-11-09" intro={<p>Where AI is used, what it can and cannot do, and how your writing is handled.</p>} sections={SECTIONS} />;
+  return <LegalPage title="How AI for Research uses AI" updated="2026-11-09" intro={<p>Where AI is used, what it can and cannot do, and how your writing is handled.</p>} sections={SECTIONS} />;
 }

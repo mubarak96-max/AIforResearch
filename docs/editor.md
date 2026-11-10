@@ -1,8 +1,8 @@
 # The editor (components/editor)
 
-The WriteOrbit academic editor: autocomplete with citations, @-cite, a Library with PDF chat, AI review, comments, suggestions, version history, real-time collaboration, and Word, LaTeX and PDF export. Built on BlockNote (ProseMirror) and Yjs.
+The AI for Research academic editor: autocomplete with citations, @-cite, a Library with PDF chat, AI review, comments, suggestions, version history, real-time collaboration, and Word, LaTeX and PDF export. Built on BlockNote (ProseMirror) and Yjs.
 
-It is the user interface. It talks to a WriteOrbit server (`lib/server` in this repo, which runs inside the web app's route handlers, or your own implementation of the same API) for documents, AI, papers and sync.
+It is the user interface. It talks to an AI for Research server (`lib/server` in this repo, which runs inside the web app's route handlers, or your own implementation of the same API) for documents, AI, papers and sync.
 
 ## Mount it
 
@@ -13,7 +13,7 @@ import { WriteOrbitEditor, WriteOrbitEditorProvider, type WriteOrbitEditorConfig
 import '@/components/editor/styles.css';
 
 const config: WriteOrbitEditorConfig = {
-  apiBase: 'https://write.example.edu',      // your WriteOrbit server ('' = same origin)
+  apiBase: 'https://write.example.edu',      // your AI for Research server ('' = same origin)
   getToken: () => session.token,             // a token the server accepts, or null
   user: { id: 'u1', email: 'ada@example.edu', full_name: 'Ada Lovelace' },
   onRequireSignIn: () => router.push('/login'),

@@ -24,9 +24,9 @@ const SAMPLE = [
 ];
 const now = Date.now();
 const COMMENTS = [
-  { id: crypto.randomUUID(), actorSessionId: 'ai', actorDisplayName: 'WriteOrbit AI', kind: 'ai-review', severity: 'major', category: 'evidence', blockId: introId, createdAt: now - 120000, status: 'open', replies: [],
+  { id: crypto.randomUUID(), actorSessionId: 'ai', actorDisplayName: 'AI for Research AI', kind: 'ai-review', severity: 'major', category: 'evidence', blockId: introId, createdAt: now - 120000, status: 'open', replies: [],
     selectedText: 'Slow-wave sleep in particular appears to promote the reactivation…', text: 'Most of this evidence comes from young adults in lab settings. Qualify the claim, or cite a study that includes older adults.' },
-  { id: crypto.randomUUID(), actorSessionId: 'ai', actorDisplayName: 'WriteOrbit AI', kind: 'ai-review', severity: 'minor', category: 'clarity', blockId: introId, createdAt: now - 120000, status: 'open', replies: [],
+  { id: crypto.randomUUID(), actorSessionId: 'ai', actorDisplayName: 'AI for Research AI', kind: 'ai-review', severity: 'minor', category: 'clarity', blockId: introId, createdAt: now - 120000, status: 'open', replies: [],
     selectedText: 'Over the past two decades…', text: 'Give a date range or a citation for this trend so the reader can check it.' },
   { id: crypto.randomUUID(), actorSessionId: 'joseph', actorDisplayName: 'Joseph N.', blockId: introId, createdAt: now - 3600000, status: 'open', replies: [],
     text: 'Could we add the meta-analysis we talked about on Tuesday here?' },

@@ -1,5 +1,5 @@
 /**
- * The animated product tour under the hero: the WriteOrbit editor drawn in HTML/CSS, playing one
+ * The animated product tour under the hero: the AI for Research editor drawn in HTML/CSS, playing one
  * 16-second loop of the real workflow. No client JS; the timeline lives in globals.css
  * ("Hero demo"), one keyframe per element, all on the same cycle:
  *
@@ -57,7 +57,7 @@ export function HeroDemo() {
   return (
     <div
       role="img"
-      aria-label="An animation of the WriteOrbit editor. Autocomplete suggests the next sentence with a citation and it is accepted with Tab; typing @ finds a paper and cites it; Claim check flags an unsupported claim and adds a source; the paper is exported to Word with its reference list."
+      aria-label="An animation of the AI for Research editor. Autocomplete suggests the next sentence with a citation and it is accepted with Tab; typing @ finds a paper and cites it; Claim check flags an unsupported claim and adds a source; the paper is exported to Word with its reference list."
       className="wo-hero"
     >
       <div aria-hidden="true" className="overflow-hidden rounded-[12px] border border-line bg-surface text-left shadow-[0_40px_80px_-44px_rgba(15,23,42,.45)] md:rounded-[16px]">

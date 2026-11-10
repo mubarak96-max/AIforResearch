@@ -6,12 +6,12 @@ const OG_IMAGE = {
   url: '/screenshots/editor.png',
   width: 2160,
   height: 1350,
-  alt: 'The WriteOrbit editor: a paper with AI autocomplete suggesting a cited sentence, and AI chat beside it',
+  alt: 'The AI for Research editor: a paper with AI autocomplete suggesting a cited sentence, and AI chat beside it',
 };
 
 /**
  * Title, description, canonical URL, Open Graph and Twitter tags for a public page.
- * `title` gets the " · WriteOrbit" suffix from the root layout unless `absolute` is set.
+ * `title` gets the " · AI for Research" suffix from the root layout unless `absolute` is set.
  * `image: false` leaves the preview image to an opengraph-image file next to the page
  * (X falls back to og:image when there is no twitter:image).
  */

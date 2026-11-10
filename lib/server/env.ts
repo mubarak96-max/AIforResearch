@@ -98,6 +98,6 @@ export const env = {
 };
 
 /** The product name used in emails, the AI provider headers and the User-Agent (APP_NAME to change it). */
-export const APP_NAME = read('APP_NAME', 'WriteOrbit');
+export const APP_NAME = read('APP_NAME', 'AI for Research');
 /** Sent to OpenAlex, Scholar and publishers; they ask for a contact URL. */
 export const USER_AGENT = `${APP_NAME}/0.2 (+${env.publicUrl})`;

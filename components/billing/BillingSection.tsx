@@ -119,7 +119,7 @@ export function BillingSection() {
   const price = shown && paying ? (interval === 'year' ? `${money(shown.yearly_cents, shown.currency)} / year` : `${money(shown.monthly_cents, shown.currency)} / month`) : null;
   const status = !sub || sub.source === 'default' || (!paying && !lapsed && sub.source !== 'admin')
     ? null
-    : sub.source === 'admin' ? { tone: 'brand' as const, label: 'Given by WriteOrbit' }
+    : sub.source === 'admin' ? { tone: 'brand' as const, label: 'Given by AI for Research' }
     : sub.status === 'past_due' ? { tone: 'negative' as const, label: 'Payment failed' }
     : sub.status === 'trialing' ? { tone: 'brand' as const, label: 'Trial' }
     : sub.cancel_at_period_end ? { tone: 'warning' as const, label: 'Cancelled' }

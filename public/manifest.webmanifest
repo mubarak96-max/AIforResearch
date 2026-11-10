@@ -1,6 +1,6 @@
 {
-  "name": "WriteOrbit",
-  "short_name": "WriteOrbit",
+  "name": "AI for Research",
+  "short_name": "AI for Research",
   "description": "The AI writing editor that cites real sources",
   "start_url": "/editor",
   "display": "standalone",

@@ -1,5 +1,5 @@
 """writeorbit-convert HTTP service (port 4100, internal only). Stateless: no auth, no database, no
-storage. The WriteOrbit API server owns those and calls this service. Contract: README.md."""
+storage. The AI for Research API server owns those and calls this service. Contract: README.md."""
 
 from __future__ import annotations
 

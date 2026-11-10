@@ -67,7 +67,7 @@ export function SiteFooter() {
         <div>
           <Link href="/" className={`inline-block rounded-lg ${focusRing}`}>
             <Logo size={24} />
-            <span className="sr-only">WriteOrbit home</span>
+            <span className="sr-only">AI for Research home</span>
           </Link>
           <p className="mt-3 max-w-[280px] text-[14px] leading-relaxed text-muted">The AI writing editor that cites real sources. For students, researchers and academics.</p>
         </div>

@@ -44,7 +44,7 @@ export const FEATURES: Feature[] = [
     icon: <LuSparkles className="h-5 w-5" />,
     title: 'Your next sentence, already cited',
     short: 'Suggestions that cite real papers as you write.',
-    body: 'Pause at the end of a sentence and WriteOrbit suggests what comes next, with a real reference. Press Tab to accept it.',
+    body: 'Pause at the end of a sentence and AI for Research suggests what comes next, with a real reference. Press Tab to accept it.',
     points: ['Follows your argument and your tone', 'Every citation opens the paper behind it', 'AI Edit improves, shortens or expands a passage'],
     visual: <AutocompleteVisual />,
   },
@@ -54,7 +54,7 @@ export const FEATURES: Feature[] = [
     icon: <LuSearch className="h-5 w-5" />,
     title: 'Find a source and cite it in one click',
     short: 'Search 250M+ works. Cite in APA, MLA, Chicago and more.',
-    body: 'Search 250M+ scholarly works, or type @ as you write. WriteOrbit formats each citation and builds your reference list or works cited page.',
+    body: 'Search 250M+ scholarly works, or type @ as you write. AI for Research formats each citation and builds your reference list or works cited page.',
     points: ['APA, MLA, Chicago, Harvard, AMA, ACS and 10,000+ styles', 'Change the style and every citation updates', 'Filter by year, citation count and open access'],
     visual: <FindPapersVisual />,
   },
@@ -169,23 +169,23 @@ export function Points({ items }: { items: string[] }) {
   );
 }
 
-/** "Not another AI chatbot": what WriteOrbit does that a general AI chat does not. */
+/** "Not another AI chatbot": what AI for Research does that a general AI chat does not. */
 export function ComparisonBand() {
   return (
     <section aria-labelledby="compare-title" className={`${container} wo-reveal pt-24 md:pt-32`}>
       <h2 id="compare-title" className={`mx-auto max-w-[620px] text-center ${h2}`}>Not <em>another</em> AI chatbot</h2>
-      <p className={`mx-auto mt-4 max-w-[480px] text-center ${lead}`}>General AI chat can invent sources. WriteOrbit cites real papers, inside your document.</p>
+      <p className={`mx-auto mt-4 max-w-[480px] text-center ${lead}`}>General AI chat can invent sources. AI for Research cites real papers, inside your document.</p>
       <div className="mx-auto mt-10 max-w-[760px]">
         <div className="hidden grid-cols-[1fr_1.3fr_1.3fr] gap-4 border-b border-line pb-3 text-[13px] md:grid">
           <span />
-          <span className="font-semibold text-ink">WriteOrbit</span>
+          <span className="font-semibold text-ink">AI for Research</span>
           <span className="text-muted">General AI chat</span>
         </div>
         <ul>
           {COMPARISON_ROWS.map((row) => (
             <li key={row.label} className="grid gap-1.5 border-b border-line py-4 text-[15px] md:grid-cols-[1fr_1.3fr_1.3fr] md:gap-4">
               <span className="font-medium text-ink">{row.label}</span>
-              <span className="flex gap-2 text-ink-2"><LuCheck className="mt-[3px] h-4 w-4 shrink-0 text-green-600" aria-hidden="true" /><span><span className="sr-only">WriteOrbit: </span>{row.writeorbit}</span></span>
+              <span className="flex gap-2 text-ink-2"><LuCheck className="mt-[3px] h-4 w-4 shrink-0 text-green-600" aria-hidden="true" /><span><span className="sr-only">AI for Research: </span>{row.writeorbit}</span></span>
               <span className="flex gap-2 text-muted"><span className="mt-[3px]"><CloseMark /></span><span><span className="sr-only">General AI chat: </span>{row.chatbot}</span></span>
             </li>
           ))}

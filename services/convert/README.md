@@ -1,8 +1,8 @@
 # writeorbit-convert
 
-A small, stateless HTTP service that converts between the WriteOrbit editor's documents (BlockNote
+A small, stateless HTTP service that converts between the AI for Research editor's documents (BlockNote
 blocks) and Word, PDF and LaTeX, and extracts text from PDFs. It listens on **port 4100** and is
-**internal only**: publish no host port. The WriteOrbit API (`lib/server`, running in the web app on Firebase
+**internal only**: publish no host port. The AI for Research API (`lib/server`, running in the web app on Firebase
 App Hosting, and Cloud Functions; `CONVERT_URL`) owns authentication, storage and the database, and
 calls this service.
 
@@ -213,7 +213,7 @@ Export object (`snake_case`, the same field names the browser sends):
 | `comments` | `null` | Comment threads (as in the import response). Threads with a `blockId` become Word comments. |
 | `settings` | `null` | The **merged** WordSettings (stored settings overlaid with the browser's, minus `source`). |
 | `format` | `"docx"` | `docx` \| `pdf` \| `latex`. Any other value → `422`. |
-| `author` | `null` | Author for new tracked changes and comments (docx/pdf, default `"WriteOrbit"`) and `\author{}` (LaTeX). Up to 200 characters. |
+| `author` | `null` | Author for new tracked changes and comments (docx/pdf, default `"AI for Research"`) and `\author{}` (LaTeX). Up to 200 characters. |
 | `asset_url_prefix` | `/api/ai-editor/assets/` | Image URLs whose path ends in `<prefix path><name>` are editor assets... |
 | `asset_fetch_base` | `null` | ...fetched as `GET <asset_fetch_base><name>` (http/https; private addresses allowed, since the caller controls this value; must match `CONVERT_ASSET_FETCH_BASES` when that is set). |
 | `source_base64` | `null` | The template `.docx` as base64 (JSON form only; the `source` part wins in multipart). |
@@ -365,7 +365,7 @@ that case, rewrite the URLs in the blocks to match.
 ## Provenance
 
 `writeorbit_convert/word/` started as an earlier Word converter. Imports are package-relative
-and it has no dependencies on that application: the default author is `WriteOrbit`, OOXML part
+and it has no dependencies on that application: the default author is `AI for Research`, OOXML part
 and relationship ids use `rc`, and LaTeX uses `rcHighlight`. The block prop `ceRole` is unchanged
 because the editor uses it. The tests in `tests/test_word_compat.py` and
 `tests/test_word_latex.py` come from the same source. Their HTTP parts were rewritten for this

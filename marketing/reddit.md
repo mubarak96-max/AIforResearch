@@ -1,11 +1,11 @@
-# WriteOrbit on Reddit: 20 posts + reply templates
+# AI for Research on Reddit: 20 posts + reply templates
 
 Written as an ordinary Reddit user would write them, not as marketing. The rule throughout is: **the post has to be worth reading even if nobody clicks the link.**
 
 ## Read this first
 
-1. **Use a real personal account with some history.** A new account that only posts about WriteOrbit gets flagged as spam. Spend 2 to 3 weeks commenting helpfully in r/PhD, r/GradSchool, r/AskAcademia etc. before posting anything that mentions the product. Reddit's general rule of thumb is that only about 1 in 10 of your posts or comments should be about your own thing.
-2. **Always disclose.** Whenever WriteOrbit is mentioned: "Disclosure: I built this." Getting caught with undisclosed promotion is the fastest way to get banned and called out.
+1. **Use a real personal account with some history.** A new account that only posts about AI for Research gets flagged as spam. Spend 2 to 3 weeks commenting helpfully in r/PhD, r/GradSchool, r/AskAcademia etc. before posting anything that mentions the product. Reddit's general rule of thumb is that only about 1 in 10 of your posts or comments should be about your own thing.
+2. **Always disclose.** Whenever AI for Research is mentioned: "Disclosure: I built this." Getting caught with undisclosed promotion is the fastest way to get banned and called out.
 3. **Read each subreddit's sidebar and rules before posting.** They change. Several (r/AskAcademia, r/academia, r/GradSchool) restrict or ban self-promotion. Where that's true, the posts below don't mention the product, or they mention it only if someone asks.
 4. **No hashtags, no emoji bullets, no "link in comments", no marketing words** ("game-changer", "revolutionary", "excited to announce").
 5. **Post, then stay.** Reply to every comment for the first few hours. Accept criticism. "Fair point, noted" earns more goodwill than defending the product.
@@ -284,7 +284,7 @@ Only in subreddits that allow self-promotion (r/SideProject, r/alphaandbetausers
 
 > Disclosure: I'm the developer.
 >
-> The problem I kept seeing: AI chatbots invent citations, and checking them takes ages. So I built WriteOrbit, an editor for academic writing where the AI can suggest sentences, but citations only ever come from a scholarly database (250M+ works). You click a citation and it opens the paper.
+> The problem I kept seeing: AI chatbots invent citations, and checking them takes ages. So I built AI for Research, an editor for academic writing where the AI can suggest sentences, but citations only ever come from a scholarly database (250M+ works). You click a citation and it opens the paper.
 >
 > Other bits:
 > - type @ to search and cite papers without leaving the sentence, 10,000+ citation styles
@@ -338,7 +338,7 @@ Only in subreddits that allow self-promotion (r/SideProject, r/alphaandbetausers
 **Subreddits:** r/SideProject, r/LocalLLaMA (only if it fits the topic), r/webdev Showoff Saturday
 **Title:** API for building AI agents that cite real papers: search, full text, DOI validation, MCP
 
-> Disclosure: I built this as part of WriteOrbit.
+> Disclosure: I built this as part of AI for Research.
 >
 > If you're building an agent that writes with sources, the hard part is stopping it from inventing references. The API gives you:
 > - scholarly paper search/lookup and full text where available (with licence info)
@@ -365,7 +365,7 @@ Only in subreddits that allow self-promotion (r/SideProject, r/alphaandbetausers
 >
 > <!-- Replace the claims above with your real numbers/observations before posting. Don't publish anything you haven't actually seen. -->
 >
-> Disclosure: the product is WriteOrbit (writeorbit.app). Happy to answer questions about building on Firebase or pricing for students.
+> Disclosure: the product is AI for Research (writeorbit.app). Happy to answer questions about building on Firebase or pricing for students.
 
 ---
 
@@ -374,13 +374,13 @@ Only in subreddits that allow self-promotion (r/SideProject, r/alphaandbetausers
 Only use these when someone asks directly or the thread clearly asks for tool suggestions. Adjust the wording each time. Copy-pasted replies get spotted.
 
 **R1 (checking claims/sources):**
-> Disclosure, I built it, but WriteOrbit has a check that flags unsupported or overstated claims, retracted papers, preprints and wrong DOIs as comments in your draft. Free plan covers it. Zotero's retraction flag is also good if you already use Zotero.
+> Disclosure, I built it, but AI for Research has a check that flags unsupported or overstated claims, retracted papers, preprints and wrong DOIs as comments in your draft. Free plan covers it. Zotero's retraction flag is also good if you already use Zotero.
 
 **R2 (review matrix is slow to fill):**
-> Yeah, filling it is the painful part. I built a version in WriteOrbit that fills the cells from your PDFs and shows the quote + page for each cell so you can verify (disclosure: it's my project). Honestly though, even doing it by hand for 15 key papers is worth it.
+> Yeah, filling it is the painful part. I built a version in AI for Research that fills the cells from your PDFs and shows the quote + page for each cell so you can verify (disclosure: it's my project). Honestly though, even doing it by hand for 15 key papers is worth it.
 
 **R3 (Word ↔ LaTeX):**
-> Disclosure: I make WriteOrbit. It opens a .docx template keeping its styles and can export a full LaTeX project for Overleaf, including equations and references. Might help for your "write once, hand in both" case. Pandoc is still the best free option if you're comfortable with it.
+> Disclosure: I make AI for Research. It opens a .docx template keeping its styles and can export a full LaTeX project for Overleaf, including equations and references. Might help for your "write once, hand in both" case. Pandoc is still the best free option if you're comfortable with it.
 
 **R4 (stats from CSV):**
 > There's a free in-browser tool I built that takes a CSV and gives descriptives, correlations, t-tests and chi-square written up in APA: writeorbit.app/tools/data-analysis. Data stays in the browser. For anything serious use R/JASP though. JASP is free and great.

@@ -2,10 +2,10 @@ import { AggregateField, C, chunked, col, db } from '../firebase.js';
 import { settings, type EffectiveSettings } from './settings.js';
 
 /**
- * Newsletter on MailCheap (mailcheap.ai): WriteOrbit keeps the list in step with its accounts.
+ * Newsletter on MailCheap (mailcheap.ai): AI for Research keeps the list in step with its accounts.
  * People with a confirmed email are added (tag "writeorbit"); anyone can leave from the
- * account page or any newsletter's unsubscribe link, and WriteOrbit mirrors those leavers back.
- * WriteOrbit's own account emails go through Admin › Email, not MailCheap.
+ * account page or any newsletter's unsubscribe link, and AI for Research mirrors those leavers back.
+ * AI for Research's own account emails go through Admin › Email, not MailCheap.
  */
 
 export const MAILCHEAP_URL = 'https://mailcheap.ai/api/v1';
@@ -74,7 +74,7 @@ export class MailCheap {
     return Array.isArray(data) ? data : data.newsletters ?? [];
   }
 
-  /** Adds or updates up to 1,000 contacts (they agreed through their WriteOrbit account). */
+  /** Adds or updates up to 1,000 contacts (they agreed through their AI for Research account). */
   importContacts(contacts: ImportRow[]) {
     return this.call<{ importId?: string }>('POST', '/contacts/import', { body: this.withNewsletter({ consent: true, contacts }) });
   }

@@ -146,23 +146,23 @@ A practical setup for most writers has two parts:
 
 You can build the second part from Google Docs and a folder of PDFs. It works until you need to find which document said the hospital's night shift starts at 7, or which article your consultant sent, or what changed in the bible between the pilot and episode four.
 
-### Where WriteOrbit fits (and what it does not do)
+### Where AI for Research fits (and what it does not do)
 
-WriteOrbit is a web editor for research-backed writing. To be plain about it: **WriteOrbit does not format screenplays and does not open `.fdx` files.** Keep writing the script in Final Draft, Fade In, WriterDuet or any formatter above. Use WriteOrbit for the development documents and research around it:
+AI for Research is a web editor for research-backed writing. To be plain about it: **AI for Research does not format screenplays and does not open `.fdx` files.** Keep writing the script in Final Draft, Fade In, WriterDuet or any formatter above. Use AI for Research for the development documents and research around it:
 
-- **Treatments and series bibles in a shared document.** Real-time co-editing, comments, suggestions (tracked changes) and version history, so the room sees who changed a character's backstory and when. WriteOrbit opens `.docx` files and keeps their styles, so an existing Word bible comes in intact, and you can export back to Word or PDF.
+- **Treatments and series bibles in a shared document.** Real-time co-editing, comments, suggestions (tracked changes) and version history, so the room sees who changed a character's backstory and when. AI for Research opens `.docx` files and keeps their styles, so an existing Word bible comes in intact, and you can export back to Word or PDF.
 - **Research with sources.** Search 250M+ scholarly works from inside the document and type `@` to cite one. Useful when a medical drama needs the real literature on sepsis, or a period piece needs the social history behind a scene.
 - **Ask one PDF at a time.** Upload archive scans, court filings, reports or your own script PDF to the Library, open one, and use Ask to question it. Answers carry page numbers, so you can check them: "Which page of the inquest report describes the first call to the fire brigade?" or, on your script, "Where does the midpoint land?"
 - **AI review as comments.** Run claim checks on a research bible or a pitch document before it goes to a producer. Results appear as comments in the text, next to the line they concern.
 - **AI Chat beside the document** for brainstorming loglines or tightening a treatment. It can draw on the web, your Library and the document itself as sources, and cites the real papers it uses. Your own judgment stays the final call.
 
-<!-- SCREENSHOT: A WriteOrbit document titled "Series bible: [fictional show]" with a character section, one @-citation in the research section, a collaborator's comment in the margin, and the Library panel open on one uploaded PDF, showing an Ask answer that cites "p. 14". -->
+<!-- SCREENSHOT: An AI for Research document titled "Series bible: [fictional show]" with a character section, one @-citation in the research section, a collaborator's comment in the margin, and the Library panel open on one uploaded PDF, showing an Ask answer that cites "p. 14". -->
 
 **Cost.** The free plan includes the full editor on any device, 10 PDFs in the Library (up to 10 MB each, enough for a feature script PDF and a few source documents), unlimited citations, and Word and PDF export, plus small daily AI allowances (5 chat messages and 3 review checks a day). Plus is $12/month or $96/year, with unlimited PDFs up to 50 MB and much higher AI limits. Check [current pricing](/pricing) since plans can change.
 
-**Confidentiality.** Unproduced scripts and bibles are sensitive. WriteOrbit can be deployed to your own Firebase / Google Cloud project, so documents stay in your own cloud account. <!-- VERIFY: confirm self-hosting is offered publicly before publishing -->
+**Confidentiality.** Unproduced scripts and bibles are sensitive. AI for Research can be deployed to your own Firebase / Google Cloud project, so documents stay in your own cloud account. <!-- VERIFY: confirm self-hosting is offered publicly before publishing -->
 
-If you only need a formatter, you do not need WriteOrbit. If your project involves research, a bible or a room, it fills the gap the formatter leaves. See [how it works](/how-it-works).
+If you only need a formatter, you do not need AI for Research. If your project involves research, a bible or a room, it fills the gap the formatter leaves. See [how it works](/how-it-works).
 
 ## How to choose: a five-question checklist
 

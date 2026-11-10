@@ -71,7 +71,7 @@ const SAMPLE = [
   if (!(await pill.isVisible().catch(() => false))) { await page.keyboard.press('Escape'); await page.keyboard.press('ArrowLeft'); await page.keyboard.press('End'); await page.waitForTimeout(800); console.log('pill after Esc:', await pill.isVisible().catch(() => false)); }
   await pill.click();
   await page.waitForTimeout(400);
-  console.log('writing flag:', await page.getByText('WriteOrbit AI', { exact: true }).isVisible().catch(() => false));
+  console.log('writing flag:', await page.getByText('AI for Research AI', { exact: true }).isVisible().catch(() => false));
   await page.screenshot({ path: `${OUT}/review-1b-writing.png` });
   const ghost = page.locator('.ce-ghost-text');
   await ghost.waitFor({ timeout: 60000 }).catch(() => {});

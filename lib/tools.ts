@@ -133,7 +133,7 @@ export const TOOLS: Tool[] = [
     description: 'Ask a research question and get a structured report built from real papers: key findings, where studies agree and disagree, and every claim cited.',
     short: 'A cited report on your question, built from real papers.',
     heading: 'A research report on your question, with every claim cited',
-    intro: 'Ask a research question. WriteOrbit finds relevant papers, reads their abstracts and writes a structured report: what is known, where studies disagree, and what is still open. Each claim cites the paper behind it.',
+    intro: 'Ask a research question. AI for Research finds relevant papers, reads their abstracts and writes a structured report: what is known, where studies disagree, and what is still open. Each claim cites the paper behind it.',
     keywords: ['deep research', 'ai research report', 'research summary generator', 'ai research assistant'],
     fields: [
       topic('Research question', 'e.g. Does remote work affect employee productivity?'),
@@ -144,7 +144,7 @@ export const TOOLS: Tool[] = [
     submitLabel: 'Write the report',
     steps: [
       { title: 'Ask', body: 'Type a research question. Add notes on your angle if you like.' },
-      { title: 'It searches', body: 'WriteOrbit searches over 250 million works and picks the most relevant papers.' },
+      { title: 'It searches', body: 'AI for Research searches over 250 million works and picks the most relevant papers.' },
       { title: 'Read and check', body: 'Read the report, open the cited papers, and open it in the editor to keep working.' },
     ],
     limitations: [...GROUNDED_LIMITS, 'It reads abstracts, not full texts, and uses about ten papers per report.'],
@@ -166,7 +166,7 @@ export const TOOLS: Tool[] = [
     description: 'Enter a topic and find possible research gaps: unanswered questions, under-studied groups and methods, and conflicting results, each linked to the papers behind it.',
     short: 'Possible gaps in the literature, each tied to real papers.',
     heading: 'Find research gaps in your topic',
-    intro: 'Enter a topic. WriteOrbit reads recent and highly cited papers and suggests possible gaps: questions not yet answered, groups or settings not studied, methods not tried, and results that disagree. Each one cites the papers it is based on.',
+    intro: 'Enter a topic. AI for Research reads recent and highly cited papers and suggests possible gaps: questions not yet answered, groups or settings not studied, methods not tried, and results that disagree. Each one cites the papers it is based on.',
     keywords: ['research gap finder', 'find research gaps', 'research gap', 'gap in the literature', 'research topic ideas'],
     fields: [topic('Topic', 'e.g. mobile money and women’s entrepreneurship in East Africa'), LEVEL, notes],
     submitLabel: 'Find gaps',
@@ -193,7 +193,7 @@ export const TOOLS: Tool[] = [
     description: 'Generate a thematic literature review or review of related literature (RRL) on your topic, built from real papers and cited in APA, MLA, Chicago or Harvard.',
     short: 'A thematic literature review (RRL) from real papers.',
     heading: 'Literature review generator, with real sources',
-    intro: 'Enter your topic. WriteOrbit finds relevant papers and drafts a thematic literature review, or review of related literature (RRL): the main themes, how studies compare, and the gap your study fills. Every citation is a real paper.',
+    intro: 'Enter your topic. AI for Research finds relevant papers and drafts a thematic literature review, or review of related literature (RRL): the main themes, how studies compare, and the gap your study fills. Every citation is a real paper.',
     keywords: ['literature review generator', 'rrl generator', 'review of related literature', 'ai literature review', 'literature review writer'],
     fields: [
       topic('Topic or research question', 'e.g. effects of social media use on adolescent sleep'),
@@ -229,7 +229,7 @@ export const TOOLS: Tool[] = [
     description: 'Draft a research proposal: background with real citations, problem statement, research questions, methods and timeline. Open it in the editor to finish it.',
     short: 'A full proposal draft: background, questions, methods, timeline.',
     heading: 'Draft a research proposal in minutes',
-    intro: 'Give your topic and a few details. WriteOrbit drafts each section of a research proposal: background and literature with real citations, problem statement, research questions, methods, ethics and timeline.',
+    intro: 'Give your topic and a few details. AI for Research drafts each section of a research proposal: background and literature with real citations, problem statement, research questions, methods, ethics and timeline.',
     keywords: ['research proposal generator', 'research proposal writer', 'ai research proposal', 'research proposal template'],
     fields: [
       topic('Topic', 'e.g. mobile banking and small business growth in Kenya'),
@@ -262,7 +262,7 @@ export const TOOLS: Tool[] = [
     description: 'Get an essay plan and first draft with an introduction, argued body paragraphs and conclusion, citing real papers in your style. Edit it in your own voice.',
     short: 'An essay plan and draft that cites real papers.',
     heading: 'An essay draft with sources you can check',
-    intro: 'Paste your essay question. WriteOrbit plans an argument and drafts the introduction, body paragraphs and conclusion, citing real papers in your style, for you to rewrite in your own voice.',
+    intro: 'Paste your essay question. AI for Research plans an argument and drafts the introduction, body paragraphs and conclusion, citing real papers in your style, for you to rewrite in your own voice.',
     keywords: ['ai essay writer', 'essay writer', 'essay generator with citations', 'academic essay writer'],
     fields: [
       topic('Essay question or topic', 'e.g. Should cities ban cars from their centres?'),
@@ -296,7 +296,7 @@ export const TOOLS: Tool[] = [
     description: 'Turn your topic, method and findings into a research paper draft in IMRaD form: introduction with real citations, methods, results and discussion.',
     short: 'Your study, drafted as an IMRaD paper with citations.',
     heading: 'Draft a research paper from your study',
-    intro: 'Describe your study: the question, how you did it and what you found. WriteOrbit drafts a paper in IMRaD form, with an introduction and discussion that cite real papers. Your results stay yours: it only writes up what you give it.',
+    intro: 'Describe your study: the question, how you did it and what you found. AI for Research drafts a paper in IMRaD form, with an introduction and discussion that cite real papers. Your results stay yours: it only writes up what you give it.',
     keywords: ['research paper writer', 'ai research paper', 'imrad', 'write a research paper', 'research paper generator'],
     fields: [
       topic('Research question', 'e.g. Does peer tutoring improve first-year maths grades?'),
@@ -328,7 +328,7 @@ export const TOOLS: Tool[] = [
     description: 'Plan a thesis or dissertation chapter: sections, what each must cover, key sources to start from and questions your examiners may ask.',
     short: 'A section-by-section plan for a thesis chapter.',
     heading: 'Plan your thesis chapter',
-    intro: 'Choose a chapter and describe your thesis. WriteOrbit plans the chapter section by section: what each part should cover, real papers to start from, and the questions examiners often ask.',
+    intro: 'Choose a chapter and describe your thesis. AI for Research plans the chapter section by section: what each part should cover, real papers to start from, and the questions examiners often ask.',
     keywords: ['thesis chapter outline', 'dissertation outline', 'thesis planner', 'thesis writing help', 'dissertation chapter'],
     fields: [
       topic('Thesis topic', 'e.g. drought adaptation by smallholder farmers in northern Ghana'),
@@ -358,7 +358,7 @@ export const TOOLS: Tool[] = [
     description: 'Draft a grant proposal: summary, specific aims, significance with real citations, approach, expected outcomes and timeline. Edit it to your funder’s rules.',
     short: 'Aims, significance and approach, drafted with citations.',
     heading: 'Draft a grant proposal',
-    intro: 'Describe your project and the funder. WriteOrbit drafts the summary, specific aims, significance (citing real papers), approach, expected outcomes and timeline, ready for you to fit to the funder’s rules.',
+    intro: 'Describe your project and the funder. AI for Research drafts the summary, specific aims, significance (citing real papers), approach, expected outcomes and timeline, ready for you to fit to the funder’s rules.',
     keywords: ['grant proposal writer', 'grant writing ai', 'research grant proposal', 'specific aims'],
     fields: [
       topic('Project', 'e.g. a low-cost sensor network for early flood warning'),
@@ -386,7 +386,7 @@ export const TOOLS: Tool[] = [
     description: 'Paste your paper or thesis and get an abstract in the length and structure you need: structured (background, methods, results, conclusions) or a single paragraph.',
     short: 'Paste your paper. Get an abstract of the right length.',
     heading: 'Write an abstract from your paper',
-    intro: 'Paste your paper, thesis chapter or report. WriteOrbit writes an abstract from it, structured or as one paragraph, within your word limit, using only what your text says.',
+    intro: 'Paste your paper, thesis chapter or report. AI for Research writes an abstract from it, structured or as one paragraph, within your word limit, using only what your text says.',
     keywords: ['abstract generator', 'abstract writer', 'write an abstract', 'research abstract', 'thesis abstract'],
     fields: [
       pasted('Your paper', 'Paste the paper, or at least the introduction, methods, results and conclusion.'),
@@ -414,7 +414,7 @@ export const TOOLS: Tool[] = [
     description: 'Turn a thesis chapter into a journal manuscript: a shorter, tighter IMRaD structure, a target word count and a list of what to cut, keep and add.',
     short: 'Turn a thesis chapter into a journal article draft.',
     heading: 'Turn your thesis into a journal manuscript',
-    intro: 'Paste a thesis chapter. WriteOrbit restructures it as a journal article: tighter, in IMRaD form, near your target length, with a note of what was cut and what a journal will expect you to add.',
+    intro: 'Paste a thesis chapter. AI for Research restructures it as a journal article: tighter, in IMRaD form, near your target length, with a note of what was cut and what a journal will expect you to add.',
     keywords: ['thesis to manuscript', 'thesis to journal article', 'convert thesis to paper', 'publish thesis as article'],
     fields: [
       pasted('Thesis chapter or summary', 'Paste the chapter (or several chapters).', 30000, 8000),
@@ -443,7 +443,7 @@ export const TOOLS: Tool[] = [
     description: 'Paraphrase a sentence or paragraph in plain, formal or shorter words while keeping its meaning. Built for academic writing. Free, no sign-up.',
     short: 'Reword a passage while keeping its meaning.',
     heading: 'Paraphrase academic text, keeping the meaning',
-    intro: 'Paste a sentence or paragraph and choose how to reword it. WriteOrbit keeps the meaning, the technical terms and any citations in place.',
+    intro: 'Paste a sentence or paragraph and choose how to reword it. AI for Research keeps the meaning, the technical terms and any citations in place.',
     keywords: ['paraphrasing tool', 'paraphraser', 'paraphrase', 'rewording tool', 'academic paraphrasing tool'],
     fields: [
       pasted('Text', 'Paste the text to paraphrase.', 6000, 2500),
@@ -469,7 +469,7 @@ export const TOOLS: Tool[] = [
     description: 'Rewrite stiff or generic text so it reads like a person wrote it: varied sentences, plain words, no stock phrases. Keeps your meaning and citations.',
     short: 'Make stiff or generic text read naturally.',
     heading: 'Make your writing sound like you',
-    intro: 'Paste text that sounds stiff, generic or machine-made. WriteOrbit rewrites it with varied sentences, plain words and no stock phrases, keeping your meaning, your facts and your citations.',
+    intro: 'Paste text that sounds stiff, generic or machine-made. AI for Research rewrites it with varied sentences, plain words and no stock phrases, keeping your meaning, your facts and your citations.',
     keywords: ['ai humanizer', 'humanizer', 'humanize ai text', 'make text sound natural', 'natural writing'],
     fields: [
       pasted('Text', 'Paste the text to rewrite.', 6000, 2500),
@@ -540,7 +540,7 @@ export const TOOLS: Tool[] = [
       'Up to 50,000 rows. For regression, ANOVA and more, use dedicated software such as R, JASP or SPSS.',
     ],
     faq: [
-      { q: 'Is my data uploaded?', a: 'No. The file is read and analysed in your browser and is never sent to WriteOrbit.' },
+      { q: 'Is my data uploaded?', a: 'No. The file is read and analysed in your browser and is never sent to AI for Research.' },
       { q: 'Which t-test does it run?', a: 'Welch’s t-test for two independent groups, which does not assume equal variances, and a paired t-test for two measures on the same cases.' },
     ],
     features: [],

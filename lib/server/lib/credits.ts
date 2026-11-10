@@ -205,7 +205,7 @@ const CREDIT_KINDS = ['credits', 'credits_topup'];
 
 /** The Dodo product of a credit pack (made on first use, remade when its price changes). */
 const packProduct = (dodo: Dodo, pack: (typeof CREDIT_PACKS)[number]) =>
-  ensureOneTimeProduct(dodo, `pack_${pack.id}`, { name: `${pack.credits.toLocaleString('en-US')} WriteOrbit credits`, cents: pack.cents });
+  ensureOneTimeProduct(dodo, `pack_${pack.id}`, { name: `${pack.credits.toLocaleString('en-US')} AI for Research credits`, cents: pack.cents });
 
 export async function startCreditCheckout(dodo: Dodo, accountId: string, packId: string) {
   const pack = packById(packId);

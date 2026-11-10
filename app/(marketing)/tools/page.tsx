@@ -24,7 +24,7 @@ export default function ToolsPage() {
           {
             '@type': 'CollectionPage',
             '@id': `${SITE_URL}/tools#page`,
-            name: 'Free WriteOrbit tools',
+            name: 'Free AI for Research tools',
             url: `${SITE_URL}/tools`,
             isPartOf: { '@id': `${SITE_URL}/#website` },
             mainEntity: { '@type': 'ItemList', itemListElement: TOOLS.map((tool, index) => ({ '@type': 'ListItem', position: index + 1, name: tool.name, url: `${SITE_URL}/tools/${tool.slug}` })) },

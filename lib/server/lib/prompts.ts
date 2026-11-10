@@ -7,7 +7,7 @@
  * [[CITATION_n]] placeholders and must come back unchanged.
  */
 
-export const AI_NAME = 'WriteOrbit AI';
+export const AI_NAME = 'AI for Research AI';
 
 const CITE_RULES =
   'Sources are numbered S1, S2, ... Cite a source only where it directly supports the sentence, ' +

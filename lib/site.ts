@@ -5,11 +5,11 @@
  */
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || process.env.PUBLIC_URL || 'https://writeorbit.app').replace(/\/+$/, '');
 
-export const SITE_NAME = 'WriteOrbit';
+export const SITE_NAME = 'AI for Research';
 
 /** Who runs this site, set when the web app is built (NEXT_PUBLIC_COMPANY_*); empty parts are left out. */
 export const COMPANY = {
-  name: process.env.NEXT_PUBLIC_COMPANY_NAME || 'WriteOrbit',
+  name: process.env.NEXT_PUBLIC_COMPANY_NAME || 'AI for Research',
   address: process.env.NEXT_PUBLIC_COMPANY_ADDRESS || '',
   phone: process.env.NEXT_PUBLIC_COMPANY_PHONE || '',
   email: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@writeorbit.app',

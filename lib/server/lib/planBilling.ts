@@ -48,7 +48,7 @@ export async function syncPlanToDodo(dodo: Dodo, planId: string): Promise<PlanRo
     const ref = col(C.billingProducts).doc(planProductKey(plan.id, interval));
     const stored = (await ref.get()).data() as Partial<StoredPlanProduct> | undefined;
     if (productMatches(stored, plan, cents)) return;
-    const name = `WriteOrbit ${plan.name} (${interval === 'month' ? 'monthly' : 'yearly'})`;
+    const name = `AI for Research ${plan.name} (${interval === 'month' ? 'monthly' : 'yearly'})`;
     const created = await dodo.products.create({
       name, description: plan.tagline || null, tax_category: 'saas',
       price: {
@@ -225,7 +225,7 @@ async function liveSubscription(dodo: Dodo, accountId: string) {
 
 /**
  * Where to add a card: on a subscription, Dodo's page to change its card (which also settles a
- * failed renewal); otherwise Dodo's customer portal. No card numbers ever reach WriteOrbit.
+ * failed renewal); otherwise Dodo's customer portal. No card numbers ever reach AI for Research.
  */
 export async function startAddCard(dodo: Dodo, accountId: string) {
   const customer = await ensureCustomer(dodo, accountId);

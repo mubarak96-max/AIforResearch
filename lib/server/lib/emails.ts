@@ -1,6 +1,6 @@
 import type { Mail } from './mail.js';
 
-/** The few account emails WriteOrbit sends, as HTML (inline styles, for mail apps) and plain text. */
+/** The few account emails AI for Research sends, as HTML (inline styles, for mail apps) and plain text. */
 
 const escape = (value: string) => value.replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]!);
 
@@ -26,7 +26,7 @@ ${paragraphs}${button}${note}
 
 export function passwordResetEmail(to: string, url: string) {
   return layout({
-    to, subject: 'Reset your WriteOrbit password', heading: 'Reset your password',
+    to, subject: 'Reset your AI for Research password', heading: 'Reset your password',
     lines: [`Someone asked to reset the password for ${to}. The link works for one hour.`],
     button: { label: 'Choose a new password', url },
     note: "Didn't ask for this? Ignore this email. Your password stays the same.",
@@ -35,8 +35,8 @@ export function passwordResetEmail(to: string, url: string) {
 
 export function confirmEmail(to: string, url: string) {
   return layout({
-    to, subject: 'Confirm your email for WriteOrbit', heading: 'Confirm your email',
-    lines: [`Confirm ${to} to finish setting up your WriteOrbit account.`],
+    to, subject: 'Confirm your email for AI for Research', heading: 'Confirm your email',
+    lines: [`Confirm ${to} to finish setting up your AI for Research account.`],
     button: { label: 'Confirm email', url },
     note: "Didn't create an account? Ignore this email.",
   });
@@ -44,14 +44,14 @@ export function confirmEmail(to: string, url: string) {
 
 export function testEmail(to: string, provider: string) {
   return layout({
-    to, subject: 'WriteOrbit test email', heading: 'Email works',
+    to, subject: 'AI for Research test email', heading: 'Email works',
     lines: [`This test was sent with ${provider} from Admin › Email.`],
   });
 }
 
 export function lowCreditsEmail(to: string, credits: number, url: string) {
   return layout({
-    to, subject: 'Your WriteOrbit credits are running low', heading: 'Credits running low',
+    to, subject: 'Your AI for Research credits are running low', heading: 'Credits running low',
     lines: [`Your the developer API balance is ${Math.max(0, Math.floor(credits)).toLocaleString('en-US')} credits. Calls that need paid credits stop when it reaches zero.`],
     button: { label: 'Buy credits', url },
     note: 'Turn on automatic top-up on the same page to never run out.',
@@ -60,7 +60,7 @@ export function lowCreditsEmail(to: string, credits: number, url: string) {
 
 export function topUpFailedEmail(to: string, reason: string, url: string) {
   return layout({
-    to, subject: 'WriteOrbit automatic top-up failed', heading: 'Automatic top-up failed',
+    to, subject: 'AI for Research automatic top-up failed', heading: 'Automatic top-up failed',
     lines: [`We could not add credits to your developer API balance: ${reason}`, 'Automatic top-up is now off.'],
     button: { label: 'Check your card', url },
   });

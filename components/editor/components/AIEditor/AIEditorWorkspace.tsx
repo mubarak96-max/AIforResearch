@@ -1643,7 +1643,7 @@ const backgroundColorStyleSpec = createStyleSpec(
   },
 );
 
-// Mantine's global styles set the page font; keep the host's UI font (Inter in the WriteOrbit app).
+// Mantine's global styles set the page font; keep the host's UI font (Inter in the AI for Research app).
 const mantineTheme = { fontFamily: 'var(--font-sans, Inter, ui-sans-serif, system-ui, sans-serif)' };
 
 const fontFamilyStyleSpec = createStyleSpec(
@@ -3326,7 +3326,7 @@ export default function AIEditorWorkspace() {
   useEffect(() => {
     if (!documentId) return undefined;
     const previous = document.title;
-    document.title = `${documentTitle.trim() || 'Untitled document'} · WriteOrbit`;
+    document.title = `${documentTitle.trim() || 'Untitled document'} · AI for Research`;
     return () => {
       document.title = previous;
     };
@@ -4676,11 +4676,11 @@ export default function AIEditorWorkspace() {
     [addAIReviewComments, collectReviewBlocks, documentTitle],
   );
 
-  // Accepted AI text goes into the version history as WriteOrbit AI (after the copy is saved).
+  // Accepted AI text goes into the version history as AI for Research AI (after the copy is saved).
   useWritingActivity(editor, documentId, Boolean(canEdit));
   const recordAIEdit = useCallback(() => {
     if (!documentId || !canEdit) return;
-    // The authorship record counts the text just inserted as WriteOrbit AI's, not typed.
+    // The authorship record counts the text just inserted as AI for Research AI's, not typed.
     noteAIInsertion();
     window.setTimeout(() => {
       void flushBlocks(getEditorBlocks(editor))
@@ -4948,7 +4948,7 @@ export default function AIEditorWorkspace() {
         window.dispatchEvent(new CustomEvent('credits-updated'));
       } catch (error) {
         if (error instanceof AssistError && error.outOfCredits) setReviewRun((current) => ({ ...current, outOfCredits: true }));
-        else toast.error((error as Error).message || 'WriteOrbit AI could not reply.');
+        else toast.error((error as Error).message || 'AI for Research AI could not reply.');
       }
     },
     [addAIReply, documentTitle, editor],
@@ -6162,7 +6162,7 @@ export default function AIEditorWorkspace() {
           <div className="w-full max-w-[460px] rounded-[16px] border border-line bg-surface px-6 py-8 text-center shadow-[0_22px_50px_-18px_rgba(15,23,42,.25)]">
             <div className="text-[18px] font-bold text-ink">Sign in to open this document</div>
             <p className="mt-2 text-[14px] leading-[1.6] text-muted">
-              Documents are saved to your WriteOrbit account. Sign in, or create a free account, to write, cite and review with AI.
+              Documents are saved to your AI for Research account. Sign in, or create a free account, to write, cite and review with AI.
             </p>
             <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
               <button type="button" onClick={() => setAuthPrompt('login')} className="h-[42px] rounded-[11px] bg-[var(--theme-primary)] px-[18px] text-[15px] font-semibold text-on-brand shadow-[0_6px_16px_-6px_rgba(var(--brand-rgb),.7)] hover:bg-[var(--theme-primary-dark)]">Sign in</button>
@@ -6989,9 +6989,9 @@ export default function AIEditorWorkspace() {
       />
 
       {autocompleteState.writingAt ? (
-        // "WriteOrbit AI" writes at the cursor until the grey text appears.
+        // "AI for Research AI" writes at the cursor until the grey text appears.
         <div className="pointer-events-none fixed z-[11500]" style={{ top: autocompleteState.writingAt.top - 20, left: autocompleteState.writingAt.left - 1 }} aria-live="polite">
-          <span className="block w-fit rounded-[5px] rounded-bl-none bg-[var(--theme-primary)] px-1.5 py-[2px] text-[11px] font-semibold leading-none text-on-brand">WriteOrbit AI</span>
+          <span className="block w-fit rounded-[5px] rounded-bl-none bg-[var(--theme-primary)] px-1.5 py-[2px] text-[11px] font-semibold leading-none text-on-brand">AI for Research AI</span>
           <span className="block h-[22px] w-[2px] animate-pulse bg-[var(--theme-primary)]" />
         </div>
       ) : null}

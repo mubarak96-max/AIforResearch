@@ -168,15 +168,15 @@ const RESET = {
     await fetch(`${MAIL}/api/v1/messages`, { method: 'DELETE' });
     const methodsOff = await call(null, '/api/auth/methods');
     check('Forgot password hidden while email is off', methodsOff.body.password_reset === false);
-    const mailSaved = await save(token, { mailProvider: 'smtp', mailFrom: 'WriteOrbit Test <test@example.test>', smtpHost: 'writeorbit-test-mailpit', smtpPort: '1025', smtpSecurity: 'none' });
+    const mailSaved = await save(token, { mailProvider: 'smtp', mailFrom: 'AI for Research Test <test@example.test>', smtpHost: 'writeorbit-test-mailpit', smtpPort: '1025', smtpSecurity: 'none' });
     check('SMTP saved', mailSaved.status === 200);
     const testMail = await call(token, '/api/admin/test/email', { method: 'POST' });
     check('test email sent', testMail.body.ok === true, JSON.stringify(testMail.body));
-    check('…and arrives', Boolean(await mailTo(auth.user.email, 'WriteOrbit test email')));
+    check('…and arrives', Boolean(await mailTo(auth.user.email, 'AI for Research test email')));
 
     const newcomer = `confirm-${Date.now()}@example.test`;
     const signup = await call(null, '/api/auth/register', { method: 'POST', body: JSON.stringify({ email: newcomer, password: PASSWORD, full_name: 'Cora Confirm' }) });
-    const confirmMail = signup.status === 201 ? await mailTo(newcomer, 'Confirm your email for WriteOrbit') : null;
+    const confirmMail = signup.status === 201 ? await mailTo(newcomer, 'Confirm your email for AI for Research') : null;
     check('password sign-up gets a confirmation email', Boolean(confirmMail), String(signup.status));
     const confirmLink = linkIn(confirmMail, '/confirm-email');
     if (confirmLink) {
@@ -215,7 +215,7 @@ const RESET = {
           await page.getByRole('button', { name: 'Send reset link' }).click();
           check('"Check your email" shown', await page.getByRole('heading', { name: 'Check your email' }).waitFor({ timeout: 10000 }).then(() => true, () => false));
           await page.screenshot({ path: `${OUT}/integrations-check-email.png` });
-          const resetMail = await mailTo(resetUser, 'Reset your WriteOrbit password');
+          const resetMail = await mailTo(resetUser, 'Reset your AI for Research password');
           const resetLink = linkIn(resetMail, '/reset-password');
           check('reset email arrives with a link', Boolean(resetLink));
           await page.goto(resetLink.replace(/^https?:\/\/[^/]+/, BASE), { waitUntil: 'domcontentloaded' });

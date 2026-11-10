@@ -55,7 +55,7 @@ export default function ReviewPanel({
   onShowComments: (check: string, category?: string) => void;
   hasSelection: boolean;
   canEdit: boolean;
-  /** WriteOrbit AI's tracked changes now in the text. */
+  /** AI for Research AI's tracked changes now in the text. */
   aiChangeCount: number;
   onShowInText: (check: string) => number;
   onResolveAIChanges: (accept: boolean) => void;

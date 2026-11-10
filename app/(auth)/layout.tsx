@@ -15,7 +15,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <aside className="flex items-center justify-between border-b border-line bg-soft px-5 py-3 lg:flex-col lg:items-stretch lg:justify-between lg:border-b-0 lg:border-r lg:px-10 lg:py-8">
         <Link href="/" className={`rounded-lg ${focusRing}`}>
           <Logo size={30} />
-          <span className="sr-only">WriteOrbit home</span>
+          <span className="sr-only">AI for Research home</span>
         </Link>
         <div className="hidden max-w-[500px] py-10 lg:block">
           <p className="mb-5 text-[12px] font-semibold uppercase tracking-[0.2em] text-muted">Your writing workspace</p>
@@ -30,7 +30,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </ul>
         </div>
         <p className="hidden text-[13px] text-muted lg:block">
-          © {new Date().getFullYear()} WriteOrbit ·{' '}
+          © {new Date().getFullYear()} AI for Research ·{' '}
           <Link href="/help" className="hover:text-ink">Help center</Link> ·{' '}
           <Link href="/pricing" className="hover:text-ink">Pricing</Link>
         </p>

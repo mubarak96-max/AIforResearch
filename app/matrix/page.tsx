@@ -33,14 +33,14 @@ export default function MatricesPage() {
     <AppFrame title="Review matrix" wide actions={<Button variant="primary" onClick={() => setCreating(true)}><LuPlus className="h-4 w-4" />New matrix</Button>}>
       <p className="-mt-2 mb-5 max-w-2xl text-[15px] leading-relaxed text-muted">
         Compare papers side by side. Each row is a paper from your Library, each column a question (aim, method, sample, findings, limitations, or your own).
-        WriteOrbit reads each paper and fills the cells, with the quote and page every answer comes from.
+        AI for Research reads each paper and fills the cells, with the quote and page every answer comes from.
       </p>
       {error ? <p className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-[14px] text-red-700">{error}</p> : null}
       {matrices === null && !error ? <p className="text-[14px] text-muted">Loading…</p> : null}
       {matrices?.length === 0 ? (
         <Card>
           <EmptyState title="No matrices yet" action={<Button variant="primary" onClick={() => setCreating(true)}><LuPlus className="h-4 w-4" />New matrix</Button>}>
-            Choose papers from your Library and WriteOrbit builds the comparison table for your literature review.
+            Choose papers from your Library and AI for Research builds the comparison table for your literature review.
           </EmptyState>
         </Card>
       ) : null}

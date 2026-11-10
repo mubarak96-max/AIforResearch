@@ -3,7 +3,7 @@ import { VerifyReport } from './VerifyReport';
 
 export const metadata: Metadata = {
   title: 'Authorship report',
-  description: 'A WriteOrbit authorship report: how a document was written.',
+  description: 'An AI for Research authorship report: how a document was written.',
   // Reports are private to whoever has the link.
   robots: { index: false, follow: false },
 };

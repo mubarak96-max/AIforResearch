@@ -150,7 +150,7 @@ export function FeatureLanding({ page: tool, children }: { page: FeaturePage; ch
             <p className="mt-1 text-[15.5px] text-ink">{tool.example.input}</p>
           </div>
           <div className="px-6 py-4">
-            <p className="text-[12px] font-medium uppercase tracking-[.1em] text-subtle">WriteOrbit returns</p>
+            <p className="text-[12px] font-medium uppercase tracking-[.1em] text-subtle">AI for Research returns</p>
             <p className="mt-1 text-[15.5px] leading-[1.6] text-ink-2">{tool.example.output}</p>
           </div>
           <figcaption className="border-t border-line-2 px-6 py-3 text-[13px] italic text-muted">Illustrative example. Real results depend on your sources and wording.</figcaption>

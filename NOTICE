@@ -1,6 +1,6 @@
-WriteOrbit is proprietary software. Copyright © 2026 WriteOrbit. All rights reserved.
+AI for Research is proprietary software. Copyright © 2026 AI for Research. All rights reserved.
 
-Parts of WriteOrbit are derived from software released under the MIT License. That licence
+Parts of AI for Research are derived from software released under the MIT License. That licence
 requires its notice to be kept with copies of the software:
 
 MIT License
@@ -27,7 +27,7 @@ SOFTWARE.
 
 ------------------------------------------------------------------------------------------
 
-WriteOrbit includes third-party software under its own licences, among them:
+AI for Research includes third-party software under its own licences, among them:
 
 - BlockNote (@blocknote/*) — MPL-2.0
 - citeproc-js (citeproc), via citation-js — CPAL-1.0 or AGPL-1.0, at the user's option.

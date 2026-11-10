@@ -66,7 +66,7 @@ export function EmailCard() {
             <span className="grid h-9 w-9 place-items-center rounded-lg bg-soft"><LuNewspaper className="h-[18px] w-[18px] text-ink-2" aria-hidden="true" /></span>
             <span className="min-w-0 flex-1">
               <span className="block text-[14.5px] font-medium">Newsletter</span>
-              <span className="block text-[13px] text-muted">{state.subscribed && !state.confirmed ? 'Starts once your email is confirmed' : 'News and tips from WriteOrbit'}</span>
+              <span className="block text-[13px] text-muted">{state.subscribed && !state.confirmed ? 'Starts once your email is confirmed' : 'News and tips from AI for Research'}</span>
             </span>
             <Switch label="Newsletter" checked={state.subscribed} disabled={busy !== null} onChange={(value) => void toggle(value)} />
           </div>

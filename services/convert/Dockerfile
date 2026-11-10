@@ -1,4 +1,4 @@
-# writeorbit-convert: Word/PDF/LaTeX converter for the WriteOrbit editor (internal service, port 4100).
+# writeorbit-convert: Word/PDF/LaTeX converter for the AI for Research editor (internal service, port 4100).
 FROM python:3.12-slim-bookworm
 
 # 1 (default) also installs pytest so the test suite can run in the image; 0 for a lean image.

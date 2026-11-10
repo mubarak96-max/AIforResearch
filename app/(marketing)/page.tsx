@@ -14,7 +14,7 @@ import { Footnote, PageReferences, PenTick, PenUnderline, type ReferenceId } fro
 const DESCRIPTION =
   'Write faster with AI that cites real papers. Generate APA, MLA, Chicago and AMA citations, check every claim and export to Word or LaTeX. Free to start.';
 
-export const metadata = pageMetadata({ title: 'WriteOrbit — AI writing editor and citation generator', absolute: true, path: '/', description: DESCRIPTION });
+export const metadata = pageMetadata({ title: 'AI for Research — AI writing editor and citation generator', absolute: true, path: '/', description: DESCRIPTION });
 
 // Static, rebuilt every 5 minutes so the plans in the pricing teaser stay current.
 export const revalidate = 300;
@@ -59,15 +59,15 @@ const AUDIENCES = [
 ];
 
 const FAQ = [
-  { q: 'Is WriteOrbit free?', a: 'Yes. The free plan includes the full editor, the citation generator and a daily AI allowance. You don’t need a credit card.' },
+  { q: 'Is AI for Research free?', a: 'Yes. The free plan includes the full editor, the citation generator and a daily AI allowance. You don’t need a credit card.' },
   { q: 'Are the citations real?', a: 'Yes. Every citation comes from a scholarly database, not from the AI’s memory. Click a citation to open the paper.' },
   { q: 'Which citation styles can I use?', a: 'APA 7, MLA 9, Chicago, Harvard, AMA, ACS, IEEE, Vancouver, Turabian, Bluebook and over 10,000 journal styles. Change the style and every citation and the reference list update.' },
-  { q: 'Can WriteOrbit check my claims?', a: 'Yes. Claim check reads your draft, flags claims that are unsupported or overstated, and shows where you need a citation. Source quality spots retracted papers and wrong DOIs.' },
+  { q: 'Can AI for Research check my claims?', a: 'Yes. Claim check reads your draft, flags claims that are unsupported or overstated, and shows where you need a citation. Source quality spots retracted papers and wrong DOIs.' },
   { q: 'Is it only for academic writing?', a: 'It is built for students, researchers and academics. It also works for any writing that needs sources, such as reports, articles and features.' },
-  { q: 'Will my writing be used to train AI?', a: 'No. WriteOrbit does not train AI on your documents. They stay private to you and the people you share them with.' },
-  { q: "Can I use my university's Word template?", a: 'Yes. Open the .docx and WriteOrbit keeps its styles, headers and page setup when you export.' },
+  { q: 'Will my writing be used to train AI?', a: 'No. AI for Research does not train AI on your documents. They stay private to you and the people you share them with.' },
+  { q: "Can I use my university's Word template?", a: 'Yes. Open the .docx and AI for Research keeps its styles, headers and page setup when you export.' },
   { q: 'Can I write with others?', a: 'Yes. Invite people as editors, commenters or viewers and write in the same document at the same time.' },
-  { q: 'Does it work on my phone?', a: 'Yes. WriteOrbit runs in the browser on phones, tablets and computers, and your work syncs between them.' },
+  { q: 'Does it work on my phone?', a: 'Yes. AI for Research runs in the browser on phones, tablets and computers, and your work syncs between them.' },
   { q: 'Can I cancel any time?', a: 'Yes. Cancel from your account. Your plan stays active until the end of the period you paid for.' },
 ];
 
@@ -142,7 +142,7 @@ export default async function LandingPage() {
       </section>
 
       {/* Facts */}
-      <section aria-label="WriteOrbit at a glance" className={`${container} pt-14 md:pt-20`}>
+      <section aria-label="AI for Research at a glance" className={`${container} pt-14 md:pt-20`}>
         <div className="relative mx-auto max-w-[840px]">
         <ul className="grid grid-cols-3 rounded-[20px] border border-line bg-surface py-6 shadow-[0_20px_40px_-32px_rgba(15,23,42,.35)] md:py-9">
           {FACTS.map((fact, index) => (
@@ -197,7 +197,7 @@ export default async function LandingPage() {
       <section aria-labelledby="audience-title" className="mt-24 border-y border-line-2 bg-panel py-20 md:mt-32 md:py-24">
         <div className={container}>
         <div className="text-center">
-          <h2 id="audience-title" className={`mx-auto max-w-[620px] ${h2}`}>Who is WriteOrbit for?</h2>
+          <h2 id="audience-title" className={`mx-auto max-w-[620px] ${h2}`}>Who is AI for Research for?</h2>
           <p className={`mx-auto mt-4 max-w-[520px] ${lead}`}>Anyone who writes with sources. It is built first for students, researchers and academics.</p>
         </div>
         <ul className="mt-10 grid gap-5 sm:grid-cols-2 md:mt-14 lg:grid-cols-4 lg:gap-6">

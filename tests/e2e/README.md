@@ -1,6 +1,6 @@
 # Browser tests
 
-Playwright scripts that drive a running WriteOrbit like a person would: sign up, write, cite, export, pay with test cards, and so on. Each prints `PASS` / `FAIL` lines and a total, and most save screenshots to `/shots`.
+Playwright scripts that drive a running AI for Research like a person would: sign up, write, cite, export, pay with test cards, and so on. Each prints `PASS` / `FAIL` lines and a total, and most save screenshots to `/shots`.
 
 Run them against `pnpm dev:all` (the Firebase emulators plus the web app on :3000), or against a deployed site with `BASE=https://…`:
 

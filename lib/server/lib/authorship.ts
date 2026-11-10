@@ -1,7 +1,7 @@
 /**
  * The authorship record: how a document was written. While someone edits, the editor sends a
  * running summary of their session every minute or so (time spent writing, characters typed,
- * pasted from outside, pasted from inside the document, accepted from WriteOrbit AI, deleted,
+ * pasted from outside, pasted from inside the document, accepted from AI for Research AI, deleted,
  * and when each large paste happened, with a hash of the pasted text, never the text). With the
  * daily snapshots in the version history (ensureDailyVersion) this becomes a report the writer
  * can share with a teacher, supervisor or client.

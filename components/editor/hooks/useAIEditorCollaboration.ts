@@ -18,7 +18,7 @@ import type {
 } from '../types/ai-editor';
 
 const EMPTY_MEMBERS: AIEditorDocumentMember[] = [];
-export const AI_COMMENT_AUTHOR = 'WriteOrbit AI';
+export const AI_COMMENT_AUTHOR = 'AI for Research AI';
 export const AI_COMMENT_SESSION_ID = 'citedevidence-ai';
 const EMPTY_BOOKMARKS: AIEditorBookmark[] = [];
 const EMPTY_COMMENTS: AIEditorComment[] = [];

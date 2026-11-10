@@ -29,7 +29,7 @@ const STYLES: { name: string; kind: string; inText: string; field: string; page?
 
 const STEPS: [string, string][] = [
   ['Find the source', 'Type @ in your document, or open Find papers and search 250M+ scholarly works. You can also add a source by hand.'],
-  ['Cite it', 'Click Cite. WriteOrbit adds the in-text citation in your style and adds the source to your reference list or works cited page.'],
+  ['Cite it', 'Click Cite. AI for Research adds the in-text citation in your style and adds the source to your reference list or works cited page.'],
   ['Change the style any time', 'Pick another style in the status bar. Every citation and the whole reference list update at once.'],
 ];
 
@@ -70,7 +70,7 @@ export default function CitationStylesPage() {
       </div>
 
       <section aria-labelledby="how-to-cite" className="pb-20 pt-14">
-        <h2 id="how-to-cite" className="text-[26px] font-bold tracking-[-0.02em] text-ink md:text-[30px]">How to cite in WriteOrbit</h2>
+        <h2 id="how-to-cite" className="text-[26px] font-bold tracking-[-0.02em] text-ink md:text-[30px]">How to cite in AI for Research</h2>
         <ol className="mt-6 grid gap-4 md:grid-cols-3">
           {STEPS.map(([title, text], index) => (
             <li key={title} className="rounded-2xl border border-line bg-surface p-5">

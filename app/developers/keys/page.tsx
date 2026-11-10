@@ -27,7 +27,7 @@ const credits = (value: number) => (value > 0 && value < 0.01 ? '<0.01' : number
 /** $29.90, $119, $4,990. */
 const usd = (cents: number) => (cents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: cents % 100 ? 2 : 0 });
 const date = (value: string) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-const KIND: Record<string, string> = { purchase: 'Purchase', topup: 'Top-up', starter: 'Starter', grant: 'Added by WriteOrbit', refund: 'Refund' };
+const KIND: Record<string, string> = { purchase: 'Purchase', topup: 'Top-up', starter: 'Starter', grant: 'Added by AI for Research', refund: 'Refund' };
 
 /** Developer API: credits, automatic top-up, API keys and this month's use. */
 export default function DeveloperKeysPage() {

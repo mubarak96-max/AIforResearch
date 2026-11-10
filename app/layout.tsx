@@ -21,10 +21,10 @@ dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: 'WriteOrbit — AI writing editor and citation generator', template: '%s · WriteOrbit' },
+  title: { default: 'AI for Research — AI writing editor and citation generator', template: '%s · AI for Research' },
   description:
     'Write faster with AI that cites real papers. Generate citations in 10,000+ styles, check every claim and export to Word or LaTeX.',
-  applicationName: 'WriteOrbit',
+  applicationName: 'AI for Research',
   manifest: '/manifest.webmanifest',
   icons: {
     icon: [

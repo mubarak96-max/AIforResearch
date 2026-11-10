@@ -4,7 +4,7 @@ import { pageMetadata } from '@/components/marketing/seo';
 export const metadata = pageMetadata({
   title: 'Privacy policy',
   path: '/privacy',
-  description: 'What WriteOrbit collects, why, who processes it and how long it is kept. Your documents are private to you and are never used to train AI.',
+  description: 'What AI for Research collects, why, who processes it and how long it is kept. Your documents are private to you and are never used to train AI.',
 });
 
 const SECTIONS: LegalSection[] = [
@@ -14,7 +14,7 @@ const SECTIONS: LegalSection[] = [
     body: (
       <ul>
         <li><strong>Account details</strong>: your name, email address and sign-in method (password or a provider such as Google).</li>
-        <li><strong>Your content</strong>: the documents, comments, references, uploaded files and PDFs you add to WriteOrbit.</li>
+        <li><strong>Your content</strong>: the documents, comments, references, uploaded files and PDFs you add to AI for Research.</li>
         <li><strong>Billing details</strong>: your plan and payment status. Card details go straight to our payment processor; we never see or store them.</li>
         <li><strong>Usage and technical data</strong>: how much of each AI feature you use (to apply plan limits), and logs such as IP address, browser and error reports that keep the service secure and working.</li>
       </ul>
@@ -25,7 +25,7 @@ const SECTIONS: LegalSection[] = [
     title: 'How we use it',
     body: (
       <>
-        <p>We use your data to run WriteOrbit: to sign you in, save and sync your documents, run the AI and citation features you ask for, apply your plan, take payments, send account emails (such as password resets) and keep the service secure.</p>
+        <p>We use your data to run AI for Research: to sign you in, save and sync your documents, run the AI and citation features you ask for, apply your plan, take payments, send account emails (such as password resets) and keep the service secure.</p>
         <p>We send the newsletter only if you turn it on, and you can turn it off at any time in Account › Email.</p>
       </>
     ),
@@ -45,7 +45,7 @@ const SECTIONS: LegalSection[] = [
     title: 'Who we share it with',
     body: (
       <>
-        <p>We do not sell your personal data. We share it only with the service providers that run WriteOrbit for us, and only as far as each one needs:</p>
+        <p>We do not sell your personal data. We share it only with the service providers that run AI for Research for us, and only as far as each one needs:</p>
         <ul>
           <li>Google Cloud and Firebase: hosting, sign-in, database and file storage.</li>
           <li>Dodo Payments: payments, as merchant of record (it receives your billing details and card, not your writing).</li>
@@ -87,7 +87,7 @@ const SECTIONS: LegalSection[] = [
   {
     id: 'children',
     title: 'Children',
-    body: <p>WriteOrbit is not meant for children under 13, and we do not knowingly collect their data. If you think a child has given us data, <ContactLine /> and we will delete it.</p>,
+    body: <p>AI for Research is not meant for children under 13, and we do not knowingly collect their data. If you think a child has given us data, <ContactLine /> and we will delete it.</p>,
   },
   {
     id: 'changes',
@@ -106,7 +106,7 @@ export default function PrivacyPage() {
     <LegalPage
       title="Privacy policy"
       updated="2026-11-06"
-      intro={<p>This policy explains what {COMPANY.name} collects when you use WriteOrbit, why, and the choices you have. The short version: your documents are yours, they stay private to you and the people you share them with, and we never use them to train AI.</p>}
+      intro={<p>This policy explains what {COMPANY.name} collects when you use AI for Research, why, and the choices you have. The short version: your documents are yours, they stay private to you and the people you share them with, and we never use them to train AI.</p>}
       sections={SECTIONS}
     />
   );

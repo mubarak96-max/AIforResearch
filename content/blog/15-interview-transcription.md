@@ -18,8 +18,8 @@ faq:
     a: "Use verbatim for legal work and research that analyzes how people speak, including pauses and false starts. Use intelligent verbatim for most journalism and qualitative research, because it is readable and keeps the meaning. Use edited transcripts only for published Q&As, and tell readers the text was edited for length and clarity."
   - q: "Is it legal to record an interview?"
     a: "Federal law and most states allow recording when one party to the conversation consents, so you can record your own interview. About a dozen states, including California, Florida, Illinois, Maryland, Massachusetts, Pennsylvania and Washington, generally require everyone's consent. Across state lines, assume the stricter law applies. Asking on the recording settles it."
-  - q: "Can WriteOrbit transcribe audio?"
-    a: "No. WriteOrbit does not transcribe audio or video. Use a transcription tool or service first, then bring the transcript in: upload it as a PDF to the Library and use Ask to find passages, with page numbers, or open the Word file as a document. You then write the story or report beside it."
+  - q: "Can AI for Research transcribe audio?"
+    a: "No. AI for Research does not transcribe audio or video. Use a transcription tool or service first, then bring the transcript in: upload it as a PDF to the Library and use Ask to find passages, with page numbers, or open the Word file as a document. You then write the story or report beside it."
 ---
 
 # Interview transcription: formats, examples and how to do it fast
@@ -196,17 +196,17 @@ The Freedom of the Press Foundation's review of transcription tools recommends: 
 
 Also: keep the audio. A transcript is only as trustworthy as the recording you can check it against.
 
-## After transcription: find quotes and check them in WriteOrbit
+## After transcription: find quotes and check them in AI for Research
 
-WriteOrbit does not transcribe audio or video. Use one of the tools above to get the transcript, then bring it into WriteOrbit for the next step: finding what matters, quoting it accurately and writing beside it.
+AI for Research does not transcribe audio or video. Use one of the tools above to get the transcript, then bring it into AI for Research for the next step: finding what matters, quoting it accurately and writing beside it.
 
 1. **Save the transcript as a PDF and upload it to the Library.** Name it with the interviewee and date, for example `2026-11-04_Reyes_intelligent-verbatim.pdf`. The free plan holds 10 PDFs up to 10 MB each; Plus allows unlimited PDFs up to 50 MB.
 2. **Use Ask on that transcript.** Ask works on one PDF at a time, and its answers carry page numbers: "Where does Reyes talk about staffing?" or "What dates does she give for Dr. Patel leaving?" Open the cited page, find the timestamp, and listen to that spot in the audio before you quote it.
-3. **Or open the Word file as a document.** WriteOrbit opens `.docx` and keeps its styles, so you can comment on a transcript, highlight quotes and share it with an editor or co-researcher.
+3. **Or open the Word file as a document.** AI for Research opens `.docx` and keeps its styles, so you can comment on a transcript, highlight quotes and share it with an editor or co-researcher.
 4. **Write the story or report beside it.** The AI Chat panel next to your draft can use your Library, your document and the web as sources, which helps you look across several sources at once; treat its answers as leads and confirm each one in the transcript itself.
 5. **Run AI review on the draft.** Claim checks and proofreading appear as comments on the exact sentences.
 
-<!-- SCREENSHOT: WriteOrbit Library with a transcript PDF open, Ask answering "When did Dr. Patel leave?" with a page-number citation, and the draft story open beside it -->
+<!-- SCREENSHOT: AI for Research Library with a transcript PDF open, Ask answering "When did Dr. Patel leave?" with a page-number citation, and the draft story open beside it -->
 
 [From transcript to story](/blog/transcript-to-story) walks through this workflow in detail, including AP quote rules and a thematic analysis method for researchers.
 
@@ -228,9 +228,9 @@ Use verbatim for legal work and research that analyzes how people speak, includi
 
 Federal law and most states allow recording when one party to the conversation consents, so you can record your own interview. About a dozen states, including California, Florida, Illinois, Maryland, Massachusetts, Pennsylvania and Washington, generally require everyone's consent. Across state lines, assume the stricter law applies. Asking on the recording settles it.
 
-### Can WriteOrbit transcribe audio?
+### Can AI for Research transcribe audio?
 
-No. WriteOrbit does not transcribe audio or video. Use a transcription tool or service first, then bring the transcript in: upload it as a PDF to the Library and use Ask to find passages, with page numbers, or open the Word file as a document. You then write the story or report beside it.
+No. AI for Research does not transcribe audio or video. Use a transcription tool or service first, then bring the transcript in: upload it as a PDF to the Library and use Ask to find passages, with page numbers, or open the Word file as a document. You then write the story or report beside it.
 
 ## Next steps
 

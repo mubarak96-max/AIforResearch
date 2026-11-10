@@ -2,7 +2,7 @@ import { getApiBase, getAuthHeader } from './auth/api';
 import { notePlanLimit } from '../lib/planLimit';
 
 /**
- * WriteOrbit's server answers editor requests directly, so the "durable job" calls the
+ * AI for Research's server answers editor requests directly, so the "durable job" calls the
  * editor inherited are plain requests here. A 402 hands the person to the host's upgrade flow.
  */
 export type JobStatus = 'queued' | 'running' | 'completed' | 'failed' | 'cancelled' | 'dead_letter';
@@ -66,7 +66,7 @@ export async function getJob(jobId: string): Promise<JobDetail> {
   return (await response.json()) as JobDetail;
 }
 
-/** Polls a job until it finishes; WriteOrbit rarely queues, so this mostly returns at once. */
+/** Polls a job until it finishes; AI for Research rarely queues, so this mostly returns at once. */
 export async function waitForJob(jobId: string, opts: { signal?: AbortSignal; [key: string]: unknown } = {}): Promise<Record<string, unknown> | null> {
   for (let attempt = 0; attempt < 600; attempt += 1) {
     if (opts.signal?.aborted) throw new DOMException('Aborted', 'AbortError');

@@ -1,5 +1,5 @@
 /**
- * A page per editor feature (/features/[slug]): things WriteOrbit already does inside the editor,
+ * A page per editor feature (/features/[slug]): things AI for Research already does inside the editor,
  * explained one at a time. Standalone tools that work on their own page are in lib/tools.ts.
  * Every `cta.href` opens a working route (the PRD's rule: unavailable features are not
  * advertised as operational). Pure data, so tests, the sitemap and the blog can read it.
@@ -24,7 +24,7 @@ export type FeaturePage = {
   category: FeatureCategory;
   /** Beta tools say so on their card and page. */
   status: 'available' | 'beta';
-  /** The <title>, without the " · WriteOrbit" suffix. */
+  /** The <title>, without the " · AI for Research" suffix. */
   seoTitle: string;
   /** Meta description, 150–160 characters. */
   description: string;
@@ -63,7 +63,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     description: 'Ask a research question and get an answer built from real papers, each cited and one click from the source. Search the web, your Library or your draft.',
     short: 'Ask a question. Get an answer with real, clickable citations.',
     heading: 'An AI research assistant that shows its sources',
-    intro: 'Ask a question in plain words. WriteOrbit searches scholarly papers, your Library or your own draft, and answers with citations you can open and check.',
+    intro: 'Ask a question in plain words. AI for Research searches scholarly papers, your Library or your own draft, and answers with citations you can open and check.',
     keywords: ['ai research assistant', 'research assistant ai', 'ai for research', 'ask research questions'],
     visual: 'chat',
     benefits: [
@@ -148,11 +148,11 @@ export const FEATURE_PAGES: FeaturePage[] = [
     description: 'Upload PDFs, import BibTeX or RIS files, and sort papers into collections. Cite any paper in your writing and ask questions about it with page numbers.',
     short: 'Upload PDFs, sort them into collections and cite them anywhere.',
     heading: 'One library for every paper you read',
-    intro: 'Keep your PDFs and references together. WriteOrbit reads each PDF’s details, so you can cite it, search it and ask about it.',
+    intro: 'Keep your PDFs and references together. AI for Research reads each PDF’s details, so you can cite it, search it and ask about it.',
     keywords: ['research library', 'pdf library for research', 'reference library', 'organize research papers'],
     visual: 'import',
     benefits: [
-      { title: 'Details filled in', body: 'Upload a PDF and WriteOrbit finds its title, authors and DOI for the citation.' },
+      { title: 'Details filled in', body: 'Upload a PDF and AI for Research finds its title, authors and DOI for the citation.' },
       { title: 'Collections', body: 'Sort papers by project, chapter or topic, and limit AI answers to one collection.' },
       { title: 'Cite from your Library', body: 'Library papers come first when you type @, in whatever style your document uses.' },
     ],
@@ -228,7 +228,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     category: 'library',
     status: 'available',
     seoTitle: 'Import from Zotero and Mendeley, BibTeX or RIS',
-    description: 'Bring your references from Zotero, Mendeley, BibTeX or RIS files into WriteOrbit, then cite them in 10,000+ styles and ask questions about the PDFs.',
+    description: 'Bring your references from Zotero, Mendeley, BibTeX or RIS files into AI for Research, then cite them in 10,000+ styles and ask questions about the PDFs.',
     short: 'Bring your Zotero, Mendeley, BibTeX and RIS references with you.',
     heading: 'Bring your Zotero and Mendeley library with you',
     intro: 'Connect Zotero or Mendeley, or import a BibTeX or RIS file. Your references arrive ready to cite, and their PDFs ready to ask about.',
@@ -259,7 +259,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     related: ['research-library', 'chat-with-pdf'],
     tools: ['citation-generator'],
     faq: [
-      { q: 'Does it sync both ways?', a: 'No. Import copies your references into WriteOrbit. Import again to pick up new items.' },
+      { q: 'Does it sync both ways?', a: 'No. Import copies your references into AI for Research. Import again to pick up new items.' },
       { q: 'Which file formats work?', a: 'BibTeX (.bib) and RIS (.ris), which EndNote, Zotero, Mendeley and most databases can export.' },
     ],
   },
@@ -274,7 +274,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     description: 'AI autocomplete that suggests your next sentence with a real citation. Press Tab to accept. Draft whole sections from papers you choose and accept each part.',
     short: 'Autocomplete that suggests your next sentence, with a real citation.',
     heading: 'An AI writing assistant that cites as it writes',
-    intro: 'Pause at the end of a sentence and WriteOrbit suggests the next one, with a real reference. Or give it a topic and papers, and it drafts section by section for you to accept or change.',
+    intro: 'Pause at the end of a sentence and AI for Research suggests the next one, with a real reference. Or give it a topic and papers, and it drafts section by section for you to accept or change.',
     keywords: ['ai writing assistant', 'academic writing ai', 'ai autocomplete', 'ai writer with citations'],
     visual: 'autocomplete',
     benefits: [
@@ -315,7 +315,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     description: 'Compare papers side by side in a review matrix filled from the PDFs, with the quote and page for every cell. Then draft your literature review with real citations.',
     short: 'A review matrix filled from your PDFs, then a cited draft.',
     heading: 'Write your literature review from the papers, not from memory',
-    intro: 'Put your papers in a review matrix. WriteOrbit reads each one and fills in the aim, method, sample, findings and limitations, with the quote and page for every answer. Then draft the review with real citations.',
+    intro: 'Put your papers in a review matrix. AI for Research reads each one and fills in the aim, method, sample, findings and limitations, with the quote and page for every answer. Then draft the review with real citations.',
     keywords: ['literature review tool', 'ai literature review', 'literature review matrix', 'literature review generator', 'review of related literature'],
     visual: 'review',
     benefits: [
@@ -325,7 +325,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     ],
     steps: [
       { title: 'Choose papers', body: 'Pick papers from your Library for a new matrix.' },
-      { title: 'Fill the matrix', body: 'WriteOrbit reads each paper and answers each column.' },
+      { title: 'Fill the matrix', body: 'AI for Research reads each paper and answers each column.' },
       { title: 'Write', body: 'Open the literature review template and draft from the papers, citing as you go.' },
     ],
     inputs: ['PDFs in your Library', 'Columns (defaults: aim, method, sample, findings, limitations)'],
@@ -356,7 +356,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     description: 'Select a passage and improve it, shorten it, expand it or change its tone. Proofread the whole document for grammar, word choice and repetition, as tracked changes.',
     short: 'Improve, shorten, expand or proofread, as tracked changes.',
     heading: 'Edit your writing with AI, one passage at a time',
-    intro: 'Select a passage and ask WriteOrbit to improve, shorten or expand it, or set a tone. Proofread the whole document and review each fix as a tracked change.',
+    intro: 'Select a passage and ask AI for Research to improve, shorten or expand it, or set a tone. Proofread the whole document and review each fix as a tracked change.',
     keywords: ['ai writing editor', 'ai proofreader', 'academic proofreading', 'improve my writing', 'paraphrase academic text'],
     visual: 'review',
     benefits: [
@@ -447,7 +447,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
       { title: 'Fix or dismiss', body: 'Resolve each comment in one click and keep track of what is left.' },
     ],
     steps: [
-      { title: 'Open your draft', body: 'Write in WriteOrbit or open your Word file.' },
+      { title: 'Open your draft', body: 'Write in AI for Research or open your Word file.' },
       { title: 'Run peer review', body: 'Choose peer review in the Review panel.' },
       { title: 'Work through it', body: 'Fix, reply to or dismiss each comment.' },
     ],
@@ -478,7 +478,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     description: 'Show a teacher, supervisor or client how your document was written: time spent, text typed, pasted and accepted from AI, with a link they can verify.',
     short: 'Show how you wrote it: typed, pasted and AI-assisted text.',
     heading: 'Show how you wrote your work',
-    intro: 'WriteOrbit keeps a record of how your document grew: time spent writing, text typed, text pasted, and text accepted from WriteOrbit AI. Share it as a report with a link anyone can verify.',
+    intro: 'AI for Research keeps a record of how your document grew: time spent writing, text typed, text pasted, and text accepted from AI for Research AI. Share it as a report with a link anyone can verify.',
     keywords: ['authorship report', 'proof of writing process', 'show writing history', 'prove i wrote my essay'],
     visual: 'phone',
     benefits: [
@@ -487,11 +487,11 @@ export const FEATURE_PAGES: FeaturePage[] = [
       { title: 'Private by default', body: 'Only people with the link can see a report. Pasted text itself is never stored.' },
     ],
     steps: [
-      { title: 'Write in WriteOrbit', body: 'The record builds while you write.' },
+      { title: 'Write in AI for Research', body: 'The record builds while you write.' },
       { title: 'Create a report', body: 'Choose File › Authorship report.' },
       { title: 'Share', body: 'Send the verification link to your teacher or supervisor.' },
     ],
-    inputs: ['A document written in WriteOrbit'],
+    inputs: ['A document written in AI for Research'],
     outputs: ['A shareable authorship report with a verification link'],
     limitations: [
       'The counts come from your browser, so the report is evidence of how the work grew, not proof. The report says so.',
@@ -499,7 +499,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     ],
     example: {
       input: 'An essay written over five sessions.',
-      output: '6 h 40 min writing · 9,800 characters typed · 600 pasted · 450 accepted from WriteOrbit AI.',
+      output: '6 h 40 min writing · 9,800 characters typed · 600 pasted · 450 accepted from AI for Research AI.',
     },
     cta: { label: 'Start writing', href: '/editor?new=1' },
     related: ['ai-writing-assistant', 'citation-checker'],

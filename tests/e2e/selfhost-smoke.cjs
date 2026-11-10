@@ -42,7 +42,7 @@ async function call(path, { token, method = 'GET', body } = {}) {
   check('admin papers test works without a key', test.data.ok === true, JSON.stringify(test.data).slice(0, 200));
   const search = await call('/api/ai-editor/assist/papers?q=sleep%20memory%20consolidation&limit=3', { token });
   check('paper search', search.status === 200 && (search.data.results || search.data.papers || []).length > 0, String(search.status));
-  const docx = await call('/api/ai-editor/word/export', { token, method: 'POST', body: { title: 'Self-host', format: 'docx', blocks: [{ id: 'a', type: 'paragraph', props: {}, content: [{ type: 'text', text: 'Hello from a self-hosted WriteOrbit.', styles: {} }], children: [] }] } });
+  const docx = await call('/api/ai-editor/word/export', { token, method: 'POST', body: { title: 'Self-host', format: 'docx', blocks: [{ id: 'a', type: 'paragraph', props: {}, content: [{ type: 'text', text: 'Hello from a self-hosted AI for Research.', styles: {} }], children: [] }] } });
   check('Word export through the converter', docx.status === 200 && docx.data.subarray(0, 2).toString() === 'PK', `${docx.status} ${docx.type}`);
   const ai = await call('/api/ai-editor/assist/complete', { token, method: 'POST', body: { before: 'Sleep helps memory because', length: 'sentence' } });
   check('AI without a key: a clear 503, not a crash', ai.status === 503 || ai.status === 402, `${ai.status} ${JSON.stringify(ai.data).slice(0, 120)}`);

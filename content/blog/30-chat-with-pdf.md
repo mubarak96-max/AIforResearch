@@ -13,7 +13,7 @@ faq:
   - q: "How does chat with PDF work?"
     a: "Most tools use retrieval-augmented generation. The tool extracts the PDF's text, splits it into passages, and indexes them. When you ask a question, it finds the passages most related to it and gives only those to a language model, which writes an answer from them. Good tools show which passage and page each claim came from."
   - q: "Is there a free way to chat with a PDF?"
-    a: "Yes. ChatPDF, AskYourPDF, SciSpace, Gemini Notebook (formerly NotebookLM) and WriteOrbit all have free tiers. Free plans cap the number of documents per day, pages or file size, and questions. Gemini Notebook's free tier is the most generous for many files: up to 50 sources per notebook. Check each tool's pricing page, because limits change often."
+    a: "Yes. ChatPDF, AskYourPDF, SciSpace, Gemini Notebook (formerly NotebookLM) and AI for Research all have free tiers. Free plans cap the number of documents per day, pages or file size, and questions. Gemini Notebook's free tier is the most generous for many files: up to 50 sources per notebook. Check each tool's pricing page, because limits change often."
   - q: "Can I chat with multiple PDFs at once?"
     a: "Yes, in most tools. ChatPDF uses folders, AskYourPDF has multi-document chat on paid plans, Adobe Acrobat uses PDF Spaces, and Gemini Notebook treats each notebook as a set of sources. Cross-document answers are harder to check, so ask the tool to name the file and page for every claim."
   - q: "Is it safe to upload confidential PDFs to an AI chat tool?"
@@ -123,7 +123,7 @@ Prices and limits as of November 2026. They change often; check each pricing pag
 | Adobe Acrobat AI Assistant | Not part of free Acrobat Reader in most plans <!-- VERIFY: whether Acrobat Reader includes any free AI Assistant questions --> | Acrobat Express about $9.99/month and Acrobat Studio about $24.99/month (annual plans, billed monthly) include AI features <!-- VERIFY: price of the standalone AI Assistant add-on for Acrobat Pro/Standard --> | PDF Spaces | Answers cite the source text | Strong PDF tools (OCR, edit, redact); says content isn't used to train its models |
 | SciSpace | Limited daily PDFs and questions <!-- VERIFY: SciSpace free tier (its comparison page listed 2 PDFs a day, 120 pages each, 50 questions a day) --> | Premium about $12/month billed yearly <!-- VERIFY: SciSpace Premium price on scispace.com/pricing --> | Yes <!-- VERIFY: SciSpace multi-PDF chat and page-level citations --> | Yes | Built for research papers; also a paper search engine |
 | Gemini Notebook (formerly NotebookLM) | 100 notebooks, 50 sources each; up to 500,000 words or 200 MB per source | Higher limits with Google AI plans (Pro: 300 sources per notebook) | Yes: every notebook is a source set | Inline citations to source passages | Renamed by Google on 16 July 2026; many source types, including audio and YouTube |
-| WriteOrbit | 10 PDFs up to 10 MB each, 5 chat messages a day | Plus $12/month: unlimited PDFs up to 50 MB, 500 chat messages a month | Library chat | Answers carry page numbers | Write and cite in the same editor; can run in your own cloud account |
+| AI for Research | 10 PDFs up to 10 MB each, 5 chat messages a day | Plus $12/month: unlimited PDFs up to 50 MB, 500 chat messages a month | Library chat | Answers carry page numbers | Write and cite in the same editor; can run in your own cloud account |
 
 Fair notes: Gemini Notebook is the strongest free option for large sets of sources. Acrobat is the best choice if you already pay for it and need OCR, redaction and editing in the same tool. SciSpace is built around research papers. ChatPDF is the fastest way to ask a question with no sign-up.
 
@@ -140,16 +140,16 @@ Fair notes: Gemini Notebook is the strongest free option for large sets of sourc
 
 Add one line to any prompt: **"If the document doesn't say, answer 'not in the document'."**
 
-## Chatting with PDFs in WriteOrbit
+## Chatting with PDFs in AI for Research
 
-WriteOrbit puts PDF chat next to the document you are writing, so the answer, the page and your draft are on one screen.
+AI for Research puts PDF chat next to the document you are writing, so the answer, the page and your draft are on one screen.
 
 1. **Upload PDFs to the Library**, or import them from Zotero or Mendeley on a paid plan.
 2. **Open a PDF and choose Ask.** Answers carry page numbers, so you can turn to the passage and check it.
 3. **Ask across your Library from the AI chat** beside your draft by choosing Library as a source. Its answers cite the papers they draw on; open the paper and use Ask on it when you need the exact page.
 4. **Cite as you write.** Type `@` to cite a paper from the Library or from a search of 250M+ scholarly works.
 5. **Check the draft.** AI review runs claim checks and flags retracted papers, preprints and wrong DOIs, as comments in the text.
-6. **Keep sensitive files in your own cloud.** WriteOrbit can be deployed to your own Firebase / Google Cloud project, so documents stay in your own cloud account. <!-- VERIFY: confirm self-hosting is offered publicly before publishing -->
+6. **Keep sensitive files in your own cloud.** AI for Research can be deployed to your own Firebase / Google Cloud project, so documents stay in your own cloud account. <!-- VERIFY: confirm self-hosting is offered publicly before publishing -->
 
 <!-- SCREENSHOT: the Library with a court filing PDF open, the chat panel answering "Where does the witness describe the meeting?" with a quoted line and a page-number link, and the draft document beside it -->
 
@@ -163,7 +163,7 @@ Most tools use retrieval-augmented generation. The tool extracts the PDF's text,
 
 ### Is there a free way to chat with a PDF?
 
-Yes. ChatPDF, AskYourPDF, SciSpace, Gemini Notebook (formerly NotebookLM) and WriteOrbit all have free tiers. Free plans cap the number of documents per day, pages or file size, and questions. Gemini Notebook's free tier is the most generous for many files: up to 50 sources per notebook. Check each tool's pricing page, because limits change often.
+Yes. ChatPDF, AskYourPDF, SciSpace, Gemini Notebook (formerly NotebookLM) and AI for Research all have free tiers. Free plans cap the number of documents per day, pages or file size, and questions. Gemini Notebook's free tier is the most generous for many files: up to 50 sources per notebook. Check each tool's pricing page, because limits change often.
 
 ### Can I chat with multiple PDFs at once?
 

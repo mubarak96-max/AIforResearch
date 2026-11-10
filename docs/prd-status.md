@@ -1,6 +1,6 @@
 # PRD status
 
-Where WriteOrbit stands against `newfeatures.md` (the research platform PRD). Updated 2026-11-10.
+Where AI for Research stands against `newfeatures.md` (the research platform PRD). Updated 2026-11-10.
 
 Two kinds of public page, never mixed:
 

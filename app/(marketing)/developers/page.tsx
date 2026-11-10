@@ -13,7 +13,7 @@ const callApi = (path: string) => getApp().request(path);
 /** Where the developer API answers, and the source code (shown only once it is public). */
 const apiUrl = (process.env.PUBLIC_API_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/+$/, '');
 const contactEmail = process.env.SUPPORT_EMAIL || process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@writeorbit.app';
-const contact = `mailto:${contactEmail}?subject=WriteOrbit%20for%20our%20institution`;
+const contact = `mailto:${contactEmail}?subject=AI for Research%20for%20our%20institution`;
 
 type Prices = {
   services: { id: string; label: string; unit: string; credits: number; free: boolean }[];
@@ -35,7 +35,7 @@ export async function generateMetadata() {
   return pageMetadata({
     title: 'Developers: scholarly papers and AI API',
     path: '/developers',
-    description: 'One WriteOrbit API key for scholarly papers, full text, research tools, reference checks, AI review and Word export. Pay only for what you use.',
+    description: 'One AI for Research API key for scholarly papers, full text, research tools, reference checks, AI review and Word export. Pay only for what you use.',
   });
 }
 
@@ -73,7 +73,7 @@ export default async function DevelopersPage() {
             One key for papers, full text and AI
           </h1>
           <p className="mx-auto mt-3.5 max-w-[640px] text-balance text-[16px] text-muted sm:text-[17px]">
-            Give your own app the same papers, full text and AI that power the WriteOrbit editor. Pay only for what you use.
+            Give your own app the same papers, full text and AI that power the AI for Research editor. Pay only for what you use.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Link href="/developers/keys" className={`${btnPrimary} h-12 px-6 text-[16px]`}>Get a key</Link>
@@ -185,7 +185,7 @@ reply = client.chat.completions.create(
           <div className="rounded-3xl border border-line bg-soft p-6 md:p-10">
             <span className="grid size-10 place-items-center rounded-xl bg-surface text-brand shadow-card"><LuGraduationCap size={20} /></span>
             <h2 id="institutions" className={`${sectionTitle} mt-4`}>For universities and research groups</h2>
-            <p className="mt-3 max-w-[720px] text-[16px] leading-relaxed text-muted">Run WriteOrbit for a whole department or university, in a Firebase project your institution owns, with your own sign-in rules, plans and providers.</p>
+            <p className="mt-3 max-w-[720px] text-[16px] leading-relaxed text-muted">Run AI for Research for a whole department or university, in a Firebase project your institution owns, with your own sign-in rules, plans and providers.</p>
             {contactEmail && <a href={contact} className={`${btnPrimary} mt-6 h-12 px-6 text-[16px]`}>Talk to us</a>}
           </div>
         </section>

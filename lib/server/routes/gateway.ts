@@ -94,7 +94,7 @@ export function gatewayRoutes(slots: Slots) {
     const header = c.req.header('authorization') || '';
     const key = header.toLowerCase().startsWith('bearer ') ? header.slice(7).trim() : '';
     const apiKey = key ? await findApiKey(key) : null;
-    if (!apiKey) throw new HTTPException(401, { message: 'Missing or invalid WriteOrbit API key. Create one at /developers/keys.' });
+    if (!apiKey) throw new HTTPException(401, { message: 'Missing or invalid AI for Research API key. Create one at /developers/keys.' });
     // Keys made while payments were in test mode stop working once real payments start.
     if (apiKey.mode !== billingMode()) throw new HTTPException(401, { message: `This is a ${apiKey.mode} key; create a new key for ${billingMode()} use.` });
     c.set('apiKey', apiKey);
@@ -259,7 +259,7 @@ export function gatewayRoutes(slots: Slots) {
     if (Array.isArray(json.tools)) {
       json.tools = json.tools.filter((tool: { name: string }) => !ACCOUNT_TOOLS.has(tool.name));
       json.tool_count = json.tools.length;
-      json.name = 'WriteOrbit research tools';
+      json.name = 'AI for Research research tools';
     }
     return c.json(json, upstream.status as any);
   });

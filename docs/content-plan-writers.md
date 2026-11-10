@@ -1,6 +1,6 @@
-# WriteOrbit content plan: journalists, editors, script writers and non-academic researchers
+# AI for Research content plan: journalists, editors, script writers and non-academic researchers
 
-30 articles to bring organic search and AI-answer traffic to WriteOrbit from writers outside academia.
+30 articles to bring organic search and AI-answer traffic to AI for Research from writers outside academia.
 
 - **Keyword data:** Ubersuggest, United States (location 2840), pulled 5 November 2026.
 - **Columns:** Vol = monthly US searches. SD = SEO difficulty, 0 to 100 (under 30 is easy, 30 to 45 is moderate, over 45 is hard). CPC = cost per click in US dollars, a rough sign of commercial value.
@@ -8,7 +8,7 @@
 
 ---
 
-## 1. What WriteOrbit can honestly promise these writers
+## 1. What AI for Research can honestly promise these writers
 
 Tie each article only to features the product has today:
 
@@ -31,7 +31,7 @@ Tie each article only to features the product has today:
 | Interview transcription | No audio-to-text | Cover what happens after transcription: upload the transcript, chat with it, quote and check it |
 | AP style checker | No AP rule engine | Teach the rules; use AI proofreading and tone review as the second pass |
 | AI headline generator | No headline tool | Teach headline writing; show how to draft and test headlines with the AI chat |
-| Screenplay writer / Final Draft alternative | No screenplay formatting | Pitch WriteOrbit for research, treatments, series bibles and coverage notes, not script formatting |
+| Screenplay writer / Final Draft alternative | No screenplay formatting | Pitch AI for Research for research, treatments, series bibles and coverage notes, not script formatting |
 
 Never claim a missing feature in any of these articles. AI assistants that quote a false claim hurt the brand more than having no citation at all. If you build a small AP-style or headline tool later, articles 7 to 11 can be updated to point to it.
 
@@ -66,7 +66,7 @@ Best openings in the data:
 4. **FAQ section with 4 to 6 questions** taken from the related keywords, marked up with `FAQPage` schema.
 5. **Cite primary sources** (AP Stylebook, WGA, SPJ Code of Ethics, PRISMA, journal papers) and link to them. Content that cites sources gets cited.
 6. **Show a dated byline and "last updated" date.** Revise yearly; titles below carry "2026" where freshness matters.
-7. **Make the product section concrete.** Show a screenshot or GIF of the exact feature (claim-check comment, chat answer with page number, citation dropdown). Never just say "try WriteOrbit".
+7. **Make the product section concrete.** Show a screenshot or GIF of the exact feature (claim-check comment, chat answer with page number, citation dropdown). Never just say "try AI for Research".
 8. **Add internal links** inside each cluster and to the cluster pillar (see section 5).
 
 ---
@@ -86,8 +86,8 @@ Best openings in the data:
   - What an AI writing assistant does in 2026: autocomplete, rewriting, chat, review
   - The hallucination problem: invented quotes, statistics and papers, with real examples of public corrections
   - 6 criteria for choosing one: source grounding, citation styles, collaboration, Word compatibility, privacy, price
-  - Comparison table: Grammarly, ChatGPT, Claude, Jasper, QuillBot, Wordtune, WriteOrbit
-  - Where WriteOrbit fits: citations to real papers, claim checks, chat with your PDFs
+  - Comparison table: Grammarly, ChatGPT, Claude, Jasper, QuillBot, Wordtune, AI for Research
+  - Where AI for Research fits: citations to real papers, claim checks, chat with your PDFs
   - Choosing by job: news, reports and white papers, scripts, books
   - FAQ: Is there a free AI writing assistant? Does Grammarly cite sources? Can I use an AI writing assistant in Word? Which AI writing assistant is most accurate?
 - **Product tie-in:** autocomplete with citations, AI review, Word import and export
@@ -107,7 +107,7 @@ Best openings in the data:
   - A free workflow for a 1,500-word sourced article
   - When to upgrade: signs you've outgrown a free plan
   - FAQ: Is there a free AI writing assistant with no sign-up? Is ChatGPT free for writing? Free AI writing assistant for Word?
-- **Product tie-in:** WriteOrbit's free plan limits (check the plans page before publishing); self-hosting the open repo is another route to low cost
+- **Product tie-in:** AI for Research's free plan limits (check the plans page before publishing); self-hosting the open repo is another route to low cost
 - **Links to:** 1, 24
 
 #### 3. AI Tools for Journalists: A Newsroom Workflow from Pitch to Publish
@@ -145,7 +145,7 @@ Best openings in the data:
   - Kinds of claims: numbers, quotes, scientific findings, dates and names; which ones AI handles well
   - Step by step: run a claim check on a 1,200-word draft (screenshots of review comments)
   - Source quality matters as much as the claim: retracted papers, preprints, wrong DOIs
-  - Comparison: Originality.ai, Facticity, Perplexity, Google Fact Check Explorer, WriteOrbit
+  - Comparison: Originality.ai, Facticity, Perplexity, Google Fact Check Explorer, AI for Research
   - What still needs a human: anonymous sources, local facts, context
   - FAQ: Is there a free AI fact checker? Can AI fact check itself? How accurate are AI fact checkers?
 - **Product tie-in:** AI review, claim checks and source-quality checks left as comments in the text
@@ -185,7 +185,7 @@ Best openings in the data:
   - Checking people, titles and quotes (call-backs, recordings)
   - Checking numbers and statistics (base rates, percentages, AP numbers style)
   - Checking scientific and medical claims (peer review, retractions, preprints)
-  - Free tools table: Google Fact Check Explorer, InVID, TinEye, Wayback Machine, Retraction Watch, WriteOrbit
+  - Free tools table: Google Fact Check Explorer, InVID, TinEye, Wayback Machine, Retraction Watch, AI for Research
   - Corrections policy: what to do after publishing
   - FAQ
 - **Product tie-in:** comments and suggestions as the fact-check log; source-quality flags for retracted and preprint studies
@@ -242,12 +242,12 @@ Best openings in the data:
 - **Outline:**
   - Short answer: the best checker by use case
   - Test method: one 300-word paragraph with 20 planted AP errors
-  - Results table: tool, errors caught, false positives, price (PerfectIt, Grammarly style guides, Lynx, ChatGPT with an AP prompt, WriteOrbit proofreading)
+  - Results table: tool, errors caught, false positives, price (PerfectIt, Grammarly style guides, Lynx, ChatGPT with an AP prompt, AI for Research proofreading)
   - Why no checker catches everything: context rules (titles, composition titles, datelines)
   - A prompt for AP style checking with any AI chat (give it to readers)
   - Human checklist for what tools miss
   - FAQ: Is there a free AP style checker? Does Grammarly check AP style?
-- **Product tie-in:** be honest: WriteOrbit has proofreading and tone review, not a dedicated AP rule engine. Show the AI chat using the prompt.
+- **Product tie-in:** be honest: AI for Research has proofreading and tone review, not a dedicated AP rule engine. Show the AI chat using the prompt.
 - **Links to:** 7, 8
 
 #### 10. AP vs. Chicago Style: Differences, Examples and When to Use Each
@@ -301,7 +301,7 @@ Best openings in the data:
   - When not to use it: features, narrative, the "hourglass" and "nut graf" structures
   - Why it suits SEO and AI answers: answer-first writing
   - FAQ
-- **Product tie-in:** a WriteOrbit document template for an inverted-pyramid story; autocomplete for the body
+- **Product tie-in:** an AI for Research document template for an inverted-pyramid story; autocomplete for the body
 - **Links to:** 13, 14, 7
 
 #### 13. How to Write a News Article: Format, Structure and Example
@@ -362,7 +362,7 @@ Best openings in the data:
   - Consent and privacy: recording laws, storing transcripts
   - After transcription: finding quotes and checking them (link to 16)
   - FAQ
-- **Product tie-in:** be honest: WriteOrbit doesn't transcribe audio. Show the step after it: import the transcript (Word or PDF), chat with it, pull quotes.
+- **Product tie-in:** be honest: AI for Research doesn't transcribe audio. Show the step after it: import the transcript (Word or PDF), chat with it, pull quotes.
 - **Links to:** 16, 3, 13
 
 #### 16. From Transcript to Story: How to Find, Quote and Check Interview Material
@@ -403,7 +403,7 @@ Best openings in the data:
   - What screenwriting software doesn't do: research, development documents, coverage
   - A full kit: formatter plus research and development workspace
   - FAQ: What software do professional screenwriters use? Is there free screenwriting software?
-- **Product tie-in:** WriteOrbit as the development and research workspace (treatments, bibles, research with sources, shared notes), not the formatter
+- **Product tie-in:** AI for Research as the development and research workspace (treatments, bibles, research with sources, shared notes), not the formatter
 - **Links to:** 18, 19, 23
 
 #### 18. Final Draft Alternatives: 9 Free and Paid Options Compared
@@ -438,7 +438,7 @@ Best openings in the data:
   - Formatting in Google Docs (step by step, add-ons) and Word (styles)
   - Annotated example page
   - FAQ
-- **Product tie-in:** light: keep the treatment and outline in WriteOrbit and import Word drafts. Don't claim screenplay formatting.
+- **Product tie-in:** light: keep the treatment and outline in AI for Research and import Word drafts. Don't claim screenplay formatting.
 - **Links to:** 17, 20
 
 #### 20. Script Coverage: What It Is, a Free Template and Real Examples
@@ -450,7 +450,7 @@ Best openings in the data:
 - **Outline:**
   - Short answer: what coverage is, who writes it, Pass / Consider / Recommend
   - Parts of coverage: logline, synopsis, comments, grid
-  - Free template (downloadable, plus a WriteOrbit template)
+  - Free template (downloadable, plus an AI for Research template)
   - Example 1: feature (public-domain or original script)
   - Example 2: TV pilot
   - How to write coverage: reading notes to a finished report
@@ -470,7 +470,7 @@ Best openings in the data:
   - Test: one script, human coverage vs. AI coverage, side by side
   - What AI got right, what it missed
   - Prompts for useful AI notes (logline, character arcs, scene purpose)
-  - Tools compared: dedicated AI coverage services, ChatGPT and Claude, WriteOrbit AI review
+  - Tools compared: dedicated AI coverage services, ChatGPT and Claude, AI for Research AI review
   - Confidentiality: who sees your script, training and data terms
   - How to use AI notes without losing your voice
   - FAQ
@@ -488,7 +488,7 @@ Best openings in the data:
   - WGA rules on AI (2023 contract) and what they mean for spec writers
   - Uses that work: research, outlining, beat sheets, dialogue passes, coverage
   - Uses that backfire: generic voice, rights and ownership issues
-  - Tools compared (AI screenplay tools, general chatbots, WriteOrbit)
+  - Tools compared (AI screenplay tools, general chatbots, AI for Research)
   - Workflow: idea to treatment to outline to draft, with AI at each step
   - FAQ: Can AI write a screenplay? Can I sell a script written with AI?
 - **Product tie-in:** research with sources, treatments and series bibles, AI review notes
@@ -498,7 +498,7 @@ Best openings in the data:
 
 - **Primary keyword:** research for a screenplay (not measured; a long-tail and AI-answer play)
 - **Secondary:** how to research for a script, screenplay research, writing a period drama research, based on a true story research
-- **Intent:** informational. Little competition, and a natural fit for WriteOrbit.
+- **Intent:** informational. Little competition, and a natural fit for AI for Research.
 - **Angle:** the research method behind fact-based films and series, with a research bible template
 - **Outline:**
   - Short answer: the 6-step research process
@@ -529,7 +529,7 @@ Best openings in the data:
   - Step by step: cite while you write (`@` to cite, autocomplete with citations)
   - Styles: APA 7, MLA 9, Chicago, IEEE, Harvard, plus 10,000+ CSL styles
   - Citations outside academia: reports, white papers, journalism (hyperlinks vs. reference lists)
-  - Comparison: Scribbr, ZoteroBib, QuillBot, MyBib, WriteOrbit
+  - Comparison: Scribbr, ZoteroBib, QuillBot, MyBib, AI for Research
   - Checking any citation in 30 seconds
   - FAQ: Can AI generate accurate citations? Is there a free AI citation generator? How do I cite a PDF?
 - **Product tie-in:** `@`-cite from 250M+ works, autocomplete that cites, source-quality flags
@@ -545,7 +545,7 @@ Best openings in the data:
   - Short answer: what an AI literature review tool does in an evidence review
   - Academic vs. professional reviews: scope, speed, audience
   - The 6-step rapid review: question, search, screen, extract, synthesize, write
-  - Tools compared: Elicit, Consensus, SciSpace, Scite, WriteOrbit
+  - Tools compared: Elicit, Consensus, SciSpace, Scite, AI for Research
   - Avoiding bias and gaps: search more than one database, record your search
   - Turning a review into a brief or report (link to 26)
   - FAQ: Can AI write a literature review? Is an AI literature review reliable?
@@ -603,7 +603,7 @@ Best openings in the data:
   - Moving between them: export formats (RIS, BibTeX)
   - Bringing either into your writing tool
   - FAQ
-- **Product tie-in:** import Zotero (API key) and Mendeley (OAuth) libraries into the WriteOrbit Library, then cite while writing
+- **Product tie-in:** import Zotero (API key) and Mendeley (OAuth) libraries into the AI for Research Library, then cite while writing
 - **Links to:** 29, 24
 
 #### 29. Best Zotero Alternatives: Reference Managers That Help You Write
@@ -615,8 +615,8 @@ Best openings in the data:
 - **Outline:**
   - Short answer table
   - Why people look for alternatives (Word plugin friction, sync storage limits, no AI, collaboration)
-  - The alternatives: Mendeley, EndNote, Paperpile, ReadCube, JabRef, Citavi, WriteOrbit
-  - Self-hosted and open-source options (WriteOrbit's repo runs on your own Firebase project)
+  - The alternatives: Mendeley, EndNote, Paperpile, ReadCube, JabRef, Citavi, AI for Research
+  - Self-hosted and open-source options (AI for Research's repo runs on your own Firebase project)
   - Keep Zotero and add a writing layer: import instead of replacing it
   - FAQ
 - **Product tie-in:** Zotero import, Library with chat, `@`-cite, self-hosting
@@ -634,7 +634,7 @@ Best openings in the data:
   - Step by step: upload, ask, check the cited page
   - Asking across many PDFs at once
   - Privacy and confidentiality: where files go, training terms, self-hosting
-  - Tools compared: ChatPDF, AskYourPDF, Adobe Acrobat AI, SciSpace, NotebookLM, WriteOrbit
+  - Tools compared: ChatPDF, AskYourPDF, Adobe Acrobat AI, SciSpace, NotebookLM, AI for Research
   - Good questions vs. bad questions (prompts table)
   - FAQ
 - **Product tie-in:** Library and chat with page-numbered answers, write next to your sources, self-hosting for sensitive documents
@@ -661,5 +661,5 @@ Best openings in the data:
 ## 6. After publishing
 
 - Add each primary keyword to an Ubersuggest project to track rankings.
-- Every quarter, ask ChatGPT, Perplexity, Gemini and Claude the head questions ("best AI fact checker", "zotero vs mendeley", "how to write a research report"). Note whether WriteOrbit is cited, and strengthen the answer block on pages that aren't.
+- Every quarter, ask ChatGPT, Perplexity, Gemini and Claude the head questions ("best AI fact checker", "zotero vs mendeley", "how to write a research report"). Note whether AI for Research is cited, and strengthen the answer block on pages that aren't.
 - Refresh the "2026" articles each January (1, 7, 17, 28).

@@ -215,7 +215,7 @@ async function payOnStripe(page) {
     const page = await context.newPage();
     await page.goto(`${BASE}/developers`, { waitUntil: 'networkidle' });
     const text = (await page.locator('main').innerText()).replace(/\s+/g, ' ');
-    check(`/developers ${label}: prices, packs, quick start, self-host, institutions`, /1,000 free credits/.test(text) && /\$29\.90/.test(text) && /Quick start/.test(text) && /Run WriteOrbit yourself/.test(text) && /universities/i.test(text));
+    check(`/developers ${label}: prices, packs, quick start, self-host, institutions`, /1,000 free credits/.test(text) && /\$29\.90/.test(text) && /Quick start/.test(text) && /Run AI for Research yourself/.test(text) && /universities/i.test(text));
     check(`/developers ${label}: no sideways scroll`, (await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)) <= 0);
     await page.screenshot({ path: `${OUT}/cloud-developers-${label}.png`, fullPage: true });
     await context.close();

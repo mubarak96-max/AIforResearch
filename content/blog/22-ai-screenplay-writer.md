@@ -17,7 +17,7 @@ faq:
   - q: "What are the WGA rules on AI?"
     a: "The 2023 WGA MBA says AI is not a writer and AI output is not literary material. A company must disclose AI-generated material it gives a writer, cannot require a writer to use AI, and cannot use AI material to cut a writer's credit or pay. The 2026 MBA keeps these terms and adds notice rules for licensing scripts to AI developers."
   - q: "What is the best AI for screenwriting?"
-    a: "It depends on the job. General chatbots such as ChatGPT, Claude and Gemini are flexible for brainstorming and notes. Dedicated coverage tools give a coverage report without prompting. A research editor with real citations, such as WriteOrbit, suits fact-based projects. Keep the script itself in a dedicated formatter."
+    a: "It depends on the job. General chatbots such as ChatGPT, Claude and Gemini are flexible for brainstorming and notes. Dedicated coverage tools give a coverage report without prompting. A research editor with real citations, such as AI for Research, suits fact-based projects. Keep the script itself in a dedicated formatter."
   - q: "Do I have to disclose that I used AI?"
     a: "Under the WGA MBA, the disclosure duty runs from the company to the writer when the company hands over AI material. A writer using AI needs the company's consent and must follow its policies. For copyright registration, the Copyright Office asks applicants to disclose more than minimal AI-generated content. Check current rules with the WGA or a lawyer."
 ---
@@ -102,7 +102,7 @@ For a full set of coverage prompts and a scoring rubric, see [AI script coverage
 | General chatbots | ChatGPT, Claude, Gemini | Brainstorming, notes, research questions | No formatting; facts without sources; check training settings |
 | AI features in screenwriting apps | Varies by app | Help inside the formatter | Feature sets change often; check each app's AI terms <!-- VERIFY: name specific screenwriting apps with built-in AI features and confirm what they do before publishing --> |
 | Dedicated coverage services | ScriptReader.ai, Greenlight Coverage | A coverage report without prompting | Same limits on taste and market; vendor claims on data use |
-| Research and development editor | WriteOrbit | Treatments, series bibles, research with real citations, notes as comments | Not a screenplay formatter; no `.fdx` |
+| Research and development editor | AI for Research | Treatments, series bibles, research with real citations, notes as comments | Not a screenplay formatter; no `.fdx` |
 | Screenplay formatters (no AI needed) | Final Draft, Fade In, WriterDuet, Highland | Writing the actual pages | See our [screenwriting software comparison](/blog/screenwriting-software) |
 
 ## A workflow from idea to draft, with AI at each step
@@ -122,7 +122,7 @@ Step 6 is empty on purpose.
 
 ### A treatment template you can copy
 
-WriteOrbit has no built-in treatment template, so here is one in Markdown. Paste it into any editor.
+AI for Research has no built-in treatment template, so here is one in Markdown. Paste it into any editor.
 
 ```markdown
 # [TITLE]: Treatment
@@ -155,9 +155,9 @@ WriteOrbit has no built-in treatment template, so here is one in Markdown. Paste
 [Key sources, with links. See the research bible.]
 ```
 
-## Developing a script in WriteOrbit
+## Developing a script in AI for Research
 
-WriteOrbit does not format screenplays. It is the workspace around the script: research, treatments, series bibles and notes.
+AI for Research does not format screenplays. It is the workspace around the script: research, treatments, series bibles and notes.
 
 - **Research with real sources.** Search 250M+ scholarly works from inside the editor and type `@` to cite one. Autocomplete suggests the next sentence of a research note and cites the papers it draws on.
 - **Chat with your source PDFs.** Upload archive documents, reports or studies to the Library and ask questions. Answers carry page numbers.
@@ -165,7 +165,7 @@ WriteOrbit does not format screenplays. It is the workspace around the script: r
 - **AI review on your treatment.** Notes appear as comments in the text.
 - **Word in and out.** Open a `.docx` and keep its styles; export Word or PDF.
 
-<!-- SCREENSHOT: a treatment document in WriteOrbit with a research paragraph citing two sources via @-cite, and an AI review comment in the margin on a gap in act two -->
+<!-- SCREENSHOT: a treatment document in AI for Research with a research paragraph citing two sources via @-cite, and an AI review comment in the margin on a gap in act two -->
 
 The free plan covers a full editor with limited daily AI use; see [/pricing](/pricing) for current plans.
 
@@ -185,7 +185,7 @@ The 2023 WGA MBA says AI is not a writer and AI output is not literary material.
 
 ### What is the best AI for screenwriting?
 
-It depends on the job. General chatbots such as ChatGPT, Claude and Gemini are flexible for brainstorming and notes. Dedicated coverage tools give a coverage report without prompting. A research editor with real citations, such as WriteOrbit, suits fact-based projects. Keep the script itself in a dedicated formatter.
+It depends on the job. General chatbots such as ChatGPT, Claude and Gemini are flexible for brainstorming and notes. Dedicated coverage tools give a coverage report without prompting. A research editor with real citations, such as AI for Research, suits fact-based projects. Keep the script itself in a dedicated formatter.
 
 ### Do I have to disclose that I used AI?
 

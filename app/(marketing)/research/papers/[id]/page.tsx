@@ -169,7 +169,7 @@ export default async function PaperPage({ params }: Props) {
                 <pre className="mt-2 overflow-x-auto rounded-lg bg-soft p-3 text-[13px] leading-[1.5] text-ink-2">{bib}</pre>
               </div>
             </div>
-            <p className="mt-3 text-[13.5px] text-muted">Made from the index record. Check names, capitalisation and page numbers against the paper. Need another style? WriteOrbit has over 10,000.</p>
+            <p className="mt-3 text-[13.5px] text-muted">Made from the index record. Check names, capitalisation and page numbers against the paper. Need another style? AI for Research has over 10,000.</p>
           </section>
 
           {related.length > 0 && (
@@ -183,8 +183,8 @@ export default async function PaperPage({ params }: Props) {
         <aside className="flex flex-col gap-5 lg:sticky lg:top-24 lg:self-start">
           <div className={`${box} p-5`}>
             <p className="text-[15px] font-semibold text-ink">Cite it as you write</p>
-            <p className="mt-1.5 text-[14px] leading-[1.55] text-muted">Search this paper in WriteOrbit and cite it in any style. Your reference list builds itself.</p>
-            <div className="mt-4"><ToolCta label="Cite in WriteOrbit" href="/editor?tool=papers" /></div>
+            <p className="mt-1.5 text-[14px] leading-[1.55] text-muted">Search this paper in AI for Research and cite it in any style. Your reference list builds itself.</p>
+            <div className="mt-4"><ToolCta label="Cite in AI for Research" href="/editor?tool=papers" /></div>
           </div>
 
           <div className={`${box} p-5`}>
@@ -220,7 +220,7 @@ export default async function PaperPage({ params }: Props) {
           )}
 
           <p className="text-[12.5px] leading-[1.5] text-subtle">
-            Bibliographic data from <a href="https://openalex.org" rel="noopener" target="_blank" className="underline underline-offset-2 hover:text-ink">OpenAlex</a> (CC0). WriteOrbit does not host this paper.
+            Bibliographic data from <a href="https://openalex.org" rel="noopener" target="_blank" className="underline underline-offset-2 hover:text-ink">OpenAlex</a> (CC0). AI for Research does not host this paper.
           </p>
         </aside>
       </div>

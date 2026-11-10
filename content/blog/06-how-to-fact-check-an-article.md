@@ -139,7 +139,7 @@ For health claims, also check whether the finding matches the wider evidence. On
 | [Wayback Machine](https://web.archive.org/) | Seeing a web page as it was on a past date; recovering dead links | Paste the URL and pick a date from the calendar; archive pages you cite | Free |
 | [Retraction Watch Database](https://retractionwatch.com/the-retraction-watch-database/) | Checking whether a study was retracted | Search by title, author or DOI | Free[1] |
 | [doi.org](https://doi.org/) and [Crossref search](https://search.crossref.org/) | Confirming a citation exists and matches | Resolve the DOI, or search the exact title | Free |
-| WriteOrbit (free plan) | Flagging claims and weak sources in your draft | Run a claim check and a source-quality check; results appear as comments | Free plan: 3 review checks a day |
+| AI for Research (free plan) | Flagging claims and weak sources in your draft | Run a claim check and a source-quality check; results appear as comments | Free plan: 3 review checks a day |
 
 Two cautions. A reverse image search that finds no earlier copy proves nothing. And a fact check from another outlet is a lead, not a verdict: read their sources.
 
@@ -147,9 +147,9 @@ Two cautions. A reverse image search that finds no earlier copy proves nothing. 
 
 Many small teams skip the fact sheet because it lives in a separate spreadsheet that falls out of date. Keeping the log in the draft itself fixes that.
 
-In WriteOrbit, run AI review on the draft: claim checks leave a comment on each claim with the source matched, and the source-quality check flags citations to retracted papers, preprints and DOIs that don't match the paper. The checker replies to each comment with the source and status ("Confirmed: council minutes, p. 3") and resolves it. Fixes go in as suggestions (tracked changes), so the writer sees exactly what changed and why. Version history keeps the checked version, which you'll want if a claim is challenged later.
+In AI for Research, run AI review on the draft: claim checks leave a comment on each claim with the source matched, and the source-quality check flags citations to retracted papers, preprints and DOIs that don't match the paper. The checker replies to each comment with the source and status ("Confirmed: council minutes, p. 3") and resolves it. Fixes go in as suggestions (tracked changes), so the writer sees exactly what changed and why. Version history keeps the checked version, which you'll want if a claim is challenged later.
 
-<!-- SCREENSHOT: WriteOrbit draft with the comment sidebar showing three resolved fact-check threads ("Confirmed: minutes p. 3", "Corrected: 62%, not 'doubled'", "Source-quality: cited paper is a preprint, added 'not yet peer-reviewed'") and one tracked-change suggestion visible in the text -->
+<!-- SCREENSHOT: AI for Research draft with the comment sidebar showing three resolved fact-check threads ("Confirmed: minutes p. 3", "Corrected: 62%, not 'doubled'", "Source-quality: cited paper is a preprint, added 'not yet peer-reviewed'") and one tracked-change suggestion visible in the text -->
 
 It doesn't replace the recording, the phone call or the reverse image search. It keeps the record of them next to the words they check. See [how it works](/how-it-works).
 

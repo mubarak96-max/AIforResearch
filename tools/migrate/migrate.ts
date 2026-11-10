@@ -1,5 +1,5 @@
 /**
- * Copies a self-hosted WriteOrbit (Postgres + files) into a Firebase project, following
+ * Copies a self-hosted AI for Research (Postgres + files) into a Firebase project, following
  * docs/data-model.md. Run from the repository root:
  *
  *   DATABASE_URL=postgres://writeorbit:…@host:5432/writeorbit \

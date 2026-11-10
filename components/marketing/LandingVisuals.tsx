@@ -1,6 +1,6 @@
 /**
  * Product visuals for the landing page, drawn in HTML/CSS (no images, no client JS). They show
- * real WriteOrbit behaviour: cited autocomplete, Find papers, chat with sources, review comments,
+ * real AI for Research behaviour: cited autocomplete, Find papers, chat with sources, review comments,
  * Word/LaTeX export and the phone editor. Decorative: each frame is labelled for screen readers.
  *
  * Frames are "demos": the wo-* classes play a short loop in CSS (globals.css, "Marketing motion").
@@ -224,7 +224,7 @@ export function ExportVisual() {
 
 export function PhoneVisual() {
   return (
-    <div className="flex justify-center" role="img" aria-label="The WriteOrbit editor on a phone">
+    <div className="flex justify-center" role="img" aria-label="The AI for Research editor on a phone">
       <div aria-hidden="true" className="w-[240px] rounded-[36px] border border-line bg-ink p-2.5 shadow-[0_30px_60px_-30px_rgba(15,23,42,.5)]">
         <div className="overflow-hidden rounded-[30px] bg-surface">
           <div className="flex items-center justify-between px-5 pt-3 text-[11px] font-semibold text-ink">
@@ -257,7 +257,7 @@ export function PhoneVisual() {
   );
 }
 
-/** "Not another chatbot": what WriteOrbit does that a general AI chat does not. */
+/** "Not another chatbot": what AI for Research does that a general AI chat does not. */
 export const COMPARISON_ROWS: { label: string; writeorbit: string; chatbot: string }[] = [
   { label: 'References', writeorbit: 'Real papers you can open', chatbot: 'Can be invented' },
   { label: 'Where you write', writeorbit: 'In your document', chatbot: 'Copy and paste' },
