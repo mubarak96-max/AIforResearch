@@ -2,12 +2,12 @@
 
 import { useEffect } from 'react';
 import { sendWritingActivity, type WritingActivity } from '../lib/aiEditor/assistApi';
-import { AI_AUTHOR } from '../lib/aiEditor/suggestions';
+import { isAIAuthor } from '../lib/aiEditor/suggestions';
 import { safeView } from '../lib/aiEditor/editorPlugins';
 
 /**
  * Records how the writer adds text, for the authorship report: characters typed, pasted from
- * outside, pasted from an AI for Research document, accepted from AI for Research AI, and deleted, plus
+ * outside, pasted from an AI for Research document, accepted from AI for Research, and deleted, plus
  * time spent writing. Large pastes are listed with when they happened and a SHA-256 of the
  * text; the text itself never leaves the editor. Other people's edits (arriving over Yjs) are
  * theirs and are not counted here.
@@ -16,7 +16,7 @@ import { safeView } from '../lib/aiEditor/editorPlugins';
  *   - a paste or drop (ProseMirror's uiEvent): pasted, from inside when the clipboard carried
  *     BlockNote's own format (copied from an AI for Research document), else from outside;
  *   - a small insertion (a few characters, as typing and autocorrect make): typed;
- *   - a large insertion that is neither: held for a moment. If AI for Research AI text was just
+ *   - a large insertion that is neither: held for a moment. If AI for Research text was just
  *     accepted (noteAIInsertion), it counts as AI; otherwise it was the app itself (a template,
  *     a citation, undo) and is not counted as anyone's writing.
  *
@@ -33,7 +33,7 @@ type Pending = { at: number; chars: number };
 
 const aiListeners = new Set<() => void>();
 
-/** Called where AI for Research AI text was accepted into the document. */
+/** Called where AI for Research text was accepted into the document. */
 export function noteAIInsertion() {
   aiListeners.forEach((listener) => listener());
 }
@@ -48,8 +48,8 @@ async function sha256(text: string): Promise<string> {
   }
 }
 
-/** AI for Research AI's tracked changes carry its name in the suggestion mark ("id|AI for Research AI|time"). */
-const isAIText = (node: any) => (node?.marks || []).some((mark: any) => typeof mark?.attrs?.stringValue === 'string' && mark.attrs.stringValue.split('|')[1] === AI_AUTHOR);
+/** AI for Research's tracked changes carry its name in the suggestion mark ("id|AI for Research|time"). */
+const isAIText = (node: any) => (node?.marks || []).some((mark: any) => typeof mark?.attrs?.stringValue === 'string' && isAIAuthor(mark.attrs.stringValue.split('|')[1]));
 
 /** Characters a transaction added and removed (text only; structure does not count), and how many of the added are AI suggestions. */
 function measure(transaction: any): { inserted: number; deleted: number; ai: number } {
@@ -137,7 +137,7 @@ export function useWritingActivity(editor: any, documentId: string | null | unde
       if (ySync?.isChangeOrigin || ySync?.isUndoRedoOperation) return;
       const measured = measure(transaction);
       const { deleted } = measured;
-      // Text AI for Research AI proposed as a tracked change is the AI's, whatever else happens.
+      // Text AI for Research proposed as a tracked change is the AI's, whatever else happens.
       totals.ai_inserted += measured.ai;
       const inserted = measured.inserted - measured.ai;
       if (!inserted && !deleted && !measured.ai) return;

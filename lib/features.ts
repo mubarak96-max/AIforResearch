@@ -478,7 +478,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     description: 'Show a teacher, supervisor or client how your document was written: time spent, text typed, pasted and accepted from AI, with a link they can verify.',
     short: 'Show how you wrote it: typed, pasted and AI-assisted text.',
     heading: 'Show how you wrote your work',
-    intro: 'AI for Research keeps a record of how your document grew: time spent writing, text typed, text pasted, and text accepted from AI for Research AI. Share it as a report with a link anyone can verify.',
+    intro: 'AI for Research keeps a record of how your document grew: time spent writing, text typed, text pasted, and text accepted from AI for Research. Share it as a report with a link anyone can verify.',
     keywords: ['authorship report', 'proof of writing process', 'show writing history', 'prove i wrote my essay'],
     visual: 'phone',
     benefits: [
@@ -499,7 +499,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     ],
     example: {
       input: 'An essay written over five sessions.',
-      output: '6 h 40 min writing · 9,800 characters typed · 600 pasted · 450 accepted from AI for Research AI.',
+      output: '6 h 40 min writing · 9,800 characters typed · 600 pasted · 450 accepted from AI for Research.',
     },
     cta: { label: 'Start writing', href: '/editor?new=1' },
     related: ['ai-writing-assistant', 'citation-checker'],

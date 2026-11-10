@@ -499,7 +499,7 @@ export default function ChatPanel({
             }}
             rows={1}
             placeholder={inDocument ? 'Ask about your document…' : 'Ask anything…'}
-            aria-label="Message AI for Research AI"
+            aria-label="Message AI for Research"
             className={`block max-h-40 min-h-[24px] w-full resize-none bg-transparent px-0.5 leading-[1.45] text-ink outline-none placeholder:text-subtle ${isMobile ? 'text-[16px]' : 'text-[14.5px]'}`}
           />
           <div className="@container/tools mt-1.5 flex items-center gap-0.5 text-muted">

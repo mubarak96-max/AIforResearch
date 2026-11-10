@@ -470,7 +470,7 @@ Best openings in the data:
   - Test: one script, human coverage vs. AI coverage, side by side
   - What AI got right, what it missed
   - Prompts for useful AI notes (logline, character arcs, scene purpose)
-  - Tools compared: dedicated AI coverage services, ChatGPT and Claude, AI for Research AI review
+  - Tools compared: dedicated AI coverage services, ChatGPT and Claude, AI for Research review
   - Confidentiality: who sees your script, training and data terms
   - How to use AI notes without losing your voice
   - FAQ

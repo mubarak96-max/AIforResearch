@@ -11,7 +11,9 @@ import type { Mark, MarkType, Node as PMNode } from '@tiptap/pm/model';
  * the opposite. Word files bring their tracked changes in this form and get them back on export.
  */
 
-export const AI_AUTHOR = 'AI for Research AI';
+export const AI_AUTHOR = 'AI for Research';
+/** Tracked changes saved before the rename carry the old assistant name; they still count as AI. */
+export const isAIAuthor = (author: string | undefined) => author === AI_AUTHOR || author === 'WriteOrbit AI';
 
 export type Suggestion = {
   id: string;

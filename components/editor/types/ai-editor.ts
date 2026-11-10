@@ -42,7 +42,7 @@ export interface AIEditorComment {
   resolvedBySessionId?: string | null;
   resolvedByDisplayName?: string | null;
   replies?: AIEditorCommentReply[];
-  /** Set on review comments written by AI for Research AI. */
+  /** Set on review comments written by AI for Research. */
   kind?: 'ai-review';
   severity?: 'minor' | 'major';
   category?: string;
@@ -70,7 +70,7 @@ export interface AIEditorCommentReply {
   text: string;
   createdAt: number;
   updatedAt?: number;
-  /** A reply written by AI for Research AI. */
+  /** A reply written by AI for Research. */
   ai?: boolean;
 }
 

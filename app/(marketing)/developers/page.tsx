@@ -7,11 +7,12 @@ import { btnPrimary, container, kicker, sectionTitle } from '@/components/market
 export const dynamic = 'force-dynamic';
 
 import { getApp } from '@/lib/server';
+import { SITE_URL } from '@/lib/site';
 
 /** Asks the API in this same process (it runs in the app's route handlers). */
 const callApi = (path: string) => getApp().request(path);
 /** Where the developer API answers, and the source code (shown only once it is public). */
-const apiUrl = (process.env.PUBLIC_API_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/+$/, '');
+const apiUrl = SITE_URL;
 const contactEmail = process.env.SUPPORT_EMAIL || process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@writeorbit.app';
 const contact = `mailto:${contactEmail}?subject=AI for Research%20for%20our%20institution`;
 

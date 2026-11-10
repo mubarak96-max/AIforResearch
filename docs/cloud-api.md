@@ -6,7 +6,7 @@ One key for scholarly papers, full text, research tools, AI, peer review and doc
 Authorization: Bearer vm_live_…
 ```
 
-Create keys and buy credits at `https://<your site>/developers/keys`. Every AI for Research deployment runs the same gateway at `<your PUBLIC_URL>/v1`.
+Create keys and buy credits at `https://<your site>/developers/keys`. Every AI for Research deployment runs the same gateway at `https://aiforresearch.app/v1`.
 
 ## Credits
 

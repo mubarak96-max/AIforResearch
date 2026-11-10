@@ -95,6 +95,7 @@ import { AUTOCOMPLETE_CSS } from '../../lib/aiEditor/autocomplete';
 import { EQUATION_CSS, EquationEditor, equationBlockSpec } from '../../lib/aiEditor/equationBlock';
 import {
   AI_AUTHOR,
+  isAIAuthor,
   SUGGESTION_CSS,
   collectSuggestions,
   findTextInBlock,
@@ -4676,11 +4677,11 @@ export default function AIEditorWorkspace() {
     [addAIReviewComments, collectReviewBlocks, documentTitle],
   );
 
-  // Accepted AI text goes into the version history as AI for Research AI (after the copy is saved).
+  // Accepted AI text goes into the version history as AI for Research (after the copy is saved).
   useWritingActivity(editor, documentId, Boolean(canEdit));
   const recordAIEdit = useCallback(() => {
     if (!documentId || !canEdit) return;
-    // The authorship record counts the text just inserted as AI for Research AI's, not typed.
+    // The authorship record counts the text just inserted as AI for Research's, not typed.
     noteAIInsertion();
     window.setTimeout(() => {
       void flushBlocks(getEditorBlocks(editor))
@@ -4901,7 +4902,7 @@ export default function AIEditorWorkspace() {
     },
     [comments, editor, isWritingEnabled, resolveComment],
   );
-  const aiChangeIds = useMemo(() => suggestions.filter((item) => item.author === AI_AUTHOR).map((item) => item.id), [suggestions]);
+  const aiChangeIds = useMemo(() => suggestions.filter((item) => isAIAuthor(item.author)).map((item) => item.id), [suggestions]);
   const resolveAIChanges = useCallback(
     (accept: boolean) => {
       const view = safeView(editor);
@@ -4948,7 +4949,7 @@ export default function AIEditorWorkspace() {
         window.dispatchEvent(new CustomEvent('credits-updated'));
       } catch (error) {
         if (error instanceof AssistError && error.outOfCredits) setReviewRun((current) => ({ ...current, outOfCredits: true }));
-        else toast.error((error as Error).message || 'AI for Research AI could not reply.');
+        else toast.error((error as Error).message || 'AI for Research could not reply.');
       }
     },
     [addAIReply, documentTitle, editor],
@@ -6989,9 +6990,9 @@ export default function AIEditorWorkspace() {
       />
 
       {autocompleteState.writingAt ? (
-        // "AI for Research AI" writes at the cursor until the grey text appears.
+        // "AI for Research" writes at the cursor until the grey text appears.
         <div className="pointer-events-none fixed z-[11500]" style={{ top: autocompleteState.writingAt.top - 20, left: autocompleteState.writingAt.left - 1 }} aria-live="polite">
-          <span className="block w-fit rounded-[5px] rounded-bl-none bg-[var(--theme-primary)] px-1.5 py-[2px] text-[11px] font-semibold leading-none text-on-brand">AI for Research AI</span>
+          <span className="block w-fit rounded-[5px] rounded-bl-none bg-[var(--theme-primary)] px-1.5 py-[2px] text-[11px] font-semibold leading-none text-on-brand">AI for Research</span>
           <span className="block h-[22px] w-[2px] animate-pulse bg-[var(--theme-primary)]" />
         </div>
       ) : null}

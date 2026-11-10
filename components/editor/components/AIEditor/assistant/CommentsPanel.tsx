@@ -113,7 +113,7 @@ function Avatar({ ai, name }: { ai: boolean; name: string }) {
   );
 }
 
-/** Comments beside the document, with AI for Research AI review comments (Minor / Major). */
+/** Comments beside the document, with AI for Research review comments (Minor / Major). */
 export default function CommentsPanel(props: Props) {
   const {
     comments,
@@ -369,7 +369,7 @@ export default function CommentsPanel(props: Props) {
                 <button type="button" onClick={() => onActiveCommentChange?.(comment.id)} className="block w-full text-left">
                   <div className="mb-1.5 flex items-center gap-2 text-[13px] text-ink">
                     <Avatar ai={ai} name={comment.actorDisplayName} />
-                    <b className="truncate font-semibold">{ai ? 'AI for Research AI' : comment.actorDisplayName}</b>
+                    <b className="truncate font-semibold">{ai ? 'AI for Research' : comment.actorDisplayName}</b>
                     {ai ? (
                       <span title={comment.severity === 'major' ? 'Major' : 'Minor'} className={`shrink-0 rounded-md px-1.5 py-px text-[11px] font-semibold ${comment.severity === 'major' ? 'bg-[#fef2f2] text-[#b91c1c]' : 'bg-line-2 text-ink-3'}`}>
                         {comment.check && comment.category && CATEGORY_LABELS[comment.category] ? CATEGORY_LABELS[comment.category] : comment.severity === 'major' ? 'Major' : 'Minor'}
@@ -413,7 +413,7 @@ export default function CommentsPanel(props: Props) {
                     {(comment.replies || []).map((reply) => (
                       <div key={reply.id}>
                         <div className="flex items-center gap-1.5 text-[12.5px]">
-                          <span className="font-semibold text-ink">{reply.ai ? 'AI for Research AI' : reply.actorDisplayName}</span>
+                          <span className="font-semibold text-ink">{reply.ai ? 'AI for Research' : reply.actorDisplayName}</span>
                           <span className="text-[12px] text-subtle" title={timeLabel(reply.createdAt)}>{relativeTime(reply.createdAt)}</span>
                         </div>
                         <div className="whitespace-pre-wrap text-[13px] text-ink-2">{reply.text}</div>
@@ -421,7 +421,7 @@ export default function CommentsPanel(props: Props) {
                     ))}
                   </div>
                 ) : null}
-                {asking === comment.id ? <div className="mt-1.5 text-[12.5px] text-muted">AI for Research AI is replying…</div> : null}
+                {asking === comment.id ? <div className="mt-1.5 text-[12.5px] text-muted">AI for Research is replying…</div> : null}
 
                 <div className="-mb-0.5 mt-1 flex items-center gap-0.5">
                   {ai && comment.suggestion && !resolved && canComment ? (
@@ -487,7 +487,7 @@ export default function CommentsPanel(props: Props) {
                           void submitReply(comment);
                         }
                       }}
-                      placeholder={ai ? 'Reply to AI for Research AI…' : 'Reply…'}
+                      placeholder={ai ? 'Reply to AI for Research…' : 'Reply…'}
                       aria-label="Reply"
                       className="h-9 w-full rounded-lg border border-line bg-surface pl-2.5 pr-9 text-[13px] text-ink outline-none placeholder:text-subtle focus:border-[var(--theme-primary,var(--color-brand))]"
                     />

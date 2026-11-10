@@ -312,7 +312,7 @@ describe('POST /comment-reply', () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ text: 'Try a shorter sentence.' });
     expect(llm.calls[0].messages[1].content).toContain('Ana: Too long?');
-    expect(llm.calls[0].messages[0].content).toContain('You are AI for Research AI replying inside a comment thread');
+    expect(llm.calls[0].messages[0].content).toContain('You are AI for Research replying inside a comment thread');
   });
 });
 

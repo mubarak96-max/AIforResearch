@@ -292,7 +292,7 @@ Only in subreddits that allow self-promotion (r/SideProject, r/alphaandbetausers
 > - pre-submission check for unsupported claims, retracted papers, wrong DOIs
 > - opens Word templates, exports Word / PDF / LaTeX
 >
-> Free plan, no card: writeorbit.app
+> Free plan, no card: aiforresearch.app
 >
 > What I'd most like feedback on: is the citation autocomplete actually useful in your field, or is it just a novelty? And what's confusing in the first 5 minutes?
 
@@ -305,7 +305,7 @@ Only in subreddits that allow self-promotion (r/SideProject, r/alphaandbetausers
 
 > Disclosure: I made it. No sign-up, no "create account to copy". Paste a DOI or a paper title (or fill in a book/website) and pick a style: APA 7, MLA 9, Chicago, Harvard, IEEE, Vancouver, or obscure journal styles.
 >
-> writeorbit.app/tools/citation-generator
+> aiforresearch.app/tools/citation-generator
 >
 > If you find a style that formats wrong, tell me and I'll fix it.
 
@@ -318,7 +318,7 @@ Only in subreddits that allow self-promotion (r/SideProject, r/alphaandbetausers
 
 > Disclosure: I built it. I got tired of uploading signed forms and unpublished manuscripts to random "free PDF" sites. This one runs entirely client-side. You can check the network tab: the PDF never leaves your machine.
 >
-> writeorbit.app/tools/pdf-tools
+> aiforresearch.app/tools/pdf-tools
 
 **Before posting:** check the network tab yourself so the claim is true. r/privacy users will check.
 
@@ -331,7 +331,7 @@ Only in subreddits that allow self-promotion (r/SideProject, r/alphaandbetausers
 >
 > It's a starting point for reading, not a thesis generator. Would love to hear whether it finds anything useful in your field, or where it's wrong.
 >
-> writeorbit.app/tools/research-gap-finder
+> aiforresearch.app/tools/research-gap-finder
 
 ## 19. Developer API
 
@@ -346,7 +346,7 @@ Only in subreddits that allow self-promotion (r/SideProject, r/alphaandbetausers
 > - `validate_citations`: check DOIs/PubMed IDs exist before they hit output
 > - OpenAI-compatible chat completions, structured manuscript review, docx/LaTeX/PDF conversion
 >
-> Search, full text, research tools and reference checks have daily free credits. Docs: writeorbit.app/developers
+> Search, full text, research tools and reference checks have daily free credits. Docs: aiforresearch.app/developers
 >
 > Curious what people building research agents are using today.
 
@@ -365,7 +365,7 @@ Only in subreddits that allow self-promotion (r/SideProject, r/alphaandbetausers
 >
 > <!-- Replace the claims above with your real numbers/observations before posting. Don't publish anything you haven't actually seen. -->
 >
-> Disclosure: the product is AI for Research (writeorbit.app). Happy to answer questions about building on Firebase or pricing for students.
+> Disclosure: the product is AI for Research (aiforresearch.app). Happy to answer questions about building on Firebase or pricing for students.
 
 ---
 
@@ -383,10 +383,10 @@ Only use these when someone asks directly or the thread clearly asks for tool su
 > Disclosure: I make AI for Research. It opens a .docx template keeping its styles and can export a full LaTeX project for Overleaf, including equations and references. Might help for your "write once, hand in both" case. Pandoc is still the best free option if you're comfortable with it.
 
 **R4 (stats from CSV):**
-> There's a free in-browser tool I built that takes a CSV and gives descriptives, correlations, t-tests and chi-square written up in APA: writeorbit.app/tools/data-analysis. Data stays in the browser. For anything serious use R/JASP though. JASP is free and great.
+> There's a free in-browser tool I built that takes a CSV and gives descriptives, correlations, t-tests and chi-square written up in APA: aiforresearch.app/tools/data-analysis. Data stays in the browser. For anything serious use R/JASP though. JASP is free and great.
 
 **R5 (AI phrasing checker):**
-> I made a free checker that highlights stock phrases and formulaic patterns: writeorbit.app/tools/ai-writing-checker. To be clear it's not a detector, just an editing aid. Disclosure: my project.
+> I made a free checker that highlights stock phrases and formulaic patterns: aiforresearch.app/tools/ai-writing-checker. To be clear it's not a detector, just an editing aid. Disclosure: my project.
 
 ---
 

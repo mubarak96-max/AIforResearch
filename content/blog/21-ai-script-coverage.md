@@ -59,7 +59,7 @@ We are running a side-by-side test of human and AI coverage. The method and ever
 
 1. **Pick the script.** One feature-length spec (90 to 120 pages) that has not been widely circulated, so no model has seen discussions of it. Use a script you own or have permission to share with each service.
 2. **Get human coverage.** Order standard coverage (logline, synopsis, comments, grid, verdict) from one paid human reader. Do not tell the reader about the test.
-3. **Get AI coverage.** Run the same script through: one dedicated AI coverage service, ChatGPT, Claude, and AI for Research AI review plus chat. Use the coverage prompt below, unchanged, for the general chatbots.
+3. **Get AI coverage.** Run the same script through: one dedicated AI coverage service, ChatGPT, Claude, and AI for Research review plus chat. Use the coverage prompt below, unchanged, for the general chatbots.
 4. **Blind the reports.** Strip tool names and format differences so a second reader scores them without knowing the source.
 5. **Score with the rubric.** Two scorers, each working alone, score every report on the eight criteria below. Average the two.
 6. **Count errors.** For every factual claim about the script (a character's action, a plot event, a page reference), check it against the script. Record wrong claims as errors.
@@ -87,7 +87,7 @@ Score each criterion from 1 (useless) to 5 (as good as a strong professional rea
 | Dedicated AI coverage service | | | | | | |
 | ChatGPT (coverage prompt) | | | | | | |
 | Claude (coverage prompt) | | | | | | |
-| AI for Research AI review + chat | | | | | | |
+| AI for Research review + chat | | | | | | |
 
 ### What to look for when you run it yourself
 

@@ -1,9 +1,8 @@
 /**
- * The public address of the site, used for canonical URLs, the sitemap, robots.txt, Open Graph
- * and structured data. Set by NEXT_PUBLIC_SITE_URL (apphosting.yaml); falls back to the production
- * domain, writeorbit.app.
+ * The public address of the site, used for canonical URLs, the sitemap, robots.txt, Open Graph,
+ * structured data and (in production) the server's redirect and webhook URLs.
  */
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || process.env.PUBLIC_URL || 'https://writeorbit.app').replace(/\/+$/, '');
+export const SITE_URL = 'https://aiforresearch.app';
 
 export const SITE_NAME = 'AI for Research';
 

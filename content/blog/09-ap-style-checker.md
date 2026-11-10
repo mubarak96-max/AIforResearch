@@ -143,7 +143,7 @@ Count a catch only if the fix is the AP form ("10:00 AM" for "10:00 a.m." is a m
 | ChatGPT with the AP prompt | | | | | | | |
 | Claude with the AP prompt | | | | | | | |
 | AI for Research proofreading review | | | | | | | |
-| AI for Research AI chat with the AP prompt | | | | | | | |
+| AI for Research chat with the AP prompt | | | | | | | |
 
 ## Why no checker catches everything
 

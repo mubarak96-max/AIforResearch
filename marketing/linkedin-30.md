@@ -59,7 +59,7 @@ Link in the first comment.
 
 #AcademicWriting #PhDLife #AcademicTwitter #Research #EdTech
 
-**First comment:** https://writeorbit.app
+**First comment:** https://aiforresearch.app
 
 **Image prompt:** A single sheet of manuscript paper seen from slightly above, lying on a desk, with handwritten-style navy text lines (illegible, abstract) and one sentence underlined in burnt-orange pen with a small superscript footnote marker beside it. A thin orange line runs from the marker into the margin, where it ends at a tiny stacked-paper icon that stands for a source. [STYLE]
 
@@ -153,7 +153,7 @@ The worst part is that checking afterwards takes a long time. You have to search
 
 I built AI for Research around that workflow. The AI can suggest your next sentence, but every citation it attaches comes from a database of 250M+ scholarly works, and each one opens the paper behind it. Chat with your PDFs and answers quote the passage and give the page. Before you submit, the claim check flags unsupported or overstated claims, retracted papers, preprints and wrong DOIs, as comments in your text. An authorship report can show a supervisor how the document was written.
 
-It's free to start at writeorbit.app.
+It's free to start at aiforresearch.app.
 
 ### The short version
 
@@ -233,7 +233,7 @@ Link in comments.
 
 #CitationGenerator #APA7 #StudentLife #AcademicWriting
 
-**First comment:** https://writeorbit.app/tools/citation-generator
+**First comment:** https://aiforresearch.app/tools/citation-generator
 
 **Image prompt:** A clean flat-lay: a single DOI-style slip of paper on the left with an arrow drawn in burnt-orange pen pointing to a perfectly formatted reference card on the right, with a hanging indent visible as navy lines. A few loose style-guide tabs (unlabelled) sit around it. [STYLE]
 
@@ -306,7 +306,7 @@ Doing this by hand takes most of a day, and that's why it often gets skipped. I 
 
 None of this replaces a real colleague's read. But it means that colleague spends their time on your ideas rather than your typos.
 
-Try it free at writeorbit.app.
+Try it free at aiforresearch.app.
 
 *What's the harshest reviewer comment you've ever received that you could have caught yourself? Share it below. Everyone has one.*
 
@@ -439,7 +439,7 @@ Your gap should come straight out of the matrix: the empty cells, the under-stud
 
 The method is old and it works, but filling in 200+ cells is the bottleneck. In AI for Research's literature review tool you add your PDFs, choose your columns, and the matrix fills from the papers, **with the quote and page for every cell**, so you check the evidence rather than trust a summary. From there it can draft the review with real citations in your style, for you to edit into your own argument.
 
-There's also a free research gap finder at writeorbit.app/tools/research-gap-finder if you want a first pass at the gaps in a topic.
+There's also a free research gap finder at aiforresearch.app/tools/research-gap-finder if you want a first pass at the gaps in a topic.
 
 *Do you use a matrix, or a different system? I'd like to know what works in your field.*
 
@@ -470,7 +470,7 @@ Try it on your topic and tell me if it found something you hadn't seen.
 
 #PhD #ResearchGap #GradSchool #ResearchMethods
 
-**First comment:** https://writeorbit.app/tools/research-gap-finder
+**First comment:** https://aiforresearch.app/tools/research-gap-finder
 
 **Image prompt:** A paper map of connected nodes (circles linked by fine navy lines, like a citation network) with one clear empty space in the middle circled in burnt-orange pen with a small dashed outline where a node is missing. [STYLE]
 
@@ -496,7 +496,7 @@ Your references, plus an editor that knows what's in them.
 
 #Zotero #Mendeley #ReferenceManager #PhDLife
 
-**First comment:** https://writeorbit.app/blog/zotero-vs-mendeley
+**First comment:** https://aiforresearch.app/blog/zotero-vs-mendeley
 
 **Image prompt:** A long row of index-card file drawers on the left with cards flowing in a smooth arc to an open notebook on the right, where they land neatly as footnotes. The arc of cards is drawn with a burnt-orange motion line. [STYLE]
 
@@ -569,7 +569,7 @@ I built AI for Research with this workflow in mind:
 - **The AI writing pattern checker** helps students find stock AI phrasing in their own drafts. It's an editing aid, deliberately not a detector.
 - **Your documents are not used to train AI.**
 
-There's a full page on how AI for Research handles AI use at writeorbit.app/ai-use.
+There's a full page on how AI for Research handles AI use at aiforresearch.app/ai-use.
 
 *Supervisors: what would make you trust a student's AI disclosure? Students: what makes the rules confusing? Both views welcome below.*
 
@@ -597,7 +597,7 @@ Run this post through it. I dare you.
 
 #Writing #Editing #AIWriting #ContentWriting
 
-**First comment:** https://writeorbit.app/tools/ai-writing-checker
+**First comment:** https://aiforresearch.app/tools/ai-writing-checker
 
 **Image prompt:** A paragraph of abstract navy text lines on cream paper where four short word-shaped blocks are highlighted with a translucent burnt-orange marker, like a highlighter pen pass. A highlighter lies at the bottom edge. [STYLE]
 
@@ -700,7 +700,7 @@ Ask a colleague, or a tool, to review it as a referee would. Fix the major comme
 
 The **thesis-to-manuscript** tool takes your chapter and proposes a tighter IMRaD structure, a target word count per section, and a list of what to cut, keep and add. You then write the article in the editor with your citations intact. Change the reference style to your journal's (10,000+ available) in one click, run **AI peer review** for referee-style comments, and export Word or LaTeX for submission.
 
-Start free at writeorbit.app.
+Start free at aiforresearch.app.
 
 *If you've published from your thesis: what was the hardest part to cut? Advice welcome below for those still stuck.*
 
@@ -798,7 +798,7 @@ Here's a fair look at the options.
 
 **Trade-offs:** owned by Elsevier, which matters to some researchers. Over the years some features have been retired or changed, so check what's currently supported before you commit.
 
-*(I've written a longer side-by-side at writeorbit.app/blog/zotero-vs-mendeley.)*
+*(I've written a longer side-by-side at aiforresearch.app/blog/zotero-vs-mendeley.)*
 
 ### The gap both leave
 
@@ -826,7 +826,7 @@ AI for Research isn't trying to replace your reference manager. It's the writing
 
 Many people keep Zotero for collecting and use AI for Research for writing. That's a perfectly good setup.
 
-Free to start at writeorbit.app.
+Free to start at aiforresearch.app.
 
 *What's your current setup, and what's the most annoying part of it?*
 
@@ -858,7 +858,7 @@ Not a replacement for R or a proper stats package on a big study. Very handy for
 
 #Statistics #DataAnalysis #APA #ResearchMethods #Students
 
-**First comment:** https://writeorbit.app/tools/data-analysis
+**First comment:** https://aiforresearch.app/tools/data-analysis
 
 **Image prompt:** A small CSV-style grid of numbers (abstract dots, not real digits) on the left flowing into a neat bell curve and a minimal bar chart drawn in navy ink on the right, with a single burnt-orange line marking a mean. [STYLE]
 
@@ -884,7 +884,7 @@ If you're building an AI agent that cites sources, the reference-check endpoint 
 
 #API #MCP #EdTech #AIAgents #DeveloperTools
 
-**First comment:** https://writeorbit.app/developers
+**First comment:** https://aiforresearch.app/developers
 
 **Image prompt:** A clean isometric illustration of a single key on cream paper, its teeth shaped like small blocks, with seven thin navy lines branching out from the key's bow to seven small icons (magnifier, document, wrench, shield-tick, speech bubble, open book, file). One line is burnt-orange. [STYLE]
 
@@ -908,7 +908,7 @@ Bookmark it. You'll need it the night before a deadline.
 
 #PDF #Privacy #Productivity #Academia
 
-**First comment:** https://writeorbit.app/tools/pdf-tools
+**First comment:** https://aiforresearch.app/tools/pdf-tools
 
 **Image prompt:** Several PDF pages being neatly merged into one stack inside the outline of a browser window drawn in thin navy lines, with the stack staying firmly inside the frame. A small burnt-orange dotted boundary emphasises that nothing leaves the window. [STYLE]
 
@@ -965,7 +965,7 @@ I built AI for Research for writing with sources. For fact-checking it helps in 
 
 There's also a **neutral-tone check** for copy that needs to read as objective, and real-time comments so a desk or review team can work in the same document.
 
-More on this at writeorbit.app/blog/ai-fact-checker. Free to start.
+More on this at aiforresearch.app/blog/ai-fact-checker. Free to start.
 
 *Journalists and analysts: what's your fastest fact-checking habit? Let's build a list in the comments.*
 
@@ -1001,7 +1001,7 @@ What should I build next? The most-requested feature in the comments goes to the
 
 #AcademicWriting #BuildInPublic #EdTech #PhD #Startup
 
-**First comment:** https://writeorbit.app/pricing
+**First comment:** https://aiforresearch.app/pricing
 
 **Image prompt:** A simple, warm desk still life: a closed notebook with a burnt-orange ribbon bookmark, a fountain pen, a coffee cup and a single finished manuscript with a small orange tick at the top, morning light. Feels like a calm "done" moment. [STYLE]
 

@@ -54,13 +54,13 @@ You need a Firebase project on the **Blaze** plan (App Hosting, Functions and Cl
    git clone <your repository URL> && cd AI for Research
    pnpm install:all                          # the app, functions/ and tools/migrate
    cp .firebaserc.example .firebaserc        # put your project id in it
-   cp functions/.env.example functions/.env  # CONVERT_URL, PUBLIC_URL
+   cp functions/.env.example functions/.env  # CONVERT_URL
    firebase functions:secrets:set SETTINGS_KEY      # 32+ random characters; the same value as the web app's
    pnpm run deploy:firebase                          # Firestore rules + indexes, Storage rules, Cloud Functions
    ```
    Then turn on the TTL policy for `rate_limits.expires_at` (Firestore › TTL).
 3. **Converter and collab on Cloud Run:** see [services/convert](services/convert/README.md) (internal ingress) and [services/collab](services/collab/README.md) (one instance, WebSockets).
-4. **Web app on App Hosting:** create a backend from your GitHub repo (app root directory: the repository root). Fill in [`apphosting.yaml`](apphosting.yaml) (Firebase web config, `PUBLIC_URL`, `CONVERT_URL`, `NEXT_PUBLIC_REALTIME_URL`) and add the secrets it names:
+4. **Web app on App Hosting:** create a backend from your GitHub repo (app root directory: the repository root). Fill in [`apphosting.yaml`](apphosting.yaml) (Firebase web config, `CONVERT_URL`, `NEXT_PUBLIC_REALTIME_URL`) and add the secrets it names:
    ```bash
    firebase apphosting:secrets:set SETTINGS_KEY
    firebase apphosting:secrets:set INTERNAL_SECRET
@@ -97,7 +97,7 @@ Each service is a slot with its own provider. Set them in `apphosting.yaml` (sec
 ### Payments with Dodo Payments
 
 1. In the Dodo dashboard (test mode), create an API key and set it as `DODO_PAYMENTS_API_KEY`.
-2. Add a webhook (Developer › Webhooks) to `PUBLIC_URL/api/dodo/webhook` with the events listed in [`dodoWebhook.ts`](lib/server/routes/dodoWebhook.ts), and set its secret as `DODO_PAYMENTS_WEBHOOK_KEY`.
+2. Add a webhook (Developer › Webhooks) to `https://aiforresearch.app/api/dodo/webhook` with the events listed in [`dodoWebhook.ts`](lib/server/routes/dodoWebhook.ts), and set its secret as `DODO_PAYMENTS_WEBHOOK_KEY`.
 3. That's all: the Dodo products for plans and credit packs are created on the first checkout, from the prices in code. Change a price in code and the next checkout makes a new product (current subscribers keep theirs).
 4. For real payments: a live-mode key and webhook, and `BILLING_LIVE=1`.
 

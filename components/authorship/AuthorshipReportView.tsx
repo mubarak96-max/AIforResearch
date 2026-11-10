@@ -26,7 +26,7 @@ const ROUTES = [
   { key: 'typed', label: 'Typed', color: 'var(--color-brand)' },
   { key: 'pasted_external', label: 'Pasted from outside', color: '#d97706' },
   { key: 'pasted_internal', label: 'Moved within AI for Research', color: '#94a3b8' },
-  { key: 'ai_inserted', label: 'Accepted from AI for Research AI', color: '#7c3aed' },
+  { key: 'ai_inserted', label: 'Accepted from AI for Research', color: '#7c3aed' },
 ] as const;
 
 const number = (value: number) => value.toLocaleString('en-US');
@@ -184,7 +184,7 @@ export function AuthorshipReportView({ payload, issued }: { payload: AuthorshipP
       <Section title="How to read this report">
         <ul className="list-disc space-y-1.5 pl-5 text-[13.5px] leading-relaxed text-ink-2">
           <li>AI for Research recorded this while the author wrote in its editor. Writing done elsewhere and pasted in shows as pasted from outside, which is normal for notes and drafts.</li>
-          <li>Accepted from AI for Research AI is text the author took from AI for Research&apos;s own suggestions. Text from other AI tools pasted in counts as pasted from outside.</li>
+          <li>Accepted from AI for Research is text the author took from AI for Research&apos;s own suggestions. Text from other AI tools pasted in counts as pasted from outside.</li>
           <li>Recording starts the first time the author opens the document after the feature was turned on; earlier writing is not included.</li>
           <li>The counts come from the author&apos;s own browser. The report is a record of how the document grew, not proof of authorship on its own.</li>
         </ul>

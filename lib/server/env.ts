@@ -1,13 +1,18 @@
 /** Server settings, read once from the environment. */
+import { SITE_URL } from '../site';
+
 const read = (name: string, fallback = '') => (process.env[name] ?? fallback).trim();
+/** The site's own address: the production domain when deployed, the dev server locally. */
+const deployed = process.env.NODE_ENV === 'production' || (!!process.env.K_SERVICE && process.env.FUNCTIONS_EMULATOR !== 'true');
+const publicUrl = deployed ? SITE_URL : 'http://localhost:3000';
 
 export const env = {
   port: Number(read('PORT', '4000')),
-  publicUrl: read('PUBLIC_URL', 'http://localhost:3000').replace(/\/+$/, ''),
+  publicUrl,
   /** The converter (services/convert on Cloud Run). */
   convertUrl: read('CONVERT_URL', 'http://localhost:4100').replace(/\/+$/, ''),
   /** How the converter reaches this API (the web app's own address on App Hosting). */
-  internalUrl: read('INTERNAL_URL', read('PUBLIC_URL', 'http://localhost:3000')).replace(/\/+$/, ''),
+  internalUrl: read('INTERNAL_URL', publicUrl).replace(/\/+$/, ''),
   /** Shared secret the converter and Cloud Functions send when they call internal endpoints. */
   internalSecret: read('INTERNAL_SECRET'),
   /** The collab service (services/collab on Cloud Run): live text and presence. */

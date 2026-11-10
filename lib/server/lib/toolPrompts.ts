@@ -11,7 +11,7 @@ export type ToolSourceForPrompt = { marker: string; title: string; authors: stri
 export type BuiltPrompt = { messages: ChatMessage[]; maxTokens: number; task: 'fast' | 'review'; temperature: number };
 
 const BASE =
-  'You are AI for Research AI, an assistant for academic writing. Write in clear, plain, formal language; ' +
+  'You are AI for Research, an assistant for academic writing. Write in clear, plain, formal language; ' +
   'prefer short common words and direct sentences. Avoid stock phrases such as "delve", "in today\'s world", ' +
   '"it is important to note", "plays a crucial role", "a testament to". Write in the language of the user\'s input. ' +
   'Answer in Markdown only: "##" and "###" headings, paragraphs and lists. No title line, no preamble, no closing offer of help, ' +

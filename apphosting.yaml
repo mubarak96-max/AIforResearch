@@ -46,17 +46,11 @@ env:
     value: "off"
     availability: [RUNTIME]
   # services/collab on Cloud Run.
-  # The public domain of the site (canonical URLs, sitemap, robots.txt, Open Graph).
-  - variable: NEXT_PUBLIC_SITE_URL
-    value: https://writeorbit.app
-    availability: [BUILD, RUNTIME]
   - variable: NEXT_PUBLIC_REALTIME_URL
     value: wss://collab-xxxxx.a.run.app/collab
     availability: [BUILD, RUNTIME]
 
   # --- Server ---
-  - variable: PUBLIC_URL
-    value: https://writeorbit.app
   - variable: FIREBASE_STORAGE_BUCKET
     value: bookward-f5bd1.firebasestorage.app
   - variable: FIREBASE_AUTH_DOMAIN

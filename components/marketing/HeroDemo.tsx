@@ -66,7 +66,7 @@ export function HeroDemo() {
           <i className="size-2 rounded-full bg-line-3 md:size-2.5" />
           <i className="size-2 rounded-full bg-line-3 md:size-2.5" />
           <i className="size-2 rounded-full bg-line-3 md:size-2.5" />
-          <span className="mx-auto flex h-5 min-w-0 items-center rounded-[6px] bg-surface px-2.5 font-mono text-[10.5px] text-muted md:text-[11.5px]">writeorbit.app/editor</span>
+          <span className="mx-auto flex h-5 min-w-0 items-center rounded-[6px] bg-surface px-2.5 font-mono text-[10.5px] text-muted md:text-[11.5px]">aiforresearch.app/editor</span>
         </div>
 
         <div className="grid h-[440px] grid-cols-1 grid-rows-1 sm:h-[480px] md:h-[520px] md:grid-cols-[176px_1fr_264px] lg:grid-cols-[196px_1fr_288px]">
