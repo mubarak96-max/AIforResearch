@@ -8,9 +8,23 @@ const COLUMNS = [
     title: 'Product',
     links: [
       { label: 'Features', href: '/features' },
+      { label: 'Chat with PDF', href: '/features/chat-with-pdf' },
+      { label: 'Claim check', href: '/features/citation-checker' },
       { label: 'How it works', href: '/how-it-works' },
       { label: 'Pricing', href: '/pricing' },
       { label: 'FAQ', href: '/#faq' },
+    ],
+  },
+  {
+    title: 'Free tools',
+    links: [
+      { label: 'All tools', href: '/tools' },
+      { label: 'Citation generator', href: '/tools/citation-generator' },
+      { label: 'APA citations', href: '/tools/citation-generator/apa' },
+      { label: 'MLA works cited', href: '/tools/citation-generator/mla' },
+      { label: 'Literature review', href: '/tools/literature-review-generator' },
+      { label: 'Research gap finder', href: '/tools/research-gap-finder' },
+      { label: 'Paraphrasing tool', href: '/tools/paraphrasing-tool' },
     ],
   },
   {
@@ -18,7 +32,8 @@ const COLUMNS = [
     links: [
       { label: 'Blog', href: '/blog' },
       { label: 'Help center', href: '/help' },
-      { label: 'Citation generator', href: '/citation-styles' },
+      { label: 'Research papers', href: '/research' },
+      { label: 'Citation styles', href: '/citation-styles' },
     ],
   },
   {
@@ -39,6 +54,8 @@ const COLUMNS = [
     links: [
       { label: 'Privacy', href: '/privacy' },
       { label: 'Terms', href: '/terms' },
+      { label: 'How we use AI', href: '/ai-use' },
+      { label: 'Cookies', href: '/cookies' },
     ],
   },
 ];
@@ -46,7 +63,7 @@ const COLUMNS = [
 export function SiteFooter() {
   return (
     <footer className="border-t border-line">
-      <div className={`${container} grid gap-x-10 gap-y-10 pb-12 pt-14 md:grid-cols-[1.6fr_repeat(5,1fr)]`}>
+      <div className={`${container} grid gap-x-10 gap-y-10 pb-12 pt-14 md:grid-cols-[1.6fr_repeat(6,1fr)]`}>
         <div>
           <Link href="/" className={`inline-block rounded-lg ${focusRing}`}>
             <Logo size={24} />

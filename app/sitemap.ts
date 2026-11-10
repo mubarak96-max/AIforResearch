@@ -1,5 +1,8 @@
 import type { MetadataRoute } from 'next';
 import { allPosts } from '@/lib/blog';
+import { CITATION_STYLES } from '@/lib/citationStyles';
+import { FEATURE_PAGES } from '@/lib/features';
+import { TOOLS } from '@/lib/tools';
 import { SITE_URL } from '@/lib/site';
 
 /**
@@ -12,6 +15,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: `${SITE_URL}/`, changeFrequency: 'weekly', priority: 1 },
     { url: `${SITE_URL}/features`, changeFrequency: 'monthly', priority: 0.8 },
+    ...FEATURE_PAGES.map((page) => ({ url: `${SITE_URL}/features/${page.slug}`, changeFrequency: 'monthly' as const, priority: 0.6 })),
+    { url: `${SITE_URL}/tools`, changeFrequency: 'monthly', priority: 0.8 },
+    ...TOOLS.map((tool) => ({ url: `${SITE_URL}/tools/${tool.slug}`, changeFrequency: 'monthly' as const, priority: 0.8 })),
+    ...CITATION_STYLES.map((style) => ({ url: `${SITE_URL}/tools/citation-generator/${style.slug}`, changeFrequency: 'monthly' as const, priority: 0.7 })),
+    // Paper and author pages are found through search and links from here; there are too many to list.
+    { url: `${SITE_URL}/research`, changeFrequency: 'weekly', priority: 0.6 },
     { url: `${SITE_URL}/how-it-works`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${SITE_URL}/pricing`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${SITE_URL}/help`, changeFrequency: 'monthly', priority: 0.6 },
@@ -31,6 +40,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     { url: `${SITE_URL}/privacy`, changeFrequency: 'yearly', priority: 0.2 },
     { url: `${SITE_URL}/terms`, changeFrequency: 'yearly', priority: 0.2 },
+    { url: `${SITE_URL}/ai-use`, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${SITE_URL}/cookies`, changeFrequency: 'yearly', priority: 0.2 },
     { url: `${SITE_URL}/login`, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${SITE_URL}/signup`, changeFrequency: 'yearly', priority: 0.5 },
   ];

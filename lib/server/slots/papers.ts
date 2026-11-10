@@ -33,6 +33,11 @@ export interface PagedPapersSlot extends PapersSlot {
   lookupWork(workId: string): Promise<RichPaper | null>;
   /** A PubMed id, through the index's pmid: identifier. */
   lookupPmid(pmid: string): Promise<RichPaper | null>;
+  /**
+   * Any OpenAlex-style path (works/W1, authors/A1, works?filter=…) as raw JSON, with the same
+   * cache, retry and fallback as search; null when the record does not exist.
+   */
+  get(path: string, params?: Record<string, string>): Promise<any | null>;
 }
 
 export class PapersError extends Error {
@@ -276,6 +281,7 @@ export function createPapersSlot(options: { settings?: PapersSettings; fetch?: t
   return {
     provider: endpoint.provider,
     searchPage,
+    get: (path, params = {}) => request(path, params),
     async search(input) {
       return (await searchPage(input)).results;
     },

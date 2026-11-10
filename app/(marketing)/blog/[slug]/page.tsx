@@ -6,6 +6,9 @@ import { pageMetadata } from '@/components/marketing/seo';
 import { btnGhost, btnPrimary, container, focusRing } from '@/components/marketing/styles';
 import { allPosts, formatDate, getPost, relatedPosts, type BlogPost } from '@/lib/blog';
 import { SITE_URL } from '@/lib/site';
+import { toolsForText } from '@/lib/tools';
+import { featuresForText } from '@/lib/features';
+import { FeatureCard, ToolCard } from '@/components/marketing/FeatureLanding';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -76,6 +79,9 @@ export default async function BlogPostPage({ params }: Props) {
   const post = getPost((await params).slug);
   if (!post) notFound();
   const related = relatedPosts(post);
+  const keywords = [post.title, post.primaryKeyword, ...post.secondaryKeywords].join(' ');
+  const tools = toolsForText(keywords, 2);
+  const features = featuresForText(keywords, 3 - tools.length);
   const pillar = post.isPillar ? null : allPosts().find((other) => `/blog/${other.slug}` === post.pillar) ?? null;
 
   return (
@@ -125,6 +131,16 @@ export default async function BlogPostPage({ params }: Props) {
               <Link href="/features" className={`${btnGhost} h-11 px-5 text-[15px]`}>See the features</Link>
             </div>
           </aside>
+
+          {tools.length + features.length > 0 && (
+            <section aria-labelledby="tools-title" className="mt-16">
+              <h2 id="tools-title" className="mb-4 text-[20px] font-bold tracking-[-0.01em] text-ink">Try it in WriteOrbit</h2>
+              <ul className="grid gap-4 sm:grid-cols-3">
+                {tools.map((tool) => <li key={tool.slug}><ToolCard tool={tool} /></li>)}
+                {features.map((page) => <li key={page.slug}><FeatureCard page={page} /></li>)}
+              </ul>
+            </section>
+          )}
 
           {related.length > 0 && (
             <section aria-labelledby="related-title" className="mt-16">

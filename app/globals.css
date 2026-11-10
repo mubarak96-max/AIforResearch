@@ -318,3 +318,17 @@ html:not([data-auth='in']) .wo-auth-in, html[data-auth='in'] .wo-auth-out { disp
 @supports (animation-timeline: scroll()) {
   .wo-site-header { animation: wo-header-lift linear both; animation-timeline: scroll(root); animation-range: 0 48px; }
 }
+
+/* An AI tool's answer (components/tools/AiTool): Markdown with headings, lists and tables. */
+.wo-tool-result { color: var(--color-ink-2); font-size: 16px; line-height: 1.7; }
+.wo-tool-result > * + * { margin-top: 0.9em; }
+.wo-tool-result h2 { margin-top: 1.6em; font-family: var(--font-serif), serif; font-size: 23px; font-weight: 600; line-height: 1.25; color: var(--color-ink); }
+.wo-tool-result h3 { margin-top: 1.3em; font-size: 17.5px; font-weight: 600; color: var(--color-ink); }
+.wo-tool-result > h2:first-child, .wo-tool-result > h3:first-child { margin-top: 0; }
+.wo-tool-result ul { list-style: disc; padding-left: 1.4em; }
+.wo-tool-result ol { list-style: decimal; padding-left: 1.4em; }
+.wo-tool-result li + li { margin-top: 0.3em; }
+.wo-tool-result strong { color: var(--color-ink); }
+.wo-tool-result table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; font-size: 14.5px; line-height: 1.5; }
+.wo-tool-result th, .wo-tool-result td { border: 1px solid var(--color-line); padding: 8px 10px; text-align: left; vertical-align: top; }
+.wo-tool-result th { background: var(--color-soft); color: var(--color-ink); font-weight: 600; }

@@ -3261,6 +3261,15 @@ export default function AIEditorWorkspace() {
     router.push(`${editorPath()}?doc=${nextDocumentId}`);
   }, [createDocument, isAuthenticated, router]);
 
+  // "?template=essay" (the tool pages' buttons) starts a document from that template once.
+  const templateRequested = !searchParams.get('doc') ? searchParams.get('template') : null;
+  const templateHandledRef = useRef(false);
+  useEffect(() => {
+    if (!templateRequested || authLoading || templateHandledRef.current) return;
+    templateHandledRef.current = true;
+    handleCreateFromTemplate(templateRequested);
+  }, [authLoading, handleCreateFromTemplate, templateRequested]);
+
   const handleImportWordFile = useCallback((file: File) => {
     if (!isAuthenticated) {
       setAuthPrompt('signup');
