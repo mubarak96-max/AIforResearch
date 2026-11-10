@@ -12,5 +12,5 @@ export const COMPANY = {
   name: process.env.NEXT_PUBLIC_COMPANY_NAME || 'WriteOrbit',
   address: process.env.NEXT_PUBLIC_COMPANY_ADDRESS || '',
   phone: process.env.NEXT_PUBLIC_COMPANY_PHONE || '',
-  email: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || '',
+  email: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@writeorbit.app',
 };

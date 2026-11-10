@@ -72,7 +72,7 @@ const FAQ = [
 ];
 
 
-const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || '';
+const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@writeorbit.app';
 
 const STRUCTURED_DATA = [
   {

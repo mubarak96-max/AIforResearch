@@ -12,7 +12,7 @@ import { getApp } from '@/lib/server';
 const callApi = (path: string) => getApp().request(path);
 /** Where the developer API answers, and the source code (shown only once it is public). */
 const apiUrl = (process.env.PUBLIC_API_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/+$/, '');
-const contactEmail = process.env.SUPPORT_EMAIL || process.env.NEXT_PUBLIC_SUPPORT_EMAIL || '';
+const contactEmail = process.env.SUPPORT_EMAIL || process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@writeorbit.app';
 const contact = `mailto:${contactEmail}?subject=WriteOrbit%20for%20our%20institution`;
 
 type Prices = {
