@@ -60,7 +60,7 @@ env:
   - variable: COLLAB_URL
     value: https://collab-xxxxx.a.run.app
   - variable: SUPPORT_EMAIL
-    value: support@writeorbit.app
+    value: support@aiforresearch.app
   - variable: LLM_PROVIDER
     value: openrouter
   - variable: PAPERS_PROVIDER

@@ -15,6 +15,8 @@ export type BlogPostSource = {
   pillar: string;
   /** Empty or a "[placeholder]" until a real byline is set. */
   author: string;
+  /** True when the article names other tools next to AI for Research; shows the vendor disclosure. */
+  comparesTools: boolean;
   /** YYYY-MM-DD */
   published: string;
   updated: string;

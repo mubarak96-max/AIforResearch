@@ -9,6 +9,7 @@ import { pageMetadata } from '@/components/marketing/seo';
 import { container, focusRing } from '@/components/marketing/styles';
 import { ComparisonBand, FEATURES, FinalCta, STEPS, StartButton, h2, lead } from '@/components/marketing/landing';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
+import { FOUNDER, personSchema } from '@/lib/authors';
 import { Footnote, PageReferences, PenTick, PenUnderline, type ReferenceId } from '@/components/marketing/Marginalia';
 
 const DESCRIPTION =
@@ -72,7 +73,7 @@ const FAQ = [
 ];
 
 
-const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@writeorbit.app';
+const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@aiforresearch.app';
 
 const STRUCTURED_DATA = [
   {
@@ -82,6 +83,7 @@ const STRUCTURED_DATA = [
     name: SITE_NAME,
     url: SITE_URL,
     logo: `${SITE_URL}/icon-512.png`,
+    founder: personSchema(FOUNDER),
     ...(SUPPORT_EMAIL ? { email: SUPPORT_EMAIL, contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: SUPPORT_EMAIL } } : {}),
   },
   {

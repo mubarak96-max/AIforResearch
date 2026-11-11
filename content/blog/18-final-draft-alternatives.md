@@ -7,6 +7,7 @@ secondary_keywords: ["free final draft alternative", "best final draft alternati
 cluster: "E. Screenwriting"
 pillar: "/blog/screenwriting-software"
 author: "Mubarak"
+compares_tools: true
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

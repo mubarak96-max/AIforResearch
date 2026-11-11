@@ -7,8 +7,9 @@ secondary_keywords: ["ai writing assistant free", "ai writing assistant free onl
 cluster: "A. AI writing assistant"
 pillar: "/blog/best-ai-writing-assistant"
 author: "Mubarak"
+compares_tools: true
 published: "2026-11-06"
-updated: "2026-11-06"
+updated: "2026-11-11"
 faq:
   - q: "Is there a free AI writing assistant with no sign-up?"
     a: "A few tools work without an account, with tighter limits. OpenAI's help center describes settings for signed-out ChatGPT users, so basic chat works logged out. Most other tools, including Claude, Grammarly and AI for Research, need a free account. An account also gives you saved history and privacy settings you can control, which matters more than skipping a sign-up form."
@@ -24,7 +25,7 @@ faq:
 
 # Free AI writing assistant: what you really get for free (and where it stops)
 
-*Last updated: 6 November 2026*
+*Last updated: 11 November 2026*
 
 You can get a capable free AI writing assistant today: Grammarly Free for grammar, ChatGPT or Claude Free for drafting, Wordtune or QuillBot for rewrites, and AI for Research Free for cited writing. Each stops somewhere: daily caps, no citation styles, no version history, or privacy defaults you need to change. Here is exactly where.
 
@@ -120,10 +121,6 @@ Pay when one of these is true, not before:
 - **Your work is confidential** and you need contractual privacy terms, which usually come with business plans.
 
 On AI for Research, Plus ($12/month or $96/year) raises the allowance to 5,000 autocompletes, 500 AI edits and 500 chat messages a month, 30 review checks and 20 drafts, with unlimited PDFs up to 50 MB, Zotero and Mendeley import, and LaTeX export. Check [/pricing](/pricing) for current limits.
-
-## The low-cost alternative to a subscription: run it in your own cloud
-
-If you're on a team that already pays for Google Cloud, there's another route. AI for Research can be deployed to your own Firebase / Google Cloud project, so documents stay in your own cloud account and you pay your cloud provider's usage costs rather than a per-seat subscription. It suits teams with someone technical who can manage a deployment. <!-- VERIFY: confirm self-hosting is offered publicly before publishing -->
 
 ## The AI for Research free plan: the full editor, with citations
 

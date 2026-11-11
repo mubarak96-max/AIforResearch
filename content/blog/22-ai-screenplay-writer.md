@@ -7,6 +7,7 @@ secondary_keywords: ["best ai for screenwriting", "ai screenwriting software", "
 cluster: "E. Screenwriting"
 pillar: "/blog/screenwriting-software"
 author: "Mubarak"
+compares_tools: true
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

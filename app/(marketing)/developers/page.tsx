@@ -13,7 +13,7 @@ import { SITE_URL } from '@/lib/site';
 const callApi = (path: string) => getApp().request(path);
 /** Where the developer API answers, and the source code (shown only once it is public). */
 const apiUrl = SITE_URL;
-const contactEmail = process.env.SUPPORT_EMAIL || process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@writeorbit.app';
+const contactEmail = process.env.SUPPORT_EMAIL || process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@aiforresearch.app';
 const contact = `mailto:${contactEmail}?subject=AI for Research%20for%20our%20institution`;
 
 type Prices = {

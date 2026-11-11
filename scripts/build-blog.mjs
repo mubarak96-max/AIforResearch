@@ -41,6 +41,7 @@ const posts = readdirSync(sourceDir)
       cluster: data.cluster,
       pillar: data.pillar,
       author: String(data.author ?? ''),
+      comparesTools: data.compares_tools === true,
       published: String(data.published),
       updated: String(data.updated),
       faq: data.faq.map(({ q, a }) => ({ q, a })),

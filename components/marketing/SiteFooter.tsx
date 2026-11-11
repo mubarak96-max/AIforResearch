@@ -30,6 +30,7 @@ const COLUMNS = [
   {
     title: 'Resources',
     links: [
+      { label: 'About us', href: '/about' },
       { label: 'Blog', href: '/blog' },
       { label: 'Help center', href: '/help' },
       { label: 'Research papers', href: '/research' },

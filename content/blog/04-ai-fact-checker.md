@@ -7,6 +7,7 @@ secondary_keywords: ["ai fact checker free", "best ai fact checker", "ai fact ch
 cluster: "B. Fact-checking"
 pillar: "/blog/ai-fact-checker"
 author: "Mubarak"
+compares_tools: true
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

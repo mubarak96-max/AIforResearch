@@ -7,8 +7,9 @@ secondary_keywords: ["best ai script coverage", "script coverage ai", "ai script
 cluster: "E. Screenwriting"
 pillar: "/blog/screenwriting-software"
 author: "Mubarak"
+compares_tools: true
 published: "2026-11-06"
-updated: "2026-11-06"
+updated: "2026-11-11"
 faq:
   - q: "Can AI do script coverage?"
     a: "AI can produce a coverage-style report: logline, synopsis, structure notes and a Pass, Consider or Recommend verdict. It is good at structure, pacing and continuity, and weak at taste, comedy and market judgment. Treat it as a fast first read before you pay a human reader, not as a replacement for one."
@@ -24,7 +25,7 @@ faq:
 
 # AI script coverage: can AI give useful notes on your screenplay?
 
-*Last updated: 6 November 2026*
+*Last updated: 11 November 2026*
 
 AI script coverage is useful for structure, pacing, continuity and a fast logline test, and unreliable for taste, comedy, voice and market judgment. Use it as a cheap first read to fix mechanical problems before a human reader sees the script. Ask for page-cited notes, check each one against the script, and keep the verdict in perspective.
 
@@ -53,7 +54,7 @@ The last row matters most. Chat models are tuned to be helpful and agreeable, so
 
 ## The test: human coverage vs. AI coverage on the same script
 
-We are running a side-by-side test of human and AI coverage. The method and every prompt are below, so you can run the same test on your own script and compare.
+Here is a side-by-side test of human and AI coverage. The method and every prompt are below, so you can run the same test on your own script and compare.
 
 ### Test method
 
@@ -79,7 +80,9 @@ Score each criterion from 1 (useless) to 5 (as good as a strong professional rea
 | 7 | Market and audience sense | None, or invented comparisons | Plausible comps, audience and budget level |
 | 8 | Verdict calibration | Grade doesn't match the notes | Grade follows from the comments |
 
-<!-- TO RUN: complete the test above on one spec script; fill in the table with averaged rubric scores (out of 40), the count of factual errors, price and turnaround for each source. Add a short "what each got right / missed" paragraph per tool. Confirm the dedicated service's price on its pricing page on the test date. -->
+<!-- TO RUN: complete the test above on one spec script; fill in the table with averaged rubric scores (out of 40), the count of factual errors, price and turnaround for each source. Add a short "what each got right / missed" paragraph per tool. Confirm the dedicated service's price on its pricing page on the test date.
+
+Results table (fill in, then move it out of this comment and delete the note below it):
 
 | Source | Rubric score (out of 40) | Factual errors | Price | Turnaround | Notable hit | Notable miss |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -88,6 +91,9 @@ Score each criterion from 1 (useless) to 5 (as good as a strong professional rea
 | ChatGPT (coverage prompt) | | | | | | |
 | Claude (coverage prompt) | | | | | | |
 | AI for Research review + chat | | | | | | |
+-->
+
+*We haven't published our own results for this test yet. The method, prompts and rubric above are complete, so you can run the same comparison on your own script.*
 
 ### What to look for when you run it yourself
 

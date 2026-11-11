@@ -7,8 +7,9 @@ secondary_keywords: ["chat with pdf ai", "ai chat with pdf", "chat with pdf free
 cluster: "F. Research and citations"
 pillar: "/blog/ai-citation-generator"
 author: "Mubarak"
+compares_tools: true
 published: "2026-11-06"
-updated: "2026-11-06"
+updated: "2026-11-11"
 faq:
   - q: "How does chat with PDF work?"
     a: "Most tools use retrieval-augmented generation. The tool extracts the PDF's text, splits it into passages, and indexes them. When you ask a question, it finds the passages most related to it and gives only those to a language model, which writes an answer from them. Good tools show which passage and page each claim came from."
@@ -24,7 +25,7 @@ faq:
 
 # Chat with PDF: how to ask questions of long reports, filings and papers (and check the answers)
 
-*Last updated: 6 November 2026*
+*Last updated: 11 November 2026*
 
 Chat with PDF tools find the passages in your document most related to your question and have a language model answer from them. That works well for finding and summarizing, and fails when the right passage isn't retrieved or the text didn't extract. Use a tool that cites the page for every claim, and open that page before you rely on the answer.
 
@@ -123,7 +124,7 @@ Prices and limits as of November 2026. They change often; check each pricing pag
 | Adobe Acrobat AI Assistant | Not part of free Acrobat Reader in most plans <!-- VERIFY: whether Acrobat Reader includes any free AI Assistant questions --> | Acrobat Express about $9.99/month and Acrobat Studio about $24.99/month (annual plans, billed monthly) include AI features <!-- VERIFY: price of the standalone AI Assistant add-on for Acrobat Pro/Standard --> | PDF Spaces | Answers cite the source text | Strong PDF tools (OCR, edit, redact); says content isn't used to train its models |
 | SciSpace | Limited daily PDFs and questions <!-- VERIFY: SciSpace free tier (its comparison page listed 2 PDFs a day, 120 pages each, 50 questions a day) --> | Premium about $12/month billed yearly <!-- VERIFY: SciSpace Premium price on scispace.com/pricing --> | Yes <!-- VERIFY: SciSpace multi-PDF chat and page-level citations --> | Yes | Built for research papers; also a paper search engine |
 | Gemini Notebook (formerly NotebookLM) | 100 notebooks, 50 sources each; up to 500,000 words or 200 MB per source | Higher limits with Google AI plans (Pro: 300 sources per notebook) | Yes: every notebook is a source set | Inline citations to source passages | Renamed by Google on 16 July 2026; many source types, including audio and YouTube |
-| AI for Research | 10 PDFs up to 10 MB each, 5 chat messages a day | Plus $12/month: unlimited PDFs up to 50 MB, 500 chat messages a month | Library chat | Answers carry page numbers | Write and cite in the same editor; can run in your own cloud account |
+| AI for Research | 10 PDFs up to 10 MB each, 5 chat messages a day | Plus $12/month: unlimited PDFs up to 50 MB, 500 chat messages a month | Library chat | Answers carry page numbers | Write and cite in the same editor |
 
 Fair notes: Gemini Notebook is the strongest free option for large sets of sources. Acrobat is the best choice if you already pay for it and need OCR, redaction and editing in the same tool. SciSpace is built around research papers. ChatPDF is the fastest way to ask a question with no sign-up.
 
@@ -149,7 +150,7 @@ AI for Research puts PDF chat next to the document you are writing, so the answe
 3. **Ask across your Library from the AI chat** beside your draft by choosing Library as a source. Its answers cite the papers they draw on; open the paper and use Ask on it when you need the exact page.
 4. **Cite as you write.** Type `@` to cite a paper from the Library or from a search of 250M+ scholarly works.
 5. **Check the draft.** AI review runs claim checks and flags retracted papers, preprints and wrong DOIs, as comments in the text.
-6. **Keep sensitive files in your own cloud.** AI for Research can be deployed to your own Firebase / Google Cloud project, so documents stay in your own cloud account. <!-- VERIFY: confirm self-hosting is offered publicly before publishing -->
+6. **Know where your files go.** AI for Research never uses your documents to train AI; see [how AI for Research uses AI](/ai-use). For material that must not leave your organization, follow your organization's rules before uploading to any online tool.
 
 <!-- SCREENSHOT: the Library with a court filing PDF open, the chat panel answering "Where does the witness describe the meeting?" with a quoted line and a page-number link, and the draft document beside it -->
 

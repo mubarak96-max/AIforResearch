@@ -1,14 +1,15 @@
 ---
-title: "AP Style Checker: Free and AI Tools Compared (2026 Test)"
+title: "AP Style Checker: Free and AI Tools Compared (2026)"
 slug: "ap-style-checker"
-description: "AP style checker test: a 300-word paragraph with 20 planted AP errors, the answer key, a free AI prompt, and what StyleGuard, PerfectIt and Grammarly miss."
+description: "AP style checker test: a 300-word paragraph with 20 planted AP errors, the answer key, a free AI prompt, and where StyleGuard, PerfectIt and Grammarly tend to slip."
 primary_keyword: "ap style checker"
 secondary_keywords: ["check ap style", "free ap style checker", "ap style checker online free", "ai ap style", "ap style converter"]
 cluster: "C. AP style and news writing"
 pillar: "/blog/ap-style-guide"
 author: "Mubarak"
+compares_tools: true
 published: "2026-11-06"
-updated: "2026-11-06"
+updated: "2026-11-11"
 faq:
   - q: "Is there a free AP style checker?"
     a: "Not a complete one. The AP-licensed checkers, such as AP StyleGuard, are paid. The best free option is a general AI chatbot given a detailed AP prompt, like the one on this page, followed by a human read for context rules. Free websites that call themselves AP checkers vary widely, so test any of them on a paragraph with known errors first."
@@ -24,7 +25,7 @@ faq:
 
 # AP style checker: free and AI tools compared (and what they miss)
 
-*Last updated: 6 November 2026*
+*Last updated: 11 November 2026*
 
 No AP style checker catches everything. AP-licensed tools such as AP StyleGuard know the most rules; PerfectIt and Grammarly only check the AP rules you add yourself; an AI chatbot with a precise prompt is the best free option. Every tool misses context rules, so finish with a human read.
 
@@ -131,7 +132,9 @@ Count a catch only if the fix is the AP form ("10:00 AM" for "10:00 a.m." is a m
 
 ### Results
 
-<!-- TO RUN: Paste the test paragraph into each tool on its default settings (and, for PerfectIt and Grammarly, once more with a 20-rule custom AP sheet built from the answer key). Record the plan and version, date tested, errors caught out of 20, false positives out of 9 traps plus any other bad changes, which error numbers were missed, and the price on the test date. Fill in the table and remove this comment. -->
+<!-- TO RUN: Paste the test paragraph into each tool on its default settings (and, for PerfectIt and Grammarly, once more with a 20-rule custom AP sheet built from the answer key). Record the plan and version, date tested, errors caught out of 20, false positives out of 9 traps plus any other bad changes, which error numbers were missed, and the price on the test date. Fill in the table and remove this comment.
+
+Results table (fill in, then move it out of this comment and delete the note below it):
 
 | Tool | Plan or version tested | Date tested | Errors caught (of 20) | False positives | Missed errors (#) | Price on test date | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -144,6 +147,9 @@ Count a catch only if the fix is the AP form ("10:00 AM" for "10:00 a.m." is a m
 | Claude with the AP prompt | | | | | | | |
 | AI for Research proofreading review | | | | | | | |
 | AI for Research chat with the AP prompt | | | | | | | |
+-->
+
+*We haven't published our own results for this test yet. The paragraph, answer key and scoring above are complete, so you can run any checker against them today.*
 
 ## Why no checker catches everything
 

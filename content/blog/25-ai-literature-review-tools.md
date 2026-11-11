@@ -7,6 +7,7 @@ secondary_keywords: ["ai literature review tools", "ai literature review generat
 cluster: "F. Research and citations"
 pillar: "/blog/ai-citation-generator"
 author: "Mubarak"
+compares_tools: true
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

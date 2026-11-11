@@ -9,6 +9,8 @@ import { SITE_URL } from '@/lib/site';
 import { toolsForText } from '@/lib/tools';
 import { featuresForText } from '@/lib/features';
 import { FeatureCard, ToolCard } from '@/components/marketing/FeatureLanding';
+import { AuthorBox } from '@/components/marketing/AuthorBox';
+import { authorPath, getAuthorByKey, personSchema } from '@/lib/authors';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -33,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       publishedTime: post.published,
       modifiedTime: post.updated,
       section: post.topic,
-      ...(post.byline ? { authors: [post.byline] } : {}),
+      ...(post.byline ? { authors: [getAuthorByKey(post.byline)?.name ?? post.byline] } : {}),
     },
   };
 }
@@ -41,7 +43,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /** Article, FAQ and breadcrumb structured data. `<` is escaped so the text can't close the script tag. */
 function structuredData(post: BlogPost) {
   const url = `${SITE_URL}/blog/${post.slug}`;
-  const publisher = { '@type': 'Organization', name: 'AI for Research', url: SITE_URL, logo: { '@type': 'ImageObject', url: `${SITE_URL}/icon-512.png` } };
+  const publisher = { '@type': 'Organization', '@id': `${SITE_URL}/#organization`, name: 'AI for Research', url: SITE_URL, logo: { '@type': 'ImageObject', url: `${SITE_URL}/icon-512.png` } };
+  const author = getAuthorByKey(post.byline);
   const graph = [
     {
       '@type': 'BlogPosting',
@@ -56,7 +59,7 @@ function structuredData(post: BlogPost) {
       keywords: [post.primaryKeyword, ...post.secondaryKeywords].join(', '),
       articleSection: post.topic,
       image: `${SITE_URL}/screenshots/editor.png`,
-      author: post.byline ? { '@type': 'Person', name: post.byline } : publisher,
+      author: author ? personSchema(author) : post.byline ? { '@type': 'Person', name: post.byline } : publisher,
       publisher,
     },
     {
@@ -83,6 +86,7 @@ export default async function BlogPostPage({ params }: Props) {
   const tools = toolsForText(keywords, 2);
   const features = featuresForText(keywords, 3 - tools.length);
   const pillar = post.isPillar ? null : allPosts().find((other) => `/blog/${other.slug}` === post.pillar) ?? null;
+  const author = getAuthorByKey(post.byline);
 
   return (
     <div className={container}>
@@ -104,12 +108,24 @@ export default async function BlogPostPage({ params }: Props) {
 
           <header>
             <h1 className="text-balance text-[34px] font-bold leading-[1.1] tracking-[-0.03em] text-ink sm:text-[44px]">{post.heading}</h1>
-            <p className="mt-4 flex flex-wrap gap-x-3 gap-y-1 text-[14px] text-muted">
-              {post.byline && <span>By {post.byline}</span>}
+            <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px] text-muted">
+              {author ? (
+                <Link href={authorPath(author)} rel="author" className={`inline-flex items-center gap-2 rounded hover:text-ink ${focusRing}`}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={author.image} alt="" width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
+                  <span>By <span className="font-medium text-ink-2">{author.name}</span></span>
+                </Link>
+              ) : post.byline && <span>By {post.byline}</span>}
               <span>Updated <time dateTime={post.updated}>{formatDate(post.updated)}</time></span>
               <span aria-hidden="true">·</span>
               <span>{post.readingMinutes} min read</span>
             </p>
+            {post.comparesTools && (
+              <p className="mt-4 rounded-xl border border-line bg-soft px-4 py-3 text-[14px] leading-relaxed text-ink-2">
+                <strong className="font-semibold text-ink">Disclosure:</strong> We make AI for Research, one of the tools covered in this article.{' '}
+                <Link href="/about#editorial" className={`rounded text-ink underline underline-offset-4 hover:text-brand ${focusRing}`}>How we write and update articles</Link>
+              </p>
+            )}
           </header>
 
           {post.lead && (
@@ -120,6 +136,8 @@ export default async function BlogPostPage({ params }: Props) {
           )}
 
           <BlogMarkdown markdown={post.rest} />
+
+          {author && <AuthorBox author={author} />}
 
           <aside aria-label="Try AI for Research" className="mt-16 rounded-2xl border border-line bg-gradient-to-br from-brand-50 to-white p-7 sm:p-8">
             <h2 className="text-[22px] font-bold tracking-[-0.02em] text-ink">Write with sources you can check</h2>

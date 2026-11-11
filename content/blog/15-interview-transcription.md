@@ -7,6 +7,7 @@ secondary_keywords: ["interview transcription example", "interview transcription
 cluster: "D. Interviews and transcripts"
 pillar: "/blog/interview-transcription"
 author: "Mubarak"
+compares_tools: true
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

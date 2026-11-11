@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { allPosts } from '@/lib/blog';
+import { AUTHORS, authorPath } from '@/lib/authors';
 import { CITATION_STYLES } from '@/lib/citationStyles';
 import { FEATURE_PAGES } from '@/lib/features';
 import { TOOLS } from '@/lib/tools';
@@ -38,6 +39,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly' as const,
       priority: post.isPillar ? 0.8 : 0.6,
     })),
+    { url: `${SITE_URL}/about`, changeFrequency: 'yearly', priority: 0.5 },
+    ...AUTHORS.map((author) => ({ url: `${SITE_URL}${authorPath(author)}`, changeFrequency: 'monthly' as const, priority: 0.4 })),
     { url: `${SITE_URL}/privacy`, changeFrequency: 'yearly', priority: 0.2 },
     { url: `${SITE_URL}/terms`, changeFrequency: 'yearly', priority: 0.2 },
     { url: `${SITE_URL}/ai-use`, changeFrequency: 'yearly', priority: 0.3 },

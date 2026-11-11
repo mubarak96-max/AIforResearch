@@ -7,13 +7,14 @@ secondary_keywords: ["self hosted zotero alternative", "reddit zotero alternativ
 cluster: "F. Research and citations"
 pillar: "/blog/ai-citation-generator"
 author: "Mubarak"
+compares_tools: true
 published: "2026-11-06"
-updated: "2026-11-06"
+updated: "2026-11-11"
 faq:
   - q: "What is the best free alternative to Zotero?"
     a: "For a free, open-source desktop tool, JabRef is the strongest alternative, especially if you write in LaTeX, because it stores your library as a plain BibTeX file. Mendeley is free with 2 GB of cloud storage but is owned by Elsevier and is not open source. ZoteroBib is free for one-off bibliographies without an account."
   - q: "Is there a self-hosted Zotero alternative?"
-    a: "JabRef keeps your library as a local BibTeX file you can store anywhere, including a private Git repository or shared drive. Zotero itself can sync attachments to your own WebDAV server. For a writing tool, AI for Research can be deployed to your own Firebase or Google Cloud project, so documents and imported libraries stay in your own cloud account."
+    a: "JabRef keeps your library as a local BibTeX file you can store anywhere, including a private Git repository or shared drive. Zotero itself can sync attachments to your own WebDAV server."
   - q: "What is a good Mendeley alternative?"
     a: "Zotero is the most common Mendeley alternative: free, open source, and it can import a Mendeley library directly. Paperpile suits people who write in Google Docs, ReadCube Papers suits people who read and annotate heavily, and EndNote suits institutions that license it. Export a backup from Mendeley in RIS or BibTeX before you switch."
   - q: "Which reference manager has AI features?"
@@ -24,7 +25,7 @@ faq:
 
 # Best Zotero alternatives: reference managers that help you write
 
-*Last updated: 6 November 2026*
+*Last updated: 11 November 2026*
 
 The best Zotero alternatives in 2026 are Mendeley for free cloud storage, Paperpile for Google Docs, ReadCube Papers for reading with AI, EndNote for institutions, JabRef for open-source LaTeX work and Citavi for knowledge organization. If your real problem is the gap between your library and your draft, keep Zotero and import it into a writing tool.
 
@@ -100,7 +101,6 @@ If the reason you're leaving is data control, your options are:
 | --- | --- | --- |
 | **Zotero with WebDAV** | Attachments sync to your own WebDAV server; the library database is local | Metadata still syncs through zotero.org if you use sync |
 | **JabRef with a BibTeX file** | Everything: the library is a text file you store wherever you like, such as a private Git repository | No built-in cloud sync or web library |
-| **AI for Research in your own cloud** | AI for Research can be deployed to your own Firebase / Google Cloud project, so documents and imported libraries stay in your own cloud account <!-- VERIFY: confirm self-hosting is offered publicly before publishing --> | You run and pay for the cloud project |
 
 **An open-source reference manager is one whose code is published under a license that lets anyone read, modify and redistribute it.** Zotero (AGPL) and JabRef qualify. Mendeley, EndNote, Paperpile, ReadCube, Citavi and AI for Research do not.
 
@@ -129,8 +129,7 @@ For a free, open-source desktop tool, JabRef is the strongest alternative, espec
 
 ### Is there a self-hosted Zotero alternative?
 
-<!-- VERIFY: confirm self-hosting is offered publicly before publishing -->
-JabRef keeps your library as a local BibTeX file you can store anywhere, including a private Git repository or shared drive. Zotero itself can sync attachments to your own WebDAV server. For a writing tool, AI for Research can be deployed to your own Firebase or Google Cloud project, so documents and imported libraries stay in your own cloud account.
+JabRef keeps your library as a local BibTeX file you can store anywhere, including a private Git repository or shared drive. Zotero itself can sync attachments to your own WebDAV server.
 
 ### What is a good Mendeley alternative?
 

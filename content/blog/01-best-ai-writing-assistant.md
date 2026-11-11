@@ -7,6 +7,7 @@ secondary_keywords: ["best ai writing assistant", "what is the best ai writing a
 cluster: "A. AI writing assistant"
 pillar: "/blog/best-ai-writing-assistant"
 author: "Mubarak"
+compares_tools: true
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:

@@ -7,8 +7,9 @@ secondary_keywords: ["best screenwriting software", "good screenwriting software
 cluster: "E. Screenwriting"
 pillar: "/blog/screenwriting-software"
 author: "Mubarak"
+compares_tools: true
 published: "2026-11-06"
-updated: "2026-11-06"
+updated: "2026-11-11"
 faq:
   - q: "What software do professional screenwriters use?"
     a: "Final Draft has been the long-standing standard in US film and TV, and its .fdx file is the format producers, studios and production software most often expect. Many working writers also use Fade In, WriterDuet, Highland or Arc Studio and export to .fdx or PDF when they deliver. What matters professionally is clean standard formatting and a file others can open, not the brand of the formatter."
@@ -24,7 +25,7 @@ faq:
 
 # Screenwriting software in 2026: the best options for every budget
 
-*Last updated: 6 November 2026*
+*Last updated: 11 November 2026*
 
 The best screenwriting software for most writers in 2026 is Fade In if you want to pay once (about $80), WriterDuet or Arc Studio if you co-write, Highland Pro if you live on a Mac and iPad, and Final Draft if your producers expect it. Trelby and Beat are the best free picks. All of them format; none of them does your research.
 
@@ -160,7 +161,7 @@ AI for Research is a web editor for research-backed writing. To be plain about i
 
 **Cost.** The free plan includes the full editor on any device, 10 PDFs in the Library (up to 10 MB each, enough for a feature script PDF and a few source documents), unlimited citations, and Word and PDF export, plus small daily AI allowances (5 chat messages and 3 review checks a day). Plus is $12/month or $96/year, with unlimited PDFs up to 50 MB and much higher AI limits. Check [current pricing](/pricing) since plans can change.
 
-**Confidentiality.** Unproduced scripts and bibles are sensitive. AI for Research can be deployed to your own Firebase / Google Cloud project, so documents stay in your own cloud account. <!-- VERIFY: confirm self-hosting is offered publicly before publishing -->
+**Confidentiality.** Unproduced scripts and bibles are sensitive. AI for Research never uses your documents to train AI, and its AI providers' terms don't let them train on what it sends. See [how AI for Research uses AI](/ai-use).
 
 If you only need a formatter, you do not need AI for Research. If your project involves research, a bible or a room, it fills the gap the formatter leaves. See [how it works](/how-it-works).
 

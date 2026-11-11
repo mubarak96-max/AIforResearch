@@ -7,6 +7,7 @@ secondary_keywords: ["ai writing assistant for journalists", "ai news writer", "
 cluster: "A. AI writing assistant"
 pillar: "/blog/best-ai-writing-assistant"
 author: "Mubarak"
+compares_tools: true
 published: "2026-11-06"
 updated: "2026-11-06"
 faq:
