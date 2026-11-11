@@ -4,6 +4,7 @@ import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import * as v1 from 'firebase-functions/v1';
 import { closeInterruptedImports, deleteUserData, newsletterOn, processPdf, ready, runImportJob, syncNewsletter } from '../../lib/server/jobs.js';
+import { flushAiObservability } from '../../lib/server/lib/ai-observability.js';
 
 /**
  * Background work that used to run inside the self-hosted server process. The code lives in
@@ -18,10 +19,14 @@ const LIBRARY_PDF = /^library\/([^/]+)\/([^/]+)\.pdf$/;
 /** A Library PDF was saved: read its text into searchable chunks (via services/convert). */
 // 540 s (the most for an event function): text extraction, then embeddings until processPdf's deadline.
 export const onLibraryPdfUploaded = onObjectFinalized({ timeoutSeconds: 540, memory: '1GiB' }, async (event) => {
-  const match = LIBRARY_PDF.exec(event.data.name || '');
-  if (!match) return;
-  await ready();
-  await processPdf(match[2], event.data.name);
+  try {
+    const match = LIBRARY_PDF.exec(event.data.name || '');
+    if (!match) return;
+    await ready();
+    await processPdf(match[2], event.data.name);
+  } finally {
+    await flushAiObservability();
+  }
 });
 
 /**
@@ -29,14 +34,18 @@ export const onLibraryPdfUploaded = onObjectFinalized({ timeoutSeconds: 540, mem
  * `attempt`, starts the next turn here (so an import can outlast any one function call).
  */
 export const onImportJobWritten = onDocumentWritten({ document: 'library_import_jobs/{id}', timeoutSeconds: 540, memory: '1GiB' }, async (event) => {
-  const after = event.data?.after;
-  if (!after?.exists) return;
-  const next = after.data() as { status?: string; attempt?: number };
-  const previous = event.data?.before?.exists ? (event.data.before.data() as { attempt?: number }) : null;
-  if (next.status !== 'running') return;
-  if (previous && (previous.attempt ?? 0) === (next.attempt ?? 0)) return;
-  await ready();
-  await runImportJob(event.params.id);
+  try {
+    const after = event.data?.after;
+    if (!after?.exists) return;
+    const next = after.data() as { status?: string; attempt?: number };
+    const previous = event.data?.before?.exists ? (event.data.before.data() as { attempt?: number }) : null;
+    if (next.status !== 'running') return;
+    if (previous && (previous.attempt ?? 0) === (next.attempt ?? 0)) return;
+    await ready();
+    await runImportJob(event.params.id);
+  } finally {
+    await flushAiObservability();
+  }
 });
 
 /** Keeps the MailCheap newsletter list in step with accounts (when the newsletter is set up). */

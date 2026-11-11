@@ -3,6 +3,7 @@
 /** The quick data analysis tool: a CSV in, column summaries and one test at a time out. All in the browser. */
 import { useMemo, useState } from 'react';
 import { LuUpload } from 'react-icons/lu';
+import posthog from 'posthog-js';
 import { anova, chiSquare, describe, fixed, frequencies, pairedT, parseCsv, pearson, toColumns, welch, type Column, type TestResult } from '@/lib/stats';
 import { btnPrimary, focusRing } from '@/components/marketing/styles';
 import { CopyButton } from '@/components/marketing/CopyButton';
@@ -62,13 +63,17 @@ export function DataAnalysis() {
     const second = columns.find((column) => column.name === b);
     if (!first || !second || first === second) return;
     const names: [string, string] = [first.name, second.name];
-    setResult(
-      testId === 'pearson' ? pearson(first.values, second.values, names)
-        : testId === 'paired' ? pairedT(first.values, second.values, names)
-          : testId === 'welch' ? welch(first.values, second.labels, names)
-            : testId === 'anova' ? anova(first.values, second.labels, names)
-              : chiSquare(first.labels, second.labels, names),
-    );
+    const nextResult = testId === 'pearson' ? pearson(first.values, second.values, names)
+      : testId === 'paired' ? pairedT(first.values, second.values, names)
+        : testId === 'welch' ? welch(first.values, second.labels, names)
+          : testId === 'anova' ? anova(first.values, second.labels, names)
+            : chiSquare(first.labels, second.labels, names);
+    setResult(nextResult);
+    posthog.capture('data_analysis_completed', {
+      test_id: testId,
+      row_count: parsed?.rows.length ?? 0,
+      column_count: columns.length,
+    });
   };
 
   return (

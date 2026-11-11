@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { LuCreditCard, LuDownload, LuExternalLink, LuPlus, LuTrash2, LuZap } from 'react-icons/lu';
+import posthog from 'posthog-js';
 import { Button, Card, CardHeader, EmptyState, StatusPill } from '@/components/app/ui';
 import { api, refreshSession } from '@/lib/session';
 import { money, openPricing, startCheckout, usePlans, type Interval } from '@/lib/billing';
@@ -66,6 +67,7 @@ export function BillingSection() {
         setBusy('return');
         try {
           const done = await api<{ kind: string }>('/api/billing/checkout/complete', { method: 'POST', body: JSON.stringify({ subscription }) });
+          posthog.capture('billing_checkout_completed', { checkout_type: outcome, result_kind: done.kind });
           setNotice(outcome === 'card' ? 'Card updated.'
             : done.kind === 'subscription' ? 'Payment received. Your new plan is on.'
             : 'Payment is still processing. Your plan turns on as soon as it clears.');
@@ -88,10 +90,11 @@ export function BillingSection() {
     })();
   }, [load]);
 
-  const run = async (key: string, work: () => Promise<unknown>, done?: string) => {
+  const run = async (key: string, work: () => Promise<unknown>, done?: string, event?: string) => {
     setBusy(key); setError(null); setNotice(null);
     try {
       await work();
+      if (event) posthog.capture(event);
       if (done) setNotice(done);
       await Promise.all([load(), refreshSession().catch(() => undefined)]);
     } catch (caught) { setError((caught as Error).message); }
@@ -158,7 +161,7 @@ export function BillingSection() {
               </Button>
             )}
             {paying && sub?.cancel_at_period_end && (
-              <Button variant="primary" disabled={busy !== null} onClick={() => void run('resume', () => api('/api/billing/resume', { method: 'POST' }), 'Your plan will renew as usual.')}>
+              <Button variant="primary" disabled={busy !== null} onClick={() => void run('resume', () => api('/api/billing/resume', { method: 'POST' }), 'Your plan will renew as usual.', 'subscription_resumed')}> 
                 {busy === 'resume' ? 'Resuming…' : 'Keep my plan'}
               </Button>
             )}
@@ -200,7 +203,7 @@ export function BillingSection() {
               <Button variant="danger" size="sm" disabled={busy !== null} onClick={() => void run('cancel', async () => {
                 await api('/api/billing/cancel', { method: 'POST', body: JSON.stringify({ reason: [reason, comment.trim()].filter(Boolean).join(': ') || undefined }) });
                 setCancelling(false);
-              }, 'Your plan is cancelled and ends at the end of this period.')}>
+              }, 'Your plan is cancelled and ends at the end of this period.', 'subscription_cancelled')}>
                 {busy === 'cancel' ? 'Cancelling…' : 'Cancel plan'}
               </Button>
             </div>

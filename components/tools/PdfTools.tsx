@@ -3,6 +3,7 @@
 /** Merge, extract, split and rotate PDFs with pdf-lib, in the browser. Files are never uploaded. */
 import { useState } from 'react';
 import { LuArrowDown, LuArrowUp, LuDownload, LuLoaderCircle, LuUpload, LuX } from 'react-icons/lu';
+import posthog from 'posthog-js';
 import { btnPrimary, focusRing } from '@/components/marketing/styles';
 
 type Task = 'merge' | 'extract' | 'split' | 'rotate';
@@ -69,14 +70,18 @@ export function PdfTools() {
           const source = await load(file);
           (await merged.copyPages(source, source.getPageIndices())).forEach((page) => merged.addPage(page));
         }
-        setOutputs([await save(merged, 'merged.pdf')]);
+        const outputs = [await save(merged, 'merged.pdf')];
+        setOutputs(outputs);
+        posthog.capture('pdf_tool_completed', { task, input_file_count: files.length, output_file_count: outputs.length });
       } else {
         const source = await load(files[0]);
         const count = source.getPageCount();
         if (task === 'extract') {
           const out = await PDFDocument.create();
           (await out.copyPages(source, parsePageList(pages, count))).forEach((page) => out.addPage(page));
-          setOutputs([await save(out, `${baseName(files[0].name)}-pages.pdf`)]);
+          const outputs = [await save(out, `${baseName(files[0].name)}-pages.pdf`)];
+          setOutputs(outputs);
+          posthog.capture('pdf_tool_completed', { task, input_file_count: files.length, output_file_count: outputs.length });
         } else if (task === 'split') {
           if (count > 300) throw new Error('Split works on PDFs of up to 300 pages.');
           const results: Output[] = [];
@@ -87,13 +92,16 @@ export function PdfTools() {
             results.push(await save(out, `${baseName(files[0].name)}-p${index + 1}.pdf`));
           }
           setOutputs(results);
+          posthog.capture('pdf_tool_completed', { task, input_file_count: files.length, output_file_count: results.length });
         } else {
           const targets = pages.trim() ? parsePageList(pages, count) : source.getPageIndices();
           for (const index of targets) {
             const page = source.getPage(index);
             page.setRotation(degrees((page.getRotation().angle + angle) % 360));
           }
-          setOutputs([await save(source, `${baseName(files[0].name)}-rotated.pdf`)]);
+          const outputs = [await save(source, `${baseName(files[0].name)}-rotated.pdf`)];
+          setOutputs(outputs);
+          posthog.capture('pdf_tool_completed', { task, input_file_count: files.length, output_file_count: outputs.length });
         }
       }
     } catch (caught) {

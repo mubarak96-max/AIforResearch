@@ -10,6 +10,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { LuArrowRight, LuFilePen, LuLoaderCircle, LuRotateCcw } from 'react-icons/lu';
+import posthog from 'posthog-js';
 import { api, hasSession } from '@/lib/session';
 import { signupHref } from '@/lib/features';
 import { ANON_DAILY_RUNS, type Tool, type ToolField } from '@/lib/tools';
@@ -86,6 +87,11 @@ export function AiTool({ tool }: { tool: Pick<Tool, 'slug' | 'name' | 'fields' |
     setError(null);
     try {
       const answer = await api<Result>(`/api/tools/run/${tool.slug}`, { method: 'POST', body: JSON.stringify(values) });
+      posthog.capture('ai_tool_generation_completed', {
+        tool_slug: tool.slug,
+        is_grounded: tool.grounded,
+        source_count: answer.sources.length,
+      });
       setResult(answer);
       window.setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     } catch (caught) {
@@ -98,6 +104,14 @@ export function AiTool({ tool }: { tool: Pick<Tool, 'slug' | 'name' | 'fields' |
 
   const references = result ? referenceList(result.sources, style) : [];
   const title = values.topic?.trim() || tool.name;
+  const openResultInEditor = () => {
+    if (!result) return;
+    posthog.capture('ai_tool_result_opened_in_editor', {
+      tool_slug: tool.slug,
+      source_count: result.sources.length,
+    });
+    openInEditor({ title, html: editorHtml(result.markdown, result.sources, style), markdown: result.markdown, style: EDITOR_STYLE[style] });
+  };
 
   return (
     <div>
@@ -131,7 +145,7 @@ export function AiTool({ tool }: { tool: Pick<Tool, 'slug' | 'name' | 'fields' |
             <div className="flex flex-wrap gap-2">
               <CopyButton text={plainText(result.markdown, result.sources, style)} label="Copy" />
               {tool.toEditor && (
-                <button type="button" onClick={() => openInEditor({ title, html: editorHtml(result.markdown, result.sources, style), markdown: result.markdown, style: EDITOR_STYLE[style] })}
+                <button type="button" onClick={openResultInEditor}
                   className={`inline-flex h-8 items-center gap-1.5 rounded-lg bg-brand px-2.5 text-[13px] font-medium text-on-brand hover:bg-brand-600 ${focusRing}`}>
                   <LuFilePen className="h-3.5 w-3.5" aria-hidden="true" /> Open in the editor
                 </button>
@@ -163,7 +177,7 @@ export function AiTool({ tool }: { tool: Pick<Tool, 'slug' | 'name' | 'fields' |
           {tool.toEditor && (
             <div className="flex flex-wrap items-center gap-3 border-t border-line-2 bg-soft px-5 py-4 sm:px-8">
               <p className="text-[14px] text-ink-2">Keep going in the editor: the citations stay live and the reference list updates itself.</p>
-              <button type="button" onClick={() => openInEditor({ title, html: editorHtml(result.markdown, result.sources, style), markdown: result.markdown, style: EDITOR_STYLE[style] })} className={`${btnGhost} h-9 rounded-[9px] px-3.5 text-[14px]`}>
+              <button type="button" onClick={openResultInEditor} className={`${btnGhost} h-9 rounded-[9px] px-3.5 text-[14px]`}>
                 Open in the editor <LuArrowRight className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>

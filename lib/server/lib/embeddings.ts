@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { env } from '../env.js';
+import { aiCallContext, captureManualEmbedding } from './ai-observability.js';
 import { settings } from './settings.js';
 import { serviceAuthHeaders } from './serviceAuth.js';
 
@@ -45,7 +46,9 @@ const modelId = (provider: string, model: string) => `${provider}:${model}:${EMB
 
 let client: { key: string; openai: OpenAI } | null = null;
 function openai(apiKey: string) {
-  if (!client || client.key !== apiKey) client = { key: apiKey, openai: new OpenAI({ apiKey }) };
+  if (!client || client.key !== apiKey) {
+    client = { key: apiKey, openai: new OpenAI({ apiKey }) };
+  }
   return client.openai;
 }
 
@@ -53,7 +56,14 @@ function openai(apiKey: string) {
 async function embedBatch(current: Config, texts: string[], kind: Kind, timeoutMs: number): Promise<{ model: string; vectors: number[][] }> {
   if (current.provider === 'openai') {
     const input = texts.map((text) => text.slice(0, 8000) || ' ');
-    const response = await openai(current.apiKey).embeddings.create({ model: current.model, input, dimensions: EMBEDDING_DIMENSIONS }, { timeout: timeoutMs });
+    const context = aiCallContext('openai');
+    const startedAt = Date.now();
+    const response = await openai(current.apiKey).embeddings.create({
+      model: current.model,
+      input,
+      dimensions: EMBEDDING_DIMENSIONS,
+    }, { timeout: timeoutMs });
+    captureManualEmbedding({ context, model: current.model, texts: input, inputTokens: response.usage?.prompt_tokens, startedAt });
     return { model: modelId('openai', current.model), vectors: [...response.data].sort((a, b) => a.index - b.index).map((item) => item.embedding) };
   }
   const response = await fetch(current.url, {

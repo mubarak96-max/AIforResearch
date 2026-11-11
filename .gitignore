@@ -19,3 +19,4 @@ ui-debug.log
 service-account*.json
 .vinext/
 .cloudflare/
+.env.local

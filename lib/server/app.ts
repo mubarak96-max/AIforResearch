@@ -23,7 +23,9 @@ import { newsletterRoutes } from './routes/newsletter.js';
 import { toolRoutes } from './routes/tools.js';
 import { createSlots } from './slots/index.js';
 import { PlanLimitError } from './lib/plans.js';
+import { flushAiObservability, runAiTurn } from './lib/ai-observability.js';
 import { ready } from './ready.js';
+import { posthogLog } from '../../instrumentation.js';
 
 /**
  * The AI for Research HTTP API. It runs inside the Next.js app (app/api/[[...route]] and
@@ -36,6 +38,28 @@ export function createApp() {
   if (process.env.NODE_ENV !== 'production') app.use('*', logger());
   app.use('*', async (_c, next) => { await ready(); await next(); });
   app.use('/api/*', optionalUser);
+  app.use('*', async (c, next) => runAiTurn(c.get('user')?.id, async () => {
+    const startedAt = performance.now();
+    try {
+      await next();
+    } finally {
+      await flushAiObservability();
+      if (posthogLog && c.req.path !== '/api/health') {
+        const statusCode = c.res.status;
+        posthogLog.emit({
+          body: 'api_request_completed',
+          severityText: statusCode >= 500 ? 'ERROR' : 'INFO',
+          attributes: {
+            event: 'api_request_completed',
+            route_group: c.req.path.startsWith('/v1/') ? 'developer_gateway' : 'application_api',
+            http_method: c.req.method,
+            http_status_code: statusCode,
+            duration_ms: Math.round(performance.now() - startedAt),
+          },
+        });
+      }
+    }
+  }));
 
   app.get('/api/health', (c) => c.json({ ok: true, llm: slots.llm.provider, papers: slots.papers.provider }));
   app.route('/api/auth', authRoutes());
