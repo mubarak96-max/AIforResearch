@@ -15,8 +15,11 @@ import { appCheckHeader, firebaseAuth, firebaseCode, firebaseMessage } from '@/l
  */
 
 /** The signed-in person, as returned by the API. */
+export type ResearchProfile = { role: string | null; field: string | null; citation_style: string | null; language: string | null };
+
 export type SessionUser = {
   id: string; email: string; full_name: string | null; plan?: string; plan_name?: string; is_admin?: boolean; email_verified?: boolean;
+  profile?: ResearchProfile;
 };
 
 const TOKEN_KEY = 'writeorbit_token';

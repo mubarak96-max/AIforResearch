@@ -35,6 +35,18 @@ export const env = {
   scholarUrl: read('SCHOLAR_URL', 'https://scholar.citedevidence.com').replace(/\/+$/, ''),
   scholarApiKey: read('SCHOLAR_API_KEY'),
   openalexEmail: read('OPENALEX_EMAIL'),
+  /**
+   * More scholarly sources (lib/server/lib/sources). All work without a key at lower limits;
+   * a key raises them. PubMed: NCBI_API_KEY (ncbi.nlm.nih.gov/account). Semantic Scholar:
+   * SEMANTIC_SCHOLAR_API_KEY (semanticscholar.org/product/api). Unpaywall and Crossref ask for a
+   * contact email (CONTACT_EMAIL, else OPENALEX_EMAIL, else SUPPORT_EMAIL).
+   */
+  ncbiApiKey: read('NCBI_API_KEY'),
+  semanticScholarApiKey: read('SEMANTIC_SCHOLAR_API_KEY'),
+  contactEmail: read('CONTACT_EMAIL') || read('OPENALEX_EMAIL') || read('SUPPORT_EMAIL'),
+  /** The Web source: 'tavily', 'brave' or 'exa' with WEB_SEARCH_API_KEY; empty turns the Web source off. */
+  webSearchProvider: read('WEB_SEARCH_PROVIDER').toLowerCase(),
+  webSearchApiKey: read('WEB_SEARCH_API_KEY'),
   /** Where people write when they are stuck (sign-in help); hidden when empty. */
   supportEmail: read('SUPPORT_EMAIL'),
 

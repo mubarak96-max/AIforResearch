@@ -11,13 +11,24 @@ import { queueNewsletterSync } from './newsletter.js';
  * module owns the `users/{uid}` and `accounts/{id}` documents that go with each person.
  */
 
+/**
+ * What a person told us about their research (asked once on Home, changeable per task): it sets
+ * the depth, tone and defaults of every workspace and which tools Home suggests.
+ */
+export const RESEARCH_ROLES = ['undergraduate', 'honours', 'masters', 'phd', 'academic', 'researcher', 'clinician', 'industry', 'other'] as const;
+export type ResearchRole = (typeof RESEARCH_ROLES)[number];
+export type ResearchProfile = { role: ResearchRole | null; field: string | null; citation_style: string | null; language: string | null };
+const EMPTY_PROFILE: ResearchProfile = { role: null, field: null, citation_style: null, language: null };
+
 export type PublicUser = {
   id: string; email: string; full_name: string | null; plan: string; plan_name: string; is_admin: boolean; email_verified: boolean;
+  profile: ResearchProfile;
 };
 
 export type UserDoc = AuthUser & {
   email_verified_at: Date | null; disabled_at: Date | null; created_at: Date; last_seen_at: Date | null;
   newsletter_opt_out?: boolean; newsletter_dirty?: boolean; newsletter_synced?: string | null;
+  profile?: Partial<ResearchProfile>;
 };
 
 const toAuthUser = (doc: UserDoc): AuthUser => ({
@@ -31,7 +42,14 @@ export async function publicUser(user: AuthUser): Promise<PublicUser> {
     id: user.id, email: user.email, full_name: user.full_name,
     plan: plan?.id ?? 'free', plan_name: plan?.name ?? 'Free', is_admin: Boolean(user.is_admin),
     email_verified: Boolean(doc?.email_verified_at),
+    profile: { ...EMPTY_PROFILE, ...(doc?.profile ?? {}) },
   };
+}
+
+/** The person's research profile (for prompts: level and field). */
+export async function researchProfile(userId: string): Promise<ResearchProfile> {
+  const doc = await getRow<UserDoc>(C.users, userId);
+  return { ...EMPTY_PROFILE, ...(doc?.profile ?? {}) };
 }
 
 export async function activeUser(id: string): Promise<AuthUser | null> {

@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI for Research: research with real sources</title>
+<meta name="description" content="Ask a research question and get an answer built from 250M+ papers, every claim cited. Then review, analyse and write, up to your thesis defence.">
+<script>document.documentElement.classList.add('js')</script>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=boska@400,401,500&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="page.css">
+</head>
+<body>
+
+<header class="nav wrap">
+  <a class="wordmark" href="#top" aria-label="AI for Research, home">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8.5 4H4.5v16h4M15.5 4h4v16h-4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2.6" fill="#8fa68e"/></svg>
+    <span>AI for Research</span>
+  </a>
+  <nav aria-label="Main">
+    <a href="#tools">Tools</a>
+    <a href="#audiences">Who it is for</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#questions">Questions</a>
+    <a href="app.html">Open the workspace</a>
+  </nav>
+</header>
+
+<main id="top">
+
+<!-- Hero: the Ask box is the one lit object -->
+<section class="hero wrap" aria-labelledby="hero-title">
+  <h1 id="hero-title" data-rise style="--i:0">Research with real sources</h1>
+  <p class="lede" data-rise style="--i:1">Ask a question and get an answer built from 250M+ papers, every claim cited. Then review, analyse and write, up to your thesis defence.</p>
+
+  <form class="ui ask" data-ui id="ask" action="app.html#research" data-rise style="--i:2">
+    <label class="vh" for="q">Ask a research question</label>
+    <textarea id="q" name="q" rows="2" placeholder="Ask a research question">Does sleep after learning improve memory consolidation?</textarea>
+    <div class="ask-row">
+      <fieldset class="seg" data-mode-group>
+        <legend class="vh">Mode</legend>
+        <label><input type="radio" name="mode" value="summary"><span>Summary</span></label>
+        <label><input type="radio" name="mode" value="deep" checked><span>Deep</span></label>
+        <label><input type="radio" name="mode" value="detailed"><span>Detailed</span></label>
+      </fieldset>
+      <fieldset class="seg">
+        <legend class="vh">Sources</legend>
+        <label><input type="radio" name="src" value="all" checked><span>All papers</span></label>
+        <label><input type="radio" name="src" value="pubmed"><span>Medical (PubMed)</span></label>
+        <label><input type="radio" name="src" value="web"><span>Web</span></label>
+        <label><input type="radio" name="src" value="library"><span>My Library</span></label>
+      </fieldset>
+    </div>
+    <div class="ask-row ask-foot">
+      <label class="btn ghost" id="attach-label">
+        <input class="vh" type="file" id="attach" accept=".pdf,.doc,.docx,.md,.txt" aria-describedby="attach-note">
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M10.5 4.5 5.6 9.4a1.6 1.6 0 0 0 2.3 2.3l5-5a2.9 2.9 0 0 0-4.1-4.1L3.6 7.8a4.2 4.2 0 0 0 6 6l4-4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span id="attach-name">Attach PDF</span>
+      </label>
+      <span class="hint" id="attach-note">Also .doc, .docx, .md, .txt</span>
+      <span class="hint cost" id="ask-hint" aria-live="polite">Deep: a structured report from 20–40 papers · 5 credits</span>
+      <button class="btn primary" type="submit">Ask a question</button>
+    </div>
+    <div class="ask-answer" id="ask-answer" hidden>
+      <p class="ans-label" id="ans-label">Sample answer for the example question</p>
+      <p>Sleep in the hours after learning improves later recall of declarative material compared with an equal period awake <a class="cite" href="app.html#research">[1]</a><a class="cite" href="app.html#research">[2]</a>. The effect is linked to slow-wave sleep and hippocampal replay <a class="cite" href="app.html#research">[2]</a><a class="cite" href="app.html#research">[3]</a>.</p>
+      <p class="ans-foot"><span>32 papers read · 18 cited · free, no card</span> <a href="app.html#research">Open the full report</a></p>
+    </div>
+  </form>
+
+  <ul class="callouts">
+    <li data-rise style="--i:3">Every claim cites a real paper you can open.</li>
+    <li data-rise style="--i:4">Your PDFs, Zotero and Mendeley in one Library.</li>
+    <li data-rise style="--i:5">From the answer to a thesis: review, analyse, write, present.</li>
+  </ul>
+</section>
+
+<!-- How it works: call and response -->
+<section class="how wrap" id="how" aria-labelledby="how-title">
+  <div class="g">
+    <h2 id="how-title" class="how-title">How it works</h2>
+    <div class="how-col">
+
+      <div class="exchange">
+        <p class="order" data-reveal>First, ask your question.</p>
+        <div class="ui call" data-ui data-reveal>
+          <p class="typed">Does sleep after learning improve memory consolidation?</p>
+          <p class="chips"><span class="chip on">Deep</span><span class="chip">All papers</span><span class="chip">Master's student</span></p>
+        </div>
+        <div class="ui response" data-ui data-reveal>
+          <ul class="run">
+            <li><span>Searched 250M+ scholarly works</span><span class="num">Done</span></li>
+            <li><span>Papers read</span><span class="num">32</span></li>
+            <li><span>Papers cited in the answer</span><span class="num">18</span></li>
+            <li><span>Report ready</span><span class="num">2 min 40 s</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exchange">
+        <p class="order" data-reveal>Then read the evidence.</p>
+        <div class="ui call" data-ui data-reveal>
+          <p class="chips"><span class="chip">Year 2000–2026</span><span class="chip">Study type: review, RCT</span><span class="chip">Journal quality: Q1–Q2</span><span class="chip on">Exclude retracted</span></p>
+        </div>
+        <div class="ui response" data-ui data-reveal>
+          <p class="finding"><span class="num">14 of 18</span> studies report a benefit</p>
+          <div class="consensus" role="img" aria-label="Supports 14, mixed 3, does not support 1"><i style="flex:14" class="c-yes"></i><i style="flex:3" class="c-mixed"></i><i style="flex:1" class="c-no"></i></div>
+          <p class="legend"><span><i class="dot c-yes"></i>Supports <b class="num">14</b></span><span><i class="dot c-mixed"></i>Mixed <b class="num">3</b></span><span><i class="dot c-no"></i>Does not support <b class="num">1</b></span></p>
+          <ol class="srcs">
+            <li><span class="n">[1]</span><span><b>The memory function of sleep</b><br>Diekelmann S, Born J · Nature Reviews Neuroscience · 2010</span><span class="pill">Review</span></li>
+            <li><span class="n">[2]</span><span><b>About sleep's role in memory</b><br>Rasch B, Born J · Physiological Reviews · 2013</span><span class="pill">Review</span></li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="exchange last">
+        <p class="order" data-reveal>Then build on it.</p>
+        <div class="ui call" data-ui data-reveal>
+          <p class="chips"><span class="chip on">Write a literature review</span><span class="chip">Find gaps</span><span class="chip">Check citations</span><span class="chip">Make slides</span></p>
+        </div>
+        <div class="ui response wide" data-ui data-reveal>
+          <div class="doc-bar"><span>Literature review: sleep and memory consolidation</span><span class="hint">Writing Studio · APA 7 · saved</span></div>
+          <div class="doc">
+            <p class="doc-h">2.1 Sleep after learning</p>
+            <p>Across reviews of the field, sleep in the hours after learning improves later recall of declarative material when compared with an equal period awake <span class="cite">(Diekelmann &amp; Born, 2010; Rasch &amp; Born, 2013)</span>. The benefit is linked to slow-wave sleep and hippocampal replay <span class="cite">(Stickgold, 2005)</span><span class="ghost-text"> and is larger for material learned with intent to remember (Walker &amp; Stickgold, 2006).</span> <kbd>Tab</kbd></p>
+            <p class="doc-h">References</p>
+            <p class="ref">Diekelmann, S., &amp; Born, J. (2010). The memory function of sleep. <i>Nature Reviews Neuroscience</i>.</p>
+            <p class="ref">Rasch, B., &amp; Born, J. (2013). About sleep's role in memory. <i>Physiological Reviews</i>.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Two doors: the two ways of working -->
+<section class="doors wrap" id="ways" aria-labelledby="ways-title">
+  <h2 id="ways-title">Two ways to work</h2>
+  <div class="door-pair">
+    <a class="door" href="app.html#research" data-reveal>
+      <div class="ui door-ui" data-ui>
+        <p class="bubble">Does sleep after learning improve memory consolidation?</p>
+        <p>Sleep in the hours after learning improves later recall compared with an equal period awake <span class="cite">[1]</span><span class="cite">[2]</span>.</p>
+        <div class="consensus" role="img" aria-label="Supports 14, mixed 3, does not support 1"><i style="flex:14" class="c-yes"></i><i style="flex:3" class="c-mixed"></i><i style="flex:1" class="c-no"></i></div>
+        <p class="legend"><span><i class="dot c-yes"></i>Supports <b class="num">14</b></span><span><i class="dot c-mixed"></i>Mixed <b class="num">3</b></span><span><i class="dot c-no"></i>No <b class="num">1</b></span></p>
+        <p class="bubble">Is the benefit the same after a nap?</p>
+        <p>Naps that include slow-wave sleep show the same direction of effect, in smaller samples <span class="cite">[2]</span><span class="cite">[4]</span>.</p>
+        <p class="followup">Ask a follow-up</p>
+      </div>
+      <span class="door-name">Research in chat</span>
+      <span class="door-line">Ask, read the cited answer, ask again.</span>
+    </a>
+    <a class="door" href="app.html#home" data-reveal>
+      <div class="ui door-ui" data-ui>
+        <p class="doc-h">2.2 Limits of the evidence</p>
+        <p class="serif">Most sources are narrative reviews, and effect sizes vary with the task and the delay before testing<span class="ghost-text">, so pooled estimates should be read with care (Rasch &amp; Born, 2013).</span></p>
+        <p class="chips"><kbd>Tab</kbd><span class="hint">accept</span><kbd>@</kbd><span class="hint">cite a paper</span></p>
+        <p class="doc-h">2.3 Open questions</p>
+        <p class="serif">Whether a daytime nap gives the same benefit as a night of sleep is not settled <span class="cite">(Walker &amp; Stickgold, 2006)</span>.</p>
+        <p class="followup">9,840 words · 41 references · APA 7</p>
+      </div>
+      <span class="door-name">Write in the editor</span>
+      <span class="door-line">Draft with suggestions that carry citations.</span>
+    </a>
+  </div>
+</section>
+
+<!-- Who it is for: sticky object, active list -->
+<section class="aud wrap" id="audiences" aria-labelledby="aud-title">
+  <div class="g">
+    <div class="aud-object">
+      <div class="ui aud-ui" data-ui id="aud-ui" data-reveal>
+        <p class="aud-role"><span class="chip on" id="aud-chip">PhD candidate</span><span class="hint">Start a task</span></p>
+        <ul class="tasks" id="aud-tasks">
+          <li><b>Systematic Review</b><span>PRISMA first: search, screen, extract</span></li>
+          <li><b>Thesis Suite</b><span>Outline, methodology, chapters</span></li>
+          <li><b>Reviewer · PhD</b><span>Comments and a scorecard per chapter</span></li>
+          <li><b>Make slides</b><span>A defence deck from your thesis</span></li>
+        </ul>
+        <p class="aud-foot" id="aud-foot">Most used mode: Detailed</p>
+      </div>
+    </div>
+    <div class="aud-list">
+      <h2 id="aud-title">Who it is for</h2>
+      <ul id="aud-rows">
+        <li class="aud-row" data-k="ug"><button type="button"><span>Undergraduates</span><span class="val">Essays, first projects</span></button>
+          <p>Find sources you can cite, start with a short answer and check your citations before you hand in. <a href="/for/undergraduates">For undergraduates</a></p></li>
+        <li class="aud-row" data-k="ms"><button type="button"><span>Master's students</span><span class="val">Dissertations</span></button>
+          <p>Plan the dissertation, build the literature review from real papers and have each chapter reviewed at master's level. <a href="/for/masters">For master's students</a></p></li>
+        <li class="aud-row on" data-k="phd"><button type="button"><span>PhD candidates</span><span class="val">Thesis and defence</span></button>
+          <p>Systematic review, thesis chapters, defence preparation: from the protocol to the questions examiners ask. <a href="/for/phd">For PhD candidates</a></p></li>
+        <li class="aud-row" data-k="ac"><button type="button"><span>Academic staff and supervisors</span><span class="val">Papers, supervision</span></button>
+          <p>Review a student's chapter in a shared project, turn a thesis into a manuscript and draft the next proposal. <a href="/for/academics">For academics</a></p></li>
+        <li class="aud-row" data-k="med"><button type="button"><span>Clinicians and medical researchers</span><span class="val">PubMed evidence</span></button>
+          <p>Ask clinical questions against PubMed, filter by study type and keep the sources for your review. <a href="/for/medicine">For medicine</a></p></li>
+        <li class="aud-row" data-k="ind"><button type="button"><span>Industry and policy analysts</span><span class="val">Reports, briefings</span></button>
+          <p>Get a cited report on a market or policy question, check the claims and turn it into a slide deck. <a href="/for/industry">For industry</a></p></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Features: the command list, scaled up -->
+<section class="cmd wrap" id="features" aria-labelledby="cmd-title">
+  <h2 id="cmd-title" class="vh">What it does</h2>
+  <div class="cmd-ui" data-ui>
+    <label class="vh" for="cmd-q">Find a feature</label>
+    <input id="cmd-q" type="search" placeholder="What it does" autocomplete="off" data-reveal>
+    <ul id="cmd-list" role="listbox" aria-label="Features">
+      <li role="option" tabindex="0" data-reveal><span class="cmd-name">Cite real papers</span><span class="keys" aria-hidden="true"><kbd>C</kbd></span><p>Answers cite real papers, never invented ones.</p></li>
+      <li role="option" tabindex="0" data-reveal><span class="cmd-name">Search everywhere</span><span class="keys" aria-hidden="true"><kbd>S</kbd></span><p>Search papers, the web, PubMed or your own Library.</p></li>
+      <li role="option" tabindex="0" class="on" aria-selected="true" data-reveal><span class="cmd-name">Filter the evidence</span><span class="keys" aria-hidden="true"><kbd>F</kbd></span><p>Filter by year, study type, journal quality and citations.</p></li>
+      <li role="option" tabindex="0" data-reveal><span class="cmd-name">Chat or write</span><span class="keys" aria-hidden="true"><kbd>W</kbd></span><p>Research in chat, or write in the editor with suggestions and citations.</p></li>
+      <li role="option" tabindex="0" data-reveal><span class="cmd-name">Share a project</span><span class="keys" aria-hidden="true"><kbd>P</kbd></span><p>Share a project with your supervisor or co-authors.</p></li>
+    </ul>
+    <p class="cmd-empty" id="cmd-empty" hidden>No feature by that name. Try "cite", "search" or "share".</p>
+  </div>
+</section>
+
+<!-- What it reads: the stacks -->
+<section class="reads wrap" id="sources" aria-labelledby="reads-title">
+  <div class="g">
+    <figure class="reads-pic" data-reveal>
+      <img src="assets/uiuc-library-main-stacks.jpg" width="1920" height="1440" alt="A long aisle of bound journals in a university library's stacks" loading="lazy" decoding="async">
+    </figure>
+    <div class="reads-text">
+      <h2 id="reads-title">What it reads</h2>
+      <p class="statement" data-reveal>An index of 250M+ scholarly works, PubMed, the web when you ask for it, and the PDFs you bring yourself.</p>
+      <ul class="facts" data-reveal>
+        <li><span class="num">250M+</span><span>scholarly works in the index</span></li>
+        <li><span class="num">10,000+</span><span>citation styles, from APA to Vancouver</span></li>
+        <li><span class="num">5</span><span>file types you can attach: PDF, .doc, .docx, .md, .txt</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Tools: a line-up at one type size -->
+<section class="tools wrap" id="tools" aria-labelledby="tools-title">
+  <div class="tools-head">
+    <h2 id="tools-title">Nine tools to start with</h2>
+    <a href="/tools" data-reveal>All 40+ tools</a>
+  </div>
+  <table class="lineup">
+    <thead class="vh"><tr><th>Tool</th><th>What it does</th><th>Where</th><th>Credits</th></tr></thead>
+    <tbody>
+      <tr data-reveal><th scope="row"><a href="/tools/deep-research">Deep Research</a></th><td>Cited reports from real papers</td><td>Research</td><td class="num">1 to 20 credits</td></tr>
+      <tr data-reveal><th scope="row"><a href="/tools/find-papers">Find Papers</a></th><td>Search 250M+ scholarly works</td><td>Research</td><td class="num">No credits</td></tr>
+      <tr data-reveal><th scope="row"><a href="/tools/chat-with-pdf">Chat with PDF</a></th><td>Answers with page numbers</td><td>Library</td><td class="num">Uses credits</td></tr>
+      <tr data-reveal><th scope="row"><a href="/tools/library">Library</a></th><td>PDFs, Zotero and Mendeley</td><td>Library</td><td class="num">No credits</td></tr>
+      <tr data-reveal><th scope="row"><a href="/tools/thesis-suite">Thesis Suite</a></th><td>Outline, methodology, chapters</td><td>Write</td><td class="num">Uses credits</td></tr>
+      <tr data-reveal><th scope="row"><a href="/tools/proposal-studio">Proposal Studio</a></th><td>Research and grant proposals</td><td>Write</td><td class="num">Uses credits</td></tr>
+      <tr data-reveal><th scope="row"><a href="/tools/thesis-to-manuscript">Thesis to Manuscript</a></th><td>A chapter into a journal paper</td><td>Write</td><td class="num">Uses credits</td></tr>
+      <tr data-reveal><th scope="row"><a href="/tools/citation-generator">Citation Generator</a></th><td>10,000+ citation styles</td><td>Library</td><td class="num">No credits</td></tr>
+      <tr data-reveal><th scope="row"><a href="/tools/humanizer">Text Humanizer</a></th><td>A natural-style rewrite</td><td>Write</td><td class="num">Uses credits</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- Showcase: the mode switch, blown up -->
+<section class="show" id="depth" data-field="deep" aria-labelledby="show-title">
+  <div class="wrap show-in">
+    <div class="show-text">
+      <h2 id="show-title">A <span id="show-word">deep</span> answer</h2>
+      <p id="show-line">A structured report from 20–40 papers. 5 credits.</p>
+    </div>
+    <fieldset class="bigseg" data-ui data-mode-group>
+      <legend class="vh">Mode</legend>
+      <label><input type="radio" name="mode-big" value="summary"><span><b>Summary</b><i>1 credit</i></span></label>
+      <label><input type="radio" name="mode-big" value="deep" checked><span><b>Deep</b><i>5 credits</i></span></label>
+      <label><input type="radio" name="mode-big" value="detailed"><span><b>Detailed</b><i>20 credits</i></span></label>
+    </fieldset>
+  </div>
+</section>
+
+<!-- Pricing: plan names, one live figure -->
+<section class="price wrap" id="pricing" aria-labelledby="price-title">
+  <h2 id="price-title">Plans and prices</h2>
+  <div class="g price-g">
+    <div class="plans" role="tablist" aria-label="Plans" id="plans">
+      <button role="tab" type="button" data-plan="free" aria-selected="false">Free</button>
+      <button role="tab" type="button" data-plan="plus" aria-selected="false">Plus</button>
+      <button role="tab" type="button" data-plan="pro" aria-selected="true">Pro</button>
+      <button role="tab" type="button" data-plan="team" aria-selected="false">Team</button>
+      <button role="tab" type="button" data-plan="pass" aria-selected="false">Defence Pass</button>
+    </div>
+    <div class="stage" id="stage" role="tabpanel" aria-live="polite">
+      <p class="figure"><span class="num" id="st-price">$29</span><span class="period" id="st-period">a month, or $19 a month billed yearly ($228)</span></p>
+      <p class="st-credits" id="st-credits">1,500 credits a month</p>
+      <p class="st-text" id="st-text">For theses and systematic reviews. High-quality mode, Detailed reports and project sharing with your supervisor or co-authors.</p>
+      <a class="cta" id="st-cta" href="app.html">Choose Pro</a>
+    </div>
+  </div>
+  <div class="g credits-g">
+    <p class="credits-note" data-reveal>A credit pays for the longer AI jobs: a Summary answer is 1, a Deep report 5, a Detailed report 20, a document review 10 and a slide deck 10.</p>
+    <p class="credits-note" data-reveal>Paper search, citations, autocomplete and the Library do not use credits. Need more in a busy month? A top-up of 500 credits is $7.</p>
+  </div>
+  <noscript>
+    <p>Free $0, 30 credits a month. Plus $12 a month or $8 a month billed yearly ($96), 500 credits. Pro $29 a month or $19 a month billed yearly ($228), 1,500 credits. Team $25 a seat a month billed yearly, 3 seats or more, 2,000 credits a seat. Defence Pass $49 once, 90 days of Pro, no renewal.</p>
+  </noscript>
+</section>
+
+<!-- Questions: all answers open -->
+<section class="faq wrap" id="questions" aria-labelledby="faq-title">
+  <div class="qa"><h2 id="faq-title" class="q soft">Questions</h2><div></div></div>
+  <div class="qa" data-reveal><h3 class="q">Where do the sources come from?</h3><p>From a scholarly index of 250M+ works (the OpenAlex catalogue), from PubMed for medical questions, from the web when you switch it on, and from the PDFs in your own Library. You choose which.</p></div>
+  <div class="qa" data-reveal><h3 class="q">Can it make up a citation?</h3><p>Citations come from search results, not from the model's memory, so each one is a real record you can open. The text around a citation is still AI-written, so check that the source says what the answer claims.</p></div>
+  <div class="qa" data-reveal><h3 class="q">Is it allowed at my university?</h3><p>Rules differ by university, course and journal, so check yours before you submit. Every answer shows its sources, so you can read them and write in your own words.</p></div>
+  <div class="qa" data-reveal><h3 class="q">What do I get for free?</h3><p>30 credits a month: Summary and Deep answers and a preview of each workspace. Paper search, citations and the Library do not use credits.</p></div>
+  <div class="qa" data-reveal><h3 class="q">What is a credit?</h3><p>The unit the longer AI jobs cost. A Summary answer is 1 credit, a Deep report 5, a Detailed report 20, a document review 10 and a slide deck 10.</p></div>
+  <div class="qa" data-reveal><h3 class="q">Can I use my own PDFs and Zotero library?</h3><p>Yes. Upload PDF, Word, Markdown or text files, or import from Zotero and Mendeley. Answers from your own files show the page they come from.</p></div>
+  <div class="qa" data-reveal><h3 class="q">Can I cancel any time?</h3><p>Yes. A plan runs to the end of the period you paid for and does not renew after you cancel. The Defence Pass is paid once and never renews.</p></div>
+</section>
+
+<!-- Closing: the reading room -->
+<section class="close wrap" id="start" aria-labelledby="close-title">
+  <figure class="close-pic" data-reveal>
+    <img src="assets/silence-is-requested-12218739974.jpg" width="1230" height="1026" alt="Readers at long tables in a public reading room, a sign on the desk asking for silence, about 1904" loading="lazy" decoding="async">
+    <figcaption>A public reading room, photographed by Robert French about 1904.</figcaption>
+  </figure>
+  <div class="close-text">
+    <h2 id="close-title">Take a seat</h2>
+    <p data-reveal>Your first 30 credits are free every month. Ask one question and read where the answer comes from.</p>
+    <a class="cta" href="#top" data-reveal>Ask a question</a>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot wrap">
+  <span>An AI research workspace</span>
+  <nav aria-label="Footer"><a href="#tools">Tools</a><a href="#pricing">Pricing</a><a href="/help">Help</a><a href="/blog">Blog</a></nav>
+  <span>2026 · <a href="/privacy">Privacy</a></span>
+  <p class="credits">Photographs: “Silence is requested!” by Robert French, about 1904, National Library of Ireland on The Commons, no known copyright restrictions; “UIUC Library Main Stacks” by Chevsapher, CC0. Both via Wikimedia Commons.</p>
+</footer>
+
+<script src="page.js"></script>
+</body>
+</html>

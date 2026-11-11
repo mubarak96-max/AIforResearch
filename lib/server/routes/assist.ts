@@ -62,7 +62,7 @@ import {
   listChatThreads,
   type StoredChatMessage,
 } from '../lib/assist-store.js';
-import { planQuota } from '../lib/plans.js';
+import { CREDIT_COSTS, planQuota } from '../lib/plans.js';
 
 // ------------------------------------------------------------------ request shapes
 
@@ -272,11 +272,11 @@ export function assistRoutes(slots: Slots) {
   const app = new Hono<{ Variables: AppVariables }>();
   app.use('*', requireUser);
 
-  // Plan allowances (Admin › Plans): refused when used up, counted after a useful answer.
+  // Credits (lib/server/lib/plans.ts): taken before the answer, given back when it fails or is empty.
   app.use('/edit', planQuota('ai_edit'));
   app.use('/complete', planQuota('autocomplete', { counted: (body) => Boolean(body?.text?.trim() || body?.heading) }));
   app.use('/review', planQuota('review'));
-  app.use('/peer-review', planQuota('review'));
+  app.use('/peer-review', planQuota('review', { credits: CREDIT_COSTS.review_standard }));
   app.use('/source-quality', planQuota('review'));
   app.use('/chat', planQuota('chat'));
 

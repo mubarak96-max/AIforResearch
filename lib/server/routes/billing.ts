@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { C, col } from '../firebase.js';
 import { requireUser, type AppVariables } from '../auth.js';
 import { dodoClient } from '../lib/dodoBilling.js';
-import { loadPlans, publicPlan, usageSummary } from '../lib/plans.js';
+import { creditSummary, loadPlans, publicPlan, usageSummary } from '../lib/plans.js';
 import {
   billingPortal, completeCheckout, ensureCustomer, listCards, listInvoices, removeCard, renewPlan, setCancelAtPeriodEnd,
   setDefaultCard, startAddCard, startPlanPurchase,
@@ -43,6 +43,9 @@ export function billingRoutes() {
   app.use('*', requireUser);
   const accountOf = (c: { get: (key: 'user') => AppVariables['user'] }) => c.get('user')!.account_id;
 
+  /** Credits left this month, for the app's credit meter and every job's start button. */
+  app.get('/credits', async (c) => c.json(await creditSummary(accountOf(c))));
+
   app.get('/', async (c) => {
     const accountId = accountOf(c);
     const summary = await usageSummary(accountId);
@@ -67,7 +70,7 @@ export function billingRoutes() {
       console.warn('billing summary: Dodo Payments unavailable', (error as Error).message);
       payments = false;
     }
-    const { plan, limits, account: state, counts } = summary;
+    const { plan, limits, account: state, counts, credits } = summary;
     return c.json({
       plan: { id: plan.id, name: plan.name, is_default: plan.is_default },
       subscription: state ? {
@@ -76,6 +79,7 @@ export function billingRoutes() {
       } : null,
       limits,
       usage: counts,
+      credits,
       library: { used: library.count, limit: limits.library_pdfs },
       cards,
       invoices,

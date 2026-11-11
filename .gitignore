@@ -19,3 +19,5 @@ ui-debug.log
 service-account*.json
 .vinext/
 .cloudflare/
+
+.taste-skill/

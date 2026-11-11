@@ -355,7 +355,7 @@ function librarySource(hit: LibraryHit): SourceCandidate {
 }
 
 /** Library passages for a query; chosen documents without a matching passage still count by title and abstract. */
-async function libraryHits(userId: string, query: string, documentIds: string[], limit: number): Promise<LibraryHit[]> {
+export async function libraryHits(userId: string, query: string, documentIds: string[], limit: number): Promise<LibraryHit[]> {
   const ids = [...new Set(documentIds)];
   const hits = await searchLibrary(userId, query, ids, limit);
   if (hits.length || !ids.length) return hits;
