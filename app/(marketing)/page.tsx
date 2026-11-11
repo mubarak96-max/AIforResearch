@@ -4,6 +4,7 @@ import { HeroDemo, HeroDemoSteps } from '@/components/marketing/HeroDemo';
 import { FeatureMini } from '@/components/marketing/FeatureMinis';
 import { AuthAware } from '@/components/marketing/AuthAware';
 import { PricingTeaser } from '@/components/marketing/PricingTeaser';
+import { FeaturedBadges } from '@/components/marketing/FeaturedBadges';
 import { loadPublicPlans } from '@/components/marketing/plans';
 import { pageMetadata } from '@/components/marketing/seo';
 import { container, focusRing } from '@/components/marketing/styles';
@@ -275,6 +276,10 @@ export default async function LandingPage() {
       {/* The sources for the numbers above (the footnotes link here). */}
       <div className={`${container} pb-16`}>
         <PageReferences className="mx-auto max-w-[760px]" />
+        <section aria-labelledby="featured-title" className="mx-auto mt-12 max-w-[760px] text-center">
+          <h2 id="featured-title" className="text-[13px] font-medium uppercase tracking-[0.08em] text-subtle">As featured in</h2>
+          <FeaturedBadges className="mt-4 justify-center" />
+        </section>
       </div>
     </>
   );
