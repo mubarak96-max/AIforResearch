@@ -74,6 +74,20 @@ export default function AboutPage() {
           </ul>
         </section>
 
+        <section aria-labelledby="featured-title" className="mt-12">
+          <h2 id="featured-title" className="mb-4 text-[24px] font-bold tracking-[-0.02em] text-ink">As featured in</h2>
+          <div className="flex flex-wrap items-center gap-4">
+            <a href="https://startupfa.me/s/ai-for-research?utm_source=aiforresearch.app" target="_blank" rel="noopener" className={`inline-block rounded ${focusRing}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="https://startupfa.me/badges/featured-badge-small.webp" alt="AI for Research - Featured on Startup Fame" width={224} height={36} />
+            </a>
+            <a href="https://www.producthunt.com/products/ai-for-research?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-ai-for-research" target="_blank" rel="noopener noreferrer" className={`inline-block rounded ${focusRing}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1312485&theme=light&t=1794408106399" alt="AI for Research - AI research with papers and citations | Product Hunt" width={250} height={54} />
+            </a>
+          </div>
+        </section>
+
         <section aria-labelledby="contact-title" className="mt-12">
           <h2 id="contact-title" className="mb-3 text-[24px] font-bold tracking-[-0.02em] text-ink">Contact</h2>
           <div className="space-y-1.5 text-[16.5px] leading-relaxed text-ink-2">
