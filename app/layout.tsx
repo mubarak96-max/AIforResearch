@@ -19,6 +19,14 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});`;
 
+// Microsoft Clarity project for session recordings and heatmaps.
+const CLARITY_ID = 'zbxvles1es';
+const clarityInitScript = `(function(c,l,a,r,i,t,y){
+c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script", "${CLARITY_ID}");`;
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: 'AI for Research — AI writing editor and citation generator', template: '%s · AI for Research' },
@@ -60,6 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </noscript>
         <Script id="gtm-init" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: gtmInitScript }} />
         <Script id="gtm" strategy="afterInteractive" src={`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`} />
+        <Script id="clarity" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: clarityInitScript }} />
         <ThemeSync />
         {children}
         <PricingDialog />

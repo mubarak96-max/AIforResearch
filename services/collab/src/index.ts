@@ -1,5 +1,7 @@
 import { createServer } from 'node:http';
 import { ready } from '../../../lib/server/index.js';
+import { deployed } from '../../../lib/server/env.js';
+import { SITE_URL } from '../../../lib/site.js';
 import { handleCollabUpgrade, hocuspocus } from './collab.js';
 import { handleRealtimeUpgrade, realtimeStats } from './realtime.js';
 
@@ -10,6 +12,16 @@ import { handleRealtimeUpgrade, realtimeStats } from './realtime.js';
  *   /health                               liveness
  */
 const port = Number(process.env.PORT || 4200);
+
+/**
+ * Pages allowed to open sockets here. Browsers skip CORS for WebSockets, so the Origin header is
+ * checked on upgrade instead: without it any site could open a socket from a signed-in visitor's tab.
+ */
+const siteHost = new URL(SITE_URL).host;
+const allowedOrigins = new Set([`https://${siteHost}`, `https://www.${siteHost}`]);
+const LOCAL_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+const originAllowed = (origin: string | undefined) =>
+  !!origin && (allowedOrigins.has(origin) || (!deployed && LOCAL_ORIGIN.test(origin)));
 
 // Admin settings and plans (sign-in on first use may create a user, which reads them).
 await ready().catch((error) => console.error('collab: settings not loaded yet', error));
@@ -26,12 +38,17 @@ const server = createServer((request, response) => {
 });
 
 server.on('upgrade', (request, socket, head) => {
+  if (!originAllowed(request.headers.origin)) {
+    socket.write('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n');
+    socket.destroy();
+    return;
+  }
   if (handleCollabUpgrade(request, socket, head)) return;
   if (handleRealtimeUpgrade(request, socket, head)) return;
   socket.destroy();
 });
 
-server.listen(port, '0.0.0.0', () => console.log(`writeorbit collab listening on :${port}`));
+server.listen(port, '0.0.0.0', () => console.log(`collab listening on :${port}`));
 
 // Cloud Run sends SIGTERM before stopping an instance: save open documents first.
 const shutdown = async () => {

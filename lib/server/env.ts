@@ -1,9 +1,9 @@
 /** Server settings, read once from the environment. */
-import { SITE_URL } from '../site';
+import { SITE_URL } from '../site.js';
 
 const read = (name: string, fallback = '') => (process.env[name] ?? fallback).trim();
 /** The site's own address: the production domain when deployed, the dev server locally. */
-const deployed = process.env.NODE_ENV === 'production' || (!!process.env.K_SERVICE && process.env.FUNCTIONS_EMULATOR !== 'true');
+export const deployed = process.env.NODE_ENV === 'production' || (!!process.env.K_SERVICE && process.env.FUNCTIONS_EMULATOR !== 'true');
 const publicUrl = deployed ? SITE_URL : 'http://localhost:3000';
 
 export const env = {
