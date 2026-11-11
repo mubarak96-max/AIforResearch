@@ -10,6 +10,7 @@ import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 import { requireUser, type AppVariables } from '../auth.js';
 import { resolveAccess } from '../lib/access.js';
+import { aiCallContext, flushAiObservability } from '../lib/ai-observability.js';
 import type { ChatMessage, LlmUsage, Slots } from '../slots/types.js';
 import { LlmError, estimateTokens, llmModelName, llmUnavailable } from '../slots/llm.js';
 import { PapersError, isPagedPapersSlot } from '../slots/papers.js';
@@ -773,7 +774,14 @@ export function assistRoutes(slots: Slots) {
           let answer = '';
           let usage: LlmUsage | null = null;
           try {
-            const result = await slots.llm.stream({ messages, task: 'fast', maxTokens: 1800, temperature: 0.4, signal: abort.signal }, (delta) => {
+            const result = await slots.llm.stream({
+              messages,
+              task: 'fast',
+              maxTokens: 1800,
+              temperature: 0.4,
+              signal: abort.signal,
+              ai: aiCallContext(slots.llm.provider, { distinctId: user.id, sessionId: `chat:${threadId}` }),
+            }, (delta) => {
               answer += delta;
               send('delta', { text: delta });
             });
@@ -810,6 +818,7 @@ export function assistRoutes(slots: Slots) {
           console.error('editor chat failed:', error);
           send('error', { status: 500, detail: 'The chat stopped. Try again.' });
         } finally {
+          await flushAiObservability();
           if (!closed) {
             closed = true;
             try {

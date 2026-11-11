@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { LuArrowLeft, LuArrowRight } from 'react-icons/lu';
+import posthog from 'posthog-js';
 import { hasSession, signIn, signUp } from '@/lib/session';
 import { getMethods, PROVIDER_NAMES, PROVIDERS, startProvider, type Methods, type Provider } from '@/lib/signin';
 import { btnPrimary, focusRing } from '@/components/marketing/styles';
@@ -93,7 +94,10 @@ export function AuthEntry() {
     setBusy(provider); setError('');
     try {
       const signedIn = await startProvider(provider);
-      if (signedIn) router.replace(target);
+      if (signedIn) {
+        posthog.capture('authentication_completed', { method: provider });
+        router.replace(target);
+      }
     } catch (caught) {
       setBusy(null);
       setError(errorMessage(caught));
@@ -142,6 +146,7 @@ export function AuthEntry() {
     setFieldError({}); setError(''); setBusy('password');
     try {
       await signIn(email, password);
+      posthog.capture('authentication_completed', { method: 'password' });
       router.replace(target);
     } catch (caught) {
       setError(errorMessage(caught));
@@ -173,6 +178,7 @@ export function AuthEntry() {
     setFieldError({}); setError(''); setBusy('signup');
     try {
       await signUp({ email, password, full_name: name.trim() });
+      posthog.capture('account_created', { method: 'password' });
       router.replace(target);
     } catch (caught) {
       setError(errorMessage(caught));

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useSyncExternalStore } from 'react';
+import posthog from 'posthog-js';
 import {
   createUserWithEmailAndPassword, onIdTokenChanged, sendEmailVerification, signInWithEmailAndPassword, signOut, updateProfile,
   type User,
@@ -42,6 +43,39 @@ function write(key: string, value: unknown) {
 }
 
 let memoryToken: string | null = null;
+let identifiedUserId: string | null = null;
+
+function posthogIsConfigured() {
+  return Boolean(process.env.NEXT_PUBLIC_POSTHOG_KEY && process.env.NEXT_PUBLIC_POSTHOG_HOST);
+}
+
+function identifySessionUser(user: SessionUser) {
+  if (!posthogIsConfigured() || identifiedUserId === user.id) return;
+  try {
+    if (identifiedUserId) posthog.reset();
+    posthog.identify(user.id, {
+      email: user.email,
+      name: user.full_name ?? undefined,
+      plan: user.plan ?? user.plan_name ?? undefined,
+      is_admin: user.is_admin ?? false,
+      email_verified: user.email_verified ?? false,
+    });
+    identifiedUserId = user.id;
+  } catch {
+    // Analytics must not interfere with sign-in or session restoration.
+  }
+}
+
+function resetPostHogIdentity() {
+  if (!posthogIsConfigured() || !identifiedUserId) return;
+  try {
+    posthog.reset();
+  } catch {
+    // Analytics must not interfere with sign-out.
+  } finally {
+    identifiedUserId = null;
+  }
+}
 
 function tokenExpiry(token: string): number {
   try {
@@ -74,10 +108,12 @@ export function setSession(token: string, user: SessionUser) {
   write(TOKEN_KEY, token);
   write(USER_KEY, user);
   try { document.cookie = 'writeorbit_signed_in=1; path=/; max-age=2592000; samesite=lax'; } catch { /* ignore */ }
+  identifySessionUser(user);
   emit();
 }
 
 function forget() {
+  resetPostHogIdentity();
   memoryToken = null;
   write(TOKEN_KEY, null);
   write(USER_KEY, null);

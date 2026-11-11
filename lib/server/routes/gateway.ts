@@ -2,6 +2,7 @@ import { Hono, type Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { randomUUID } from 'node:crypto';
 import { env } from '../env.js';
+import { aiCallContext, captureManualGeneration, flushAiObservability } from '../lib/ai-observability.js';
 import { serviceAuthHeaders } from '../lib/serviceAuth.js';
 import { findApiKey, type ApiKeyRow } from '../lib/apiKeys.js';
 import { settings } from '../lib/settings.js';
@@ -131,6 +132,8 @@ export function gatewayRoutes(slots: Slots) {
     await can(c, 'llm_output_tokens');
     const model = body.model === 'deepseek-reasoner' ? 'deepseek-reasoner' : 'deepseek-chat';
     const requestId = randomUUID();
+    const observability = aiCallContext('deepseek');
+    const startedAt = Date.now();
     const upstream = await fetch('https://api.deepseek.com/chat/completions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${upstreamKey}`, 'Content-Type': 'application/json' },
@@ -147,6 +150,16 @@ export function gatewayRoutes(slots: Slots) {
     if (!body.stream || !upstream.body) {
       const json: any = await upstream.json().catch(() => ({}));
       const charged = upstream.ok && json?.usage ? await chargeUsage(json.usage) : null;
+      if (upstream.ok) {
+        captureManualGeneration({
+          context: observability,
+          model,
+          messages: body.messages,
+          outputChoices: json?.choices ?? [],
+          usage: json?.usage,
+          startedAt,
+        });
+      }
       for (const [name, value] of Object.entries(creditHeaders(charged))) c.header(name, value);
       return c.json(json, upstream.status as any);
     }
@@ -154,6 +167,7 @@ export function gatewayRoutes(slots: Slots) {
     const decoder = new TextDecoder();
     let buffer = '';
     let usage: Usage | null = null;
+    let output = ''; 
     const stream = upstream.body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
       transform(chunk, controller) {
         controller.enqueue(chunk);
@@ -162,12 +176,27 @@ export function gatewayRoutes(slots: Slots) {
         buffer = lines.pop() || '';
         for (const line of lines) {
           if (!line.startsWith('data: ') || line.includes('[DONE]')) continue;
-          try { const data = JSON.parse(line.slice(6)); if (data.usage) usage = data.usage; } catch { /* partial line */ }
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.usage) usage = data.usage;
+            output += data.choices?.[0]?.delta?.content ?? '';
+          } catch { /* partial line */ }
         }
       },
       async flush() {
         if (usage) await chargeUsage(usage).catch((error) => console.error('AI charge failed', requestId, error));
-      },
+        if (upstream.ok) {
+          captureManualGeneration({
+            context: observability,
+            model,
+            messages: body.messages,
+            outputChoices: [{ message: { role: 'assistant', content: output } }],
+            usage,
+            startedAt,
+          });
+          await flushAiObservability();
+        }
+      }, 
     }));
     return new Response(stream, { status: upstream.status, headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' } });
   });

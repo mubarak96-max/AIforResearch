@@ -10,6 +10,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import { Cite } from '@citation-js/core';
 import '@citation-js/plugin-csl';
 import { LuLoaderCircle, LuPlus, LuSearch, LuTrash2, LuX } from 'react-icons/lu';
+import posthog from 'posthog-js';
 import { api } from '@/lib/session';
 import { COMMON_STYLES, loadCslStyle, normalizeStyleId, searchStyles, type CslStyleInfo } from '@/components/editor/lib/citations/cslStyles';
 import { btnPrimary, focusRing } from '@/components/marketing/styles';
@@ -191,6 +192,7 @@ export function CitationGenerator({ defaultStyle = 'apa' }: { defaultStyle?: str
     setError(null);
     try {
       const response = await api<{ results: Csl[] }>(`/api/tools/cite?q=${encodeURIComponent(query)}`);
+      posthog.capture('citation_search_completed', { result_count: response.results.length });
       setFound(response.results);
       if (!response.results.length) setError('Nothing found. Check the DOI, try fewer words, or enter the source by hand.');
     } catch (caught) {
@@ -200,7 +202,10 @@ export function CitationGenerator({ defaultStyle = 'apa' }: { defaultStyle?: str
     }
   }
 
-  const add = useCallback((item: Csl) => setList((current) => (current.some((other) => other.id === item.id) ? current : [...current, item])), []);
+  const add = useCallback((item: Csl) => {
+    setList((current) => (current.some((other) => other.id === item.id) ? current : [...current, item]));
+    posthog.capture('citation_added_to_list', { source_type: mode });
+  }, [mode]);
 
   const ordered = useMemo(() => {
     if (!formatted) return [];
@@ -258,7 +263,7 @@ export function CitationGenerator({ defaultStyle = 'apa' }: { defaultStyle?: str
           <h2 id="list-title" className="text-[15px] font-semibold text-ink">Your list {list.length > 0 && <span className="font-normal text-muted">({list.length})</span>}</h2>
           {ordered.length > 0 && (
             <div className="flex gap-2">
-              <button type="button" onClick={async () => { const html = ordered.map((entry) => entry.html).join(''); if (await copyRich(html, ordered.map((entry) => textOf(entry.html)).join('\n'))) flash('all'); }}
+              <button type="button" onClick={async () => { const html = ordered.map((entry) => entry.html).join(''); if (await copyRich(html, ordered.map((entry) => textOf(entry.html)).join('\n'))) { posthog.capture('citation_list_copied', { citation_count: ordered.length }); flash('all'); } }}
                 className={`inline-flex h-8 items-center rounded-lg bg-brand px-2.5 text-[13px] font-medium text-on-brand hover:bg-brand-600 ${focusRing}`}>{copied === 'all' ? 'Copied' : 'Copy all'}</button>
               <button type="button" onClick={() => setList([])} className={`inline-flex h-8 items-center gap-1 rounded-lg border border-line px-2.5 text-[13px] text-ink-2 hover:bg-soft ${focusRing}`}><LuTrash2 className="h-3.5 w-3.5" aria-hidden="true" />Clear</button>
             </div>

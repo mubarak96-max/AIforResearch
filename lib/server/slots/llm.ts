@@ -5,6 +5,7 @@
  */
 import OpenAI from 'openai';
 import { env, APP_NAME } from '../env.js';
+import { aiCallContext, captureManualGeneration } from '../lib/ai-observability.js';
 import type { ChatMessage, LlmSlot, LlmUsage } from './types.js';
 
 export type LlmProvider = 'deepseek' | 'openai' | 'anthropic' | 'openrouter' | 'ollama';
@@ -144,14 +145,15 @@ export function createLlmSlot(options: { settings?: LlmSettings; fetch?: typeof 
   let client: OpenAI | null = null;
   const getClient = () => {
     if (config.unavailable) throw new LlmError('not_configured', config.unavailable);
-    client ??= new OpenAI({
+    const clientOptions = {
       apiKey: config.apiKey,
       baseURL: config.baseURL,
       timeout: 120_000,
       maxRetries: 1,
       defaultHeaders: config.headers,
       ...(options.fetch ? { fetch: options.fetch as any } : {}),
-    });
+    };
+    client ??= new OpenAI(clientOptions);
     return client;
   };
 
@@ -173,6 +175,8 @@ export function createLlmSlot(options: { settings?: LlmSettings; fetch?: typeof 
     async complete(input) {
       try {
         const openai = getClient();
+        const context = input.ai ?? aiCallContext(config.provider);
+        const startedAt = Date.now();
         const request: Record<string, unknown> = body(input);
         if (input.json && config.jsonMode) request.response_format = { type: 'json_object' };
         let response: OpenAI.Chat.Completions.ChatCompletion;
@@ -190,6 +194,14 @@ export function createLlmSlot(options: { settings?: LlmSettings; fetch?: typeof 
           inputTokens: response.usage?.prompt_tokens ?? estimate.inputTokens,
           outputTokens: response.usage?.completion_tokens ?? estimate.outputTokens,
         };
+        captureManualGeneration({
+          context,
+          model: String(request.model),
+          messages: request.messages,
+          outputChoices: response.choices,
+          usage: { prompt_tokens: usage.inputTokens, completion_tokens: usage.outputTokens },
+          startedAt,
+        });
         return { text, usage };
       } catch (error) {
         throw classifyLlmError(error, config.provider);
@@ -200,6 +212,8 @@ export function createLlmSlot(options: { settings?: LlmSettings; fetch?: typeof 
       let text = '';
       try {
         const openai = getClient();
+        const context = input.ai ?? aiCallContext(config.provider);
+        const startedAt = Date.now();
         const request: Record<string, unknown> = { ...body(input), stream: true, stream_options: { include_usage: true } };
         let stream: AsyncIterable<OpenAI.Chat.Completions.ChatCompletionChunk>;
         try {
@@ -220,10 +234,16 @@ export function createLlmSlot(options: { settings?: LlmSettings; fetch?: typeof 
           if (chunk.usage) reported = chunk.usage;
         }
         const estimate = estimateUsage(input.messages, text);
-        return {
-          text,
-          usage: { inputTokens: reported?.prompt_tokens ?? estimate.inputTokens, outputTokens: reported?.completion_tokens ?? estimate.outputTokens },
-        };
+        const usage = { inputTokens: reported?.prompt_tokens ?? estimate.inputTokens, outputTokens: reported?.completion_tokens ?? estimate.outputTokens };
+        captureManualGeneration({
+          context,
+          model: String(request.model),
+          messages: request.messages,
+          outputChoices: [{ message: { role: 'assistant', content: text } }],
+          usage: { prompt_tokens: usage.inputTokens, completion_tokens: usage.outputTokens },
+          startedAt,
+        });
+        return { text, usage };
       } catch (error) {
         const classified = classifyLlmError(error, config.provider);
         if (classified instanceof Error && text) Object.assign(classified, { partialText: text });

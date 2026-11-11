@@ -10,6 +10,8 @@ import type { AppVariables, AuthUser } from '../auth.js';
 import { recordUsage, type UsageEvent } from '../usage.js';
 import { LlmError, llmModelName } from '../slots/llm.js';
 import { PapersError } from '../slots/papers.js';
+import { aiCallContext } from './ai-observability.js';
+import type { AiCallContext } from './ai-observability.js';
 import type { ChatMessage, LlmSlot, LlmUsage } from '../slots/types.js';
 
 /** The signed-in writer (the routes sit behind requireUser). */
@@ -84,6 +86,7 @@ export type LlmCall = {
   temperature?: number;
   json?: boolean;
   signal?: AbortSignal;
+  ai?: AiCallContext;
 };
 
 /**
@@ -91,7 +94,7 @@ export type LlmCall = {
  * other call by tokens.
  */
 export async function completeMetered(llm: LlmSlot, user: AuthUser, call: LlmCall, metering: { feature: string; reviewWords?: number }): Promise<string> {
-  const { text, usage } = await llm.complete(call);
+  const { text, usage } = await llm.complete({ ...call, ai: call.ai ?? aiCallContext(llm.provider, { distinctId: user.id }) });
   const metadata = { feature: metering.feature, provider: llm.provider, model: llmModelName(llm, call.task) };
   if (metering.reviewWords !== undefined) {
     await meterReviewWords(user, metering.reviewWords, { ...metadata, input_tokens: usage.inputTokens, output_tokens: usage.outputTokens });
