@@ -38,12 +38,6 @@ const COLUMNS = [
     ],
   },
   {
-    title: 'Build',
-    links: [
-      { label: 'Developers', href: '/developers' },
-    ],
-  },
-  {
     title: 'Account',
     links: [
       { label: 'Sign in', href: '/login' },

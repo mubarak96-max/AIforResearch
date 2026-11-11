@@ -56,7 +56,6 @@ export async function deleteUserData(uid: string) {
     const others = await col(C.users).where('account_id', '==', user.account_id).limit(1).get();
     if (others.empty) {
       await cancelPlanSubscription(user.account_id);
-      await deleteQuery(col(C.apiKeys).where('account_id', '==', user.account_id));
       await deleteDeep(col(C.accounts).doc(user.account_id));
     }
   }

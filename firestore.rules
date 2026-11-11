@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Every write goes through the API (Admin SDK), which checks access, plan limits and credits;
+// Every write goes through the API (Admin SDK), which checks access and plan limits;
 // the Admin SDK is not bound by these rules. Browsers may only read a few things of their own,
 // for live listeners. Everything else is closed. Tests: tests/rules.
 service cloud.firestore {
@@ -28,7 +28,7 @@ service cloud.firestore {
       allow read: if resource.data.is_public == true;
     }
 
-    // Default: closed (accounts, credits, API keys, settings, legacy passwords, members, chunks, …).
+    // Default: closed (accounts, settings, legacy passwords, members, chunks, …).
     match /{path=**} {
       allow read, write: if false;
     }

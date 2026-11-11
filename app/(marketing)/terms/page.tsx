@@ -67,11 +67,6 @@ const SECTIONS: LegalSection[] = [
     ),
   },
   {
-    id: 'api',
-    title: 'Developer API',
-    body: <p>Use of the <Link href="/developers" className={link}>AI for Research API</Link> is billed as you go and must follow these terms. Keep your API keys secret; you are responsible for usage under them.</p>,
-  },
-  {
     id: 'termination',
     title: 'Suspension and closing your account',
     body: <p>You can delete your account at any time. We may suspend or close an account that seriously or repeatedly breaks these terms, and will tell you why unless the law or safety prevents it.</p>,

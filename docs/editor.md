@@ -42,4 +42,4 @@ export function Writing() {
 
 Also exported: the side panels (`AppToolDrawer`, `AppChatSideload`), `EditorToaster`, paper search (`searchPapers`, `lookupPaper`), Library helpers and chat streaming. See `src/index.ts`.
 
-The services behind the editor (papers, full text, AI, reviews, exports) come from the providers set up on the server (see the main README); other apps can reach them through the [developer API](../../docs/cloud-api.md).
+The services behind the editor (papers, full text, AI, reviews, exports) come from the providers set up on the server (see the main README).

@@ -9,7 +9,7 @@ AI for Research runs on one Firebase project. Each part, what it does and where 
   Next.js pages     │                                                                          │
   editor ───────────┼─ https ─► App Hosting (the Next.js app)                                  │
                     │             ├─ pages (Next.js 15)                                        │
-                    │             └─ app/api, app/v1 → lib/server (Hono) ─────┐                │
+                    │             └─ app/api → lib/server (Hono) ─────────────┐                │
                     │                                                         │ Admin SDK     │
                     │   Firestore ◄───────────────────────────────────────────┤               │
                     │   Cloud Storage ◄───────────────────────────────────────┤               │
@@ -25,10 +25,10 @@ AI for Research runs on one Firebase project. Each part, what it does and where 
 ## The pieces
 
 **The Next.js app (repository root): App Hosting.** It serves the pages and the HTTP API. The API is
-`lib/server`, a Hono app mounted by two catch-all route handlers:
-`app/api/[[...route]]` and `app/v1/[[...route]]`. The URLs are the same ones the self-hosted
+`lib/server`, a Hono app mounted by a catch-all route handler,
+`app/api/[[...route]]`. The URLs are the same ones the self-hosted
 server used, so the editor needed no change for HTTP. Server components that need API
-data (pricing, developer prices) call the app in-process (`getApp().request(...)`).
+data (pricing) call the app in-process (`getApp().request(...)`).
 
 **Authentication.** Firebase Authentication handles every sign-in method (email and password,
 Google, Microsoft, Apple) and sends the reset and confirmation emails. The browser keeps the
@@ -38,8 +38,8 @@ creates their `users/{uid}` and `accounts/{id}` documents (`lib/users.ts`). Ther
 accounts: the app has no admin page.
 
 **Firestore and Storage.** All data lives here; see [data-model.md](data-model.md). Browsers
-never write either one. Every change goes through the API, which checks access, plan limits and
-credits. `firestore.rules` allows a few read-only listeners and denies everything else.
+never write either one. Every change goes through the API, which checks access and plan
+limits. `firestore.rules` allows a few read-only listeners and denies everything else.
 `storage.rules` denies everything. A document's block JSON and its Yjs state are kept in Storage,
 because a long thesis passes Firestore's 1 MiB document limit.
 

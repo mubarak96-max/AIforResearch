@@ -18,7 +18,7 @@ async function call(path, { token, method = 'GET', body } = {}) {
   if (!process.env.GRANTED) {
     const home = await call('/');
     check('landing page', home.status === 200 && /writeorbit/i.test(home.data.toString()));
-    for (const path of ['/pricing', '/developers', '/login', '/signup']) check(`page ${path}`, (await call(path)).status === 200);
+    for (const path of ['/pricing', '/login', '/signup']) check(`page ${path}`, (await call(path)).status === 200);
     const health = await call('/api/health');
     check('API healthy, papers from Scholar by default', health.data.ok === true && health.data.papers === 'scholar', JSON.stringify(health.data));
     const methods = await call('/api/auth/methods');
@@ -46,7 +46,5 @@ async function call(path, { token, method = 'GET', body } = {}) {
   check('Word export through the converter', docx.status === 200 && docx.data.subarray(0, 2).toString() === 'PK', `${docx.status} ${docx.type}`);
   const ai = await call('/api/ai-editor/assist/complete', { token, method: 'POST', body: { before: 'Sleep helps memory because', length: 'sentence' } });
   check('AI without a key: a clear 503, not a crash', ai.status === 503 || ai.status === 402, `${ai.status} ${JSON.stringify(ai.data).slice(0, 120)}`);
-  const cloud = await call('/v1/credits');
-  check('this install\'s own /v1 gateway asks for a key', cloud.status === 401);
   console.log(`\n${results.filter(Boolean).length}/${results.length} passed`);
 })().catch((error) => { console.error(error); process.exit(1); });

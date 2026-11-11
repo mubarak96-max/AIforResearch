@@ -48,20 +48,3 @@ export function testEmail(to: string, provider: string) {
     lines: [`This test was sent with ${provider} from Admin › Email.`],
   });
 }
-
-export function lowCreditsEmail(to: string, credits: number, url: string) {
-  return layout({
-    to, subject: 'Your AI for Research credits are running low', heading: 'Credits running low',
-    lines: [`Your the developer API balance is ${Math.max(0, Math.floor(credits)).toLocaleString('en-US')} credits. Calls that need paid credits stop when it reaches zero.`],
-    button: { label: 'Buy credits', url },
-    note: 'Turn on automatic top-up on the same page to never run out.',
-  });
-}
-
-export function topUpFailedEmail(to: string, reason: string, url: string) {
-  return layout({
-    to, subject: 'AI for Research automatic top-up failed', heading: 'Automatic top-up failed',
-    lines: [`We could not add credits to your developer API balance: ${reason}`, 'Automatic top-up is now off.'],
-    button: { label: 'Check your card', url },
-  });
-}

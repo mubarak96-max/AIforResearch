@@ -57,13 +57,10 @@ export const C = {
   libraryDoi: 'library_doi',      // library_doi/{user}__{sha1(lower doi)}: one document per DOI per person
   chunks: 'chunks',                // library_documents/{id}/chunks
   assets: 'assets',
-  apiKeys: 'api_keys',
   usageEvents: 'usage_events',
   billingEvents: 'billing_events',
   billingProducts: 'billing_products',
   planUsage: 'plan_usage',         // accounts/{id}/plan_usage
-  creditLedger: 'credit_ledger',   // accounts/{id}/credit_ledger
-  creditDailyFree: 'credit_daily_free', // accounts/{id}/credit_daily_free
   authFlows: 'auth_flows',
   libraryConnections: 'library_connections',
   libraryImportJobs: 'library_import_jobs',

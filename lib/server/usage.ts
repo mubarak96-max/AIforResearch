@@ -1,11 +1,16 @@
 import { C, col } from './firebase.js';
-import { usageEventId } from './lib/credits.js';
-import type { ServiceName } from './lib/prices.js';
 
-/** One service call made from the app itself (plans cover these; Cloud keys are charged in lib/credits.ts). */
+/** Services the app records use of (plans cover these). */
+export type ServiceName =
+  | 'papers_requests' | 'files_requests' | 'research_calls' | 'reference_checks'
+  | 'llm_input_tokens' | 'llm_cached_tokens' | 'llm_output_tokens' | 'review_words' | 'conversions';
+
+/** usage_events ids are `{service}__{request id}`, so a retried request is never recorded twice. */
+const usageEventId = (service: string, requestId: string) => `${service}__${requestId.replace(/\//g, '_').slice(0, 400)}`;
+
+/** One service call made from the app itself. */
 export type UsageEvent = {
   accountId: string;
-  apiKeyId?: string | null;
   service: ServiceName;
   quantity: number;
   requestId: string;
@@ -16,8 +21,8 @@ export type UsageEvent = {
 export async function recordUsage(event: UsageEvent) {
   if (!event.quantity || event.quantity <= 0) return;
   await col(C.usageEvents).doc(usageEventId(event.service, event.requestId)).create({
-    account_id: event.accountId, api_key_id: event.apiKeyId ?? null, via_key: Boolean(event.apiKeyId), service: event.service,
-    quantity: event.quantity, request_id: event.requestId, metadata: event.metadata ?? {}, free_milli: 0, paid_milli: 0, created_at: new Date(),
+    account_id: event.accountId, service: event.service,
+    quantity: event.quantity, request_id: event.requestId, metadata: event.metadata ?? {}, created_at: new Date(),
   }).catch((error: { code?: number }) => {
     if (error?.code !== 6) throw error; // 6 = ALREADY_EXISTS: recorded before
   });

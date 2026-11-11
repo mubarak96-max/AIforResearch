@@ -295,20 +295,6 @@
       ]
     },
     {
-      "collectionGroup": "api_keys",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "account_id",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "revoked_at",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
       "collectionGroup": "usage_events",
       "queryScope": "COLLECTION",
       "fields": [
@@ -327,71 +313,7 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "api_key_id",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "created_at",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "usage_events",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "account_id",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "via_key",
-          "order": "ASCENDING"
-        },
-        {
           "fieldPath": "service",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "created_at",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "usage_events",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "service",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "created_at",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "usage_events",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "via_key",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "created_at",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "credit_ledger",
-      "queryScope": "COLLECTION_GROUP",
-      "fields": [
-        {
-          "fieldPath": "kind",
           "order": "ASCENDING"
         },
         {
@@ -621,28 +543,6 @@
       "fieldPath": "expires_at",
       "ttl": true,
       "indexes": []
-    },
-    {
-      "collectionGroup": "credit_ledger",
-      "fieldPath": "created_at",
-      "indexes": [
-        {
-          "order": "ASCENDING",
-          "queryScope": "COLLECTION"
-        },
-        {
-          "order": "DESCENDING",
-          "queryScope": "COLLECTION"
-        },
-        {
-          "order": "ASCENDING",
-          "queryScope": "COLLECTION_GROUP"
-        },
-        {
-          "order": "DESCENDING",
-          "queryScope": "COLLECTION_GROUP"
-        }
-      ]
     },
     {
       "collectionGroup": "writing_sessions",

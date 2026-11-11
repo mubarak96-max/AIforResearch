@@ -4,7 +4,6 @@ import { C, col } from '../firebase.js';
 import { settings } from '../lib/settings.js';
 import { dodoClient } from '../lib/dodoBilling.js';
 import { syncPlanSubscription } from '../lib/planBilling.js';
-import { grantForPayment, rememberCard, topUpFailed } from '../lib/credits.js';
 
 /** Events the webhook subscribes to (Dodo dashboard → Developer → Webhooks; also set by Admin › Billing). */
 export const WEBHOOK_EVENTS = [
@@ -17,8 +16,6 @@ export const WEBHOOK_EVENTS = [
   'subscription.cancelled',
   'subscription.expired',
   'subscription.failed',
-  'payment.succeeded',
-  'payment.failed',
 ] as const satisfies readonly DodoPayments.WebhookEventType[];
 
 async function hasPlanSubscription(subscriptionId: string) {
@@ -37,7 +34,7 @@ async function planSubscriptionOf(event: DodoPayments.UnwrapWebhookEvent): Promi
 /**
  * Dodo Payments webhook: POST /api/dodo/webhook. Verifies the Standard Webhooks signature with
  * the signing secret from the admin page and handles each delivery once (by its webhook-id):
- * plan subscriptions keep the account's plan, paid credit purchases and top-ups add credits.
+ * plan subscriptions keep the account's plan.
  */
 export function dodoWebhookRoutes() {
   const app = new Hono();
@@ -76,18 +73,9 @@ export function dodoWebhookRoutes() {
       if (planSubscription) {
         // Deliveries can arrive out of order: read the subscription as it is now.
         await syncPlanSubscription(await dodo.subscriptions.retrieve(planSubscription), new Date(event.timestamp));
-      } else if (event.type === 'payment.succeeded') {
-        const payment = event.data;
-        const granted = await grantForPayment(payment);
-        // A plan's first payment: keep its card and address for credit top-ups.
-        if (!granted.granted && payment.metadata?.writeorbit_kind === 'plan' && payment.metadata.writeorbit_account_id) {
-          await rememberCard(String(payment.metadata.writeorbit_account_id), payment);
-        }
-      } else if (event.type === 'payment.failed') {
-        await topUpFailed(event.data);
       }
     } catch (error) {
-      // Dodo retries on 5xx; credits are granted once per payment whichever attempt lands.
+      // Dodo retries on 5xx.
       console.error('dodo webhook handling failed', event.type, webhookId, (error as Error).message);
       await eventRef.delete().catch(() => undefined);
       return c.json({ detail: 'Handling failed; retry.' }, 500);

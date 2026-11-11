@@ -10,8 +10,6 @@ import { libraryRoutes } from './routes/library.js';
 import { libraryImportRoutes } from './routes/libraryImport.js';
 import { libraryConnectionRoutes } from './routes/libraryConnections.js';
 import { versionRoutes } from './routes/versions.js';
-import { cloudPriceRoutes, cloudRoutes } from './routes/cloud.js';
-import { gatewayRoutes } from './routes/gateway.js';
 import { reviewRoutes } from './routes/review.js';
 import { evidenceRoutes } from './routes/evidence.js';
 import { matrixRoutes } from './routes/matrix.js';
@@ -26,8 +24,8 @@ import { PlanLimitError } from './lib/plans.js';
 import { ready } from './ready.js';
 
 /**
- * The AI for Research HTTP API. It runs inside the Next.js app (app/api/[[...route]] and
- * app/v1/[[...route]]) on Firebase App Hosting; the URLs are the ones the editor
+ * The AI for Research HTTP API. It runs inside the Next.js app (app/api/[[...route]]) on
+ * Firebase App Hosting; the URLs are the ones the editor
  * package has always called, so the editor did not change.
  */
 export function createApp() {
@@ -52,14 +50,11 @@ export function createApp() {
   app.route('/api/library', libraryConnectionRoutes());
   app.route('/api/library', libraryImportRoutes(slots));
   app.route('/api/library', libraryRoutes(slots));
-  app.route('/api/cloud/prices', cloudPriceRoutes());
-  app.route('/api/cloud', cloudRoutes());
   app.route('/api/plans', planRoutes());
   app.route('/api/tools', toolRoutes(slots));
   app.route('/api/newsletter', newsletterRoutes());
   app.route('/api/billing', billingRoutes());
   app.route('/api/dodo', dodoWebhookRoutes());
-  app.route('/v1', gatewayRoutes(slots));
 
   app.onError((error, c) => {
     // A plan limit says which one, so the app can offer the upgrade with that reason.

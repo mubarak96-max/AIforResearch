@@ -1,6 +1,5 @@
 import DodoPayments from 'dodopayments';
 import { env } from '../env.js';
-import { C, col, db } from '../firebase.js';
 import { settings } from './settings.js';
 
 /**
@@ -20,7 +19,7 @@ export function dodoClient(): DodoPayments | null {
   return cached.client;
 }
 
-/** 'live' when real payments are on, else 'test'. API keys carry this in their prefix. */
+/** 'live' when real payments are on, else 'test'. */
 export function billingMode(): 'test' | 'live' {
   return env.billingLive ? 'live' : 'test';
 }
@@ -32,32 +31,3 @@ export const dodoCurrency = (currency: string) => currency.toUpperCase() as Dodo
 
 /** True for a Dodo "not found" answer (an id from the other mode, or deleted). */
 export const isNotFound = (error: unknown) => (error as { status?: number })?.status === 404;
-
-/**
- * A one-time Dodo product for something the app sells at a fixed price (a credit pack), created on
- * first use and stored in `billing_products/{key}`. A new price or mode makes a new product (the
- * old one is archived), so a product always matches what the page shows.
- */
-export async function ensureOneTimeProduct(dodo: Dodo, key: string, input: { name: string; cents: number; currency?: string }) {
-  const ref = col(C.billingProducts).doc(key);
-  const mode = billingMode();
-  const stored = (await ref.get()).data() as { product_id?: string; cents?: number; mode?: string } | undefined;
-  if (stored?.product_id && stored.cents === input.cents && stored.mode === mode) return stored.product_id;
-  const product = await dodo.products.create({
-    name: input.name,
-    tax_category: 'saas',
-    price: { type: 'one_time_price', price: input.cents, currency: dodoCurrency(input.currency ?? 'usd'), discount: 0, purchasing_power_parity: false },
-    metadata: { writeorbit_product: key },
-  });
-  if (stored?.product_id && stored.mode === mode) await dodo.products.archive(stored.product_id).catch(() => undefined);
-  // Two instances may create one at the same moment: keep the first, archive the other.
-  return db().runTransaction(async (tx) => {
-    const current = (await tx.get(ref)).data() as { product_id?: string; cents?: number; mode?: string } | undefined;
-    if (current?.product_id && current.product_id !== stored?.product_id && current.cents === input.cents && current.mode === mode) {
-      void dodo.products.archive(product.product_id).catch(() => undefined);
-      return current.product_id;
-    }
-    tx.set(ref, { product_id: product.product_id, cents: input.cents, mode, updated_at: new Date() });
-    return product.product_id;
-  });
-}

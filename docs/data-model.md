@@ -7,7 +7,7 @@ into `Date`s; writing a `Date` stores a Timestamp. Ids are the old ids (uuid str
 come from `newId()` (a random UUID), except where noted.
 
 Browsers never write Firestore directly: every write goes through the API with the Admin SDK,
-which checks access, plan limits and credits. `firestore.rules` allows a few read-only
+which checks access and plan limits. `firestore.rules` allows a few read-only
 listeners (your own profile, documents you are a member of) and denies everything else.
 
 ## People and accounts
@@ -16,10 +16,8 @@ listeners (your own profile, documents you are a member of) and denies everythin
 | --- | --- | --- |
 | `users/{uid}` | `users` | `uid` is the **Firebase Auth uid**. `account_id, email (lower case), full_name, is_admin, email_verified_at, disabled_at, created_at, last_seen_at, newsletter_opt_out, newsletter_dirty, newsletter_synced, newsletter_synced_at, newsletter_error`. No password: Firebase Auth has it. |
 | `legacy_passwords/{email}` | `users.password_hash` | Server-only. Argon2 hashes Firebase cannot import (tools/migrate). The first successful sign-in moves the password into Firebase Auth and deletes the entry. |
-| `accounts/{id}` | `accounts` | Billing entity. `name, plan, dodo_customer_id, dodo_payment_method_id, dodo_billing, billing_status, billing_event_at, plan_subscription_id, plan_status, plan_interval, plan_period_end, plan_cancel_at_period_end, plan_source, plan_event_at, credits_milli, starter_granted_at, topup_*, low_balance_noticed_at, created_at`. |
+| `accounts/{id}` | `accounts` | Billing entity. `name, plan, dodo_customer_id, dodo_payment_method_id, dodo_billing, billing_status, billing_event_at, plan_subscription_id, plan_status, plan_interval, plan_period_end, plan_cancel_at_period_end, plan_source, plan_event_at, created_at`. |
 | `accounts/{id}/plan_usage/{key}__{period}` | `plan_usage` | `key, period, amount`. Incremented with `FieldValue.increment` in a transaction. |
-| `accounts/{id}/credit_ledger/{id}` | `credit_ledger` | When `reference` is set the doc id is `ref_<sha256(reference)[0:40]>`, so a Dodo payment is granted once (`create()` fails on a repeat). |
-| `accounts/{id}/credit_daily_free/{YYYY-MM-DD}` | `credit_daily_free` | `used_milli`. |
 | — | `user_identities`, `user_passkeys` | Gone: Firebase Auth links Google, Microsoft and Apple to one user per email. Passkeys are not offered (Firebase has none). |
 
 ## Documents
@@ -58,18 +56,16 @@ the upload request.
 | `review_matrices/{id}` | (new) | Literature review matrix: `user_id, title, columns[{id, label, prompt}], document_ids[]` (Library documents, row order), `created_at, updated_at`. |
 | `review_matrices/{id}/rows/{libraryDocumentId}` | (new) | `cells: { [columnId]: { value, quote, page, status (done/empty/error), basis (full_text/abstract/none/writer), edited, updated_at } }`. A cell with `edited` is the writer's own and is never refilled. |
 
-## Cloud API and billing
+## Usage and billing
 
 Plans are not stored: they are defined in `lib/server/lib/plans.ts`. Settings are not stored
 either: they come from the environment.
 
 | Path | Was | Notes |
 | --- | --- | --- |
-| `api_keys/{id}` | `api_keys` | Looked up by `key_hash` (indexed). |
 | `usage_events/{service}__{request_id}` | `usage_events` | The id makes retries idempotent (`create()`). |
 | `billing_events/{webhook-id}` | `billing_events` | Dodo Payments webhook deliveries; `create()` makes each one handled once. |
 | `billing_products/plan_{plan}_{month\|year}` | | Dodo product of a plan's price: `kind: 'plan', product_id, cents, currency, trial_days, mode`. Ignored once the price in code or the mode differs, and a new one is made at the next checkout. |
-| `billing_products/pack_{pack}` | | Dodo product of a credit pack: `product_id, cents, mode` (remade when the price or mode changes). |
 | `rate_limits/{key}:{ip hash}:{window}` | (memory) | TTL policy on `expires_at`. |
 
 ## Indexes and TTL

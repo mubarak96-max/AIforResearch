@@ -38,13 +38,6 @@ export const env = {
   /** Where people write when they are stuck (sign-in help); hidden when empty. */
   supportEmail: read('SUPPORT_EMAIL'),
 
-  /** The developer API (/v1): upstreams and credits. */
-  cloudDeepseekKey: read('CLOUD_DEEPSEEK_API_KEY'),
-  cloudScholarKey: read('CLOUD_SCHOLAR_API_KEY'),
-  cloudPapersUrl: read('CLOUD_PAPERS_URL', 'https://api.openalex.org').replace(/\/+$/, ''),
-  cloudDailyFreeCredits: read('CLOUD_DAILY_FREE_CREDITS', '1000'),
-  cloudStarterCredits: read('CLOUD_STARTER_CREDITS', '100'),
-
   /** Encrypts keys saved from the admin page (32+ characters). */
   settingsKey: read('SETTINGS_KEY'),
 

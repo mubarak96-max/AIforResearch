@@ -89,7 +89,6 @@ export async function ensureUser(token: DecodedIdToken): Promise<AuthUser | null
     tx.set(col(C.accounts).doc(accountId), {
       name: fullName || email, plan: 'free', created_at: new Date(),
       billing_status: 'none', plan_status: 'none', plan_source: 'default', plan_cancel_at_period_end: false,
-      credits_milli: 0, topup_enabled: false, topup_threshold: 500, topup_pack: 'credits_2000', topup_monthly_limit_cents: 10000,
     });
     const created = {
       account_id: accountId, email, full_name: fullName, is_admin: false,

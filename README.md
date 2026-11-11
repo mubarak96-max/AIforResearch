@@ -5,7 +5,6 @@
 ![The AI for Research editor](docs/images/editor.png)
 
 - **Run it:** this repo deploys to your own Firebase project (App Hosting, Firestore, Storage, Authentication, Cloud Functions) plus two small Cloud Run services.
-- **Build on it:** the editor is a React package, and the [developer API](#developer-api) gives other apps papers, full text, research tools and AI through keys you issue.
 
 ---
 
@@ -23,7 +22,7 @@
 
 ## What it costs to run
 
-You pay Google Cloud for what your Firebase project uses (the free tier covers small groups) and the providers you connect: an AI provider such as DeepSeek or OpenAI, and optionally a Scholar key, Dodo Payments and an email service. You can sell plans and developer-API credits to your own users with Dodo Payments (merchant of record: it handles sales tax and receipts).
+You pay Google Cloud for what your Firebase project uses (the free tier covers small groups) and the providers you connect: an AI provider such as DeepSeek or OpenAI, and optionally a Scholar key, Dodo Payments and an email service. You can sell plans to your own users with Dodo Payments (merchant of record: it handles sales tax and receipts).
 
 ---
 
@@ -32,9 +31,9 @@ You pay Google Cloud for what your Firebase project uses (the free tier covers s
 ```
   Browser ──────────────► Firebase Authentication   (password, Google, Microsoft, Apple; App Check)
      │  ID token
-     ├─ https ─────────►  App Hosting: Next.js app    Next.js pages + the API (/api, /v1) in route handlers
+     ├─ https ─────────►  App Hosting: Next.js app    Next.js pages + the API (/api) in route handlers
      │                       │  Admin SDK
-     │                       ├──► Firestore           accounts, documents, Library, plans, credits, settings
+     │                       ├──► Firestore           accounts, documents, Library, plans, settings
      │                       ├──► Cloud Storage        PDFs, document blocks, Yjs state, images
      │                       └──► Cloud Run: convert   Word / PDF / LaTeX, PDF text (internal only)
      └─ wss ───────────►  Cloud Run: collab          live text (Hocuspocus/Yjs) and presence
@@ -87,9 +86,9 @@ Each service is a slot with its own provider. Set them in `apphosting.yaml` (sec
 | **AI** | OpenRouter running DeepSeek (default), DeepSeek API, OpenAI, Anthropic, Ollama | `LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL`, `LLM_REVIEW_MODEL`, `LLM_BASE_URL` |
 | **Papers** | [CitedEvidence Scholar](#papers-from-scholar) (default), OpenAlex | `PAPERS_PROVIDER`, `SCHOLAR_API_KEY`, `OPENALEX_EMAIL` |
 | **Library search** | Word search, or embeddings with Firestore vector search: from the converter's own model (`local`, no per-token fees) or OpenAI | `EMBEDDINGS_PROVIDER` (`local` \| `openai`), `EMBEDDINGS_API_KEY` (OpenAI only) |
-| **Email** | SMTP or Resend (invitations and credit notices; Firebase sends sign-in emails itself) | `MAIL_PROVIDER`, `MAIL_FROM`, `SMTP_*`, `RESEND_API_KEY` |
+| **Email** | SMTP or Resend (invitations; Firebase sends sign-in emails itself) | `MAIL_PROVIDER`, `MAIL_FROM`, `SMTP_*`, `RESEND_API_KEY` |
 | **Newsletter** | MailCheap (keeps a list in step with confirmed accounts) | `NEWSLETTER_PROVIDER`, `MAILCHEAP_API_KEY` |
-| **Payments** | Dodo Payments, if you sell plans or credits yourself | `DODO_PAYMENTS_API_KEY`, `DODO_PAYMENTS_WEBHOOK_KEY`, `BILLING_LIVE=1` for live mode |
+| **Payments** | Dodo Payments, if you sell plans yourself | `DODO_PAYMENTS_API_KEY`, `DODO_PAYMENTS_WEBHOOK_KEY`, `BILLING_LIVE=1` for live mode |
 | **Sign-in** | Email and password, Google, Microsoft, Apple (Firebase Authentication), App Check | Firebase console › Authentication; on/off with `SIGNIN_PASSWORD`, `SIGNIN_GOOGLE`, `SIGNIN_MICROSOFT`, `SIGNIN_APPLE` |
 
 [`.env.example`](.env.example) lists every setting with a short note. Files live in the project's Cloud Storage bucket.
@@ -98,7 +97,7 @@ Each service is a slot with its own provider. Set them in `apphosting.yaml` (sec
 
 1. In the Dodo dashboard (test mode), create an API key and set it as `DODO_PAYMENTS_API_KEY`.
 2. Add a webhook (Developer › Webhooks) to `https://aiforresearch.app/api/dodo/webhook` with the events listed in [`dodoWebhook.ts`](lib/server/routes/dodoWebhook.ts), and set its secret as `DODO_PAYMENTS_WEBHOOK_KEY`.
-3. That's all: the Dodo products for plans and credit packs are created on the first checkout, from the prices in code. Change a price in code and the next checkout makes a new product (current subscribers keep theirs).
+3. That's all: the Dodo products for plans are created on the first checkout, from the prices in code. Change a price in code and the next checkout makes a new product (current subscribers keep theirs).
 4. For real payments: a live-mode key and webhook, and `BILLING_LIVE=1`.
 
 ### Papers from Scholar
@@ -112,32 +111,6 @@ Papers come from [CitedEvidence Scholar](https://scholar.citedevidence.com): 250
 If Scholar is busy, searches fall back to [OpenAlex](https://openalex.org) automatically.
 
 ---
-
-## Developer API
-
-Your deployment can offer its services to other apps at `/v1`: people create keys at `/developers/keys` and pay in credits (Dodo Payments). The API calls the same providers you connected above, using the upstream keys `CLOUD_DEEPSEEK_API_KEY` and `CLOUD_SCHOLAR_API_KEY`. Prices are in [`lib/server/lib/prices.ts`](lib/server/lib/prices.ts); free allowances are `CLOUD_DAILY_FREE_CREDITS` and `CLOUD_STARTER_CREDITS`.
-
-| Service | Endpoint | Credits |
-| --- | --- | --- |
-| Paper search and lookups (works, authors, journals…) | `GET /v1/oa/…` | 1 per request · free daily |
-| Full text and PDFs | `GET /v1/files/…` | 1 per request · free daily |
-| Research tools: multi-source search, citation networks, recommendations | `POST /v1/research/tools/{name}`, `POST /v1/mcp` | 1 per call · free daily |
-| Reference checks (do these DOIs and PubMed IDs exist?) | `validate_citations` | 1 per reference · free daily |
-| AI (OpenAI-compatible, DeepSeek) | `POST /v1/chat/completions` | 78 input / 312 output per 1M tokens |
-| AI peer review of a manuscript | `POST /v1/review` | 10 per 1,000 words |
-| Word, PDF or LaTeX from editor documents | `POST /v1/convert` | 1 per file |
-
-- **1,000 free credits every day** for the services marked *free daily*. They reset at midnight UTC.
-- **100 credits to start** on your first key, to try AI, reviews and exports. Both need a confirmed email.
-- **Credit packs:** 2,000 for $29.90 · 10,000 for $119 · 100,000 for $790 · 1,000,000 for $4,990. One credit is one paper or file request. Credits people buy don't expire.
-- Optional automatic top-up with a monthly limit, and a monthly cap per key.
-
-```bash
-curl -H "Authorization: Bearer $WRITEORBIT_API_KEY" \
-  "https://<your site>/v1/oa/works?search=sleep%20memory&per_page=5"
-```
-
-Every response reports `X-Credits-Charged` and `X-Credits-Balance`; out of credits is `402`. Research tools work in any MCP client (Claude, Cursor…) with `https://<your site>/v1/mcp` and the key as a Bearer header. Full reference: [docs/cloud-api.md](docs/cloud-api.md).
 
 ## Develop
 
@@ -157,11 +130,11 @@ The repository root is the Next.js app (Next.js 15, React 19, Tailwind 4, Fireba
 
 | Folder | What it is |
 | --- | --- |
-| `app` | Pages, plus the API's two route handlers, `app/api/[[...route]]` and `app/v1/[[...route]]`. |
+| `app` | Pages, plus the API's route handler, `app/api/[[...route]]`. |
 | `components` | The site and app components. |
 | `components/editor` | The editor (BlockNote + Yjs), mounted with `<WriteOrbitEditorProvider config={…}>`. |
 | `lib` | Browser helpers (Firebase, session, sign-in). |
-| `lib/server` | The API (Hono) and data layer on Firestore and Storage: plans, credits, AI and papers slots, the developer API (/v1) and the background jobs. Server-only. |
+| `lib/server` | The API (Hono) and data layer on Firestore and Storage: plans, AI and papers slots and the background jobs. Server-only. |
 | `public` | Static files. |
 | `tests/server` | API unit tests (Vitest). `tests/rules`: security rules. `tests/e2e`: browser tests. |
 | `services/collab` | Live text (Hocuspocus) and presence over WebSockets, on Cloud Run. Uses the root's packages and bundles `lib/server` (`pnpm build:collab`). |
