@@ -38,10 +38,17 @@ export default defineConfig({
       NEXT_PUBLIC_REALTIME_URL: bindings.text(env("NEXT_PUBLIC_REALTIME_URL")),
       COLLAB_URL: bindings.text(env("COLLAB_URL")),
       CONVERT_URL: bindings.text(env("CONVERT_URL")),
+      MAIL_PROVIDER: bindings.text(env("MAIL_PROVIDER")),
+      MENDELEY_CLIENT_ID: bindings.text(env("MENDELEY_CLIENT_ID")),
+      ZOTERO_CALLBACK_URL: bindings.text(env("ZOTERO_CALLBACK_URL")),
+      ZOTERO_CLIENT_KEY: bindings.text(env("ZOTERO_CLIENT_KEY")),
       // Set as encrypted secrets on the Worker (dashboard "Secret" type or `wrangler secret put`),
       // never as plain-text vars — plain vars are printed in deploy diffs.
       DODO_PAYMENTS_API_KEY: bindings.secret(),
       DODO_PAYMENTS_WEBHOOK_KEY: bindings.secret(),
+      RESEND_API_KEY: bindings.secret(),
+      MENDELEY_CLIENT_SECRET: bindings.secret(),
+      ZOTERO_CLIENT_SECRET: bindings.secret(),
       // Google credentials on the Worker (the service-account key file's JSON); lib/server/google
       // uses it for Firestore, Auth and Storage over their REST APIs.
       GOOGLE_SERVICE_ACCOUNT_JSON: bindings.secret(),

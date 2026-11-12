@@ -19,8 +19,12 @@ ui-debug.log
 service-account*.json
 .vinext/
 .cloudflare/
+<<<<<<< Updated upstream
 
 .taste-skill/
 
 # Firebase Admin SDK service account keys
 *firebase-adminsdk*.json
+=======
+.taste-skill/
+>>>>>>> Stashed changes
