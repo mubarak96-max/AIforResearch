@@ -5,6 +5,8 @@ import { AudienceSection, ComparisonBand, FEATURES, FinalCta, PageIntro, Points,
 import { FigCaption } from '@/components/marketing/Marginalia';
 import { FeatureCard } from '@/components/marketing/FeatureLanding';
 import { activeFeatureCategories, FEATURE_PAGES } from '@/lib/features';
+import { LandingGrid } from '@/components/marketing/MarkdownLanding';
+import { landingPages } from '@/lib/landingPages';
 
 export const metadata = pageMetadata({
   title: 'Features: AI writing, citations and claim check',
@@ -54,6 +56,13 @@ export default function FeaturesPage() {
       <section aria-labelledby="all-features-title" className={`${container} pt-24 md:pt-32`}>
         <h2 id="all-features-title" className="text-balance font-serif text-[30px] font-semibold leading-[1.12] tracking-[-0.02em] text-ink md:text-[40px]">Every feature, in detail</h2>
         <div className="mt-10 flex flex-col gap-12">
+          {landingPages('features').length > 0 && (
+            <div>
+              <h3 className="text-[18px] font-semibold text-ink">Workspaces</h3>
+              <p className="mt-1 text-[14.5px] text-muted">Deep research, reviews, proposals, theses, data and slides.</p>
+              <div className="mt-4"><LandingGrid pages={landingPages('features')} /></div>
+            </div>
+          )}
           {activeFeatureCategories().map((category) => (
             <div key={category.id}>
               <h3 className="text-[18px] font-semibold text-ink">{category.name}</h3>

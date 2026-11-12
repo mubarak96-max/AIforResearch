@@ -129,6 +129,8 @@ export async function searchOpenAlex(input: ProviderSearch): Promise<FoundPaper[
 const S2_BASE = 'https://api.semanticscholar.org/graph/v1';
 const S2_FIELDS = 'title,abstract,year,venue,authors,citationCount,externalIds,isOpenAccess,openAccessPdf,publicationTypes,publicationDate,tldr,journal';
 const s2Headers = (): Record<string, string> => (env.semanticScholarApiKey ? { 'x-api-key': env.semanticScholarApiKey } : {});
+/** A key allows 1 request a second, and Deep or Detailed answers start 3 to 6 searches at once. */
+const S2_PACE = { key: 'semantic_scholar', ms: 1100 };
 const S2_TYPES: Partial<Record<StudyType, string>> = { 'meta-analysis': 'MetaAnalysis', review: 'Review', 'systematic-review': 'Review', 'clinical-trial': 'ClinicalTrial', rct: 'ClinicalTrial', 'case-report': 'CaseReport' };
 
 export function s2ToFound(item: any): FoundPaper {
@@ -175,7 +177,7 @@ export async function searchSemanticScholar(input: ProviderSearch): Promise<Foun
   if (f.openAccess) url.searchParams.set('openAccessPdf', '');
   const mapped = (f.studyTypes ?? []).map((type) => S2_TYPES[type]);
   if (mapped.length && mapped.every(Boolean)) url.searchParams.set('publicationTypes', [...new Set(mapped)].join(','));
-  const data = await fetchSource(url, { source: 'Semantic Scholar', headers: s2Headers() });
+  const data = await fetchSource(url, { source: 'Semantic Scholar', headers: s2Headers(), pace: S2_PACE });
   return (Array.isArray(data?.data) ? data.data : []).map(s2ToFound);
 }
 
@@ -184,14 +186,14 @@ export async function semanticScholarLinks(paperId: string, direction: 'referenc
   const url = new URL(`${S2_BASE}/paper/${encodeURIComponent(paperId)}/${direction}`);
   url.searchParams.set('limit', String(Math.min(1000, limit)));
   url.searchParams.set('fields', S2_FIELDS.replace(',tldr', ''));
-  const data = await fetchSource(url, { source: 'Semantic Scholar', headers: s2Headers() });
+  const data = await fetchSource(url, { source: 'Semantic Scholar', headers: s2Headers(), pace: S2_PACE });
   const key = direction === 'references' ? 'citedPaper' : 'citingPaper';
   return (Array.isArray(data?.data) ? data.data : []).map((row: any) => row?.[key]).filter((item: any) => item?.paperId).map(s2ToFound);
 }
 
 /** A paper by DOI, arXiv id, PMID or Semantic Scholar id (`DOI:10…`, `ARXIV:…`, `PMID:…`). */
 export async function semanticScholarPaper(id: string): Promise<FoundPaper | null> {
-  const data = await fetchSource(`${S2_BASE}/paper/${encodeURIComponent(id)}?fields=${S2_FIELDS}`, { source: 'Semantic Scholar', headers: s2Headers() });
+  const data = await fetchSource(`${S2_BASE}/paper/${encodeURIComponent(id)}?fields=${S2_FIELDS}`, { source: 'Semantic Scholar', headers: s2Headers(), pace: S2_PACE });
   return data?.paperId ? s2ToFound(data) : null;
 }
 
@@ -200,7 +202,7 @@ export async function semanticScholarSimilar(paperIds: string[], limit = 20): Pr
   const ids = paperIds.filter(Boolean).slice(0, 20);
   if (!ids.length) return [];
   const data = await fetchSource(`https://api.semanticscholar.org/recommendations/v1/papers?limit=${Math.min(100, limit)}&fields=${S2_FIELDS.replace(',tldr', '')}`, {
-    source: 'Semantic Scholar', method: 'POST', headers: s2Headers(), body: { positivePaperIds: ids },
+    source: 'Semantic Scholar', method: 'POST', headers: s2Headers(), pace: S2_PACE, body: { positivePaperIds: ids },
   });
   return (Array.isArray(data?.recommendedPapers) ? data.recommendedPapers : []).map(s2ToFound);
 }
@@ -462,8 +464,9 @@ export async function crossrefWork(doi: string): Promise<CrossrefRecord | null> 
   const clean = doiKey(doi);
   if (!clean) return null;
   const data = await fetchSource(`https://api.crossref.org/works/${encodeURIComponent(clean)}?${mailto()}`, { source: 'Crossref' });
+  if (data === null) return null;
   const work = data?.message;
-  if (!work) return null;
+  if (!work || typeof work !== 'object' || Array.isArray(work)) throw new SourceError('Crossref', 'Crossref returned an incomplete DOI record.');
   return {
     doi: clean,
     title: Array.isArray(work.title) ? work.title[0] ?? null : null,
@@ -481,6 +484,7 @@ export async function crossrefUpdates(doi: string): Promise<UpdateNotice[]> {
   const clean = doiKey(doi);
   if (!clean) return [];
   const data = await fetchSource(`https://api.crossref.org/works?filter=updates:${encodeURIComponent(clean)}&rows=20&${mailto()}`, { source: 'Crossref' });
+  if (!Array.isArray(data?.message?.items)) throw new SourceError('Crossref', 'Crossref returned an incomplete notice response.');
   const notices: UpdateNotice[] = [];
   for (const item of data?.message?.items ?? []) {
     for (const update of item?.['update-to'] ?? []) {

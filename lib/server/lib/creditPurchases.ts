@@ -83,7 +83,7 @@ export async function startPackPurchase(dodo: Dodo, accountId: string, packId: P
   const pack = PACKS[packId];
   const { plan } = await effectivePlan(accountId);
   if (pack.kind === 'topup' && plan.is_default) {
-    throw new PlanLimitError(`Extra credits are for paid plans. Upgrade from ${plan.name} first; Plus includes 500 credits a month.`, 'credits', plan.id);
+    throw new PlanLimitError(`Extra credits are for paid plans. Upgrade from ${plan.name} first; Plus includes 750 credits a month.`, 'credits', plan.id);
   }
   const product = await ensurePackProduct(dodo, packId);
   const customer = await ensureCustomer(dodo, accountId);

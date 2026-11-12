@@ -8,8 +8,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  LuBookOpen, LuChartBar, LuClipboardCheck, LuFileText, LuFolderKanban, LuGraduationCap, LuHistory, LuHouse,
-  LuLayoutGrid, LuLibrary, LuListChecks, LuNotebookPen, LuSearch, LuSparkles, LuUser, LuCircleHelp, LuPlus,
+  LuBookOpen, LuChartBar, LuClipboardCheck, LuClipboardList, LuFileText, LuFolderKanban, LuGraduationCap, LuHistory, LuHouse,
+  LuLayoutGrid, LuLibrary, LuListChecks, LuNotebookPen, LuNotebookTabs, LuSearch, LuSparkles, LuUser, LuCircleHelp, LuPlus,
 } from 'react-icons/lu';
 import { toggleSideload, useSideloads } from '@/components/editor';
 import { Logo } from '@/components/Logo';
@@ -22,7 +22,7 @@ type Item = { href: string; label: string; icon: React.ComponentType<{ className
 export const NAV_MAIN: Item[] = [
   { href: '/home', label: 'Home', icon: LuHouse },
   { href: '/deep-research', label: 'Deep Research', icon: LuSparkles },
-  { href: '/papers', label: 'Find Papers', icon: LuSearch, match: ['/papers', '/citation-map', '/landscape'] },
+  { href: '/papers', label: 'Find Papers', icon: LuSearch, match: ['/papers', '/citation-map', '/landscape', '/official-sources', '/monitoring'] },
 ];
 export const NAV_WORKSPACES: Item[] = [
   { href: '/write', label: 'Writing Studio', icon: LuNotebookPen, match: ['/write', '/editor', '/slides'] },
@@ -31,6 +31,8 @@ export const NAV_WORKSPACES: Item[] = [
   { href: '/systematic-review', label: 'Systematic Review', icon: LuListChecks },
   { href: '/reviewer', label: 'Reviewer', icon: LuClipboardCheck, match: ['/reviewer', '/matrix', '/authorship'] },
   { href: '/data-lab', label: 'Data Lab', icon: LuChartBar },
+  { href: '/surveys', label: 'Surveys', icon: LuClipboardList },
+  { href: '/workbooks', label: 'Workbooks', icon: LuNotebookTabs },
 ];
 export const NAV_MORE: Item[] = [
   { href: '/all-tools', label: 'All tools', icon: LuLayoutGrid },

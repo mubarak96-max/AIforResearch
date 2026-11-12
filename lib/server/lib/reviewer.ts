@@ -156,7 +156,7 @@ export type ReviewInput = {
   language?: string | null;
 };
 
-const norm = (value: string) => value.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+export const norm = (value: string) => value.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
 
 /** True when the quote (or most of it) is in the text: invented quotes are dropped. */
 export function quoteInText(quote: string, normalizedText: string): boolean {

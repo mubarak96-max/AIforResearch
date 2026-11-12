@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ContactLine, LegalPage, type LegalSection } from '@/components/marketing/LegalPage';
 import { pageMetadata } from '@/components/marketing/seo';
+import { PrivacySettingsButton } from '@/components/analytics/PrivacyControls';
 
 export const metadata = pageMetadata({
   title: 'Cookies and browser storage',
@@ -55,6 +56,7 @@ const SECTIONS: LegalSection[] = [
         <p>Stored only in this browser and never sent to us. Clearing your browser data removes them.</p>
         {table([
           row('Theme', 'Light or dark mode.', 'Until cleared'),
+          row('research-privacy-v1', 'Your choices for optional analytics and public-page recordings.', '180 days, or until changed or cleared'),
           row('writeorbit_nav_collapsed', 'Whether the editor’s side menu is collapsed.', 'Until cleared'),
           row('writeorbit_autocomplete_settings', 'Your autocomplete source choices.', 'Until cleared'),
           row('writeorbit_review_…', 'When each review check last ran on a document, so its results show again.', 'Until cleared'),
@@ -69,8 +71,9 @@ const SECTIONS: LegalSection[] = [
     title: 'Analytics',
     body: (
       <>
-        <p>We use Google Tag Manager to load Google Analytics, which sets cookies (such as <code>_ga</code>) to count visits and see which pages are used. This helps us improve AI for Research. It does not read your documents.</p>
-        <p>You can block these cookies in your browser settings or with a content blocker; AI for Research keeps working.</p>
+        <p>Optional analytics is off until you choose it. With your permission, Google Tag Manager loads analytics on public information pages; Google Analytics may use cookies such as <code>_ga</code> to measure visits. The app also counts approved feature events, such as document creation and review completion, in daily totals. Those event payloads exclude document text, questions, source names and document, account and user identifiers.</p>
+        <p>Microsoft Clarity session recordings and heatmaps are a separate, optional choice for adults on public information pages. Clarity can use cookies such as <code>_clck</code> and <code>_clsk</code>. Third-party analytics and recording scripts are not loaded in private workspaces, sign-in pages, interactive tools or research search pages. Advertising consent stays denied.</p>
+        <p><PrivacySettingsButton />. You can decline or withdraw either choice and keep using the app. Withdrawal stops collection going forward and reloads a tracked page to remove loaded analytics code; it does not remove data already collected. Your browser can also clear cookies and block third-party requests.</p>
       </>
     ),
   },
@@ -87,5 +90,5 @@ const SECTIONS: LegalSection[] = [
 ];
 
 export default function CookiesPage() {
-  return <LegalPage title="Cookies and browser storage" updated="2026-11-09" intro={<p>What AI for Research stores in your browser, and why.</p>} sections={SECTIONS} />;
+  return <LegalPage title="Cookies and browser storage" updated="2026-11-12" intro={<p>What AI for Research stores in your browser, and why.</p>} sections={SECTIONS} />;
 }

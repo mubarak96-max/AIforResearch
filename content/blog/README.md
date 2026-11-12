@@ -54,3 +54,20 @@ grep -n "<!-- \(VERIFY\|TO RUN\|SCREENSHOT\)" *.md
 | 28 | F | [Zotero vs. Mendeley](28-zotero-vs-mendeley.md) |
 | 29 | F | [Zotero alternatives](29-zotero-alternatives.md) |
 | 30 | F | [Chat with PDF](30-chat-with-pdf.md) |
+
+## Articles 61 to 100: the research workspace
+
+Written 12 November 2026 from [docs/redesign/04-content-plan.md](../../docs/redesign/04-content-plan.md), section 3. Credit figures follow `lib/server/lib/plans.ts` (Free 45, Plus 750, Pro 1,500; Summary 1, Deep 15, Detailed 45). Besides `VERIFY`, `TO RUN` and `SCREENSHOT`, these files carry `<!-- LINK: … -->` comments: where to add a link when a planned landing page (L11 to L66) ships.
+
+| Posts | Cluster | Pillar |
+| --- | --- | --- |
+| 61–64 | G. Deep research | 61 what-is-deep-research-ai |
+| 65, 66, 84 | H. Research tools compared | 64 best-ai-for-deep-research |
+| 67–69, 83, 85 | I. Finding and checking sources | 67 levels-of-evidence-and-study-types |
+| 70, 71, 78–80 | J. Planning a study and thesis | 70 how-to-write-a-research-question |
+| 72–74 | K. Thesis defense | 72 thesis-defense-guide |
+| 75–77, 86 | L. Research proposals | 75 how-to-write-a-research-proposal |
+| 81, 82 | M. Reviewing and publishing | 82 how-to-respond-to-reviewer-comments |
+| 87–92 | N. Systematic reviews | 87 what-is-a-systematic-review |
+| 93–96 | O. Statistics for research | 93 which-statistical-test-to-use |
+| 97–100 | P. Research by field | 97 ai-for-qualitative-research |

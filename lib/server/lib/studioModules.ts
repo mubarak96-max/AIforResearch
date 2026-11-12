@@ -6,7 +6,7 @@
 import type { ChatMessage } from '../slots/types.js';
 import type { ResearchSource } from './research.js';
 import { sourcesBlock } from './research.js';
-import type { StudioModule } from './studioCatalog.js';
+import { template, type StudioModule } from './studioCatalog.js';
 
 export type StudioLength = 'short' | 'standard' | 'long';
 export type StudioContext = {
@@ -18,6 +18,8 @@ export type StudioContext = {
   length: StudioLength;
   language: string | null;
   highQuality: boolean;
+  /** The earlier result this run continues (a research answer or another module's text), its markers renumbered to `sources`. */
+  prior?: { title: string; markdown: string } | null;
 };
 export type StudioPrompt = { messages: ChatMessage[]; maxTokens: number; task: 'fast' | 'review'; temperature: number; json?: boolean };
 
@@ -89,11 +91,109 @@ const BUILDERS: Record<string, Builder> = {
     user: `Write ${c.inputs.format === 'unstructured' ? 'a one-paragraph abstract' : 'a structured abstract with bold labels Background, Methods, Results and Conclusions'} of about ${c.inputs.words || '250'} words for this paper. Then add a line "**Keywords:**" with 5 keywords.\n\nThe paper:\n${(c.inputs.text || '').slice(0, 60000)}`,
     maxTokens: 900,
   }),
+  template: (c) => {
+    const chosen = template(c.inputs.template) ?? template('imrad')!;
+    const sections = chosen.sections.filter(([heading]) => !/^references/i.test(heading));
+    const base = chosen.id === 'conference-abstract' ? 300 : chosen.id === 'poster' ? 700 : chosen.id === 'thesis-chapter' ? 2500 : 2000;
+    return {
+      user: `Write a complete ${chosen.label.toLowerCase()} on "${c.inputs.topic}", about ${words(base, c)} words, for ${reader(c)}. ` +
+        `Use exactly these sections as "##" headings, in this order, and write real content under each (never leave a section empty or repeat the guidance):\n` +
+        sections.map(([heading, hint]) => `- ${heading}${hint ? `: ${hint}` : ''}`).join('\n') +
+        '\nWhere a section needs facts only the writer has (their own data, sample, results, team, amounts, dates), write a clear [placeholder] in square brackets instead of inventing them. ' +
+        'Generic section names such as "Theme 1" or "Section 1" should be replaced by a heading that names the theme.' + notesLine(c.inputs.notes),
+      maxTokens: chosen.id === 'conference-abstract' ? 1200 : chosen.id === 'poster' ? 2000 : 6500, grounded: true,
+    };
+  },
   paraphrase: (c) => ({
     system: `${BASE} Keep the meaning, every fact, number, name, quotation and citation exactly; change only the wording. Keep the paragraph breaks.`,
     user: `Paraphrase this text in a natural, human style${{ light: ', keeping the sentence structure close', strong: ' with new sentence structures' }[c.inputs.strength] ?? ''}. Return only the paraphrase.\n\n${(c.inputs.text || '').slice(0, 40000)}`,
     maxTokens: Math.min(12000, Math.ceil(((c.inputs.text || '').length / 3.5) * 1.3) + 200),
   }),
+
+  // ---------------------------------------------------------------- Writing Studio: deliverables
+  'case-report': (c) => {
+    const format = c.inputs.journal || 'standard';
+    const size = format === 'poster' ? 'a conference abstract of about 300 words with the labels Introduction, Case presentation, Discussion and Conclusion'
+      : format === 'short' ? 'a short case report of about 600 words with the headings Introduction, Case presentation, Discussion and Learning points'
+        : `a case report of about ${words(1500, c)} words in the CARE structure, with these "##" headings: Abstract (labelled Introduction, Case presentation, Diagnoses and interventions, Outcomes, Conclusion), Keywords, Introduction, Patient information, Clinical findings, Timeline (a table: day, event), Diagnostic assessment (including the diagnoses considered), Therapeutic intervention, Follow-up and outcomes, Discussion, Learning points, Patient perspective, Informed consent`;
+    return {
+      system: `${BASE} You write clinical case reports for ${reader(c)}. ${language(c)} Every clinical detail (history, findings, results, doses, outcomes) must come from the case notes given; never add, round or change one. ` +
+        'Where a CARE item is not in the notes (such as the patient’s perspective, consent, a dose, a follow-up result), write a [placeholder] saying what to add. ' +
+        'Keep the patient de-identified: no names, initials, exact dates, hospital names or rare identifying details; if the notes contain any, leave them out and add a line at the end, "**Check before submission:** identifiers removed: …". ' +
+        'Use the sources only in the Introduction and Discussion, to set the case in context; never present a source’s finding as part of this case.',
+      user: `Write ${size}, on: "${c.inputs.topic}". Start with a "**Title:**" line containing the words "case report".` +
+        `\n\nThe case notes:\n${(c.inputs.case || '').slice(0, 20000)}${notesLine(c.inputs.notes)}`,
+      maxTokens: format === 'standard' ? 4200 : 1800, grounded: true,
+    };
+  },
+  'clinical-audit': (c) => {
+    const report = c.inputs.stage === 'report';
+    const standard = c.inputs.standard?.trim() ? `\n\nThe standard, as the writer gives it:\n${c.inputs.standard.trim().slice(0, 6000)}` : '\n\nNo standard was given: base it on the sources, citing them, and say clearly that the team must confirm it against their local guideline.';
+    return {
+      user: (report
+        ? `Write the report of a completed clinical audit on "${c.inputs.topic}". ${headingsRule(c, 'Summary, Background, Standard and criteria (a table: criterion | target | exceptions | source), Method (sample, period, data source, data collection), Results (a table: criterion | target | achieved n/N (%) | met or not met), Discussion (why practice differed from the standard), Action plan (a table: action | owner | deadline), Re-audit (when and how the cycle will be closed)')} ` +
+          'Use only the results the writer gives below, exactly; compute nothing new except a percentage from a count they give; where a number is missing write a [placeholder]. Never invent results.'
+        : `Write the plan for a clinical audit on "${c.inputs.topic}". ${headingsRule(c, 'Title, Background and rationale, Aim and objectives, Standard (its source and wording), Criteria and targets (a table: criterion | target % | exceptions | how it is measured), Sample and period (with a sample size that is realistic for an audit), Data collection (a data collection form as a table of fields: field | how recorded | allowed values), Analysis, Dissemination and action, Re-audit, Approvals (audit registration with the clinical governance or audit department; research ethics is usually not needed for audit, but the team must follow local policy)')} ` +
+          'Write [placeholders] for local details the writer must add (team, ward, dates).') +
+        standard +
+        (report && c.inputs.results?.trim() ? `\n\nThe writer's data and results:\n${c.inputs.results.trim().slice(0, 20000)}` : report ? '\n\nThe writer gave no results: put [placeholders] in every result cell.' : '') +
+        notesLine(c.inputs.notes),
+      maxTokens: report ? 4500 : 3800, grounded: true,
+    };
+  },
+  'evaluation-report': (c) => {
+    const criteria: Record<string, string> = {
+      dac: 'one "###" subsection per OECD-DAC criterion: Relevance, Coherence, Effectiveness, Efficiency, Impact, Sustainability; under each, a short judgement and the evidence for it',
+      questions: 'one "###" subsection per evaluation question in the notes (or, if none are given, per main programme objective), each with the answer and the evidence',
+      logframe: 'subsections for Outputs, Outcomes and Impact, each with a table: indicator | baseline | target | achieved | comment, then the explanation',
+    };
+    return {
+      system: `${BASE} You write programme evaluation reports for ${reader(c)} and the people who commissioned the evaluation. ${language(c)} ` +
+        'Judgements must follow from the evidence given; say where evidence is weak or missing. Never invent data, indicator values, quotations, people consulted or sample sizes: use the writer’s material exactly, and write [placeholders] for what is missing. ' +
+        'Use plain, direct language; findings and recommendations should be specific enough to act on.',
+      user: `Write an evaluation report of about ${words(2500, c)} words for "${c.inputs.topic}". ${headingsRule(c, `Executive summary (one page: purpose, method in brief, main findings, main recommendations), Background and programme description, Evaluation purpose, scope and questions, Methodology (design, data sources, sampling, analysis, limitations and ethics), Findings (${criteria[c.inputs.framework] ?? criteria.dac}), Conclusions, Recommendations (a numbered table: recommendation | addressed to | priority | timeframe), Lessons learned, Annexes (a list of what should be attached)`)}` +
+        `\n\nAbout the programme:\n${(c.inputs.description || '').slice(0, 20000)}` +
+        (c.inputs.findings?.trim() ? `\n\nThe evaluation's data and findings:\n${c.inputs.findings.trim().slice(0, 40000)}` : '\n\nNo findings were given: write the structure with [placeholders] for every finding, and note what evidence each criterion needs.') +
+        notesLine(c.inputs.notes),
+      maxTokens: 6500,
+    };
+  },
+  'policy-brief': (c) => {
+    const audience: Record<string, string> = { government: 'government officials and ministers', legislators: 'legislators and their staff', agency: 'staff of an agency or international organisation', ngo: 'NGOs and advocates', public: 'the general public' };
+    const recommend = c.inputs.stance === 'recommend';
+    return {
+      user: `Write a policy brief of about ${words(1500, c)} words on "${c.inputs.topic}" for ${audience[c.inputs.audience] ?? audience.government}${c.inputs.context?.trim() ? `, for ${c.inputs.context.trim().slice(0, 200)}` : ''}. ` +
+        `${headingsRule(c, `Key messages (3–5 bullet points a busy reader can act on), The problem, What the evidence says, Policy options (a table: option | expected benefits | costs and risks | strength of evidence | what implementing it takes), ${recommend ? 'Recommendation (the option the evidence best supports, and why)' : 'Weighing the options (trade-offs, without choosing one)'}, Implementation considerations (feasibility, cost, equity, who must act), Evidence gaps`)} ` +
+        'Write for a non-specialist: short paragraphs, no jargon, numbers only from the sources or the writer. Say how strong and how transferable the evidence is; research from other settings may not apply directly. ' +
+        `Where local facts are needed (current policy, local figures, budgets) and not given, write a [placeholder].${notesLine(c.inputs.notes)}`,
+      maxTokens: 4200, grounded: true,
+    };
+  },
+  'annotated-bibliography': (c) => {
+    const size = { short: 60, long: 200 }[c.inputs.size] ?? 120;
+    const kind: Record<string, string> = {
+      descriptive: 'a descriptive annotation: what the source does, its method and main findings',
+      critical: 'a critical annotation: its argument or findings in brief, then the strengths and weaknesses of its method, evidence and reasoning',
+      combined: 'an annotation in three parts: a summary (aim, method, main findings), an evaluation (strengths and weaknesses), and its relevance to the topic',
+    };
+    return {
+      user: `Write an annotated bibliography on "${c.inputs.topic}" for ${reader(c)}. Start with a "## Introduction" paragraph on the scope and how the sources relate. ` +
+        `Then a "## Annotations" section with one entry for each relevant source (at least 8, ordered by theme or importance): a "###" heading that is the source's title exactly as listed, then ${kind[c.inputs.kind] ?? kind.combined}, about ${size} words, ending with the source's marker, e.g. [S4]. ` +
+        'Annotate only what the source listing shows (its abstract and details); if only the title is known, say so and skip that source. Skip sources that do not fit the topic. End with "## Gaps", two or three sentences on what these sources leave open.' +
+        notesLine(c.inputs.notes),
+      maxTokens: 6500, grounded: true,
+    };
+  },
+  'reading-prep': (c) => {
+    const depth = c.inputs.depth || 'standard';
+    return {
+      system: `${BASE} You help ${reader(c)} prepare for a seminar. ${language(c)} Work only from the readings given: summarise, analyse and question them; never attribute to them anything they do not say, and never invent page numbers. ` +
+        'When you point to a passage, name its section or quote a few words of it.',
+      user: `Prepare me for a seminar on these readings. ${headingsRule(c, `At a glance (a table: reading | main claim | evidence or method | key concepts), Reading by reading (a "###" subsection per reading: the argument in ${depth === 'quick' ? '2–3' : '4–6'} sentences, key terms defined, the strongest evidence, and weak points or assumptions to question), How the readings connect (agreements, tensions, what one adds to another)${depth === 'deep' ? ', Counter-arguments (the best objection to each main claim and how its author might reply)' : ''}, Discussion questions (${depth === 'quick' ? 3 : 6} open questions, each with what it tests), Points to raise (3 contributions I could make in class, each tied to a passage)`)}` +
+        `${notesLine(c.inputs.notes)}\n\nThe readings:\n${(c.inputs.text || '').slice(0, 140000)}`,
+      maxTokens: depth === 'deep' ? 6000 : depth === 'quick' ? 2500 : 4500,
+    };
+  },
 
   // ---------------------------------------------------------------- Thesis Suite
   question: (c) => ({
@@ -202,13 +302,22 @@ const BUILDERS: Record<string, Builder> = {
 
 export const hasStudioPrompt = (id: string) => Boolean(BUILDERS[id]);
 
+/** The earlier work, for modules that write from a topic (those that take the writer's text get it in the form instead). */
+function priorPart(context: StudioContext) {
+  const prior = context.prior?.markdown?.trim();
+  if (!prior) return '';
+  return `\n\nThis continues the writer's earlier work, "${context.prior!.title.slice(0, 160)}" (its source markers match the sources below). ` +
+    'Build on it: keep its findings, argument and citations, go further where the task asks, and do not contradict it unless a source does.\n' +
+    `<earlier_work>\n${prior.slice(0, 24000)}\n</earlier_work>`;
+}
+
 /** The messages and settings for one run of a module. */
 export function buildStudioPrompt(module: StudioModule, context: StudioContext): StudioPrompt {
   const built = BUILDERS[module.id](context);
   const cited = context.sources.length > 0;
   const system = built.system ?? `${BASE} Write for ${reader(context)}. ${language(context)}${cited ? ` ${CITE}` : ' Do not cite sources you were not given; where a claim needs a source, write [citation needed].'}`;
   return {
-    messages: [{ role: 'system', content: built.system && cited ? `${system} ${CITE}` : system }, { role: 'user', content: `${built.user}${sourcesPart(context)}` }],
+    messages: [{ role: 'system', content: built.system && cited ? `${system} ${CITE}` : system }, { role: 'user', content: `${built.user}${built.system ? '' : priorPart(context)}${sourcesPart(context)}` }],
     maxTokens: context.highQuality ? Math.round(built.maxTokens * 1.4) : built.maxTokens,
     task: context.highQuality || built.task === 'review' ? 'review' : 'fast',
     temperature: built.json ? 0.3 : 0.5,

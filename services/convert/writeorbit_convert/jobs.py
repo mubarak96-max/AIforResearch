@@ -171,7 +171,7 @@ def docx_to_pdf_job(data: bytes, extension: str) -> bytes:
         raise ConvertError(500, "PDF conversion failed")
 
 
-def pdf_text_job(data: bytes) -> bytes:
+def pdf_text_job(data: bytes, ocr_languages: str | None = None) -> bytes:
     """PDF -> {"pages": [...], "page_count", "title", "metadata"} as JSON bytes, via a bounded subprocess."""
     started = time.monotonic()
     with tempfile.TemporaryDirectory(prefix="writeorbit-convert-") as tmp:
@@ -180,6 +180,9 @@ def pdf_text_job(data: bytes) -> bytes:
             handle.write(data)
         # -P: don't put the working directory on sys.path.
         command = [sys.executable, "-P", "-m", "writeorbit_convert.pdftext", path]
+        if ocr_languages:
+            from .ocr import language_codes
+            command.append("+".join(language_codes(ocr_languages)))
         nice = shutil.which("nice")
         if nice:
             command = [nice, "-n", "10", *command]
@@ -198,3 +201,8 @@ def pdf_text_job(data: bytes) -> bytes:
         raise ConvertError(400, "This file could not be read as a PDF.")
     logger.info("PDF text: %d bytes of JSON in %.1fs", len(result.stdout), time.monotonic() - started)
     return result.stdout
+
+
+def ocr_capabilities_job() -> dict:
+    from .ocr import capabilities
+    return capabilities()

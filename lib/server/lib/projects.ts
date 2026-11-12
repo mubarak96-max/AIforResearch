@@ -9,10 +9,12 @@
  */
 import { HTTPException } from 'hono/http-exception';
 import type { AuthUser } from '../auth.js';
-import { C, col, db, newId, row, rows } from '../firebase.js';
+import { C, col, db, deleteDeep, newId, row, rows } from '../firebase.js';
+import { deletePrefix } from './storage.js';
 import { checkTotal } from './plans.js';
 import { mailReady, sendMail } from './mail.js';
 import { env } from '../env.js';
+import { detachMemberSources, detachProjectMatrices } from './matrix.js';
 
 export type ProjectRole = 'owner' | 'edit' | 'comment' | 'view';
 export type ProjectMember = { user_id: string | null; email: string; name: string | null; role: Exclude<ProjectRole, 'owner'>; added_at: Date };
@@ -21,7 +23,12 @@ export type Project = {
   members: ProjectMember[]; member_ids: string[]; invite_emails: string[]; created_at: Date; updated_at: Date;
 };
 
+// Per instance: forgetRoles clears only this process. Other instances may serve a role
+// for up to ROLE_CACHE_MS after a change, so the owner role is never cached — an ownership
+// transfer must take effect everywhere at once. Owner-only governance actions also use
+// getProjectFor (a fresh read) and re-check ownership inside their transactions.
 const roleCache = new Map<string, { role: ProjectRole | null; until: number }>();
+const ROLE_CACHE_MS = 10_000;
 
 /** The person's role on a project, or null when they are not on it. */
 export async function projectRole(projectId: string, user: Pick<AuthUser, 'id' | 'email'>): Promise<ProjectRole | null> {
@@ -33,12 +40,13 @@ export async function projectRole(projectId: string, user: Pick<AuthUser, 'id' |
   let role: ProjectRole | null = null;
   if (project?.owner_user_id === user.id) role = 'owner';
   else role = project?.members.find((member) => member.user_id === user.id)?.role ?? null;
-  roleCache.set(key, { role, until: Date.now() + 15_000 });
+  if (role !== 'owner') roleCache.set(key, { role, until: Date.now() + ROLE_CACHE_MS });
   return role;
 }
-const forgetRoles = (projectId: string) => { for (const key of roleCache.keys()) if (key.startsWith(`${projectId}:`)) roleCache.delete(key); };
+export const forgetRoles = (projectId: string) => { for (const key of roleCache.keys()) if (key.startsWith(`${projectId}:`)) roleCache.delete(key); };
 
 export async function getProjectFor(user: AuthUser, id: string, need: ProjectRole[] = ['owner', 'edit', 'comment', 'view']): Promise<Project & { role: ProjectRole }> {
+  if (!id || id.includes('/')) throw new HTTPException(404, { message: 'Project not found' });
   const project = row<Project>(await col(C.projects).doc(id).get());
   if (!project) throw new HTTPException(404, { message: 'Project not found' });
   const role = project.owner_user_id === user.id ? 'owner' : project.members.find((member) => member.user_id === user.id)?.role ?? null;
@@ -100,10 +108,18 @@ export async function updateProject(user: AuthUser, id: string, patch: { name?: 
 export async function deleteProject(user: AuthUser, id: string) {
   await getProjectFor(user, id, ['owner']);
   const tasks = await col(C.tasks).where('project_id', '==', id).get();
-  const batch = db().batch();
-  for (const task of tasks.docs) batch.update(task.ref, { project_id: null });
-  batch.delete(col(C.projects).doc(id));
-  await batch.commit();
+  for (let start = 0; start < tasks.docs.length; start += 400) {
+    const batch = db().batch();
+    for (const task of tasks.docs.slice(start, start + 400)) batch.update(task.ref, { project_id: null });
+    await batch.commit();
+  }
+  await detachProjectMatrices(id);
+  for (const collection of ['workflows', 'research_monitors', C.reviews]) {
+    const linked = await col(collection).where('project_id', '==', id).get();
+    for (const item of linked.docs) await item.ref.update({ project_id: null });
+  }
+  await deleteDeep(col(C.projects).doc(id));
+  await deletePrefix(`project-evidence/${id}`);
   forgetRoles(id);
 }
 
@@ -151,6 +167,9 @@ export async function removeMember(user: AuthUser, id: string, email: string) {
     updated_at: new Date(),
   });
   forgetRoles(id);
+  // Shared matrices must stop reading the departed person's Library.
+  const departed = project.members.find((member) => member.email === target)?.user_id;
+  if (departed && departed !== project.owner_user_id) await detachMemberSources(id, departed);
 }
 
 /** What the browser sees of a project. */

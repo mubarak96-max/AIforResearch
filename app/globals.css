@@ -80,6 +80,12 @@
   --m-on-ink: var(--color-on-ink);
 }
 
+:root {
+  /* Chart series in a fixed order (Data Lab survival curves), validated for colour-vision deficiency. */
+  --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; --series-4: #eda100;
+  --series-5: #e87ba4; --series-6: #008300; --series-7: #6250d6; --series-8: #e34948;
+}
+
 /*
  * Nocturne: the dark theme. Set by <html data-theme="dark"> (see components/theme).
  * Screen only, so printing a document always uses the light paper colours.
@@ -87,6 +93,8 @@
 @media screen {
   html[data-theme="dark"] {
     color-scheme: dark;
+    --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
+    --series-5: #d55181; --series-6: #008300; --series-7: #9085e9; --series-8: #e66767;
     --brand-rgb: 139, 156, 247;
 
     --color-brand: #8b9cf7;
@@ -159,6 +167,7 @@ body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 @keyframes wo-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 @keyframes wo-rise { from { opacity: 0; translate: 0 22px; } to { opacity: 1; translate: 0 0; } }
 @keyframes wo-blink { 50% { opacity: 0; } }
+@keyframes wo-pop { from { opacity: 0; transform: translateY(-4px) scale(0.98); } to { opacity: 1; transform: none; } }
 
 /* Autocomplete demo: the suggestion types in grey, Tab is pressed, it turns to ink and the source appears. */
 @keyframes wo-ac-word {

@@ -14,11 +14,16 @@ import { env } from '../env.js';
  *   its credits before it runs and gets them back when it fails (spendCredits / refundCredits).
  *   Top-up credits (bought once, kept 12 months) are used after the month's allowance.
  * - **Limits**: autocomplete is a count (it fires constantly), the Library and projects are
- *   totals, and some features are on or off per plan.
+ *   totals, and some features are on or off per plan. Deep and Detailed reports also have a daily
+ *   count and a cap on how many run at once (research_runs, research_parallel): a report runs for
+ *   minutes and reads hundreds of papers, so credits alone would let one account start dozens at
+ *   once.
  */
 export const LIMIT_DEFS = {
   credits: { kind: 'credits', label: 'Credits a month', noun: 'credits' },
   autocomplete: { kind: 'count', label: 'AI autocompletes', noun: 'AI autocompletes' },
+  research_runs: { kind: 'count', label: 'Deep and Detailed reports', noun: 'Deep and Detailed reports' },
+  research_parallel: { kind: 'total', label: 'Reports running at once', noun: 'reports running at once' },
   library_pdfs: { kind: 'total', label: 'PDFs in Library', noun: 'PDFs in your Library' },
   upload_mb: { kind: 'total', label: 'Largest PDF (MB)', noun: 'MB per PDF' },
   upload_batch: { kind: 'total', label: 'PDFs per upload', noun: 'PDFs at once' },
@@ -40,17 +45,17 @@ export const HARD_UPLOAD_MB = 100;
  * runs; a failed job is refunded. Keep in step with docs/redesign/03-pricing.md.
  */
 export const CREDIT_COSTS = {
-  /** A short cited answer (Deep Research, Summary depth). */
+  /** A short cited answer (Deep Research, Summary depth): plan, search, screen, rank, read, write, verify. */
   summary: 1,
   /** A chat message, a Chat with PDF question, an AI edit or a short rewrite. */
   chat: 1,
   ai_edit: 1,
   /** One editor check (claim check, proofread, tone, source quality). */
   review: 2,
-  /** A structured report from 20–40 papers. */
-  deep: 5,
-  /** A long report from 50+ papers with tables. Paid plans only. */
-  detailed: 20,
+  /** A 2,500 to 4,000-word report with figures: 5 sub-questions, about 250 papers screened, 45+ kept, 12 full texts, a gap round, every citation checked. */
+  deep: 15,
+  /** A 5,000 to 8,000-word report with figures and a study table: 7 sub-questions to review, citation chasing, 90+ papers, 25 full texts. Paid plans only. */
+  detailed: 45,
   /** A section, abstract, outline or gap analysis. */
   section: 3,
   /** A whole draft: paper, proposal or literature review (Write with AI counts here). */
@@ -60,6 +65,8 @@ export const CREDIT_COSTS = {
   review_standard: 10,
   review_high: 30,
   review_preview: 3,
+  /** A reporting-guideline check (CONSORT, STROBE, PRISMA, CARE …), per 10,000 words. */
+  guideline_check: 5,
   /** A slide deck. */
   slides: 10,
   /** An AI-written analysis in Data Lab (the statistics themselves are computed in the browser). */
@@ -78,6 +85,9 @@ export type Limits = {
   /** Credits a month; null is unlimited. */
   credits: number | null;
   autocomplete: CountLimit;
+  /** Deep and Detailed reports a day, and how many may run at once. */
+  research_runs: CountLimit;
+  research_parallel: number | null;
   library_pdfs: number | null;
   upload_mb: number | null;
   upload_batch: number | null;
@@ -93,9 +103,9 @@ export type Limits = {
 };
 
 export type FeatureKey = 'latex_export' | 'pptx_export' | 'zotero_import' | 'mendeley_import' | 'detailed_mode' | 'high_quality';
-type TotalKey = 'library_pdfs' | 'upload_mb' | 'upload_batch' | 'projects' | 'collaborators';
+type TotalKey = 'library_pdfs' | 'upload_mb' | 'upload_batch' | 'projects' | 'collaborators' | 'research_parallel';
 const FEATURE_KEYS: FeatureKey[] = ['latex_export', 'pptx_export', 'zotero_import', 'mendeley_import', 'detailed_mode', 'high_quality'];
-const TOTAL_KEYS: TotalKey[] = ['library_pdfs', 'upload_mb', 'upload_batch', 'projects', 'collaborators'];
+const TOTAL_KEYS: TotalKey[] = ['library_pdfs', 'upload_mb', 'upload_batch', 'projects', 'collaborators', 'research_parallel'];
 
 export type PlanRow = {
   id: string; name: string; tagline: string; sort_order: number; is_default: boolean; is_public: boolean; featured: boolean;
@@ -107,7 +117,7 @@ export type PlanFeature = { label: string; included: boolean };
 
 const UNLIMITED: CountLimit = { amount: null, per: 'month' };
 const UNLIMITED_LIMITS: Limits = {
-  credits: null, autocomplete: UNLIMITED, library_pdfs: null, upload_mb: null, upload_batch: null, projects: null, collaborators: null,
+  credits: null, autocomplete: UNLIMITED, research_runs: UNLIMITED, research_parallel: null, library_pdfs: null, upload_mb: null, upload_batch: null, projects: null, collaborators: null,
   latex_export: true, pptx_export: true, zotero_import: true, mendeley_import: true, detailed_mode: true, high_quality: true,
 };
 
@@ -115,17 +125,20 @@ const UNLIMITED_LIMITS: Limits = {
 export function normalizeLimits(raw: unknown): Limits {
   const value = (raw && typeof raw === 'object' ? raw : {}) as Record<string, any>;
   const whole = (item: unknown) => (item === null || item === undefined || item === '' ? null : Math.max(0, Math.floor(Number(item))));
-  const count = (key: 'autocomplete'): CountLimit => {
+  const count = (key: 'autocomplete' | 'research_runs'): CountLimit => {
     const item = value[key];
     if (!item || typeof item !== 'object') return UNLIMITED;
     const amount = whole(item.amount);
     return { amount: Number.isFinite(amount as number) || amount === null ? amount : null, per: item.per === 'day' ? 'day' : 'month' };
   };
-  const limits = { credits: whole(value.credits), autocomplete: count('autocomplete') } as Limits;
+  const limits = { credits: whole(value.credits), autocomplete: count('autocomplete'), research_runs: count('research_runs') } as Limits;
   for (const key of TOTAL_KEYS) limits[key] = whole(value[key]);
   for (const key of FEATURE_KEYS) limits[key] = value[key] === undefined ? true : Boolean(value[key]);
   return limits;
 }
+
+/** Team credits are per seat, pooled. */
+const TEAM_SEAT_CREDITS = 2000;
 
 /** The plans AI for Research sells: Free, Plus, Pro and Team. Prices in cents. */
 export const DEFAULT_PLANS: (Omit<PlanRow, 'dodo_monthly_product_id' | 'dodo_yearly_product_id' | 'dodo_mode' | 'limits'> & { limits: Limits; features: PlanFeature[] })[] = [
@@ -133,12 +146,13 @@ export const DEFAULT_PLANS: (Omit<PlanRow, 'dodo_monthly_product_id' | 'dodo_yea
     id: 'free', name: 'Free', tagline: 'Try every workspace', sort_order: 0, is_default: true, is_public: true, featured: false,
     checkout: 'self_serve', contact_url: null, monthly_cents: 0, yearly_cents: 0, currency: 'usd', trial_days: 0,
     limits: {
-      credits: 30, autocomplete: { amount: 10, per: 'day' }, library_pdfs: 25, upload_mb: 10, upload_batch: 5, projects: 1, collaborators: 1,
+      credits: 45, autocomplete: { amount: 10, per: 'day' }, research_runs: { amount: 2, per: 'day' }, research_parallel: 1, library_pdfs: 25, upload_mb: 10, upload_batch: 5, projects: 1, collaborators: 1,
       latex_export: false, pptx_export: false, zotero_import: false, mendeley_import: false, detailed_mode: false, high_quality: false,
     },
     features: [
-      { label: '30 credits a month for AI research, reviews and drafts', included: true },
-      { label: 'Summary and Deep research answers from every source', included: true },
+      { label: '45 credits a month for AI research, reviews and drafts', included: true },
+      { label: 'Summary answers and Deep reports with figures, each claim checked against its paper', included: true },
+      { label: '2 Deep reports a day, one at a time', included: true },
       { label: 'Unlimited paper search, filters and citations', included: true },
       { label: 'The full editor, 10 AI autocompletes a day', included: true },
       { label: '25 PDFs in your Library, 1 project', included: true },
@@ -151,16 +165,17 @@ export const DEFAULT_PLANS: (Omit<PlanRow, 'dodo_monthly_product_id' | 'dodo_yea
     id: 'plus', name: 'Plus', tagline: 'For students researching every week', sort_order: 1, is_default: false, is_public: true, featured: false,
     checkout: 'self_serve', contact_url: null, monthly_cents: 1200, yearly_cents: 9600, currency: 'usd', trial_days: 0,
     limits: {
-      credits: 500, autocomplete: { amount: 5000, per: 'month' }, library_pdfs: null, upload_mb: 50, upload_batch: 20, projects: 10, collaborators: 3,
+      credits: 750, autocomplete: { amount: 5000, per: 'month' }, research_runs: { amount: 15, per: 'day' }, research_parallel: 1, library_pdfs: null, upload_mb: 50, upload_batch: 20, projects: 10, collaborators: 3,
       latex_export: true, pptx_export: true, zotero_import: true, mendeley_import: true, detailed_mode: true, high_quality: false,
     },
     features: [
-      { label: '500 credits a month', included: true },
-      { label: 'Detailed reports from 50+ papers', included: true },
+      { label: '750 credits a month', included: true },
+      { label: 'Detailed reports from 90+ papers with figures and a study table: review the plan first', included: true },
+      { label: '15 Deep or Detailed reports a day, one at a time', included: true },
       { label: '5,000 AI autocompletes a month', included: true },
       { label: 'Unlimited PDFs in your Library, up to 50 MB each', included: true },
       { label: '10 projects, 3 people on each', included: true },
-      { label: 'Zotero and Mendeley sync', included: true },
+      { label: 'Zotero and Mendeley import and updates', included: true },
       { label: 'Word, PDF, LaTeX and PowerPoint export', included: true },
     ],
   },
@@ -168,12 +183,13 @@ export const DEFAULT_PLANS: (Omit<PlanRow, 'dodo_monthly_product_id' | 'dodo_yea
     id: 'pro', name: 'Pro', tagline: 'For theses, reviews and papers', sort_order: 2, is_default: false, is_public: true, featured: true,
     checkout: 'self_serve', contact_url: null, monthly_cents: 2900, yearly_cents: 22800, currency: 'usd', trial_days: 0,
     limits: {
-      credits: 1500, autocomplete: { amount: 20000, per: 'month' }, library_pdfs: null, upload_mb: 100, upload_batch: 50, projects: null, collaborators: 10,
+      credits: 1500, autocomplete: { amount: 20000, per: 'month' }, research_runs: { amount: 40, per: 'day' }, research_parallel: 3, library_pdfs: null, upload_mb: 100, upload_batch: 50, projects: null, collaborators: 10,
       latex_export: true, pptx_export: true, zotero_import: true, mendeley_import: true, detailed_mode: true, high_quality: true,
     },
     features: [
       { label: 'Everything in Plus', included: true },
       { label: '1,500 credits a month', included: true },
+      { label: '40 Deep or Detailed reports a day, 3 at once', included: true },
       { label: 'High-quality mode for reports and reviews', included: true },
       { label: '20,000 AI autocompletes a month', included: true },
       { label: 'Unlimited projects, 10 people on each', included: true },
@@ -184,10 +200,11 @@ export const DEFAULT_PLANS: (Omit<PlanRow, 'dodo_monthly_product_id' | 'dodo_yea
   {
     id: 'team', name: 'Team', tagline: 'For labs, departments and writing groups', sort_order: 3, is_default: false, is_public: true, featured: false,
     checkout: 'contact', contact_url: env.supportEmail ? `mailto:${env.supportEmail}?subject=AI for Research%20Team` : null, monthly_cents: 0, yearly_cents: 0, currency: 'usd', trial_days: 0,
-    limits: { ...UNLIMITED_LIMITS, credits: 2000 * 3 },
+    limits: { ...UNLIMITED_LIMITS, credits: TEAM_SEAT_CREDITS * 3, research_runs: { amount: 100, per: 'day' }, research_parallel: 10 },
     features: [
       { label: 'Everything in Pro for each member', included: true },
       { label: '2,000 credits a seat a month, pooled', included: true },
+      { label: '100 Deep or Detailed reports a day, 10 at once', included: true },
       { label: 'Shared projects and Library', included: true },
       { label: 'One invoice, from 3 seats', included: true },
       { label: 'Onboarding and priority support', included: true },
@@ -267,7 +284,7 @@ export async function effectivePlan(accountId: string): Promise<{ plan: PlanRow;
   const plan = chosen ?? fallback;
   // No plans at all (a fresh install before seeding): nothing is limited.
   const limits = plan ? normalizeLimits(plan.limits) : UNLIMITED_LIMITS;
-  if (plan?.id === 'team' && limits.credits !== null) limits.credits = 2000 * Math.max(3, account?.team_seats || 3);
+  if (plan?.id === 'team' && limits.credits !== null) limits.credits = TEAM_SEAT_CREDITS * Math.max(3, account?.team_seats || 3);
   return { plan, limits, account };
 }
 
@@ -321,7 +338,7 @@ export async function creditSummary(accountId: string) {
   const { plan, limits, account } = await effectivePlan(accountId);
   const month = periodOf('month');
   const usage = await usageRef(accountId, 'credits', month).get();
-  const used = usage.exists ? Number(usage.get('amount') ?? 0) : 0;
+  const used = usage.exists ? Number(usage.get('amount') ?? 0) || 0 : 0;
   const topup = account?.credit_topup ?? 0;
   const allowance = limits.credits;
   const left = allowance === null ? null : Math.max(0, allowance - used) + topup;
@@ -393,9 +410,9 @@ export function creditCost(action: CreditAction, options: { highQuality?: boolea
 
 // ------------------------------------------------------------------ counts, totals, features
 
-type CountKey = 'autocomplete';
+type CountKey = 'autocomplete' | 'research_runs';
 
-/** Refuses (402) when autocomplete is used up; returns what is left (null: unlimited). */
+/** Refuses (402) when a daily or monthly count (autocomplete, reports) is used up; returns what is left (null: unlimited). */
 export async function checkQuota(accountId: string, key: CountKey): Promise<number | null> {
   const { plan, limits } = await effectivePlan(accountId);
   const limit = limits[key];
@@ -414,6 +431,19 @@ export async function countUse(accountId: string, key: string, amount = 1) {
     batch.set(usageRef(accountId, key, period), { key, period, amount: increment(amount) }, { merge: true });
   }
   await batch.commit();
+}
+
+/** Refuses (402) one more report while the plan's reports-at-once are all running. */
+export async function checkRunning(accountId: string, running: number) {
+  const { plan, limits } = await effectivePlan(accountId);
+  const limit = limits.research_parallel;
+  if (limit === null || running < limit) return;
+  throw new PlanLimitError(
+    limit === 1
+      ? `A report is already running. Your ${plan.name} plan runs one at a time; wait for it to finish, or upgrade to run several at once.`
+      : `${limit} reports are already running, the most your ${plan.name} plan runs at once. Wait for one to finish, or upgrade for more.`,
+    'research_parallel', plan.id,
+  );
 }
 
 /** Refuses (402) a feature the plan does not include. */
@@ -470,7 +500,7 @@ export async function usageSummary(accountId: string) {
   const auto = await usageRef(accountId, 'autocomplete', periodOf(limits.autocomplete.per)).get();
   const counts = [
     { key: 'credits', label: LIMIT_DEFS.credits.label, used: credits.used, limit: limits.credits, per: 'month' as const },
-    { key: 'autocomplete', label: LIMIT_DEFS.autocomplete.label, used: auto.exists ? Number(auto.get('amount') ?? 0) : 0, limit: limits.autocomplete.amount, per: limits.autocomplete.per },
+    { key: 'autocomplete', label: LIMIT_DEFS.autocomplete.label, used: auto.exists ? Number(auto.get('amount') ?? 0) || 0 : 0, limit: limits.autocomplete.amount, per: limits.autocomplete.per },
   ];
   return { plan, limits, account, counts, credits };
 }
@@ -489,7 +519,7 @@ export function publicPlan(plan: PlanRow, features: PlanFeature[]) {
 
 /** What the old per-feature allowances cost now, in credits. */
 const LEGACY_KEYS = { chat: 'chat', ai_edit: 'ai_edit', review: 'review', write: 'write' } as const;
-type QuotaKey = CountKey | keyof typeof LEGACY_KEYS;
+type QuotaKey = 'autocomplete' | keyof typeof LEGACY_KEYS;
 
 /**
  * Route guard for a metered action. Autocomplete is a count; every other key takes credits

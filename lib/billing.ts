@@ -8,7 +8,7 @@ import { api } from '@/lib/session';
 export type Interval = 'month' | 'year';
 export type CountLimit = { amount: number | null; per: 'day' | 'month' };
 export type PlanLimits = {
-  credits: number | null; autocomplete: CountLimit; library_pdfs: number | null; upload_mb: number | null; projects: number | null;
+  credits: number | null; autocomplete: CountLimit; research_runs: CountLimit; research_parallel: number | null; library_pdfs: number | null; upload_mb: number | null; projects: number | null;
   collaborators: number | null; latex_export: boolean; pptx_export: boolean; zotero_import: boolean; mendeley_import: boolean;
   detailed_mode: boolean; high_quality: boolean;
 };

@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { LuExternalLink, LuLoader, LuSearch } from 'react-icons/lu';
 import {
-  connectZoteroKey, disconnectReferenceManager, getLibraryConnections, getReferenceCollections, startReferenceImport, startReferenceSignIn,
+  connectZoteroKey, disconnectReferenceManager, getLibraryConnections, getReferenceCollections, getZoteroGroups, startReferenceImport, startReferenceSignIn,
   type LibraryConnections, type ReferenceCollection, type ReferenceProvider,
 } from '../../../utils/libraryApi';
 import { FindPdfs, ImportProgress, UpgradeCard, plural, useImportJob } from './LibraryImportParts';
@@ -77,6 +77,7 @@ function Connect({ provider, signIn, onConnected }: { provider: ReferenceProvide
           <ol className="mt-1.5 list-decimal pl-5 text-[13.5px] leading-relaxed text-ink-3">
             <li><a href={ZOTERO_NEW_KEY} target="_blank" rel="noreferrer" className="font-semibold text-[var(--theme-primary,var(--color-brand))] hover:underline">Create a key on zotero.org<LuExternalLink className="ml-1 inline h-3 w-3" /></a> with library access (it is filled in for you).</li>
             <li>Save it, copy the key and paste it here.</li>
+            <li>For group imports, explicitly grant read access to the groups you choose. Write access is not needed.</li>
           </ol>
           <div className="mt-3 flex flex-wrap gap-2">
             <input value={key} onChange={(event) => setKey(event.target.value)} placeholder="Zotero API key" aria-label="Zotero API key" spellCheck={false} autoComplete="off"
@@ -101,6 +102,10 @@ function Collections({ provider, accountName, folderId, onDisconnected, onChange
   const [libraryItems, setLibraryItems] = useState<number | null>(null);
   const [choice, setChoice] = useState<string>('');
   const [query, setQuery] = useState('');
+  const [groupId, setGroupId] = useState('');
+  const [groups, setGroups] = useState<{ id: string; name: string }[] | null>(null);
+  const [groupWarning, setGroupWarning] = useState<string | null>(null);
+  const [groupsBusy, setGroupsBusy] = useState(false);
   const [findPdfs, setFindPdfs] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -108,10 +113,20 @@ function Collections({ provider, accountName, folderId, onDisconnected, onChange
   useEffect(() => { if (job && job.status !== 'running') onChanged(); }, [job, onChanged]);
 
   useEffect(() => {
-    getReferenceCollections(provider)
-      .then((result) => { setCollections(result.collections); setLibraryItems(result.library_items); })
-      .catch((caught) => setError((caught as Error).message));
-  }, [provider]);
+    let active = true;
+    setCollections(null); setChoice(''); setQuery(''); setError(null);
+    getReferenceCollections(provider, groupId || null)
+      .then((result) => { if (active) { setCollections(result.collections); setLibraryItems(result.library_items); } })
+      .catch((caught) => { if (active) setError((caught as Error).message); });
+    return () => { active = false; };
+  }, [provider, groupId]);
+
+  const readGroups = async () => {
+    setGroupsBusy(true); setGroupWarning(null);
+    try { const result = await getZoteroGroups(); setGroups(result.groups); setGroupWarning(result.warning); }
+    catch (caught) { setGroupWarning((caught as Error).message); }
+    finally { setGroupsBusy(false); }
+  };
 
   // Nested collections listed under their parent.
   const ordered = useMemo(() => {
@@ -130,7 +145,7 @@ function Collections({ provider, accountName, folderId, onDisconnected, onChange
     setBusy(true); setError(null);
     const picked = collections?.find((item) => item.id === choice) ?? null;
     try {
-      const started = await startReferenceImport(provider, { collection: picked?.id ?? null, collection_name: picked?.name ?? null, folder_id: folderId, find_pdfs: findPdfs });
+      const started = await startReferenceImport(provider, { collection: picked?.id ?? null, collection_name: picked?.name ?? null, folder_id: folderId, find_pdfs: findPdfs, ...(provider === 'zotero' && groupId ? { group_id: groupId } : {}) });
       follow(started.job_id);
     } catch (caught) { setError((caught as Error).message); } finally { setBusy(false); }
   };
@@ -154,6 +169,12 @@ function Collections({ provider, accountName, folderId, onDisconnected, onChange
         <span className="min-w-0 flex-1 truncate">Connected{accountName ? ` as ${accountName}` : ''}</span>
         <button type="button" onClick={() => void disconnect()} className="shrink-0 text-[13px] font-medium text-muted hover:text-[#dc2626]">Disconnect</button>
       </div>
+      {provider === 'zotero' && <div className="space-y-2">
+        <button type="button" disabled={groupsBusy} onClick={() => void readGroups()} className="text-[13px] font-medium text-brand hover:underline disabled:opacity-50">{groupsBusy ? 'Reading group permissions…' : groups ? 'Refresh available groups' : 'Choose a group library'}</button>
+        {groups && <label className="block text-[13px] font-medium text-ink">Zotero library<select value={groupId} onChange={(event) => setGroupId(event.target.value)} className="mt-1 block h-10 w-full rounded-lg border border-line bg-surface px-3 text-[14px]"><option value="">Personal library</option>{groups.map((group) => <option key={group.id} value={group.id}>{group.name}</option>)}</select></label>}
+        {groupWarning && <p className="text-[12.5px] text-muted">{groupWarning}</p>}
+        {groupId && <p className="text-[12.5px] text-muted">Read-only import from the selected group. Permissions are checked again when importing; nothing is written back.</p>}
+      </div>}
       {!collections && !error && <p className="flex items-center gap-2 text-[13.5px] text-muted"><LuLoader className="h-4 w-4 animate-spin" />Reading your {name} collections…</p>}
       {collections && (
         <>
@@ -165,13 +186,13 @@ function Collections({ provider, accountName, folderId, onDisconnected, onChange
             </div>
           )}
           <div className="max-h-[300px] overflow-y-auto rounded-xl border border-line p-1.5" role="radiogroup" aria-label={`What to import from ${name}`}>
-            {!query && option('', `Whole ${name} library`, libraryItems)}
+            {!query && option('', groupId ? 'Whole selected group library' : `Whole ${name} library`, libraryItems)}
             {ordered.map((item) => option(item.id, item.name, item.items, item.depth))}
             {collections.length === 0 && <p className="px-3 py-2 text-[13px] text-subtle">No collections: the whole library is imported.</p>}
           </div>
-          <p className="text-[12.5px] text-muted">{choice && !folderId ? 'It becomes a Library collection with the same name. ' : ''}Items already in your Library are skipped.</p>
+          <p className="text-[12.5px] text-muted">{choice && !folderId ? 'It becomes a Library collection with the same name. ' : ''}Import again to update unchanged reference fields from this account. Your local edits and PDFs stay intact. Nothing is written back to {name}.</p>
           <FindPdfs value={findPdfs} onChange={setFindPdfs} />
-          <div><button type="button" className={primary} disabled={busy} onClick={() => void start()}>{busy && <LuLoader className="h-4 w-4 animate-spin" />}Import from {name}</button></div>
+          <div><button type="button" className={primary} disabled={busy} onClick={() => void start()}>{busy && <LuLoader className="h-4 w-4 animate-spin" />}Import or update from {name}</button></div>
         </>
       )}
       {error && <p role="alert" className="text-[13px] text-[#dc2626]">{error}</p>}

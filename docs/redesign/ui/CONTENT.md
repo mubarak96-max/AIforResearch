@@ -13,7 +13,7 @@ The three style proposals (A, B, C) show the same product, the same navigation n
 
 1. **Hero.** One h1, one supporting sentence, and the working **Ask box**:
    - a text field ("Ask a research question"), sample question *Does sleep after learning improve memory consolidation?*
-   - mode switch: **Summary** (a short cited answer, 1 credit) · **Deep** (a structured report from 20–40 papers, 5 credits) · **Detailed** (a long report with tables from 50+ papers, 20 credits)
+   - mode switch: **Summary** (a short cited answer, 1 credit) · **Deep** (a structured report from 20–40 papers, 7 credits) · **Detailed** (a long report with tables from 50+ papers, the plan reviewed first, 25 credits)
    - source switch: All papers · Medical (PubMed) · Web · My Library
    - "Attach PDF" (also .doc, .docx, .md, .txt), and the Ask button
    - Headline options (pick or write one, two lines at most): "Research with real sources" · "Ask. Read. Write. Defend."

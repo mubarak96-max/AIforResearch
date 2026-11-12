@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-  LuArrowRight, LuChartBar, LuClipboardCheck, LuFileText, LuGraduationCap, LuListChecks, LuNotebookPen, LuPresentation, LuSearch, LuSparkles, LuWandSparkles,
+  LuArrowRight, LuChartBar, LuClipboardCheck, LuFileText, LuGraduationCap, LuListChecks, LuNotebookPen, LuNotebookTabs, LuPresentation, LuSearch, LuSparkles, LuWandSparkles,
 } from 'react-icons/lu';
 import { AppFrame } from '@/components/app/AppFrame';
 import { Card } from '@/components/app/ui';
@@ -14,6 +14,7 @@ import { useCredits } from '@/lib/billing';
 import { AskComposer, type AskRequest } from '@/components/app/research/AskComposer';
 import { ROLE_OPTIONS } from '@/components/app/research/parts';
 import { KIND_LABELS, PENDING_KEY, taskHref, type TaskRecord } from '@/components/app/research/handoff';
+import { HomeWorkbooks } from '@/components/app/workflows/HomeWorkbooks';
 
 /** The quick tasks under the Ask box (the follow-on tools of every result, as starting points). */
 const TASKS = [
@@ -27,6 +28,7 @@ const TASKS = [
   { label: 'Systematic review', href: '/systematic-review', icon: LuListChecks },
   { label: 'Make slides', href: '/slides', icon: LuPresentation },
   { label: 'Analyse data', href: '/data-lab', icon: LuChartBar },
+  { label: 'Plan a deliverable', href: '/workbooks?new=1', icon: LuNotebookTabs },
 ];
 
 /** First visit: three seconds to say who you are, so every workspace starts at the right level. */
@@ -104,6 +106,7 @@ function Home() {
             <h2 id="continue-title" className="text-[15px] font-bold text-ink">Continue</h2>
             <Link href="/history" className="text-[13.5px] font-semibold text-brand hover:underline">All history</Link>
           </div>
+          <HomeWorkbooks />
           {tasks === null && <p className="mt-3 text-[14px] text-muted">Loading…</p>}
           {tasks?.length === 0 && (
             <Card className="mt-2.5 px-5 py-6">

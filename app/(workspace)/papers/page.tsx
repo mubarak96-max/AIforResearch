@@ -3,8 +3,10 @@
 import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { LuSearch, LuShare2 } from 'react-icons/lu';
+import { LuArrowUpDown, LuSearch, LuShare2 } from 'react-icons/lu';
+import { Select } from '@/components/app/research/controls';
 import { AppFrame } from '@/components/app/AppFrame';
+import { SourcesNav } from '@/components/app/SourcesNav';
 import { Button, Card } from '@/components/app/ui';
 import { useSignedIn } from '@/components/app/useSignedIn';
 import { api } from '@/lib/session';
@@ -62,6 +64,7 @@ function FindPapers() {
 
   return (
     <AppFrame wide title="Find Papers" subtitle="Search papers, PubMed, preprints, the web and your Library at once, with filters for year, study type and journal.">
+      <SourcesNav />
       <form onSubmit={(event) => { event.preventDefault(); search(25); }} className="flex gap-2">
         <label htmlFor="paper-query" className="sr-only">Search</label>
         <div className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-xl border border-line bg-surface px-3 focus-within:border-brand">
@@ -92,11 +95,8 @@ function FindPapers() {
                 {result.papers.length ? `${result.papers.length} papers` : 'No papers'}{searched.length ? ` from ${searched.join(', ')}` : ''}
                 {result.errors.length ? ` · ${result.errors.map((error) => PROVIDERS[error.provider] || error.provider).join(', ')} did not answer` : ''}
               </p>
-              <select aria-label="Sort" value={sort} onChange={(event) => setSort(event.target.value as typeof sort)} className="h-9 rounded-[10px] border border-line bg-surface px-2 text-[14px]">
-                <option value="relevance">Most relevant</option>
-                <option value="cited">Most cited</option>
-                <option value="newest">Newest</option>
-              </select>
+              <Select label="Sort" prefix="Sort" icon={<LuArrowUpDown />} align="right" value={sort} onChange={(next) => setSort(next as typeof sort)}
+                options={[{ value: 'relevance', label: 'Most relevant' }, { value: 'cited', label: 'Most cited' }, { value: 'newest', label: 'Newest' }]} />
               {result.papers.length > 0 && (
                 <Link href={`/deep-research?q=${encodeURIComponent(query.trim())}`} className="inline-flex h-9 items-center gap-1.5 rounded-[10px] border border-line px-3 text-[14px] font-semibold text-ink-2 hover:bg-soft">
                   <LuShare2 className="h-4 w-4" aria-hidden="true" />Ask about these

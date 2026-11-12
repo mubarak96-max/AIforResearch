@@ -28,6 +28,7 @@ export type PublicUser = {
 export type UserDoc = AuthUser & {
   email_verified_at: Date | null; disabled_at: Date | null; created_at: Date; last_seen_at: Date | null;
   newsletter_opt_out?: boolean; newsletter_dirty?: boolean; newsletter_synced?: string | null;
+  deletion_pending_at?: Date | null;
   profile?: Partial<ResearchProfile>;
 };
 
@@ -53,10 +54,17 @@ export async function researchProfile(userId: string): Promise<ResearchProfile> 
   return { ...EMPTY_PROFILE, ...(doc?.profile ?? {}) };
 }
 
-export async function activeUser(id: string): Promise<AuthUser | null> {
+/** The person as stored, or null when missing or disabled; `deletionPending` marks an account being deleted. */
+export async function accountState(id: string): Promise<{ user: AuthUser; deletionPending: boolean } | null> {
   const doc = await getRow<UserDoc>(C.users, id);
   if (!doc || doc.disabled_at) return null;
-  return toAuthUser(doc);
+  return { user: toAuthUser(doc), deletionPending: Boolean(doc.deletion_pending_at) };
+}
+
+/** A person who may use the app: not disabled and not in the middle of account deletion. */
+export async function activeUser(id: string): Promise<AuthUser | null> {
+  const state = await accountState(id);
+  return state && !state.deletionPending ? state.user : null;
 }
 
 export async function userByEmail(email: string): Promise<UserDoc | null> {
@@ -100,7 +108,7 @@ export async function ensureUser(token: DecodedIdToken): Promise<AuthUser | null
     const existing = await tx.get(ref);
     if (existing.exists) {
       const data = existing.data() as UserDoc;
-      if (data.disabled_at) return null;
+      if (data.disabled_at || data.deletion_pending_at) return null;
       return toAuthUser({ ...data, id: existing.id });
     }
     const accountId = newId();

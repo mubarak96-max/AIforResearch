@@ -217,6 +217,8 @@ export default function LibraryPanel({ onCite, onAsk, citing, visible = true }: 
             const processing = ['pending', 'processing', 'reprocessing'].includes(String(document.processing_status));
             const failed = String(document.processing_status) === 'failed';
             const isPdf = /pdf/i.test(String(document.file_type || document.filename || ''));
+            const extractionWarnings = Array.isArray(document.metadata?.extraction_warnings) ? document.metadata.extraction_warnings.filter((value): value is string => typeof value === 'string') : [];
+            const importConflicts = Array.isArray(document.metadata?.import_conflicts) ? document.metadata.import_conflicts.filter((value): value is { field: string; local: unknown; incoming: unknown } => Boolean(value && typeof value === 'object' && typeof value.field === 'string')) : [];
             // "Diekelmann, Susanne" and "Susanne Diekelmann" both give "Diekelmann".
             const surname = (name: string) => (name.includes(',') ? name.split(',')[0].trim() : name.trim().split(/\s+/).pop() || name);
             const authorLabel = authors.length
@@ -247,6 +249,7 @@ export default function LibraryPanel({ onCite, onAsk, citing, visible = true }: 
                     ) : failed ? (
                       <span className="mt-1 inline-flex rounded-md bg-[#fef2f2] px-1.5 py-0.5 text-[11.5px] font-medium text-[#b91c1c]">Could not read</span>
                     ) : null}
+                    {(extractionWarnings.length > 0 || importConflicts.length > 0) && <span className="mt-1 inline-flex rounded-md bg-[#fffbeb] px-1.5 py-0.5 text-[11.5px] font-medium text-[#b45309]">{extractionWarnings.length ? 'Check extracted text' : 'Local edits preserved'}</span>}
                     {(document as { folder_id?: string | null }).folder_id && !folderId ? (
                       <span className="mt-1 inline-flex max-w-full items-center gap-1 rounded-md border border-line px-1.5 py-0.5 text-[11.5px] text-ink-3">
                         <LuFolder className="h-3 w-3 shrink-0 text-[var(--theme-primary,var(--color-brand))]" />
@@ -258,6 +261,8 @@ export default function LibraryPanel({ onCite, onAsk, citing, visible = true }: 
                     <div className="mt-2 space-y-1.5 text-[13px] text-ink-2">
                       {document.publisher ? <p className="text-[12.5px] italic text-muted">{document.publisher}</p> : null}
                       {document.abstract ? <p className="leading-[1.5]">{document.abstract}</p> : <p className="text-muted">No abstract.</p>}
+                      {extractionWarnings.length > 0 && <details className="text-[#b45309]"><summary className="cursor-pointer">Text extraction notes</summary><ul className="mt-1 list-disc space-y-1 pl-4">{extractionWarnings.map((warning, at) => <li key={at}>{warning}</li>)}</ul></details>}
+                      {importConflicts.length > 0 && <details><summary className="cursor-pointer text-[#b45309]">Compare imported values with your saved values</summary><p className="mt-1 text-muted">Your saved values are retained. Changed DOI identities require a separate reference.</p><dl className="mt-2 space-y-2">{importConflicts.map((conflict, at) => <div key={at}><dt className="font-medium">{conflict.field.replaceAll('_', ' ')}</dt><dd className="break-words">Saved: {Array.isArray(conflict.local) ? conflict.local.join('; ') : String(conflict.local ?? 'Empty')}</dd><dd className="break-words text-muted">Imported: {Array.isArray(conflict.incoming) ? conflict.incoming.join('; ') : String(conflict.incoming ?? 'Empty')}</dd></div>)}</dl></details>}
                       {document.doi ? (
                         <button
                           type="button"

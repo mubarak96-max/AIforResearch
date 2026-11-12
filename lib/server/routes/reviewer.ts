@@ -3,7 +3,8 @@
  *   POST /review      Reviewer: a thesis, proposal or manuscript reviewed at a level (credits per 10,000 words)
  *   POST /claims      Claim check: each claim in a paragraph against papers (CREDIT_COSTS.review)
  *   POST /citations   Citation check: every reference looked up, retractions flagged (free; the AI support check costs CREDIT_COSTS.review)
- * Every run is saved in History (kinds review, claim_check, citation_check).
+ *   POST /guidelines  Reporting-guideline check: every item of CONSORT, STROBE, PRISMA … (CREDIT_COSTS.guideline_check per 10,000 words)
+ * Every run is saved in History (kinds review, claim_check, citation_check, guideline_check).
  */
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -17,6 +18,8 @@ import { createTask, failTask, finishTask } from '../lib/history.js';
 import { resolveAccess } from '../lib/access.js';
 import { CHECKS, DOC_TYPES, LEVELS, PREVIEW_WORDS, countWords, referenceSection, runClaimCheck, runReview, splitClaims } from '../lib/reviewer.js';
 import { checkReference, checkSupport, citationSummary, mapLimit, splitReferences, type ReferenceInput } from '../lib/reviewerCitations.js';
+import { GUIDELINE_MAX_WORDS, runGuidelineCheck } from '../lib/guidelineCheck.js';
+import { GUIDELINE_IDS } from '../../reportingGuidelines.js';
 
 const MAX_WORDS = 150_000;
 
@@ -72,6 +75,20 @@ const CitationsRequest = z.object({
   title: z.string().max(200).optional(),
   project_id: z.string().max(64).nullish(),
 });
+
+const GuidelinesRequest = z.object({
+  guideline: z.enum(GUIDELINE_IDS),
+  text: z.string().max(1_500_000).optional(),
+  document_id: z.string().max(64).optional(),
+  title: z.string().max(200).optional(),
+  language: z.string().max(40).nullish(),
+  project_id: z.string().max(64).nullish(),
+});
+
+/** What a guideline check costs: per 10,000 words checked (at most GUIDELINE_MAX_WORDS are read). */
+export function guidelineCredits(words: number) {
+  return creditCost('guideline_check', { units: Math.max(1, Math.ceil(Math.min(words, GUIDELINE_MAX_WORDS) / 10_000)) });
+}
 
 /** What a review costs: the preview a flat price; otherwise per 10,000 words. */
 export function reviewCredits(words: number, quality: 'standard' | 'high', preview: boolean) {
@@ -139,6 +156,39 @@ export function reviewerRoutes(slots: Slots) {
       await finishTask(taskId, saved);
       charge = null;
       return c.json({ task_id: taskId, credits, ...saved });
+    } catch (error) {
+      if (taskId) await failTask(taskId, (error as Error)?.message || 'failed');
+      throw failure(error);
+    } finally {
+      await refundCredits(charge);
+    }
+  });
+
+  app.post('/guidelines/quote', async (c) => {
+    const body = await parseBody(c, z.object({ words: z.number().int().min(0).max(MAX_WORDS * 2) }));
+    return c.json({ credits: guidelineCredits(body.words), max_words: GUIDELINE_MAX_WORDS });
+  });
+
+  app.post('/guidelines', async (c) => {
+    const user = currentUser(c);
+    const body = await parseBody(c, GuidelinesRequest);
+    llmReady();
+    let { text = '', title = '' } = body;
+    if (body.document_id) ({ text, title } = { ...(await documentText(user, body.document_id)), ...(body.title ? { title: body.title } : {}) });
+    const words = countWords(text);
+    if (words < 300) throw new HTTPException(422, { message: 'Add the manuscript (at least 300 words) to check it against a guideline.' });
+    if (words > MAX_WORDS) throw new HTTPException(413, { message: `Documents can be up to ${MAX_WORDS.toLocaleString('en-US')} words.` });
+    const credits = guidelineCredits(words);
+    let charge: CreditCharge | null = await spendCredits(user.account_id, credits, 'This guideline check');
+    let taskId: string | null = null;
+    try {
+      taskId = await createTask(user, { kind: 'guideline_check', module: body.guideline, title: title || 'Untitled manuscript', project_id: body.project_id ?? null, credits, inputs: { guideline: body.guideline, words, document_id: body.document_id ?? null } });
+      const usage: LlmUsage = { inputTokens: 0, outputTokens: 0 };
+      const result = await runGuidelineCheck(slots.llm, { guideline: body.guideline, text, title, language: body.language }, usage);
+      await meter(user, usage, `reviewer:guideline:${body.guideline}`);
+      await finishTask(taskId, result);
+      charge = null;
+      return c.json({ task_id: taskId, credits, ...result });
     } catch (error) {
       if (taskId) await failTask(taskId, (error as Error)?.message || 'failed');
       throw failure(error);

@@ -2,11 +2,11 @@ import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 import { env } from '../env.js';
-import { bearer, decodeToken, forgetUser, requireUser, type AppVariables } from '../auth.js';
+import { bearer, decodeToken, forgetUser, requireUser, requireUserForDeletion, type AppVariables } from '../auth.js';
 import { adminAuth, C, col, getRow } from '../firebase.js';
 import { rateLimit } from '../lib/rateLimit.js';
 import { requireAppCheck } from '../lib/appCheck.js';
-import { METHODS, PROVIDER_IDS, PROVIDERS, type Provider } from '../lib/signin.js';
+import { institutionalProviders, METHODS, PROVIDER_IDS, PROVIDERS, type Provider } from '../lib/signin.js';
 import { RESEARCH_ROLES, publicUser, signedIn, userByEmail, type UserDoc } from '../lib/users.js';
 import { forgetLegacyPassword, legacyPassword, verifyLegacyPassword } from '../lib/legacyPasswords.js';
 import { deleteUserData } from '../lib/accountDeletion.js';
@@ -34,7 +34,7 @@ export function authRoutes() {
   const app = new Hono<{ Variables: AppVariables }>();
 
   /** password_reset: Firebase sends reset links itself, so "Forgot password?" always works. */
-  app.get('/methods', (c) => c.json({ ...METHODS, password_reset: true, support_email: env.supportEmail || null }));
+  app.get('/methods', (c) => c.json({ ...METHODS, sso: institutionalProviders(), password_reset: true, support_email: env.supportEmail || null }));
 
   /** The signed-in person; also where a fresh sign-in is recorded (last seen, admin, invitations). */
   app.get('/me', requireUser, async (c) => {
@@ -63,7 +63,7 @@ export function authRoutes() {
   });
 
   /** Deletes the account and everything in it. The Auth user goes last (its trigger repeats the cleanup harmlessly). */
-  app.delete('/me', requireUser, rateLimit({ key: 'delete-account', limit: 5, windowSeconds: 3600 }), async (c) => {
+  app.delete('/me', requireUserForDeletion, rateLimit({ key: 'delete-account', limit: 5, windowSeconds: 3600 }), async (c) => {
     const user = c.get('user')!;
     await deleteUserData(user.id);
     await adminAuth().deleteUser(user.id).catch((error) => {
@@ -104,21 +104,30 @@ export function authRoutes() {
   app.get('/sign-in-methods/me', requireUser, async (c) => {
     const record = await adminAuth().getUser(c.get('user')!.id);
     const linked = (provider: Provider) => record.providerData.find((info) => info.providerId === PROVIDER_IDS[provider]);
+    const institutional = institutionalProviders();
     return c.json({
       password: record.providerData.some((info) => info.providerId === 'password'),
       providers: Object.fromEntries(PROVIDERS.map((provider) => [provider, { connected: Boolean(linked(provider)), email: linked(provider)?.email ?? null }])),
       email_verified: record.emailVerified,
-      available: METHODS,
+      sso: institutional.map((provider) => {
+        const identity = record.providerData.find((info) => info.providerId === provider.id);
+        return { ...provider, connected: Boolean(identity), email: identity?.email ?? null };
+      }),
+      available: { ...METHODS, sso: institutional },
     });
   });
 
   app.delete('/identities/:provider', requireUser, async (c) => {
-    const provider = providerParam.safeParse(c.req.param('provider'));
-    if (!provider.success) throw new HTTPException(404, { message: 'Unknown sign-in method.' });
+    const requested = c.req.param('provider');
+    const provider = providerParam.safeParse(requested);
+    const institutional = institutionalProviders().find((candidate) => candidate.id === requested);
+    if (!provider.success && !institutional) throw new HTTPException(404, { message: 'Unknown sign-in method.' });
+    const providerId = provider.success ? PROVIDER_IDS[provider.data] : institutional!.id;
     const user = c.get('user')!;
     const record = await adminAuth().getUser(user.id);
     if (record.providerData.length <= 1) throw new HTTPException(422, { message: 'This is your only way to sign in. Add another one first.' });
-    await adminAuth().updateUser(user.id, { providersToUnlink: [PROVIDER_IDS[provider.data]] });
+    if (!record.providerData.some((info) => info.providerId === providerId)) throw new HTTPException(404, { message: 'That sign-in method is not connected.' });
+    await adminAuth().updateUser(user.id, { providersToUnlink: [providerId] });
     return c.json({ ok: true });
   });
 

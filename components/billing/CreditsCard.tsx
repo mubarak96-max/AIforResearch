@@ -56,7 +56,7 @@ export function CreditsCard({ credits, purchases, packs, paymentsEnabled, onPass
         <div className="flex flex-wrap items-center gap-2 border-t border-line-2 px-5 py-4">
           {plan.is_default ? (
             <>
-              <p className="min-w-0 flex-1 text-[14px] text-ink-2">Extra credits are for paid plans. Plus gives you 500 credits a month.</p>
+              <p className="min-w-0 flex-1 text-[14px] text-ink-2">Extra credits are for paid plans. Plus gives you 750 credits a month.</p>
               <Button variant="primary" size="sm" onClick={() => openPricing('More credits come with the paid plans.')}>Upgrade</Button>
             </>
           ) : (

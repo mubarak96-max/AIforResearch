@@ -4,6 +4,7 @@ import { AUTHORS, authorPath } from '@/lib/authors';
 import { CITATION_STYLES } from '@/lib/citationStyles';
 import { FEATURE_PAGES } from '@/lib/features';
 import { TOOLS } from '@/lib/tools';
+import { allLandingPages, landingPath } from '@/lib/landingPages';
 import { SITE_URL } from '@/lib/site';
 
 /**
@@ -17,6 +18,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/`, changeFrequency: 'weekly', priority: 1 },
     { url: `${SITE_URL}/features`, changeFrequency: 'monthly', priority: 0.8 },
     ...FEATURE_PAGES.map((page) => ({ url: `${SITE_URL}/features/${page.slug}`, changeFrequency: 'monthly' as const, priority: 0.6 })),
+    ...(['for', 'alternatives', 'templates'] as const).map((section) => ({ url: `${SITE_URL}/${section}`, changeFrequency: 'monthly' as const, priority: 0.7 })),
+    ...allLandingPages().map((page) => ({ url: `${SITE_URL}${landingPath(page)}`, lastModified: new Date(`${page.updated}T00:00:00Z`), changeFrequency: 'monthly' as const, priority: 0.8 })),
     { url: `${SITE_URL}/tools`, changeFrequency: 'monthly', priority: 0.8 },
     ...TOOLS.map((tool) => ({ url: `${SITE_URL}/tools/${tool.slug}`, changeFrequency: 'monthly' as const, priority: 0.8 })),
     ...CITATION_STYLES.map((style) => ({ url: `${SITE_URL}/tools/citation-generator/${style.slug}`, changeFrequency: 'monthly' as const, priority: 0.7 })),

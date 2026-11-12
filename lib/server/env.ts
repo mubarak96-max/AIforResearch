@@ -7,6 +7,12 @@ export const deployed = process.env.NODE_ENV === 'production' || (!!process.env.
 const publicUrl = deployed ? SITE_URL : 'http://localhost:3000';
 
 export const env = {
+  /**
+   * Background research jobs. Fixed in code, not read from the environment: set to true only after
+   * deploying onResearchJobWritten and recoverStuckResearch to the existing Functions service,
+   * otherwise background jobs would wait in the queue with nothing to run them.
+   */
+  researchJobsEnabled: false,
   port: Number(read('PORT', '4000')),
   publicUrl,
   /** The converter (services/convert on Cloud Run). */

@@ -114,6 +114,20 @@ work in other languages, build with
 220 MB). Changing the model makes earlier vectors unsearchable until their PDFs are re-processed:
 each chunk records the model that embedded it, and search only compares vectors from the same model.
 
+OCR for scanned PDF pages is always on. The image installs Tesseract with the English pack, and the
+settings (default language `eng`, 216 DPI, 15 s per page, 80 s and 40 pages per PDF, pages with fewer
+than 20 native characters and at least half image) are fixed in `writeorbit_convert/config.py`, not
+read from the environment. To offer more languages, add their packs (for example `tesseract-ocr-ara
+tesseract-ocr-jpn`) to the Tesseract line in the Dockerfile; a request can then choose any installed
+pack. This is a document language setting, with no account-location restriction, and a missing pack is
+never silently replaced by English. Without Tesseract (local development) scanned pages are reported
+as unread.
+The API's attachment picker lists available packs through `GET /api/files/ocr`.
+
+Run the focused OCR tests in the existing test image with
+`python -m pytest -q tests/test_pdf_ocr.py`. These use native-text and empty-page PDF fixtures
+and a mocked OCR engine; an actual engine/language smoke test is still needed for the chosen image.
+
 ### Process discipline
 
 - Every LibreOffice run and every PDF-text run is a child process. It runs under `nice -n 10`
@@ -271,7 +285,21 @@ real Word package. The response is `200` `application/pdf` with
 ### `POST /pdf/text`
 
 `multipart/form-data` with field `file`: a PDF up to **50 MB** (`%PDF-` within its first 1 KB).
-Text is extracted with pypdfium2. There is no OCR, so scanned pages come back with empty text.
+Text is extracted with pypdfium2. When a local Tesseract engine is available, sparse or scanned pages
+can use OCR. Optional multipart `ocr_languages` selects installed codes joined with `+` (up to eight).
+An unavailable language is reported explicitly and is never silently replaced with another language.
+Native text remains the default; OCR only replaces sparse text when it adds readable content.
+
+The existing response adds `pages[].method` (`native`, `ocr`, `empty`), `needs_review`, `warning`,
+top-level `warnings`, and `extraction` with `status`, `ocr_pages`, `pages_without_text`,
+`ocr_languages`, and `requires_review`. Original page numbers are retained, including empty pages.
+`complete` describes text availability, not transcription accuracy. Missing engines, missing language
+data, timeouts and page limits produce explicit quality warnings. Check OCR quotations, numbers,
+tables and reading order against the original; handwriting and table structure are not guaranteed.
+
+`GET /pdf/ocr` returns `{available, languages, default_languages, warning?}` for installed packs.
+There are no runtime downloads or external OCR providers. The caller must preserve warnings when
+using partial text; the Library stores them beside extraction metadata and the attachment API returns them.
 Line breaks are `\n`.
 
 `200` `application/json`:

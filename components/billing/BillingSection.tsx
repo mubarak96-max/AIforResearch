@@ -25,6 +25,8 @@ export type Billing = {
   cards: SavedCard[];
   invoices: Invoice[];
   payments_enabled: boolean;
+  managed_team?: boolean;
+  can_manage_billing?: boolean;
 };
 
 const LIVE = ['active', 'trialing', 'past_due'];
@@ -127,6 +129,7 @@ export function BillingSection() {
       <Card><div className="flex h-40 items-center justify-center text-[14px] text-muted" aria-busy="true">{error || (busy === 'return' ? 'Finishing up with Dodo Payments…' : 'Loading billing…')}</div></Card>
     );
   }
+  if (billing.managed_team && !billing.can_manage_billing) return <Card><CardHeader title={`${billing.plan.name} billing`} description="Your Team owner or administrator manages subscriptions, cards and invoices. Your work uses the shared credit pool." /><div className="grid gap-4 px-5 py-5">{billing.usage.map((row) => <Meter key={row.key} label={row.label} used={row.used} limit={row.limit} per={row.per} />)}<Meter label="PDFs in your Library" used={billing.library.used} limit={billing.library.limit} /></div></Card>;
 
   const sub = billing.subscription;
   const paying = Boolean(sub && sub.source === 'dodo' && LIVE.includes(sub.status));
@@ -175,7 +178,7 @@ export function BillingSection() {
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            {lapsed && billing.payments_enabled && (
+            {lapsed && billing.payments_enabled && !billing.managed_team && (
               <Button variant="primary" disabled={busy !== null} onClick={() => void go('renew', '/api/billing/renew')}>
                 {busy === 'renew' ? 'Opening…' : onHold ? 'Update card and pay' : `Renew ${lapsedPlan?.name || 'plan'}`}
               </Button>
@@ -185,10 +188,11 @@ export function BillingSection() {
                 {busy === 'resume' ? 'Resuming…' : 'Keep my plan'}
               </Button>
             )}
-            <Button variant={paying || lapsed ? 'secondary' : 'primary'} onClick={() => openPricing()}>
+            {!billing.managed_team && <Button variant={paying || lapsed ? 'secondary' : 'primary'} onClick={() => openPricing()}>
               {!paying && !lapsed && <LuZap className="h-4 w-4" aria-hidden="true" />}
               {paying ? 'Change plan' : 'Upgrade'}
-            </Button>
+            </Button>}
+            {billing.managed_team && <span className="max-w-xs text-sm text-muted">Seat counts and plan changes are managed through your existing Team agreement.</span>}
             {paying && !sub?.cancel_at_period_end && (
               <Button variant="ghost" onClick={() => setCancelling(true)}>Cancel plan</Button>
             )}
@@ -335,7 +339,9 @@ function InvoiceStatus({ status }: { status: string | null }) {
   return <StatusPill>{status || '—'}</StatusPill>;
 }
 
-function Meter({ label, used, limit, per }: { label: string; used: number; limit: number | null; per?: 'day' | 'month' }) {
+function Meter({ label, used: rawUsed, limit, per }: { label: string; used: number | null; limit: number | null; per?: 'day' | 'month' }) {
+  // A count the server could not read arrives as null (NaN in JSON); show it as nothing used.
+  const used = Number.isFinite(rawUsed) ? (rawUsed as number) : 0;
   const share = limit === null ? 0 : limit === 0 ? 1 : Math.min(1, used / limit);
   const full = limit !== null && used >= limit;
   return (

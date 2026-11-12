@@ -12,6 +12,8 @@ import { Button, Card, Segmented } from '@/components/app/ui';
 import { CreditCost, Tag, creditsChanged, showError } from '@/components/app/research/parts';
 import { passes, setVote, withStates } from './client';
 import { DECISION_LABELS, type Decision, type ReviewState, type SrRecord, type Stage } from './types';
+import { FullTextPanel } from './FullTextPanel';
+import toast from 'react-hot-toast';
 
 type View = 'todo' | 'conflicts' | 'all' | 'included' | 'excluded';
 
@@ -46,6 +48,7 @@ export function ScreeningTab({ state, setRecords, reload }: { state: ReviewState
     if (view !== 'todo') setIndex((current) => Math.min(current + 1, shown.length - 1));
     try {
       await api(`/api/systematic-reviews/${review.id}/records/${target.id}/vote`, { method: 'POST', body: JSON.stringify({ stage, decision, reason: decision === 'exclude' ? reason : null }) });
+      await reload();
     } catch (error) {
       showError(error);
       await reload();
@@ -81,7 +84,8 @@ export function ScreeningTab({ state, setRecords, reload }: { state: ReviewState
   const suggest = async () => {
     setBusy(true);
     try {
-      await api(`/api/systematic-reviews/${review.id}/screen/ai`, { method: 'POST', body: JSON.stringify({ stage, limit: 25 }) });
+      const result = await api<{ suggested: number; unavailable?: { id: string; reason: string }[] }>(`/api/systematic-reviews/${review.id}/screen/ai`, { method: 'POST', body: JSON.stringify({ stage, limit: 25 }) });
+      if (result.unavailable?.length) toast(`${result.suggested} suggestions. ${result.unavailable.length} records could not be read: ${result.unavailable[0].reason}`);
       await reload();
     } catch (error) { showError(error); } finally { setBusy(false); creditsChanged(); }
   };
@@ -133,12 +137,14 @@ export function ScreeningTab({ state, setRecords, reload }: { state: ReviewState
               {!record.doi && record.url && <a href={record.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-brand hover:underline">Open<LuExternalLink className="h-3 w-3" /></a>}
             </div>
             <p className="mt-4 whitespace-pre-line text-[15.5px] leading-[1.7] text-ink">{record.abstract || 'No abstract in this record.'}</p>
+            {stage === 'full' && <FullTextPanel reviewId={review.id} record={record} canEdit={canEdit} reload={reload} />}
+            {record.blinded?.[stage] && <p className="mt-3 text-[13px] text-muted">Peer decisions and AI suggestions are hidden until you submit your independent decision.</p>}
 
             {ai && (
               <div className="mt-4 rounded-xl bg-soft px-4 py-3 text-[14px]">
                 <p className="font-semibold text-ink-2"><LuSparkles className="mr-1 inline h-3.5 w-3.5 text-brand" aria-hidden="true" />AI suggestion: {DECISION_LABELS[ai.decision]}</p>
                 <p className="mt-0.5 text-ink-2">{ai.reason}</p>
-                <p className="mt-1 text-[12.5px] text-muted">A suggestion only{state.ai_second ? '; it counts as the second reviewer here' : ''}. Your decision is what counts.</p>
+                <p className="mt-1 text-[12.5px] text-muted">A suggestion only{state.ai_second ? '; used as an assisted second opinion here, not an independent human reviewer' : ''}. Check the source before deciding.</p>
               </div>
             )}
             {others.length > 0 && <p className="mt-3 text-[13.5px] text-muted">{others.map(([id, item]) => `${nameOf(id)}: ${DECISION_LABELS[item.decision]}${item.reason ? ` (${item.reason})` : ''}`).join(' · ')}</p>}
@@ -146,7 +152,7 @@ export function ScreeningTab({ state, setRecords, reload }: { state: ReviewState
 
             {canEdit && (
               <div className="mt-5 border-t border-line-2 pt-4">
-                {current?.status === 'conflict' ? (
+                {current?.status === 'conflict' && state.can_adjudicate ? (
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[14px] font-semibold text-amber-800">Reviewers disagree. Resolve:</span>
                     <Button size="sm" onClick={() => resolveConflict('include')}>Include</Button>
@@ -182,7 +188,7 @@ export function ScreeningTab({ state, setRecords, reload }: { state: ReviewState
             {state.reviewers.length === 1 && (
               <label className="mt-3 flex items-start gap-2 text-[13.5px] text-ink-2">
                 <input type="checkbox" checked={review.ai_second_reviewer} onChange={(event) => toggleAi(event.target.checked)} className="mt-0.5 h-4 w-4 accent-[var(--color-brand)]" />
-                Use the AI as a second reviewer (disagreements become conflicts to resolve)
+                Compare with an AI second opinion (does not replace independent human review)
               </label>
             )}
           </Card>

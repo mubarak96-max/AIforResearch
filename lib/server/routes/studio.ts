@@ -23,6 +23,7 @@ import { mergeResults, searchSources, sortPapers, semanticScholarSimilar, SOURCE
 import { searchSemanticScholar } from '../lib/sources/providers.js';
 import { createTask, failTask, finishTask, getTaskFor } from '../lib/history.js';
 import { Filters, toFilters } from './research.js';
+import { figuresAsText, type ResearchFigure } from '../lib/researchFigures.js';
 import { STUDIO_KIND, studioCredits, studioModule, type StudioField, type StudioModule } from '../lib/studioCatalog.js';
 import { batches, buildStudioPrompt, cleanDeck, hasStudioPrompt, improvePrompt, paragraphsOf, type StudioLength } from '../lib/studioModules.js';
 
@@ -196,8 +197,18 @@ type RunBody = z.infer<typeof RunRequest>;
 export const FREE_SLIDES = 5;
 type Send = (event: string, data: unknown) => void;
 
-/** The sources a run may cite: the research task it continues, or a fresh search, plus attached files. */
-async function gatherStudioSources(slots: Slots, user: AuthUser, module: StudioModule, inputs: Record<string, string>, body: RunBody, usage: LlmUsage, send: Send): Promise<ResearchSource[]> {
+/** Markdown with its [S…] markers renamed through `map`; markers with no match are dropped. */
+export function remapMarkers(markdown: string, map: Map<string, string>): string {
+  return markdown.replace(/\s?\[(S\d+(?:\s*[,;]\s*S?\d+)*)\]/g, (whole, group: string) => {
+    const kept = [...group.matchAll(/S?(\d+)/g)].map((match) => map.get(`S${match[1]}`)).filter(Boolean);
+    return kept.length ? `${whole.startsWith(' ') ? ' ' : ''}[${[...new Set(kept)].join(', ')}]` : '';
+  });
+}
+
+type Gathered = { sources: ResearchSource[]; prior: { title: string; markdown: string } | null };
+
+/** The sources a run may cite (the task it continues, or a fresh search, plus attached files) and that task's text. */
+async function gatherStudioSources(slots: Slots, user: AuthUser, module: StudioModule, inputs: Record<string, string>, body: RunBody, usage: LlmUsage, send: Send): Promise<Gathered> {
   const topic = inputs[module.topicField] || inputs.topic || '';
   const files = body.attachments.map((file, index) => fileToSource(file, topic, index + 1));
   let found: ResearchSource[] = [];
@@ -205,6 +216,10 @@ async function gatherStudioSources(slots: Slots, user: AuthUser, module: StudioM
     const task = await getTaskFor(user, body.from_task);
     found = ((task.result?.all_sources ?? task.result?.sources ?? []) as ResearchSource[]).filter((source) => source.kind !== 'file');
     send('status', { stage: 'reading', detail: `Using the ${found.length} sources of “${task.title.slice(0, 60)}”` });
+    const sources = renumber([...files, ...found]);
+    const map = new Map(found.map((source, index) => [source.marker, sources[files.length + index].marker]));
+    const markdown = typeof task.result?.markdown === 'string' ? remapMarkers(figuresAsText(task.result.markdown, task.result.figures as ResearchFigure[] | undefined), map).trim() : '';
+    return { sources, prior: markdown ? { title: task.title, markdown } : null };
   } else if (module.grounded && !(module.id === 'slides' && inputs.text)) {
     const groups: SourceGroup[] = body.library_document_ids.length && !body.groups.includes('library') ? [...body.groups, 'library'] : body.groups;
     send('status', { stage: 'planning', detail: module.grounded === 'multi' ? 'Planning the searches' : 'Searching the literature' });
@@ -218,7 +233,7 @@ async function gatherStudioSources(slots: Slots, user: AuthUser, module: StudioM
     found = papers.map((paper, index) => paperToSource(paper, index + 1));
     if (!found.length && !files.length) throw new HTTPException(422, { message: 'No papers found for this topic with these sources and filters. Try broader words or fewer filters.' });
   }
-  return renumber([...files, ...found]);
+  return { sources: renumber([...files, ...found]), prior: null };
 }
 
 async function runModule(slots: Slots, user: AuthUser, module: StudioModule, inputs: Record<string, string>, body: RunBody, profile: Awaited<ReturnType<typeof researchProfile>>, usage: LlmUsage, signal: AbortSignal, send: Send): Promise<Record<string, unknown>> {
@@ -245,9 +260,9 @@ async function runModule(slots: Slots, user: AuthUser, module: StudioModule, inp
     return { pairs, summary: `${changed} of ${pairs.length} paragraphs changed`, markdown: pairs.map((pair) => pair.after).join('\n\n') };
   }
 
-  const sources = await gatherStudioSources(slots, user, module, inputs, body, usage, send);
+  const { sources, prior } = await gatherStudioSources(slots, user, module, inputs, body, usage, send);
   if (sources.length) send('sources', { sources });
-  const prompt = buildStudioPrompt(module, { inputs, sources, role, field: profile.field, headings: body.headings, length: body.length as StudioLength, language: body.language ?? null, highQuality: body.high_quality });
+  const prompt = buildStudioPrompt(module, { inputs, sources, prior, role, field: profile.field, headings: body.headings, length: body.length as StudioLength, language: body.language ?? null, highQuality: body.high_quality });
   send('status', { stage: 'writing', detail: sources.length ? `Reading ${sources.length} sources and writing` : 'Writing' });
 
   if (module.output === 'slides') {

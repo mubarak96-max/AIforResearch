@@ -45,7 +45,21 @@ export type FetchOptions = {
   timeoutMs?: number;
   /** Cache key override (POST bodies); false to skip the cache. */
   cacheKey?: string | false;
+  /** Spaces this service's requests at least `ms` apart in this process (keyed rate limits). */
+  pace?: { key: string; ms: number; maxWaitMs?: number };
 };
+
+/** The next free start time per paced service. */
+const paceNext = new Map<string, number>();
+
+/** Waits for this service's next free slot; throws when the queue is longer than maxWaitMs. */
+async function waitTurn(pace: NonNullable<FetchOptions['pace']>, source: string) {
+  const now = Date.now();
+  const start = Math.max(now, paceNext.get(pace.key) ?? 0);
+  if (start - now > (pace.maxWaitMs ?? 15_000)) throw new SourceError(source, `${source} is busy (rate limit).`, 429);
+  paceNext.set(pace.key, start + pace.ms);
+  if (start > now) await sleep(start - now);
+}
 
 /** GET or POST, parsed; null on 404. Throws SourceError when the service fails twice. */
 export async function fetchSource<T = any>(url: string | URL, options: FetchOptions): Promise<T | null> {
@@ -58,6 +72,7 @@ export async function fetchSource<T = any>(url: string | URL, options: FetchOpti
   if (options.body !== undefined) headers['Content-Type'] = 'application/json';
   for (let attempt = 0; ; attempt += 1) {
     let response: Response;
+    if (options.pace) await waitTurn(options.pace, options.source);
     try {
       response = await net.fetch(url, {
         method: options.method ?? 'GET', headers,
@@ -79,7 +94,8 @@ export async function fetchSource<T = any>(url: string | URL, options: FetchOpti
     }
     if (attempt === 0 && (response.status === 429 || response.status >= 500)) {
       const after = Number(response.headers.get('retry-after'));
-      await sleep(Number.isFinite(after) && after > 0 ? Math.min(after * 1000, 2500) : 800);
+      // Paced services wait for their next slot instead (waitTurn at the top of the loop).
+      if (!options.pace) await sleep(Number.isFinite(after) && after > 0 ? Math.min(after * 1000, 2500) : 800);
       continue;
     }
     throw new SourceError(options.source, `${options.source} answered ${response.status}.`, response.status === 429 ? 429 : 503);

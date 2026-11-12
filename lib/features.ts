@@ -93,7 +93,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     faq: [
       { q: 'Where do the sources come from?', a: 'From a scholarly index of over 250 million works (the OpenAlex catalogue), from PDFs you upload to your Library, and from the document you are writing. You choose which.' },
       { q: 'Can it make up a citation?', a: 'Citations come from search results, not from the model’s memory, so each one is a real record you can open. The text around a citation is still AI-written, so check that the source says what the answer claims.' },
-      { q: 'Is it free?', a: 'Yes. The free plan includes 30 credits a month; a chat answer costs 1 credit. Paid plans include 500 or 1,500 credits a month.' },
+      { q: 'Is it free?', a: 'Yes. The free plan includes 45 credits a month; a chat answer costs 1 credit. Paid plans include 750 or 1,500 credits a month.' },
     ],
   },
   {

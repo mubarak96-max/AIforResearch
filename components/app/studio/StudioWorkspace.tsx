@@ -5,11 +5,16 @@
  * modules in a list, the chosen module's form with sources, filters, role and output options,
  * the credits it costs, and its result (cited text, before/after revisions, slides or papers).
  * Opened from History (?task=), from Home or a research result (?module=…&from=<task>).
+ * The work it was opened from goes with the person: its topic and text fill each module's form,
+ * runs cite its sources and build on its text, and a finished result becomes what the next
+ * module (or template) continues from.
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { LuCopy, LuDownload, LuFileInput, LuFilePen, LuLoaderCircle, LuLock, LuPlay, LuUpload, LuX } from 'react-icons/lu';
+import { LuArrowRight, LuCheck, LuCopy, LuDownload, LuFileInput, LuFilePen, LuLoaderCircle, LuLock, LuPlay, LuQuote, LuRuler, LuUpload, LuX } from 'react-icons/lu';
+import { Check, Select } from '@/components/app/research/controls';
 import { AppFrame } from '@/components/app/AppFrame';
 import { Button, Card } from '@/components/app/ui';
 import { useSignedIn } from '@/components/app/useSignedIn';
@@ -20,10 +25,10 @@ import {
   AttachMenu, AttachmentList, CitedMarkdown, CreditCost, FiltersToggle, RoleSelect, SourcePicker, SourceRow, creditsChanged, showError,
   type Attachment, type Filters, type LibraryPick, type Source, type SourceGroup,
 } from '@/components/app/research/parts';
-import { loadFromTask, openResultInEditor, type TaskRecord } from '@/components/app/research/handoff';
+import { followOnLinks, loadFromTask, openResultInEditor, withoutMarkers, type TaskRecord } from '@/components/app/research/handoff';
 import { fileText, postStream } from '@/components/app/research/stream';
 import {
-  STUDIO_WORKSPACES, studioCredits, studioModule, workspaceModules, type StudioField, type StudioModule, type StudioWorkspace as WorkspaceId,
+  STUDIO_WORKSPACES, studioCredits, studioModule, template as findTemplate, workspaceModules, type StudioField, type StudioModule, type StudioWorkspace as WorkspaceId,
 } from '@/lib/server/lib/studioCatalog';
 import { wordDiff } from './diff';
 import { downloadPptx, type Deck } from './pptx';
@@ -125,6 +130,29 @@ function defaults(module: StudioModule): Record<string, string> {
   return Object.fromEntries(module.fields.map((field) => [field.name, field.kind === 'select' ? field.options?.[0]?.[0] ?? '' : '']));
 }
 
+/** The work a workspace continues: a research answer, or the result of the module before. */
+export type FromWork = { id: string; title: string; topic: string; markdown: string; sources: Source[] };
+
+/**
+ * A module's form filled from the work it continues: the topic, and the text for modules that
+ * take the writer's text. `replaceText` puts newer work over text carried from the module before.
+ */
+function fillFrom(module: StudioModule, inputs: Record<string, string>, work: FromWork, replaceText = false): Record<string, string> {
+  const out = { ...inputs };
+  for (const field of module.fields) {
+    if (field.kind === 'select') continue;
+    if (field.name === 'topic' && !out.topic?.trim()) out.topic = work.topic.slice(0, field.max);
+    if (field.name === 'text' && (replaceText || !out.text?.trim())) {
+      const text = module.id === 'similar' ? work.topic : module.id === 'slides' ? work.markdown : withoutMarkers(work.markdown);
+      if (text.trim()) out.text = text.slice(0, field.max);
+    }
+  }
+  return out;
+}
+
+/** What a workspace hands to its intro (Writing Studio's templates). */
+export type StudioIntroContext = { from: FromWork | null; startTemplate: (id: string) => void };
+
 /** Paragraph by paragraph: the original, the revision with its changes marked, and a choice. */
 function CompareView({ pairs, title }: { pairs: Pair[]; title: string }) {
   const [keep, setKeep] = useState<boolean[]>(() => pairs.map(() => true));
@@ -211,9 +239,8 @@ function SlidesView({ deck, sources, locked }: { deck: Deck; sources: Source[]; 
   );
 }
 
-export function StudioWorkspace({ workspace, intro }: { workspace: WorkspaceId; intro?: React.ReactNode }) {
+export function StudioWorkspace({ workspace, intro }: { workspace: WorkspaceId; intro?: (context: StudioIntroContext) => React.ReactNode }) {
   const { user } = useSignedIn();
-  const router = useRouter();
   const params = useSearchParams();
   const info = STUDIO_WORKSPACES[workspace];
   const modules = workspaceModules(workspace);
@@ -231,24 +258,55 @@ export function StudioWorkspace({ workspace, intro }: { workspace: WorkspaceId; 
   const [length, setLength] = useState<'short' | 'standard' | 'long'>('standard');
   const [style, setStyle] = useState<'apa' | 'mla' | 'chicago' | 'harvard'>('apa');
   const [highQuality, setHighQuality] = useState(false);
-  const [from, setFrom] = useState<{ id: string; title: string; count: number } | null>(null);
+  const [from, setFrom] = useState<FromWork | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const abort = useRef<AbortController | null>(null);
+  const form = useRef<HTMLDivElement>(null);
+  const runButton = useRef<HTMLButtonElement>(null);
+  /** Briefly marks the form after a template is picked above it, so the eye lands on it. */
+  const [picked, setPicked] = useState(false);
   useEffect(() => { if (user?.profile?.role && !role) setRole(user.profile.role); }, [user?.profile?.role]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const choose = (id: string) => {
+  /** The result on screen as work to continue, once it has finished with text. */
+  const finished: FromWork | null = result && !result.running && !result.error && result.taskId && result.markdown.trim()
+    ? { id: result.taskId, title: result.title || module.label, topic: inputs.topic || from?.topic || result.title, markdown: result.markdown, sources: result.allSources }
+    : null;
+
+  const choose = (id: string, preset: Record<string, string> = {}) => {
     const next = studioModule(id)!;
+    // The result on screen goes with the person to the next module; otherwise the work it was opened from stays.
+    const work = finished ?? from;
+    if (finished) setFrom(finished);
     setModuleId(id);
-    // Keep what was typed in fields both modules share (topic, text, notes).
-    setInputs((current) => ({ ...defaults(next), ...Object.fromEntries(Object.entries(current).filter(([key, value]) => value && next.fields.some((field) => field.name === key && field.kind !== 'select'))) }));
+    // Keep what was typed in fields both modules share (topic, text, notes), then fill the rest from the work.
+    setInputs((current) => {
+      const carried = { ...defaults(next), ...Object.fromEntries(Object.entries(current).filter(([key, value]) => value && next.fields.some((field) => field.name === key && field.kind !== 'select'))), ...preset };
+      return work ? fillFrom(next, carried, work, Boolean(finished)) : carried;
+    });
     setResult(null);
     const url = new URL(window.location.href);
     url.searchParams.set('module', id);
     url.searchParams.delete('task');
+    if (work) url.searchParams.set('from', work.id);
     window.history.replaceState(null, '', url.toString());
   };
 
-  // Reopen a saved task, or continue from a research result.
+  const startTemplate = (id: string) => {
+    choose('template', { template: id });
+    setPicked(true);
+    window.setTimeout(() => setPicked(false), 2400);
+    requestAnimationFrame(() => {
+      form.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      runButton.current?.focus({ preventScroll: true });
+    });
+  };
+
+  const loadFrom = async (id: string): Promise<FromWork | null> => {
+    const loaded = await loadFromTask(id);
+    return loaded ? { id, title: loaded.task.title, topic: loaded.topic, markdown: loaded.markdown, sources: loaded.task.result?.all_sources ?? loaded.sources } : null;
+  };
+
+  // Reopen a saved task (and the work it continued), or continue from a research result or another module.
   useEffect(() => {
     if (!user) return;
     const taskId = params.get('task');
@@ -264,19 +322,27 @@ export function StudioWorkspace({ workspace, intro }: { workspace: WorkspaceId; 
           markdown: String(data.markdown ?? ''), sources: data.sources ?? [], allSources: data.all_sources ?? [], pairs: saved.output === 'compare' ? data.pairs ?? [] : [],
           deck: data.deck ?? null, lockedSlides: data.locked_slides ?? 0,
         });
+        if (typeof task.inputs?.from_task === 'string') loadFrom(task.inputs.from_task).then((work) => work && setFrom(work)).catch(() => undefined);
       }).catch(showError);
       return;
     }
     const fromId = params.get('from');
     if (fromId) {
-      loadFromTask(fromId).then((loaded) => {
-        if (!loaded) return;
-        setFrom({ id: fromId, title: loaded.task.title, count: loaded.sources.length });
-        setInputs((current) => ({ ...current, topic: current.topic || loaded.topic.slice(0, 400), ...(workspace === 'slides' && loaded.markdown ? { text: loaded.markdown.slice(0, 100_000) } : {}) }));
-      });
+      loadFrom(fromId).then((work) => {
+        if (!work) return;
+        setFrom(work);
+        setInputs((current) => fillFrom(module, current, work));
+      }).catch(showError);
     }
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => () => abort.current?.abort(), []);
+
+  const stopBuilding = () => {
+    setFrom(null);
+    const url = new URL(window.location.href);
+    url.searchParams.delete('from');
+    window.history.replaceState(null, '', url.toString());
+  };
 
   const freePlan = Boolean(credits?.plan.is_default);
   // Plans without PowerPoint export get the five-slide preview, priced as a preview (as on the server).
@@ -284,6 +350,8 @@ export function StudioWorkspace({ workspace, intro }: { workspace: WorkspaceId; 
   const missing = module.fields.find((field) => field.required && (inputs[field.name] || '').trim().length < (field.min ?? 1));
   const running = Boolean(result?.running);
   const grounded = Boolean(module.grounded) && !(module.id === 'slides' && inputs.text?.trim());
+  const chosenTemplate = module.id === 'template' ? findTemplate(inputs.template) : null;
+  const runLabel = module.output === 'papers' ? 'Find papers' : chosenTemplate ? `Write the ${chosenTemplate.label.replace(/\s*\(.*\)$/, '').toLowerCase()}` : 'Run';
 
   const run = useCallback(async () => {
     if (missing) { toast.error(`Add ${missing.label.toLowerCase()}.`); return; }
@@ -343,25 +411,53 @@ export function StudioWorkspace({ workspace, intro }: { workspace: WorkspaceId; 
 
   return (
     <AppFrame wide title={info.title} subtitle={info.subtitle}>
-      {intro}
+      {intro?.({ from: from ?? finished, startTemplate })}
       <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
         <nav aria-label={`${info.title} modules`} className="-mx-[18px] flex gap-1.5 overflow-x-auto px-[18px] pb-1 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0">
-          {modules.map((item) => (
-            <button key={item.id} type="button" onClick={() => choose(item.id)} aria-current={item.id === moduleId ? 'true' : undefined}
+          {modules.map((item, index) => (
+            <Fragment key={item.id}>
+            {item.group && item.group !== modules[index - 1]?.group && <p className="hidden px-3 pb-1 pt-3 text-[12px] font-medium text-subtle lg:block">{item.group}</p>}
+            <button type="button" onClick={() => choose(item.id)} aria-current={item.id === moduleId ? 'true' : undefined}
               className={`shrink-0 rounded-[10px] px-3 py-2 text-left text-[14px] font-medium lg:w-full ${item.id === moduleId ? 'bg-brand-50 text-brand' : 'text-ink-2 hover:bg-soft'}`}>
               {item.label}
             </button>
+            </Fragment>
           ))}
         </nav>
 
-        <div className="min-w-0">
-          <Card className="p-4 sm:p-5">
-            <h2 className="text-[18px] font-bold tracking-[-0.01em] text-ink">{module.label}</h2>
-            <p className="mt-0.5 text-[14.5px] text-muted">{module.short}</p>
+        <div ref={form} className="min-w-0 scroll-mt-6">
+          <Card className={`p-4 transition-shadow duration-500 sm:p-5 ${picked ? 'ring-2 ring-brand ring-offset-2 ring-offset-[var(--color-page)]' : ''}`}>
+            {chosenTemplate ? (
+              <>
+                <p className="text-[12.5px] font-semibold uppercase tracking-[0.06em] text-brand">Template</p>
+                <h2 className="text-[18px] font-bold tracking-[-0.01em] text-ink">{chosenTemplate.label}</h2>
+                <p className="mt-0.5 text-[14.5px] text-muted">
+                  {from
+                    ? <>Every section is written for you from “{from.title}”, citing its sources. Check the topic, then press <strong className="font-semibold text-ink-2">{runLabel}</strong>.</>
+                    : <>Add your topic, then press <strong className="font-semibold text-ink-2">{runLabel}</strong>. Every section is written for you with citations to real papers.</>}
+                </p>
+                <div className="mt-3 rounded-xl bg-soft px-4 py-3">
+                  <p className="text-[13px] font-semibold text-ink-2">What gets written</p>
+                  <ol className="mt-1.5 flex flex-wrap gap-1.5">
+                    {chosenTemplate.sections.map(([heading]) => (
+                      <li key={heading} className="inline-flex items-center gap-1 rounded-md bg-surface px-2 py-1 text-[13px] text-ink-2">
+                        <LuCheck className="h-3.5 w-3.5 text-brand" aria-hidden="true" />{/^references/i.test(heading) ? `${heading} (from the citations)` : heading}
+                      </li>
+                    ))}
+                  </ol>
+                  <p className="mt-2 text-[12.5px] text-muted">Anything only you know (your data, sample, results, budget) is left as a [placeholder] to fill in. You can edit everything afterwards in the editor.</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-[18px] font-bold tracking-[-0.01em] text-ink">{module.label}</h2>
+                <p className="mt-0.5 text-[14.5px] text-muted">{module.short}</p>
+              </>
+            )}
             {from && (
               <div className="mt-3 flex items-center gap-2 rounded-lg bg-brand-50 px-3 py-2 text-[13.5px] text-brand-600">
-                <span className="min-w-0 flex-1 truncate">Using the {from.count} sources of “{from.title}”</span>
-                <button type="button" onClick={() => setFrom(null)} className="font-semibold hover:underline">Search instead</button>
+                <span className="min-w-0 flex-1 truncate">Building on “{from.title}”{from.sources.length ? ` and its ${from.sources.length} sources` : ''}</span>
+                <button type="button" onClick={stopBuilding} className="font-semibold hover:underline">Start fresh</button>
               </div>
             )}
             <div className="mt-4 grid gap-4">
@@ -384,27 +480,24 @@ export function StudioWorkspace({ workspace, intro }: { workspace: WorkspaceId; 
                 <RoleSelect value={role} onChange={setRole} />
                 {module.output === 'markdown' && (
                   <>
-                    <label className="flex items-center gap-2 text-[13.5px] text-ink-2"><input type="checkbox" checked={headings} onChange={(event) => setHeadings(event.target.checked)} className="h-4 w-4 accent-[var(--color-brand)]" />With headings</label>
+                    {!chosenTemplate && <Check size="sm" checked={headings} onChange={setHeadings}>With headings</Check>}
                     {module.lengthOption && (
-                      <select aria-label="Length" value={length} onChange={(event) => setLength(event.target.value as typeof length)} className="h-8 rounded-full border border-line bg-surface px-3 text-[13.5px] font-medium text-ink-2">
-                        <option value="standard">Standard length</option><option value="short">Shorter</option><option value="long">Longer</option>
-                      </select>
+                      <Select label="Length" prefix="Length" icon={<LuRuler />} value={length} onChange={(next) => setLength(next as typeof length)} active={length !== 'standard'}
+                        options={[{ value: 'standard', label: 'Standard' }, { value: 'short', label: 'Shorter', detail: 'About half the usual length' }, { value: 'long', label: 'Longer', detail: 'More depth and detail' }]} />
                     )}
                     {module.grounded && (
-                      <select aria-label="Citation style" value={style} onChange={(event) => setStyle(event.target.value as typeof style)} className="h-8 rounded-full border border-line bg-surface px-3 text-[13.5px] font-medium text-ink-2">
-                        {STYLES.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
-                      </select>
+                      <Select label="Citation style" prefix="Style" icon={<LuQuote />} value={style} onChange={(next) => setStyle(next as typeof style)}
+                        options={STYLES.map(([id, label]) => ({ value: id, label }))} />
                     )}
                   </>
                 )}
-                <label className="flex items-center gap-2 text-[13.5px] text-ink-2" title="The stronger model and longer answers, for 3× the credits">
-                  <input type="checkbox" checked={highQuality} onChange={(event) => (limits.highQuality ? setHighQuality(event.target.checked) : openPricing('High-quality mode is part of the Pro plan.'))} className="h-4 w-4 accent-[var(--color-brand)]" />
+                <Check size="sm" title="The stronger model and longer answers, for 3× the credits" checked={highQuality} onChange={(on) => (limits.highQuality ? setHighQuality(on) : openPricing('High-quality mode is part of the Pro plan.'))}>
                   High quality{!limits.highQuality && <LuLock className="h-3.5 w-3.5 text-muted" aria-label="Pro plan" />}
-                </label>
+                </Check>
               </div>
             )}
             <div className="mt-5 flex items-center gap-3">
-              <Button variant="primary" onClick={run} disabled={running}>{running ? <LuLoaderCircle className="h-4 w-4 animate-spin" /> : <LuPlay className="h-4 w-4" />}{running ? 'Working…' : module.output === 'papers' ? 'Find papers' : 'Run'}</Button>
+              <Button ref={runButton} variant="primary" onClick={run} disabled={running}>{running ? <LuLoaderCircle className="h-4 w-4 animate-spin" /> : <LuPlay className="h-4 w-4" />}{running ? (chosenTemplate ? 'Writing…' : 'Working…') : runLabel}</Button>
               <CreditCost credits={cost} />
             </div>
           </Card>
@@ -426,8 +519,20 @@ export function StudioWorkspace({ workspace, intro }: { workspace: WorkspaceId; 
                       <div className="mt-4 flex flex-wrap gap-2">
                         <Button variant="primary" size="sm" onClick={() => openResultInEditor(result.title || module.label, result.markdown, result.allSources, style)}><LuFilePen className="h-4 w-4" />Open in editor</Button>
                         <Button size="sm" onClick={() => navigator.clipboard.writeText(result.markdown).then(() => toast.success('Copied'))}><LuCopy className="h-4 w-4" />Copy</Button>
-                        {result.taskId && workspace !== 'slides' && <Button size="sm" onClick={() => router.push(`/slides?from=${result.taskId}`)}>Make slides from this</Button>}
                       </div>
+                    )}
+                    {finished && (
+                      <section aria-labelledby="studio-next-title" className="mt-6">
+                        <h3 id="studio-next-title" className="text-[14.5px] font-bold text-ink">Build on this</h3>
+                        <p className="mt-0.5 text-[13.5px] text-muted">Choose another module{workspace === 'write' ? ' or a template' : ''}, or continue elsewhere. This result and its sources go with you.</p>
+                        <div className="mt-2.5 flex flex-wrap gap-2">
+                          {followOnLinks(finished.id).filter((link) => !link.href.startsWith(`${info.path}?`)).map((link) => (
+                            <Link key={link.href} href={link.href} className="inline-flex h-9 items-center gap-1.5 rounded-[10px] border border-line bg-surface px-3 text-[14px] font-medium text-ink-2 hover:bg-soft">
+                              {link.label}<LuArrowRight className="h-3.5 w-3.5 text-subtle" aria-hidden="true" />
+                            </Link>
+                          ))}
+                        </div>
+                      </section>
                     )}
                   </div>
                   {shownSources.length > 0 && (

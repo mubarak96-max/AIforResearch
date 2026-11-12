@@ -43,11 +43,19 @@ export type CatalogItem = {
 };
 
 export const CATALOG: CatalogItem[] = [
+  {
+    id: 'workbooks', name: 'Workbooks', hub: 'research', workspace: true,
+    description: 'Keep sources, exact quotations, appraisals and reviewer sign-off together, then draft a literature review or findings report from them.',
+    href: '/workbooks', credits: 'No credits to save · AI suggestions 3 credits', phase1: false, marketing: null, landing: null,
+    keywords: ['workbook', 'evidence table', 'appraisal', 'journal club', 'qualitative', 'coding', 'themes', 'deliverable', 'supervisor review'],
+  },
+  { id: 'evidence-monitoring', name: 'Saved searches', hub: 'research', workspace: true, description: 'Save searches, compare new results and publication notices, and review updates in a decision journal.', href: '/monitoring', credits: 'No credits', phase1: false, marketing: null, landing: null, keywords: ['alerts', 'saved searches', 'retractions', 'updates', 'monitor'] },
+  { id: 'official-sources', name: 'Trial registries', hub: 'research', description: 'Find trial registrations, link them to publications and save them with their provenance.', href: '/official-sources', credits: 'No credits', phase1: false, marketing: null, landing: null, keywords: ['clinical trials', 'registry', 'registration', 'outcomes', 'official'] },
   // ---------------------------------------------------------------- Research
   {
     id: 'deep-research', name: 'Deep Research', hub: 'research', workspace: true,
     description: 'Ask a question and get an answer built from real papers, with every claim cited and a consensus line.',
-    href: '/deep-research', credits: 'Summary 1 credit · Deep 5 · Detailed 20', phase1: true,
+    href: '/deep-research', credits: 'Summary 1 credit · Deep 15 · Detailed 45', phase1: true,
     marketing: '/features/research-assistant', landing: '/features/deep-research', keywords: ['ask', 'chat', 'report', 'consensus', 'summary'],
   },
   {
@@ -105,6 +113,36 @@ export const CATALOG: CatalogItem[] = [
     href: '/write', credits: '3 credits a section · 15 a full draft', phase1: false, marketing: '/features/ai-writing-editor', landing: null, keywords: ['paper', 'article', 'literature review', 'abstract'],
   },
   {
+    id: 'case-report', name: 'Case report writer', hub: 'write',
+    description: 'A clinical case report in the CARE structure from your de-identified notes, with the literature in the discussion.',
+    href: '/write?module=case-report', credits: '15 credits', phase1: false, marketing: null, landing: '/features/case-report-writer', keywords: ['care', 'case report', 'medical', 'clinical'],
+  },
+  {
+    id: 'clinical-audit', name: 'Clinical audit', hub: 'write',
+    description: 'An audit plan with criteria, targets and a data collection form, or the report of a completed audit cycle.',
+    href: '/write?module=clinical-audit', credits: 'Plan 3 credits · report 15', phase1: false, marketing: null, landing: '/features/clinical-audit', keywords: ['audit', 'quality improvement', 're-audit', 'nhs'],
+  },
+  {
+    id: 'evaluation-report', name: 'Evaluation report', hub: 'write',
+    description: 'A programme evaluation against the OECD-DAC criteria, your questions or your logframe, from your findings.',
+    href: '/write?module=evaluation-report', credits: '15 credits', phase1: false, marketing: null, landing: '/features/evaluation-report', keywords: ['m&e', 'oecd dac', 'ngo', 'donor report', 'logframe'],
+  },
+  {
+    id: 'policy-brief', name: 'Policy brief', hub: 'write',
+    description: 'Key messages, the evidence, policy options compared and recommendations, cited to real research.',
+    href: '/write?module=policy-brief', credits: '15 credits', phase1: false, marketing: null, landing: '/features/policy-brief', keywords: ['policy', 'government', 'options', 'brief'],
+  },
+  {
+    id: 'annotated-bibliography', name: 'Annotated bibliography', hub: 'write',
+    description: 'Real sources on your topic, each with a summary, an evaluation and why it matters.',
+    href: '/write?module=annotated-bibliography', credits: '15 credits', phase1: false, marketing: null, landing: '/features/annotated-bibliography', keywords: ['annotations', 'sources', 'bibliography', 'apa'],
+  },
+  {
+    id: 'reading-prep', name: 'Seminar reading prep', hub: 'write',
+    description: 'Upload the week’s readings: each argument, its weak points, how they connect and questions for class.',
+    href: '/write?module=reading-prep', credits: '3 credits per 10,000 words', phase1: false, marketing: null, landing: '/features/seminar-reading-prep', keywords: ['seminar', 'readings', 'discussion questions', 'course'],
+  },
+  {
     id: 'editor', name: 'Documents and editor', hub: 'write',
     description: 'Write with AI autocomplete that cites real papers, comments, tracked changes and live co-editing.',
     href: '/editor', credits: 'Autocomplete: 10 a day on Free', phase1: true, marketing: '/features/ai-writing-assistant', landing: null, keywords: ['editor', 'word', 'latex', 'autocomplete'],
@@ -152,6 +190,11 @@ export const CATALOG: CatalogItem[] = [
     href: '/reviewer', credits: '10 credits per 10,000 words · High quality 30 · free preview 3', phase1: false, marketing: '/features/ai-peer-review', landing: null, keywords: ['peer review', 'feedback', 'thesis review'],
   },
   {
+    id: 'guideline-check', name: 'Reporting-guideline check', hub: 'review',
+    description: 'Check a manuscript against CONSORT, STROBE, PRISMA, CARE, STARD, COREQ, SRQR or SQUIRE, item by item, with the passage for each.',
+    href: '/reviewer?module=guidelines', credits: '5 credits per 10,000 words', phase1: false, marketing: null, landing: '/features/reporting-guideline-checker', keywords: ['consort', 'strobe', 'prisma', 'care', 'stard', 'coreq', 'equator', 'checklist'],
+  },
+  {
     id: 'claim-check', name: 'Claim check', hub: 'review',
     description: 'Paste a claim or a paragraph and see which studies support it and which do not.',
     href: '/reviewer?module=claims', credits: '2 credits', phase1: false, marketing: '/features/citation-checker', landing: null, keywords: ['claims', 'evidence', 'support'],
@@ -182,8 +225,13 @@ export const CATALOG: CatalogItem[] = [
   // ---------------------------------------------------------------- Data
   {
     id: 'data-lab', name: 'Data Lab', hub: 'data', workspace: true,
-    description: 'Upload a table, get the right statistical test, charts and a written report.',
-    href: '/data-lab', credits: 'Statistics free · AI write-up 2 credits', phase1: false, marketing: '/tools/data-analysis', landing: '/features/data-lab', keywords: ['statistics', 't-test', 'anova', 'chart', 'csv'],
+    description: 'Upload a table: t-tests to logistic regression, survival curves, diagnostic accuracy, ROC, reliability and sample size, with R, Python and SPSS code.',
+    href: '/data-lab', credits: 'Statistics free · AI write-up 2 credits', phase1: false, marketing: '/tools/data-analysis', landing: '/features/data-lab', keywords: ['statistics', 't-test', 'anova', 'chart', 'csv', 'logistic regression', 'survival', 'kaplan-meier', 'roc', 'sensitivity', 'cronbach', 'sample size', 'spss', 'r code'],
+  },
+  {
+    id: 'surveys', name: 'Survey builder', hub: 'data', workspace: true,
+    description: 'Questionnaires with validated scales (PHQ-9, GAD-7, SUS …), anonymous online responses, scoring and reliability in Data Lab.',
+    href: '/surveys', credits: 'No credits · AI drafting 3 · AI check 2', phase1: false, marketing: null, landing: '/features/survey-builder', keywords: ['questionnaire', 'likert', 'survey', 'phq-9', 'gad-7', 'cronbach'],
   },
   {
     id: 'pdf-tools', name: 'PDF tools', hub: 'data',

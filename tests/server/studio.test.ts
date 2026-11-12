@@ -140,6 +140,18 @@ describe('POST /api/studio/run/:module', () => {
     expect(last(events, 'done').sources[0]).toMatchObject({ marker: 'S1', title: 'Earlier paper' });
   });
 
+  it('builds on the text of the task it continues, its markers renumbered to the new sources', async () => {
+    fake.put('tasks/research-2', { user_id: USER.id, account_id: ACCOUNT, project_id: null, kind: 'research', title: 'Sleep and memory', status: 'done', result: { markdown: 'Sleep consolidates memory [S3]. Invented [S8].', all_sources: [{ n: 3, marker: 'S3', kind: 'paper', id: 'W9', title: 'Earlier paper', authors: [], abstract: 'x' }] }, created_at: new Date(), updated_at: new Date() });
+    const seen: string[] = [];
+    const llm = fakeLlm((messages) => { seen.push(messages[1].content); return '## Introduction\n\nText [S2].'; });
+    const { events } = await run(llm, 'template', { inputs: { template: 'imrad', topic: 'Sleep and memory' }, from_task: 'research-2', attachments: [{ name: 'notes.md', text: 'My notes on sleep.' }] });
+    expect(last(events, 'done').markdown).toContain('[S2]');
+    expect(search.calls).toHaveLength(0);
+    expect(seen[0]).toContain('Sleep consolidates memory [S2]. Invented.');
+    expect(seen[0]).toContain('- Introduction: The problem');
+    expect(seen[0]).not.toContain('- References');
+  });
+
   it('returns the credits and records the failure when the model fails', async () => {
     const { events } = await run(fakeLlm('', new Error('boom')), 'outline', { inputs: { topic: 'nurse burnout' } });
     expect(last(events, 'error').detail).toContain('Your credits were returned');
@@ -148,7 +160,7 @@ describe('POST /api/studio/run/:module', () => {
 
   it('refuses High quality on Free and a run that needs more credits than are left', async () => {
     expect((await run(fakeLlm('x'), 'outline', { inputs: { topic: 'nurse burnout' }, high_quality: true })).status).toBe(402);
-    fake.put(`accounts/${ACCOUNT}/plan_usage/credits__${new Date().toISOString().slice(0, 7)}`, { key: 'credits', amount: 25 });
+    fake.put(`accounts/${ACCOUNT}/plan_usage/credits__${new Date().toISOString().slice(0, 7)}`, { key: 'credits', amount: 40 });
     const refused = await run(fakeLlm('x'), 'paper', { inputs: { topic: 'a study' } });
     expect(refused.status).toBe(402);
     expect(refused.json).toMatchObject({ code: 'plan_limit', limit: 'credits' });

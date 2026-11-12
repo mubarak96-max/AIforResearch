@@ -72,7 +72,7 @@ describe('payments', () => {
     expect(first).toMatchObject({ credits: 500, duplicate: false });
     expect(await applyPackPayment(payment())).toMatchObject({ duplicate: true });
     expect(account().credit_topup).toBe(500);
-    expect((await creditSummary(ACCOUNT)).left).toBe(1000);
+    expect((await creditSummary(ACCOUNT)).left).toBe(1250);
   });
 
   it('finds the pack from the product in the cart when the metadata is missing', async () => {

@@ -9,6 +9,7 @@ import { api } from '@/lib/session';
 import { openInEditor } from '@/components/tools/editorHandoff';
 import { EDITOR_STYLE, editorHtml, type ResultSource } from '@/components/tools/toolOutput';
 import type { Source } from './parts';
+import { figuresAsText } from '@/lib/server/lib/researchFigures';
 
 export function toResultSource(source: Source): ResultSource {
   return {
@@ -37,8 +38,12 @@ export async function loadFromTask(id: string | null | undefined): Promise<{ top
   const task = await api<TaskRecord>(`/api/history/${encodeURIComponent(id)}`).catch(() => null);
   if (!task) return null;
   const sources = ((task.result?.sources ?? task.result?.all_sources ?? []) as Source[]);
-  return { topic: String(task.inputs?.question ?? task.inputs?.topic ?? task.title), sources, markdown: String(task.result?.markdown ?? ''), task };
+  // A report's figures arrive as tables: the workspaces that build on it read text.
+  return { topic: String(task.inputs?.question ?? task.inputs?.topic ?? task.title), sources, markdown: figuresAsText(String(task.result?.markdown ?? ''), task.result?.figures), task };
 }
+
+/** Text with its [S1] markers removed, for forms that take plain text (abstract, paraphrase, improve…). */
+export const withoutMarkers = (markdown: string) => markdown.replace(/\s?\[S\d+(?:[,;\s]*S?\d+)*\]/g, '');
 
 /** Where each follow-on tool lives, with the task it continues from. */
 export function followOnLinks(taskId: string) {
@@ -46,6 +51,7 @@ export function followOnLinks(taskId: string) {
   return [
     { label: 'Write a literature review', href: `/write?module=literature-review&${from}` },
     { label: 'Write a paper', href: `/write?module=paper&${from}` },
+    { label: 'Fill a template', href: `/write?module=template&${from}` },
     { label: 'Find gaps', href: `/thesis?module=gaps&${from}` },
     { label: 'Thesis outline', href: `/thesis?module=outline&${from}` },
     { label: 'Write abstract', href: `/write?module=abstract&${from}` },
@@ -60,7 +66,7 @@ export function taskHref(task: Pick<TaskRecord, 'id' | 'kind' | 'module'>): stri
   const id = encodeURIComponent(task.id);
   switch (task.kind) {
     case 'research': return `/deep-research?task=${id}`;
-    case 'review': case 'claim_check': case 'citation_check': return `/reviewer?task=${id}`;
+    case 'review': case 'claim_check': case 'citation_check': case 'guideline_check': return `/reviewer?task=${id}`;
     case 'thesis': return `/thesis?task=${id}`;
     case 'proposal': return `/proposals?task=${id}`;
     case 'writing': return `/write?task=${id}`;
@@ -74,7 +80,7 @@ export function taskHref(task: Pick<TaskRecord, 'id' | 'kind' | 'module'>): stri
 }
 
 export const KIND_LABELS: Record<string, string> = {
-  research: 'Deep Research', papers: 'Find Papers', review: 'Reviewer', claim_check: 'Claim check', citation_check: 'Citation check', thesis: 'Thesis Suite',
+  research: 'Deep Research', papers: 'Find Papers', review: 'Reviewer', claim_check: 'Claim check', citation_check: 'Citation check', guideline_check: 'Guideline check', thesis: 'Thesis Suite',
   proposal: 'Proposal Studio', writing: 'Writing Studio', systematic_review: 'Systematic Review', data: 'Data Lab', citation_map: 'Citation Map',
   landscape: 'Landscape', slides: 'Slides', tool: 'Tool', chat_pdf: 'Chat with PDF',
 };

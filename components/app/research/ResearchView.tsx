@@ -7,40 +7,62 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { LuArrowRight, LuCopy, LuFilePen, LuLibrary, LuLoaderCircle, LuSend } from 'react-icons/lu';
+import { LuArrowRight, LuCopy, LuFilePen, LuLibrary, LuLoaderCircle, LuRotateCcw, LuSend } from 'react-icons/lu';
 import { api } from '@/lib/session';
 import { Button } from '@/components/app/ui';
 import { CitedMarkdown, ConsensusBar, CreditCost, SourceRow, creditsChanged, saveToLibrary, showError, type Source } from './parts';
+import { Check } from './controls';
 import { followOnLinks, openResultInEditor } from './handoff';
+import { AskComposer, type AskRequest } from './AskComposer';
+import { ResearchSteps, VerifyFlags, type StepView } from './ResearchSteps';
+import type { ResearchFigure } from './figures';
+import { figuresAsText } from '@/lib/server/lib/researchFigures';
 
 export type ResearchState = {
   taskId: string | null;
   question: string;
   depth: string;
   groups: string[];
-  status: { stage: string; detail: string } | null;
+  /** The seven steps (Plan … Verify), live or as saved; empty on answers saved before the steps. */
+  steps: StepView[];
   markdown: string;
+  /** A report's figures (Deep and Detailed), drawn where the text has a figure block. */
+  figures?: ResearchFigure[];
   sources: Source[];
   allSources: Source[];
   web: Source[];
   consensus: { applicable: boolean; line: string | null; counts: Record<string, number>; total: number } | null;
+  verification?: { flags: { kind: string; text: string; revised?: string | null; note: string | null; n?: number | null }[] } | null;
   searched: { counts: Record<string, number>; errors: { provider: string; message: string }[]; queries?: string[] } | null;
   followUps: { question: string; answer: string }[];
+  /** A saved task already holds a version with headings, so turning them back on is free. */
+  headedCopy?: boolean;
   running: boolean;
   error: string | null;
+  /** What was asked, so a run that failed or found nothing can be changed and run again. */
+  request?: Partial<AskRequest>;
 };
 
 const GROUP_LABELS: Record<string, string> = { papers: 'All papers', medical: 'Medical', preprints: 'Preprints', web: 'Web', library: 'My Library' };
+const hasHeadings = (markdown: string) => /^#{1,6}[ \t]+\S/m.test(markdown);
+
 const PROVIDER_LABELS: Record<string, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', pubmed: 'PubMed', europepmc: 'Europe PMC', arxiv: 'arXiv', web: 'Web', library: 'Library' };
 
-export function ResearchView({ state }: { state: ResearchState }) {
+export function ResearchView({ state, onRetry }: { state: ResearchState; onRetry?: (request: AskRequest) => void }) {
   const [tab, setTab] = useState<'cited' | 'all' | 'web'>('cited');
   const [highlight, setHighlight] = useState<number | null>(null);
   const [followUps, setFollowUps] = useState(state.followUps);
   const [asking, setAsking] = useState(false);
   const [followUp, setFollowUp] = useState('');
+  const [markdown, setMarkdown] = useState(state.markdown);
+  const [headedCopy, setHeadedCopy] = useState(Boolean(state.headedCopy));
+  const [formatting, setFormatting] = useState(false);
   const sourcesRef = useRef<HTMLDivElement>(null);
   useEffect(() => setFollowUps(state.followUps), [state.followUps]);
+  useEffect(() => setMarkdown(state.markdown), [state.markdown]);
+  useEffect(() => setHeadedCopy(Boolean(state.headedCopy)), [state.headedCopy]);
+  const withHeadings = hasHeadings(markdown);
+  const addCost = withHeadings || headedCopy ? 0 : 1;
   useEffect(() => { if (!state.running && state.sources.length === 0 && state.allSources.length) setTab('all'); }, [state.running, state.sources.length, state.allSources.length]);
 
   const cite = (n: number) => {
@@ -53,7 +75,11 @@ export function ResearchView({ state }: { state: ResearchState }) {
   const shown = tab === 'cited' ? (state.running && !state.sources.length ? state.allSources : state.sources) : tab === 'all' ? state.allSources : state.web;
   const everySource = [...state.allSources, ...state.web];
   const cited = state.sources.length;
+  // Under the answer: what the reader must know (changed sentences, unsupported claims, retracted or corrected papers).
+  const attention = (state.verification?.flags ?? []).filter((flag) => flag.kind !== 'unconfirmed');
   const searchedTotal = Object.values(state.searched?.counts ?? {}).reduce((sum, value) => sum + value, 0);
+  /** The report as text, each figure as a table: for the editor and the clipboard. */
+  const asText = () => figuresAsText(markdown, state.figures);
 
   const ask = async () => {
     if (!state.taskId || followUp.trim().length < 2) return;
@@ -67,6 +93,20 @@ export function ResearchView({ state }: { state: ResearchState }) {
     } finally {
       setAsking(false);
       creditsChanged();
+    }
+  };
+  const toggleHeadings = async (on: boolean) => {
+    if (!state.taskId || formatting) return;
+    setFormatting(true);
+    try {
+      const result = await api<{ markdown: string; headed_copy: boolean; credits: number }>(`/api/research/${state.taskId}/headings`, { method: 'POST', body: JSON.stringify({ headings: on }) });
+      setMarkdown(result.markdown);
+      setHeadedCopy(result.headed_copy);
+      if (result.credits) creditsChanged();
+    } catch (error) {
+      showError(error);
+    } finally {
+      setFormatting(false);
     }
   };
   const saveAll = async () => {
@@ -87,21 +127,39 @@ export function ResearchView({ state }: { state: ResearchState }) {
             {state.searched.errors.map((error) => PROVIDER_LABELS[error.provider] || error.provider).join(', ')} did not answer this time; the answer uses the other sources.
           </p>
         ) : null}
-        {state.running && state.status && (
-          <p className="mt-4 flex items-center gap-2 text-[15px] font-medium text-ink-2" aria-live="polite">
-            <LuLoaderCircle className="h-4 w-4 animate-spin text-brand" aria-hidden="true" />{state.status.detail}…
-          </p>
+        {state.steps.length > 0 && <ResearchSteps key={state.taskId ?? 'live'} steps={state.steps} running={state.running} />}
+        {state.error && <p role="alert" className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-[14.5px] text-red-700">{state.error}</p>}
+        {state.error && !state.running && onRetry && (
+          <section aria-labelledby="retry-title" className="mt-5">
+            <h2 id="retry-title" className="flex items-center gap-2 text-[15px] font-bold text-ink">
+              <LuRotateCcw className="h-4 w-4 text-brand" aria-hidden="true" />Try again
+            </h2>
+            <p className="mt-1 text-[14px] text-muted">Your question and settings are below. Change the wording, the sources or the filters, then press Enter or the arrow to search again.</p>
+            <div className="mt-3">
+              <AskComposer key={state.taskId ?? state.question} onSubmit={onRetry} autoFocus initialRequest={{ ...state.request, question: state.request?.question ?? state.question }} />
+            </div>
+          </section>
         )}
-        {state.error && <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-[14.5px] text-red-700">{state.error}</p>}
         {state.consensus && <div className="mt-4"><ConsensusBar consensus={state.consensus} /></div>}
-        {state.markdown && <CitedMarkdown className="mt-2" markdown={state.markdown} sources={everySource} onCite={cite} />}
+        {markdown && <CitedMarkdown className={`mt-2 transition-opacity ${formatting ? 'opacity-50' : ''}`} markdown={markdown} sources={everySource} onCite={cite} figures={state.figures} />}
+        {!state.running && attention.length > 0 && (
+          <section aria-labelledby="checks-title" className="mt-5 rounded-xl bg-soft px-4 py-3">
+            <h2 id="checks-title" className="text-[14px] font-bold text-ink">Notes from the citation check</h2>
+            <VerifyFlags flags={attention} />
+          </section>
+        )}
 
-        {!state.running && state.markdown && state.taskId && (
+        {!state.running && markdown && state.taskId && (
           <>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <Button variant="primary" size="sm" onClick={() => openResultInEditor(state.question, state.markdown, everySource)}><LuFilePen className="h-4 w-4" />Open in editor</Button>
-              <Button size="sm" onClick={() => navigator.clipboard.writeText(state.markdown).then(() => toast.success('Copied'))}><LuCopy className="h-4 w-4" />Copy</Button>
+            <div className="mt-6 flex flex-wrap items-center gap-2">
+              <Button variant="primary" size="sm" onClick={() => openResultInEditor(state.question, asText(), everySource)}><LuFilePen className="h-4 w-4" />Open in editor</Button>
+              <Button size="sm" onClick={() => navigator.clipboard.writeText(asText()).then(() => toast.success('Copied'))}><LuCopy className="h-4 w-4" />Copy</Button>
               <Button size="sm" onClick={() => saveAll().catch(showError)}><LuLibrary className="h-4 w-4" />Save cited papers</Button>
+              <Check size="sm" className="ml-1" checked={withHeadings} onChange={toggleHeadings}
+                title={withHeadings ? 'Show the answer as flowing paragraphs' : addCost ? 'Add section headings; the text and citations stay the same (1 credit)' : 'Show the version with section headings'}>
+                Headings
+                {formatting ? <LuLoaderCircle className="h-3.5 w-3.5 animate-spin text-brand" aria-label="Updating" /> : !withHeadings && addCost > 0 && <span className="text-[12.5px] text-muted">· {addCost} credit</span>}
+              </Check>
             </div>
             <section aria-labelledby="next-title" className="mt-8">
               <h2 id="next-title" className="text-[15px] font-bold text-ink">Build on this</h2>

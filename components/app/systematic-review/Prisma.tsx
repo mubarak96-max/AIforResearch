@@ -36,12 +36,12 @@ export const PrismaDiagram = forwardRef<SVGSVGElement, { prisma: Prisma }>(funct
   const excluded: Box = { x: RIGHT, y: y2, lines: [`Records excluded (n = ${n(prisma.excluded_title)})`] };
   const y3 = y2 + Math.max(height(screened), height(excluded)) + 40;
   const sought: Box = { x: LEFT, y: y3, lines: [`Reports sought for retrieval (n = ${n(prisma.sought)})`] };
-  const notRetrieved: Box = { x: RIGHT, y: y3, lines: [`Reports not yet assessed (n = ${n(prisma.awaiting_full + prisma.conflicts_full)})`] };
+  const notRetrieved: Box = { x: RIGHT, y: y3, lines: [`Reports not retrieved (n = ${n(prisma.not_retrieved ?? 0)})`, `Awaiting a decision (n = ${n(prisma.awaiting_full + prisma.conflicts_full)})`] };
   const y4 = y3 + Math.max(height(sought), height(notRetrieved)) + 40;
   const assessed: Box = { x: LEFT, y: y4, lines: [`Reports assessed for eligibility (n = ${n(prisma.assessed)})`] };
   const reasons: Box = { x: RIGHT, y: y4, lines: [`Reports excluded (n = ${n(prisma.excluded_full_total)})`, ...prisma.excluded_full.slice(0, 10).flatMap((item) => wrap(`${item.reason} (n = ${n(item.count)})`))] };
   const y5 = y4 + Math.max(height(assessed), height(reasons)) + 40;
-  const included: Box = { x: LEFT, y: y5, lines: [`Studies included in review (n = ${n(prisma.included)})`] };
+  const included: Box = { x: LEFT, y: y5, lines: [`Reports included in review (n = ${n(prisma.included)})`] };
   const total = y5 + height(included) + 30;
   const boxes = [identified, removed, screened, excluded, sought, notRetrieved, assessed, reasons, included];
   const down = (from: Box, to: Box) => ({ x1: LEFT + BOX / 2, y1: from.y + height(from), x2: LEFT + BOX / 2, y2: to.y });
@@ -52,7 +52,7 @@ export const PrismaDiagram = forwardRef<SVGSVGElement, { prisma: Prisma }>(funct
     <svg ref={ref} xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${W} ${total}`} width="100%" role="img" aria-label="PRISMA 2020 flow diagram" style={{ background: '#ffffff', fontFamily: 'Arial, Helvetica, sans-serif' }}>
       <defs><marker id="prisma-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10z" fill="#1c1917" /></marker></defs>
       <rect width={W} height={total} fill="#ffffff" />
-      <text x={LEFT} y={30} fontSize="15" fontWeight="700" fill="#1c1917">Identification of studies via databases and registers</text>
+      <text x={LEFT} y={30} fontSize="15" fontWeight="700" fill="#1c1917">Records from databases, registers and other sources</text>
       {arrows.map((arrow, index) => <line key={index} {...arrow} stroke="#1c1917" strokeWidth="1.4" markerEnd="url(#prisma-arrow)" />)}
       {boxes.map((box, index) => (
         <g key={index}>

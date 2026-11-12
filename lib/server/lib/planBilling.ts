@@ -23,8 +23,19 @@ async function accountData(accountId: string): Promise<Record<string, any> | nul
   return snapshot.exists ? (snapshot.data() as Record<string, any>) : null;
 }
 
-/** The first person of an account (the owner). */
+/** Managed Teams designate their owners explicitly; other accounts retain their existing rule. */
 async function accountOwner(accountId: string) {
+  const account = await accountData(accountId);
+  const governance = account?.team_governance as { members?: Record<string, { role: string }> } | undefined;
+  if (governance?.members) {
+    const owners = Object.entries(governance.members).filter(([, member]) => member.role === 'owner');
+    for (const [id] of owners) {
+      const snapshot = await col(C.users).doc(id).get();
+      const person = snapshot.data() as { email: string; full_name: string | null; account_id: string; disabled_at?: unknown; email_verified_at?: unknown } | undefined;
+      if (person && person.account_id === accountId && !person.disabled_at && person.email_verified_at) return person;
+    }
+    return null;
+  }
   const people = rows<{ email: string; full_name: string | null; created_at: Date | null }>(
     await col(C.users).where('account_id', '==', accountId).limit(50).get());
   return people.sort((a, b) => (a.created_at?.getTime() ?? 0) - (b.created_at?.getTime() ?? 0))[0] ?? null;
@@ -90,6 +101,11 @@ export async function ensureCustomer(dodo: Dodo, accountId: string) {
   // Another request may have created one at the same moment: keep the first.
   return db().runTransaction(async (tx) => {
     const current = await tx.get(accountRef(accountId));
+    const reservedFor = current.get('personal_reserved_for') as string | null | undefined;
+    if (reservedFor) {
+      const person = await tx.get(col(C.users).doc(reservedFor));
+      if (!person.exists || person.get('account_id') !== accountId || person.get('deletion_pending_at')) throw new Error('This personal account is no longer available for checkout. Reload account settings; no checkout was started.');
+    }
     const existing = current.get('dodo_customer_id') as string | null | undefined;
     if (existing) return existing;
     tx.update(accountRef(accountId), { dodo_customer_id: customer.customer_id });

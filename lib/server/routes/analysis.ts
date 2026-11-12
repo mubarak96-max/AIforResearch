@@ -9,6 +9,7 @@
  *   POST /data/report                an AI-written results section from the computed numbers (CREDIT_COSTS.data_ai)
  */
 import { Hono } from 'hono';
+import { createHash } from 'node:crypto';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 import { requireUser, type AppVariables } from '../auth.js';
@@ -21,12 +22,22 @@ import { getLibraryDocuments } from '../lib/assist-store.js';
 import { researchProfile } from '../lib/users.js';
 import { rateLimit } from '../lib/rateLimit.js';
 import { citationMap, dataReportPrompt, landscape, reviewsCiting, snowball } from '../lib/analysis.js';
+import { ANALYSES, analysisDef, variableRange } from '../../dataLabAnalyses.js';
 
 const Seed = z.object({
   work_id: z.string().max(40).nullish(), doi: z.string().max(300).nullish(), title: z.string().max(500).nullish(), library_document_id: z.string().max(64).nullish(),
 });
 const Ids = z.array(z.string().regex(/^W\d{1,12}$/)).max(50);
 const SetPaper = z.object({ id: z.string().max(40), title: z.string().max(500), year: z.number().int().nullable().optional(), doi: z.string().max(300).nullable().optional(), round: z.number().int().optional() });
+const Kinds = z.record(z.enum(['numeric', 'categorical']));
+const Fingerprint = z.string().regex(/^[a-f0-9]{64}$/);
+const Reproducibility = z.object({
+  schema: z.literal(1), software: z.string().max(80), created_at: z.string().datetime(), dataset_sha256: Fingerprint,
+  rows: z.number().int().min(0).max(50_000), columns: z.array(z.string().max(200)).max(200), truncated: z.boolean(), column_kinds: Kinds,
+  transformations: z.array(z.object({ at: z.string().datetime(), action: z.enum(['load', 'edit_data', 'column_type', 'derive']), detail: z.string().max(500) })).max(300),
+  analyses: z.array(z.object({ test: z.enum(ANALYSES.map((item) => item.id) as [string, ...string[]]), variables: z.array(z.string().max(200)).min(1).max(41), options: z.object({ positive: z.string().max(200), reference_positive: z.string().max(200), event: z.string().max(200) }).partial().strict().optional(), kinds: Kinds, at: z.string().datetime(), dataset_sha256: Fingerprint, missing: z.literal('complete_observations'), rows_used: z.number().int().min(0), rows_omitted: z.number().int().min(0) }).refine((spec) => { const [min, max] = variableRange(analysisDef(spec.test)!); return spec.variables.length >= min && spec.variables.length <= max; }, 'An analysis has the wrong number of columns.')).max(30),
+  notes: z.string().max(10_000),
+});
 
 const LEVELS: Record<string, string> = {
   undergraduate: 'an undergraduate student', honours: 'an honours student', masters: 'a master’s student', phd: 'a doctoral researcher',
@@ -101,17 +112,33 @@ export function analysisRoutes(slots: Slots) {
     dataset: z.string().trim().max(200),
     n: z.number().int().min(0).max(10_000_000),
     columns: z.array(z.object({ name: z.string().max(200), kind: z.string().max(20), summary: z.string().max(600) })).max(200),
-    results: z.array(z.object({ title: z.string().max(300), rows: z.array(z.tuple([z.string().max(200), z.string().max(300)])).max(60), apa: z.string().max(2000).optional(), warnings: z.array(z.string().max(400)).max(10).optional() })).min(1).max(30),
+    results: z.array(z.object({
+      title: z.string().max(300), rows: z.array(z.tuple([z.string().max(200), z.string().max(300)])).max(60), apa: z.string().max(2000).optional(), warnings: z.array(z.string().max(400)).max(10).optional(),
+      chart: z.object({ kind: z.enum(['survival', 'roc']), x: z.string().max(200), y: z.string().max(200), series: z.array(z.object({ name: z.string().max(200), points: z.array(z.tuple([z.number().finite(), z.number().finite()])).max(420) })).max(12) }).optional(),
+    })).min(1).max(30),
     project_id: z.string().max(64).nullish(),
     task_id: z.string().max(64).nullish(),
+    reproducibility: Reproducibility.optional(),
+    save_dataset: z.boolean().default(false),
+    dataset_snapshot: z.string().max(2_000_000).optional(),
   });
+
+  function reproducibleFields(body: z.infer<typeof DataBody>) {
+    if (body.dataset_snapshot !== undefined && !body.save_dataset) throw new HTTPException(422, { message: 'Saving raw data requires explicit opt-in.' });
+    if (body.save_dataset && (body.dataset_snapshot === undefined || !body.reproducibility)) throw new HTTPException(422, { message: 'Include the dataset and its reproducibility record to save a snapshot.' });
+    if (body.dataset_snapshot !== undefined && Buffer.byteLength(body.dataset_snapshot, 'utf8') > 2_000_000) throw new HTTPException(422, { message: 'Dataset snapshots must be no larger than 2 MB.' });
+    if (body.dataset_snapshot !== undefined && createHash('sha256').update(body.dataset_snapshot).digest('hex') !== body.reproducibility?.dataset_sha256) throw new HTTPException(422, { message: 'The dataset fingerprint does not match the saved analysis.' });
+    if (body.reproducibility?.analyses.some((spec) => spec.dataset_sha256 !== body.reproducibility!.dataset_sha256)) throw new HTTPException(422, { message: 'Every analysis must use the same dataset version.' });
+    return { ...(body.reproducibility ? { reproducibility: body.reproducibility } : {}), dataset_snapshot: body.save_dataset ? body.dataset_snapshot : null };
+  }
 
   app.post('/data/save', async (c) => {
     const user = currentUser(c);
     const body = await parseBody(c, DataBody);
-    const saved = { summary: `${body.results.length} result${body.results.length === 1 ? '' : 's'} from ${body.dataset}`, dataset: body.dataset, n: body.n, columns: body.columns, results: body.results, question: body.question };
+    const saved = { summary: `${body.results.length} result${body.results.length === 1 ? '' : 's'} from ${body.dataset}`, dataset: body.dataset, n: body.n, columns: body.columns, results: body.results, question: body.question, ...reproducibleFields(body) };
     if (body.task_id) {
       const task = await getTaskFor(user, body.task_id, 'edit');
+      if (task.kind !== 'data') throw new HTTPException(409, { message: 'This is not a Data Lab analysis.' });
       await updateTaskResult(task.id, { ...(task.result ?? {}), ...saved }, { title: body.title });
       return c.json({ task_id: task.id });
     }
@@ -123,6 +150,8 @@ export function analysisRoutes(slots: Slots) {
   app.post('/data/report', async (c) => {
     const user = currentUser(c);
     const body = await parseBody(c, DataBody);
+    const reproduction = reproducibleFields(body);
+    if (body.task_id && (await getTaskFor(user, body.task_id, 'edit')).kind !== 'data') throw new HTTPException(409, { message: 'This is not a Data Lab analysis.' });
     const unavailable = llmUnavailable(slots.llm);
     if (unavailable) throw new HTTPException(503, { message: unavailable });
     let charge: CreditCharge | null = await spendCredits(user.account_id, CREDIT_COSTS.data_ai, 'A Data Lab report');
@@ -135,7 +164,7 @@ export function analysisRoutes(slots: Slots) {
       await meterTokens(user, usage, { feature: 'data:report', provider: slots.llm.provider, model: llmModelName(slots.llm, 'fast') });
       const markdown = text.trim();
       if (!markdown) throw new HTTPException(503, { message: 'The AI returned nothing. Try again.' });
-      const saved = { summary: markdown.replace(/[#*_]/g, '').slice(0, 300), markdown, dataset: body.dataset, n: body.n, columns: body.columns, results: body.results, question: body.question };
+      const saved = { summary: markdown.replace(/[#*_]/g, '').slice(0, 300), markdown, dataset: body.dataset, n: body.n, columns: body.columns, results: body.results, question: body.question, ...reproduction };
       let taskId = body.task_id ?? null;
       if (taskId) {
         const task = await getTaskFor(user, taskId, 'edit');

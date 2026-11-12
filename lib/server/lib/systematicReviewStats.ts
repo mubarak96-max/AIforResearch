@@ -41,7 +41,7 @@ export type ScreeningRecord = {
   duplicate_of: string | null;
   source: string;
   votes: Partial<Record<Stage, Record<string, Vote>>>;
-  ai?: Partial<Record<Stage, { decision: Decision; reason: string } | null>>;
+  ai?: Partial<Record<Stage, { decision: Decision; reason: string; source_revision?: string | null } | null>>;
   resolved?: Partial<Record<Stage, Vote | null>>;
 };
 
@@ -121,6 +121,7 @@ export type Prisma = {
   conflicts_title: number;
   sought: number;
   assessed: number;
+  not_retrieved: number;
   excluded_full: { reason: string; count: number }[];
   excluded_full_total: number;
   awaiting_full: number;
@@ -133,7 +134,7 @@ export function prismaCounts(records: ScreeningRecord[], setup: ReviewerSetup): 
   const bySource = new Map<string, number>();
   for (const record of records) bySource.set(record.source, (bySource.get(record.source) ?? 0) + 1);
   const unique = records.filter((record) => !record.duplicate_of);
-  let excludedTitle = 0; let awaitingTitle = 0; let conflictsTitle = 0; let sought = 0; let assessed = 0; let awaitingFull = 0; let conflictsFull = 0; let included = 0;
+  let excludedTitle = 0; let awaitingTitle = 0; let conflictsTitle = 0; let sought = 0; let assessed = 0; let notRetrieved = 0; let awaitingFull = 0; let conflictsFull = 0; let included = 0;
   const reasons = new Map<string, number>();
   for (const record of unique) {
     const title = stageState(record, 'title', setup);
@@ -144,6 +145,7 @@ export function prismaCounts(records: ScreeningRecord[], setup: ReviewerSetup): 
     const full = stageState(record, 'full', setup);
     if (full.status === 'pending' || full.decision === 'maybe') { awaitingFull += 1; continue; }
     if (full.status === 'conflict') { conflictsFull += 1; continue; }
+    if (full.decision === 'exclude' && /^full text not available(?:$|:)/i.test(full.reason || '')) { notRetrieved += 1; continue; }
     assessed += 1;
     if (full.decision === 'include') included += 1;
     else {
@@ -162,6 +164,7 @@ export function prismaCounts(records: ScreeningRecord[], setup: ReviewerSetup): 
     conflicts_title: conflictsTitle,
     sought,
     assessed,
+    not_retrieved: notRetrieved,
     excluded_full: excludedFull,
     excluded_full_total: excludedFull.reduce((sum, item) => sum + item.count, 0),
     awaiting_full: awaitingFull,

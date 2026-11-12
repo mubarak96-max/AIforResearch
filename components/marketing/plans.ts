@@ -30,8 +30,10 @@ export function comparisonRows(plans: PublicPlan[]): { feature: string; values: 
   return [
     row('Credits a month', (plan) => total(plan.limits.credits)),
     row('Paper search, filters and citations', () => 'Unlimited'),
-    row('Summary and Deep research', () => true),
-    row('Detailed reports (50+ papers)', (plan) => plan.limits.detailed_mode),
+    row('Summary answers and Deep reports with figures', () => true),
+    row('Detailed reports (90+ papers, study table)', (plan) => plan.limits.detailed_mode),
+    row('Deep and Detailed reports', (plan) => count(plan.limits.research_runs)),
+    row('Reports running at once', (plan) => total(plan.limits.research_parallel)),
     row('High-quality mode', (plan) => plan.limits.high_quality),
     row('AI autocomplete', (plan) => count(plan.limits.autocomplete)),
     row('PDFs in your Library', (plan) => total(plan.limits.library_pdfs)),
@@ -48,8 +50,8 @@ const usd = (cents: number) => `$${(cents / 100).toLocaleString('en-US', { maxim
 /** One-line summary used in the /pricing meta description. */
 export function pricingSummary(plans: PublicPlan[] | null) {
   const paid = (plans ?? []).filter((plan) => plan.monthly_cents > 0);
-  if (!paid.length) return 'Start free with 30 credits a month for AI research, unlimited paper search and citations. Upgrade for more credits, Detailed reports and High-quality mode.';
+  if (!paid.length) return 'Start free with 45 credits a month for AI research, unlimited paper search and citations. Upgrade for more credits, Detailed reports and High-quality mode.';
   const cheapest = paid.reduce((low, plan) => (plan.monthly_cents < low.monthly_cents ? plan : low));
   const perMonthYearly = cheapest.yearly_cents ? usd(Math.round(cheapest.yearly_cents / 12)) : null;
-  return `Start free with 30 credits a month and unlimited paper search. ${cheapest.name} is ${usd(cheapest.monthly_cents)}/month${perMonthYearly ? ` or ${perMonthYearly}/month billed yearly` : ''}, with 500 credits and Detailed reports. Defence Pass: 90 days of Pro for $49.`;
+  return `Start free with 45 credits a month and unlimited paper search. ${cheapest.name} is ${usd(cheapest.monthly_cents)}/month${perMonthYearly ? ` or ${perMonthYearly}/month billed yearly` : ''}, with 750 credits and Detailed reports. Defence Pass: 90 days of Pro for $49.`;
 }
