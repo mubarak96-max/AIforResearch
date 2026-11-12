@@ -7,7 +7,7 @@ import { adminAuth, C, col, getRow } from '../firebase.js';
 import { rateLimit } from '../lib/rateLimit.js';
 import { requireAppCheck } from '../lib/appCheck.js';
 import { methodsFor, PROVIDER_IDS, PROVIDERS, type Provider } from '../lib/signin.js';
-import { publicUser, signedIn, userByEmail, type UserDoc } from '../lib/users.js';
+import { RESEARCH_ROLES, publicUser, signedIn, userByEmail, type UserDoc } from '../lib/users.js';
 import { forgetLegacyPassword, legacyPassword, verifyLegacyPassword } from '../lib/legacyPasswords.js';
 import { deleteUserData } from '../lib/accountDeletion.js';
 
@@ -19,7 +19,15 @@ import { deleteUserData } from '../lib/accountDeletion.js';
  */
 
 const loginBody = z.object({ email: z.string().trim().toLowerCase().email().max(254), password: z.string().min(1).max(200) });
-const profileBody = z.object({ full_name: z.string().trim().max(120) });
+const profileBody = z.object({
+  full_name: z.string().trim().max(120).optional(),
+  profile: z.object({
+    role: z.enum(RESEARCH_ROLES).nullable().optional(),
+    field: z.string().trim().max(80).nullable().optional(),
+    citation_style: z.string().trim().max(80).nullable().optional(),
+    language: z.string().trim().max(40).nullable().optional(),
+  }).optional(),
+});
 const providerParam = z.enum(['google', 'microsoft', 'apple']);
 
 export function authRoutes() {
@@ -40,9 +48,16 @@ export function authRoutes() {
     const parsed = profileBody.safeParse(await c.req.json().catch(() => ({})));
     if (!parsed.success) throw new HTTPException(422, { message: 'Enter a name of up to 120 characters.' });
     const user = c.get('user')!;
-    const fullName = parsed.data.full_name || null;
-    await col(C.users).doc(user.id).update({ full_name: fullName });
-    await adminAuth().updateUser(user.id, { displayName: fullName }).catch(() => undefined);
+    let fullName = user.full_name;
+    if (parsed.data.full_name !== undefined) {
+      fullName = parsed.data.full_name || null;
+      await col(C.users).doc(user.id).update({ full_name: fullName });
+      await adminAuth().updateUser(user.id, { displayName: fullName }).catch(() => undefined);
+    }
+    if (parsed.data.profile) {
+      const updates = Object.fromEntries(Object.entries(parsed.data.profile).filter(([, value]) => value !== undefined).map(([key, value]) => [`profile.${key}`, value || null]));
+      if (Object.keys(updates).length) await col(C.users).doc(user.id).update(updates);
+    }
     forgetUser(user.id);
     return c.json(await publicUser({ ...user, full_name: fullName }));
   });

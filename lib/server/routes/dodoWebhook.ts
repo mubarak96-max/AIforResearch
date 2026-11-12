@@ -4,6 +4,7 @@ import { C, col } from '../firebase.js';
 import { settings } from '../lib/settings.js';
 import { dodoClient } from '../lib/dodoBilling.js';
 import { syncPlanSubscription } from '../lib/planBilling.js';
+import { applyPackPayment, applyRefund } from '../lib/creditPurchases.js';
 
 /** Events the webhook subscribes to (Dodo dashboard → Developer → Webhooks; also set by Admin › Billing). */
 export const WEBHOOK_EVENTS = [
@@ -16,6 +17,9 @@ export const WEBHOOK_EVENTS = [
   'subscription.cancelled',
   'subscription.expired',
   'subscription.failed',
+  // Credit top-ups and the Defence Pass (one-time payments, lib/creditPurchases.ts).
+  'payment.succeeded',
+  'refund.succeeded',
 ] as const satisfies readonly DodoPayments.WebhookEventType[];
 
 async function hasPlanSubscription(subscriptionId: string) {
@@ -34,7 +38,8 @@ async function planSubscriptionOf(event: DodoPayments.UnwrapWebhookEvent): Promi
 /**
  * Dodo Payments webhook: POST /api/dodo/webhook. Verifies the Standard Webhooks signature with
  * the signing secret from the admin page and handles each delivery once (by its webhook-id):
- * plan subscriptions keep the account's plan.
+ * plan subscriptions keep the account's plan; paid top-ups add credits and a Defence Pass runs
+ * Pro for 90 days; refunds take back what is left of them.
  */
 export function dodoWebhookRoutes() {
   const app = new Hono();
@@ -73,6 +78,11 @@ export function dodoWebhookRoutes() {
       if (planSubscription) {
         // Deliveries can arrive out of order: read the subscription as it is now.
         await syncPlanSubscription(await dodo.subscriptions.retrieve(planSubscription), new Date(event.timestamp));
+      } else if (event.type === 'payment.succeeded') {
+        // Top-ups and passes; plan charges (with a subscription id) are left to the subscription events.
+        await applyPackPayment(event.data as DodoPayments.Payments.Payment);
+      } else if (event.type === 'refund.succeeded') {
+        await applyRefund(event.data as DodoPayments.Refunds.Refund);
       }
     } catch (error) {
       // Dodo retries on 5xx.

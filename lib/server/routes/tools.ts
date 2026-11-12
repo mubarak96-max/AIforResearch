@@ -14,18 +14,22 @@ import type { Slots } from '../slots/types.js';
 import { searchParams, cleanDoi, type PagedPapersSlot } from '../slots/papers.js';
 import { LlmError } from '../slots/llm.js';
 import { completeMetered, toHttpError } from '../lib/assist-llm.js';
-import { checkQuota, countUse } from '../lib/plans.js';
+import { CREDIT_COSTS, refundCredits, spendCredits, type CreditCharge } from '../lib/plans.js';
 import { rateLimit } from '../lib/rateLimit.js';
 import { getFirst, isCitableWork, papersSlots, toPaperRecord, workToCsl, type PaperRecord } from '../lib/directory.js';
 import { buildToolPrompt, cleanMarkers, hasToolPrompt, type ToolInputs } from '../lib/toolPrompts.js';
 import { ANON_DAILY_RUNS, getTool, type Tool, type ToolField } from '../../tools.js';
 
-/** Which plan allowance a tool uses: drafts count as Write with AI, rewrites as AI edits. */
-const QUOTA: Record<string, 'write' | 'ai_edit'> = {
-  'paraphrasing-tool': 'ai_edit',
-  humanizer: 'ai_edit',
-  'abstract-generator': 'ai_edit',
+/** What a tool costs signed in, in credits (lib/server/lib/plans.ts): rewrites 1, sections 3, reports and drafts more. */
+const TOOL_CREDITS: Record<string, number> = {
+  'paraphrasing-tool': CREDIT_COSTS.ai_edit,
+  humanizer: CREDIT_COSTS.ai_edit,
+  'abstract-generator': CREDIT_COSTS.section,
+  'research-gap-finder': CREDIT_COSTS.section,
+  'thesis-chapter-planner': CREDIT_COSTS.section,
+  'deep-research': CREDIT_COSTS.deep,
 };
+export const toolCredits = (slug: string) => TOOL_CREDITS[slug] ?? CREDIT_COSTS.write;
 
 export type ToolSource = {
   marker: string;
@@ -141,34 +145,38 @@ export function toolRoutes(slots: Slots) {
     if (!parsed.success) throw new HTTPException(422, { message: parsed.error.issues[0]?.message || 'Check the form and try again.' });
     const inputs = parsed.data as ToolInputs;
 
-    const quota = QUOTA[tool.slug] ?? 'write';
-    if (user) await checkQuota(user.account_id, quota);
+    let charge: CreditCharge | null = null;
+    if (user) charge = await spendCredits(user.account_id, toolCredits(tool.slug), tool.name);
     else await allowAnonymous(c);
-
-    let records: PaperRecord[] = [];
-    if (tool.grounded) {
-      records = await findSources(papersSlots(), inputs.topic, { recent: tool.slug === 'research-gap-finder' }).catch(() => []);
-      if (!records.length) throw new HTTPException(422, { message: 'No papers found for that topic. Try broader or different words.' });
-    }
-    const sources = records.map((record, index) => toSource(record, `S${index + 1}`));
-    const prompt = buildToolPrompt(tool.slug, inputs, records.map((record, index) => ({
-      marker: `S${index + 1}`, title: record.paper.title, authors: record.authors.map((a) => a.name), year: record.paper.year, venue: record.paper.venue, abstract: record.paper.abstract,
-    })));
-
-    let text: string;
     try {
-      text = user
-        ? await completeMetered(slots.llm, user, prompt, { feature: `tool:${tool.slug}` })
-        : (await slots.llm.complete(prompt)).text;
-    } catch (error) {
-      if (error instanceof LlmError) throw toHttpError(error);
-      throw new HTTPException(503, { message: 'The AI is busy. Try again in a minute.' });
-    }
+      let records: PaperRecord[] = [];
+      if (tool.grounded) {
+        records = await findSources(papersSlots(), inputs.topic, { recent: tool.slug === 'research-gap-finder' }).catch(() => []);
+        if (!records.length) throw new HTTPException(422, { message: 'No papers found for that topic. Try broader or different words.' });
+      }
+      const sources = records.map((record, index) => toSource(record, `S${index + 1}`));
+      const prompt = buildToolPrompt(tool.slug, inputs, records.map((record, index) => ({
+        marker: `S${index + 1}`, title: record.paper.title, authors: record.authors.map((a) => a.name), year: record.paper.year, venue: record.paper.venue, abstract: record.paper.abstract,
+      })));
 
-    const { text: markdown, used } = cleanMarkers(text.trim(), new Set(sources.map((source) => source.marker)));
-    if (!markdown) throw new HTTPException(503, { message: 'The AI returned nothing. Try again.' });
-    if (user) await countUse(user.account_id, quota).catch((error) => console.error('tool usage not counted', error));
-    return c.json({ markdown, sources: sources.filter((source) => used.includes(source.marker)) });
+      let text: string;
+      try {
+        text = user
+          ? await completeMetered(slots.llm, user, prompt, { feature: `tool:${tool.slug}` })
+          : (await slots.llm.complete(prompt)).text;
+      } catch (error) {
+        if (error instanceof LlmError) throw toHttpError(error);
+        throw new HTTPException(503, { message: 'The AI is busy. Try again in a minute.' });
+      }
+
+      const { text: markdown, used } = cleanMarkers(text.trim(), new Set(sources.map((source) => source.marker)));
+      if (!markdown) throw new HTTPException(503, { message: 'The AI returned nothing. Try again.' });
+      charge = null;
+      return c.json({ markdown, sources: sources.filter((source) => used.includes(source.marker)), credits: user ? toolCredits(tool.slug) : 0 });
+    } finally {
+      // Anything that stopped the tool before an answer gives the credits back.
+      await refundCredits(charge);
+    }
   });
 
   app.get('/cite', async (c) => {

@@ -15,8 +15,11 @@ import { appCheckHeader, firebaseAuth, firebaseCode, firebaseMessage } from '@/l
  */
 
 /** The signed-in person, as returned by the API. */
+export type ResearchProfile = { role: string | null; field: string | null; citation_style: string | null; language: string | null };
+
 export type SessionUser = {
   id: string; email: string; full_name: string | null; plan?: string; plan_name?: string; is_admin?: boolean; email_verified?: boolean;
+  profile?: ResearchProfile;
 };
 
 const TOKEN_KEY = 'writeorbit_token';
@@ -170,8 +173,24 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
     if (response.status === 401) clearSession();
   }
   const body = await response.json().catch(() => null);
-  if (!response.ok) throw new Error((body && (body.detail || body.error)) || `Request failed (${response.status})`);
+  if (!response.ok) throw new ApiError((body && (body.detail || body.error)) || `Request failed (${response.status})`, response.status, body);
   return body as T;
+}
+
+/** An API refusal: the server's message, its HTTP status and, for plan limits (402), which limit. */
+export class ApiError extends Error {
+  readonly code: string | null;
+  constructor(message: string, readonly status: number, readonly body: any) {
+    super(message);
+    this.name = 'ApiError';
+    this.code = body?.code ?? null;
+  }
+}
+
+/** Headers for a raw fetch (streams, uploads): the ID token and App Check. */
+export async function authHeaders(): Promise<Record<string, string>> {
+  const token = await freshToken().catch(() => getToken());
+  return { ...(await appCheckHeader()), ...(token ? { Authorization: `Bearer ${token}` } : {}) };
 }
 
 /** Kept for callers of the old API; nothing is offered after a sign-in any more (no passkeys). */

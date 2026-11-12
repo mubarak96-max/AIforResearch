@@ -1,0 +1,9 @@
+Title: Sleep After Lectures and Long-Term Recall of Course Material Among Undergraduate Students at a Kenyan Public University
+
+Degree: Master of Science in Psychology (Cognitive Psychology)
+
+Abstract
+
+Laboratory studies show that sleep after learning improves memory consolidation, but most of this evidence comes from small samples learning artificial material in Europe and North America. This study examined whether sleep in the night after a lecture predicts recall of real lecture content one week later, and whether a structured afternoon nap improves recall compared with quiet rest. Sixty-four first-year students (38 women, 26 men; mean age 19.8 years) attended a 50-minute introductory psychology lecture. They kept a sleep diary for seven nights and wore no objective sleep measure. Half were randomly assigned to a 60-minute nap opportunity in a quiet room the afternoon after the lecture and half to 60 minutes of quiet rest. Recall was measured with a 30-item multiple-choice and short-answer test one week later. Self-reported sleep duration on the night after the lecture was positively correlated with recall (r = .34, p = .006), and the association remained after controlling for prior grade point average. The nap group scored slightly higher than the rest group (mean 19.4 vs. 17.9 out of 30), but the difference was not statistically significant (t(62) = 1.78, p = .08, d = 0.44). Whether participants actually fell asleep during the nap was not measured. The findings suggest that sleep on the night after a lecture supports long-term recall of course material in a real university setting. Implications for examination scheduling and student sleep education are discussed, together with the limitations of self-reported sleep and a single-site sample.
+
+Chapters: 1 Introduction; 2 Literature review; 3 Methodology; 4 Results; 5 Discussion; 6 Conclusion and recommendations.

@@ -3,12 +3,13 @@ import { comparisonRows, loadPublicPlans, pricingSummary, type CompareValue } fr
 import { PricingPlans } from '@/components/marketing/PricingPlans';
 import { pageMetadata } from '@/components/marketing/seo';
 import { container } from '@/components/marketing/styles';
+import { CreditFaq, PricingExtras } from '@/components/billing/PricingExtras';
 
 // Rendered per request (plans are cached for 5 minutes) so the plans are always in the HTML.
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata() {
-  return pageMetadata({ title: 'Pricing: free AI writing and citation plans', path: '/pricing', description: pricingSummary(await loadPublicPlans()) });
+  return pageMetadata({ title: 'Pricing: free AI research plans with monthly credits', path: '/pricing', description: pricingSummary(await loadPublicPlans()) });
 }
 
 function Cell({ value }: { value: CompareValue }) {
@@ -42,13 +43,14 @@ export default async function PricingPage() {
         <div className={container}>
           <div className="pt-10 text-center md:pt-[46px]">
             <h1 className="text-balance font-serif text-[34px] font-semibold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[44px] lg:text-[52px]">
-              Start free. Pay only when you need more.
+              Start free. Pay when you need more research.
             </h1>
             <p className="mt-3.5 text-balance text-[16px] text-muted sm:text-[17px]">
-              The full editor and citation generator are free. Paid plans give you more AI writing, more checks and LaTeX export.
+              Every plan searches papers, cites and keeps your Library for free. Credits pay for AI jobs: reports, reviews, drafts and slides. Free gives you 30 a month to try every workspace.
             </p>
           </div>
           <PricingPlans initialPlans={plans} />
+          <PricingExtras />
         </div>
       </div>
 
@@ -95,6 +97,7 @@ export default async function PricingPage() {
             </table>
           </div>
         </section>}
+        <div className="mb-16 md:mb-[90px]"><CreditFaq /></div>
       </div>
     </>
   );

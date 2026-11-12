@@ -1,0 +1,23 @@
+IDEA NOTES (for testing Proposal Studio: research proposal, grant proposal, ethics application, data management plan)
+
+Working title: A campus nap-room intervention to improve exam-period alertness and recall among first-year students
+
+The idea
+- Many first-year students sleep less than 6 hours during exam weeks (our pilot diary data: median 5.6 h, n = 64).
+- My MSc found a small, non-significant benefit of a 60-minute nap on lecture recall (d = 0.44, p = .08). I did not check whether students fell asleep.
+- I want to test a proper nap intervention: a quiet nap room on campus, 20-minute and 60-minute nap options, with wrist actigraphy to confirm sleep.
+
+Design thoughts
+- Randomised controlled trial, three arms: 20-minute nap, 60-minute nap, quiet rest (control).
+- First-year students at one campus, recruited in week 1 of the semester.
+- Outcomes: recall of lecture material one week later (primary), psychomotor vigilance task (PVT) lapses, sleepiness (Karolinska Sleepiness Scale), end-of-semester exam score (secondary).
+- Need a sample size calculation. Expect a medium effect (d about 0.5) for the 60-minute nap vs rest.
+
+Practical
+- Need actigraphs (about 30 devices), a room, two research assistants.
+- Ethics through the university ethics committee; participants are students so need to avoid pressure from lecturers; data includes sleep and grades.
+- 18 months.
+
+Partners
+- University counselling and health services.
+- Possibly apply afterwards to an international foundation for a multi-campus trial.

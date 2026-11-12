@@ -10,9 +10,26 @@ import { C, col, db } from '../firebase.js';
  */
 const local = new Map<string, { count: number; resetAt: number }>();
 
+/**
+ * How many proxies in front of the app append to X-Forwarded-For (TRUSTED_PROXY_HOPS, default 1).
+ * The client can write anything at the start of the header, so the address is read from the
+ * right: with 1 hop, the last entry (what the nearest proxy saw); behind a load balancer that adds
+ * its own entry too, 2. Cloudflare's CF-Connecting-IP wins when present (it cannot be forged
+ * through Cloudflare).
+ */
+const HOPS = Math.max(1, Number(process.env.TRUSTED_PROXY_HOPS) || 1);
+
+export function clientAddress(header: (name: string) => string | undefined): string {
+  const cloudflare = header('cf-connecting-ip')?.trim();
+  if (cloudflare) return cloudflare;
+  const hops = (header('x-forwarded-for') || '').split(',').map((part) => part.trim()).filter(Boolean);
+  if (hops.length) return hops[Math.max(0, hops.length - HOPS)];
+  return header('x-real-ip')?.trim() || 'local';
+}
+
 export function rateLimit(options: { key: string; limit: number; windowSeconds: number }): MiddlewareHandler {
   return async (c, next) => {
-    const address = c.req.header('x-forwarded-for')?.split(',')[0]?.trim() || c.req.header('cf-connecting-ip') || 'local';
+    const address = clientAddress((name) => c.req.header(name));
     const now = Date.now();
     const windowMs = options.windowSeconds * 1000;
     const windowStart = Math.floor(now / windowMs) * windowMs;

@@ -1,0 +1,48 @@
+[
+ {
+  "file": "assets/uiuc-library-main-stacks.jpg",
+  "media": "image",
+  "ref": "commons:103327462",
+  "title": "UIUC Library Main Stacks",
+  "creator": "Chevsapher",
+  "creatorUrl": null,
+  "date": "2021-03-31",
+  "license": "CC0",
+  "licenseCode": "cc0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "creditRequired": false,
+  "page": "https://commons.wikimedia.org/wiki/File:UIUC_Library_Main_Stacks.jpg",
+  "via": "Wikimedia Commons",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/UIUC_Library_Main_Stacks.jpg/1920px-UIUC_Library_Main_Stacks.jpg",
+  "width": 1920,
+  "height": 1440,
+  "bytes": 393205,
+  "credit": "\"UIUC Library Main Stacks\" by Chevsapher, CC0, via Wikimedia Commons",
+  "notes": [],
+  "saved": "2026-11-11T20:04:15.213Z"
+ },
+ {
+  "file": "assets/silence-is-requested-12218739974.jpg",
+  "media": "image",
+  "ref": "commons:32376661",
+  "title": "Silence is requested! (12218739974)",
+  "creator": "Robert French",
+  "creatorUrl": null,
+  "date": "1904",
+  "license": "no known copyright restrictions",
+  "licenseCode": "pd",
+  "licenseUrl": "https://www.flickr.com/commons/usage/",
+  "creditRequired": false,
+  "page": "https://commons.wikimedia.org/wiki/File:Silence_is_requested!_(12218739974).jpg",
+  "via": "Wikimedia Commons",
+  "image": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Silence_is_requested%21_%2812218739974%29.jpg",
+  "width": 1230,
+  "height": 1026,
+  "bytes": 771381,
+  "credit": "\"Silence is requested! (12218739974)\" by Robert French, no known copyright restrictions, via Wikimedia Commons",
+  "notes": [
+   "Not a formal licence: the archive that published it states it knows of no copyright restrictions."
+  ],
+  "saved": "2026-11-11T20:04:16.985Z"
+ }
+]

@@ -69,6 +69,10 @@ export const C = {
   matrixRows: 'rows',              // review_matrices/{id}/rows/{libraryDocumentId}
   writingSessions: 'writing_sessions', // documents/{id}/writing_sessions/{sessionId}
   authorshipReports: 'authorship_reports',
+  tasks: 'tasks',                  // History: every job a person ran (lib/history.ts)
+  projects: 'projects',            // Shared projects (lib/projects.ts)
+  reviews: 'systematic_reviews',   // Systematic Review workspaces
+  reviewRecords: 'records',        // systematic_reviews/{id}/records
 } as const;
 
 export const col = (name: string) => db().collection(name);

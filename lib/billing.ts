@@ -8,9 +8,42 @@ import { api } from '@/lib/session';
 export type Interval = 'month' | 'year';
 export type CountLimit = { amount: number | null; per: 'day' | 'month' };
 export type PlanLimits = {
-  autocomplete: CountLimit; ai_edit: CountLimit; chat: CountLimit; review: CountLimit; write: CountLimit;
-  library_pdfs: number | null; latex_export: boolean;
+  credits: number | null; autocomplete: CountLimit; library_pdfs: number | null; upload_mb: number | null; projects: number | null;
+  collaborators: number | null; latex_export: boolean; pptx_export: boolean; zotero_import: boolean; mendeley_import: boolean;
+  detailed_mode: boolean; high_quality: boolean;
 };
+
+/** Credits this month (GET /api/billing/credits). `left` is null when unlimited. */
+export type CreditSummary = {
+  plan: { id: string; name: string; is_default: boolean }; allowance: number | null; used: number; topup: number; left: number | null;
+  resets_on: string; costs: Record<string, number>;
+};
+
+// One shared request per page; refreshed after every job (refreshCredits).
+let creditsRequest: Promise<CreditSummary> | null = null;
+const creditListeners = new Set<() => void>();
+let creditsValue: CreditSummary | null = null;
+export function refreshCredits() {
+  creditsRequest = api<CreditSummary>('/api/billing/credits').then((value) => {
+    creditsValue = value;
+    creditListeners.forEach((listener) => listener());
+    return value;
+  });
+  creditsRequest.catch(() => { creditsRequest = null; });
+  return creditsRequest;
+}
+/** The signed-in person's credits, kept fresh across the app. */
+export function useCredits(enabled = true) {
+  const value = useSyncExternalStore(
+    (listener) => { creditListeners.add(listener); return () => { creditListeners.delete(listener); }; },
+    () => creditsValue,
+    () => null,
+  );
+  useEffect(() => {
+    if (enabled && !creditsRequest) refreshCredits().catch(() => {});
+  }, [enabled]);
+  return value;
+}
 export type PublicPlan = {
   id: string; name: string; tagline: string; featured: boolean; is_default: boolean; checkout: 'self_serve' | 'contact';
   contact_url: string | null; monthly_cents: number; yearly_cents: number; currency: string; trial_days: number;

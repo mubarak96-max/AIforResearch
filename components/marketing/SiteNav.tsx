@@ -79,7 +79,7 @@ export function SiteNav() {
       </nav>
       <div className="ml-auto hidden items-center gap-2 md:flex">
         <AuthAware
-          signedIn={<Link href="/editor" className={`${btnPrimary} h-9 rounded-[9px] px-3.5 text-[14px]`}>Dashboard</Link>}
+          signedIn={<Link href="/home" className={`${btnPrimary} h-9 rounded-[9px] px-3.5 text-[14px]`}>Dashboard</Link>}
           signedOut={(
             <>
               <Link href="/login" className={`${btnGhost} h-9 rounded-[9px] px-3.5 text-[14px]`}>Sign in</Link>
@@ -151,7 +151,7 @@ export function SiteNav() {
           </nav>
           <div className="mt-auto grid gap-2.5 px-4 pt-4 pb-[max(16px,env(safe-area-inset-bottom))]">
             <AuthAware
-              signedIn={<Link href="/editor" onClick={() => setOpen(false)} className={`${btnPrimary} h-12 rounded-xl text-base`}>Dashboard</Link>}
+              signedIn={<Link href="/home" onClick={() => setOpen(false)} className={`${btnPrimary} h-12 rounded-xl text-base`}>Dashboard</Link>}
               signedOut={(
                 <>
                   <Link href="/login" onClick={() => setOpen(false)} className={`${btnGhost} h-12 rounded-xl text-base`}>Sign in</Link>

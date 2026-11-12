@@ -1,0 +1,21 @@
+References
+
+Diekelmann, S., & Born, J. (2010). The memory function of sleep. Nature Reviews Neuroscience, 11(2), 114–126. https://doi.org/10.1038/nrn2762
+
+Kamau, P., & Otieno, R. (2021). Napping habits and academic performance among Kenyan university students. East African Journal of Education Research, 4(2), 55–68.
+
+Lim, J., & Dinges, D. F. (2010). A meta-analysis of the impact of short-term sleep deprivation on cognitive variables. Psychological Bulletin, 136(3), 375–389. https://doi.org/10.1037/a0018883
+
+Mednick, S., Nakayama, K., & Stickgold, R. (2003). Sleep-dependent learning: A nap is as good as a night. Nature Neuroscience, 6(7), 697–698. https://doi.org/10.1038/nn1078
+
+Obokata, H., Wakayama, T., Sasai, Y., Kojima, K., Vacanti, M. P., Niwa, H., Yamato, M., & Vacanti, C. A. (2014). Stimulus-triggered fate conversion of somatic cells into pluripotency. Nature, 505(7485), 641–647. https://doi.org/10.1038/nature12968
+
+Stickgold, R. (2003). Sleep-dependent memory consolidation. Nature, 437(7063), 1272–1278. https://doi.org/10.1038/nature04286
+
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L., & Polosukhin, I. (2017). Attention is all you need. arXiv. https://arxiv.org/abs/1706.03762
+
+Wakefield, A. J., Murch, S. H., Anthony, A., Linnell, J., Casson, D. M., Malik, M., Berelowitz, M., Dhillon, A. P., Thomson, M. A., Harvey, P., Valentine, A., Davies, S. E., & Walker-Smith, J. A. (1998). Ileal-lymphoid-nodular hyperplasia, non-specific colitis, and pervasive developmental disorder in children. The Lancet, 351(9103), 637–641. https://doi.org/10.1016/S0140-6736(97)11096-0
+
+Walker, M. P., & Stickgold, R. (2006). Sleep, memory, and plasticity. Annual Review of Psychology, 57, 139–166. https://doi.org/10.1146/annurev.psych.56.091103.070307
+
+Xie, L., Kang, H., Xu, Q., Chen, M. J., Liao, Y., Thiyagarajan, M., O'Donnell, J., Christensen, D. J., Nicholson, C., Iliff, J. J., Takano, T., Deane, R., & Nedergaard, M. (2013). Sleep drives metabolite clearance from the adult brain. Science, 342(6156), 373–377. https://doi.org/10.1126/science.1241999

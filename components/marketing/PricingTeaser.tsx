@@ -13,14 +13,14 @@ function price(plan: PublicPlan) {
   return { amount: dollars(plan.monthly_cents), unit: '/ month', note: 'Billed monthly' };
 }
 
-/** Pricing on the landing page: the live plans from Admin › Plans, three highlights each. */
+/** Pricing on the landing page: the live plans, three highlights each. */
 export function PricingTeaser({ plans }: { plans: PublicPlan[] | null }) {
   return (
     <section id="pricing" aria-labelledby="pricing-title" className={`${container} scroll-mt-6 pt-24 md:pt-36`}>
       <h2 id="pricing-title" className="mx-auto max-w-[620px] text-balance text-center font-serif text-[30px] font-semibold leading-[1.12] tracking-[-0.02em] text-ink md:text-[40px]">
-        Start free. Upgrade <em>when</em> you need more.
+        Start free. Upgrade when you need more.
       </h2>
-      <p className="mx-auto mt-4 max-w-[460px] text-balance text-center text-[16px] leading-[1.6] text-muted md:text-[17px]">The full editor and citation generator are free, with a daily AI allowance. Paid plans raise the limits.</p>
+      <p className="mx-auto mt-4 max-w-[460px] text-balance text-center text-[16px] leading-[1.6] text-muted md:text-[17px]">Paper search, citations and your Library are free. Credits pay for AI jobs: 30 a month on Free, 500 on Plus, 1,500 on Pro. Or 90 days of Pro for $49 with the Defence Pass.</p>
       {plans && plans.length > 0 && (
         <ul className={`mt-10 grid gap-4 md:mt-12 md:grid-cols-2 ${plans.length >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
           {plans.map((plan) => {

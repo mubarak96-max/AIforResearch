@@ -19,3 +19,8 @@ ui-debug.log
 service-account*.json
 .vinext/
 .cloudflare/
+
+.taste-skill/
+
+# Firebase Admin SDK service account keys
+*firebase-adminsdk*.json

@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI for Research: ask, read, write, defend</title>
+<meta name="description" content="Ask a research question and get an answer built from 250M+ papers, every claim cited. Then review, analyse and write, up to your thesis defence.">
+<script>document.documentElement.classList.add('js')</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Stack+Sans+Headline:wght@300&family=Stack+Sans+Text:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="hero">
+  <nav class="top" aria-label="Site">
+    <a class="top__mark" href="#top" aria-label="AI for Research, home">
+      <svg viewBox="0 0 30 22" aria-hidden="true"><path d="M2 8 5 1h9l3 7h11v13H2z" fill="#141414"/><path d="M8 13h14M8 17h9" stroke="#c3cbe5" stroke-width="1.8"/></svg>
+      AI for Research
+    </a>
+    <a class="top__link link" href="app.html#home">Sign in</a>
+  </nav>
+
+  <h1 id="top"><span>Ask. Read.</span> <span>Write. Defend.</span></h1>
+  <p class="hero__lede">Ask a question and get an answer built from 250M+ papers, every claim cited. Then review, analyse and write, up to your thesis defence.</p>
+
+  <div class="stack">
+    <a class="folder folder--back on-ink" href="#pricing" style="--f: var(--ink); --f-ink: #ffffff; --x: 79%; --i: 0">
+      <span class="folder__tab">Pricing</span><span class="folder__note">Free, then from $8 a month</span>
+    </a>
+    <a class="folder folder--back" href="#tools" style="--f: var(--sage); --x: 60%; --i: 1">
+      <span class="folder__tab">Tools</span><span class="folder__note">Nine to start with, 40+ in all</span>
+    </a>
+    <a class="folder folder--back" href="#who" style="--f: var(--pink); --x: 41%; --i: 2">
+      <span class="folder__tab">Who it is for</span><span class="folder__note">Undergraduate to supervisor</span>
+    </a>
+    <a class="folder folder--back" href="#how" style="--f: var(--sand); --x: 22%; --i: 3">
+      <span class="folder__tab">How it works</span><span class="folder__note">Ask, read the evidence, build on it</span>
+    </a>
+
+    <div class="folder folder--front" id="ask" style="--f: var(--peach); --x: 3%; --i: 4">
+      <span class="folder__tab">Ask</span>
+
+      <form class="ask u-panel" data-ui action="app.html#research" method="get" aria-label="Ask a research question">
+        <label class="sr-only" for="q">Ask a research question</label>
+        <textarea class="ask__q" id="q" name="q" rows="2" placeholder="Ask a research question">Does sleep after learning improve memory consolidation?</textarea>
+        <div class="ask__row">
+          <div class="seg" role="radiogroup" aria-label="Mode" data-mode-group>
+            <button type="button" role="radio" aria-checked="false" data-mode="summary">Summary</button>
+            <button type="button" role="radio" aria-checked="true" data-mode="deep">Deep</button>
+            <button type="button" role="radio" aria-checked="false" data-mode="detailed">Detailed</button>
+          </div>
+          <div class="seg" role="radiogroup" aria-label="Sources" data-source-group>
+            <button type="button" role="radio" aria-checked="true">All papers</button>
+            <button type="button" role="radio" aria-checked="false">Medical (PubMed)</button>
+            <button type="button" role="radio" aria-checked="false">Web</button>
+            <button type="button" role="radio" aria-checked="false">My Library</button>
+          </div>
+          <label class="u-btn">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M13 7.5 8.2 12.3a3 3 0 0 1-4.3-4.3l5-5a2 2 0 0 1 2.9 2.9l-5 4.9a1 1 0 0 1-1.4-1.4L9.8 5"/></svg>
+            <span data-attach-label>Attach PDF</span>
+            <input class="sr-only" type="file" accept=".pdf,.doc,.docx,.md,.txt" aria-describedby="attach-help" data-attach>
+          </label>
+          <div class="ask__go">
+            <span class="u-muted u-small">Free · no card</span>
+            <button class="btn" type="submit">Ask a question</button>
+          </div>
+        </div>
+        <div class="ask__note u-small">
+          <span aria-live="polite" data-mode-line>Deep: a structured report from 20–40 papers · 5 credits</span>
+          <span class="u-muted" id="attach-help">PDF, .doc, .docx, .md or .txt</span>
+        </div>
+      </form>
+
+      <ul class="callouts">
+        <li><span class="tabmark" aria-hidden="true"></span><span>Every claim cites a real paper you can open.</span></li>
+        <li><span class="tabmark" aria-hidden="true"></span><span>Your PDFs, Zotero and Mendeley in one Library.</span></li>
+        <li><span class="tabmark" aria-hidden="true"></span><span>From the answer to a thesis: review, analyse, write, present.</span></li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="how" id="how" aria-labelledby="how-title">
+  <div class="how__field">
+    <h2 id="how-title">How it works</h2>
+    <div class="how__card u-panel" data-ui>
+      <h3>Does sleep after learning improve memory consolidation?</h3>
+      <div class="row"><span class="u-chip">Deep</span><span class="u-chip">All papers</span><span class="u-chip">5 credits</span></div>
+    </div>
+    <p class="how__clause">First, ask your question.</p>
+  </div>
+  <div class="how__field">
+    <span aria-hidden="true"></span>
+    <div class="how__card u-panel" data-ui>
+      <h3>Does sleep after learning improve memory consolidation?</h3>
+      <div class="row"><span class="u-chip">Deep</span><span class="u-chip">All papers</span><span class="u-chip">32 papers read</span></div>
+      <div class="rule">
+        <p>14 of 18 studies report a benefit</p>
+        <div class="consensus" role="img" aria-label="Supports 14, mixed 3, does not support 1"><i class="yes" style="flex: 14"></i><i class="mix" style="flex: 3"></i><i class="no" style="flex: 1"></i></div>
+      </div>
+      <div class="rule">
+        <div class="row" style="margin-top: 0"><span class="u-chip">Year</span><span class="u-chip">Study type</span><span class="u-chip">Journal quality</span></div>
+        <p class="src" style="margin-top: 8px"><span class="u-cite">1</span><span><b>The memory function of sleep.</b> <span class="u-muted">Nature Reviews Neuroscience, 2010</span></span></p>
+        <p class="src"><span class="u-cite">2</span><span><b>About sleep's role in memory.</b> <span class="u-muted">Physiological Reviews, 2013</span></span></p>
+      </div>
+    </div>
+    <p class="how__clause">Then read the evidence.</p>
+  </div>
+  <div class="how__field">
+    <span aria-hidden="true"></span>
+    <div class="how__card u-panel" data-ui>
+      <h3>Does sleep after learning improve memory consolidation?</h3>
+      <div class="row"><span class="u-chip">Deep</span><span class="u-chip">18 cited</span><span class="u-chip">Report ready</span></div>
+      <div class="rule">
+        <p>14 of 18 studies report a benefit</p>
+        <div class="consensus" role="img" aria-label="Supports 14, mixed 3, does not support 1"><i class="yes" style="flex: 14"></i><i class="mix" style="flex: 3"></i><i class="no" style="flex: 1"></i></div>
+      </div>
+      <div class="rule">
+        <p class="done"><span>Literature review</span><span class="u-muted">Open in editor</span></p>
+        <p class="done"><span>Slide deck</span><span class="u-muted">10 credits</span></p>
+        <p class="done"><span>Gap analysis</span><span class="u-muted">Find gaps</span></p>
+        <p class="done"><span>Draft</span><span class="u-muted">Writing Studio</span></p>
+      </div>
+    </div>
+    <p class="how__clause">Then build on it, in one click.</p>
+  </div>
+</section>
+
+<section class="who field" id="who" aria-labelledby="who-title">
+  <div class="wrap">
+    <div class="grid">
+      <h2 class="head who__intro" id="who-title" data-reveal>Who it is for</h2>
+      <p class="lead who__lede" data-reveal style="--i: 1">One workspace, set to your level. Pick your role when you start a task and the tools follow it.</p>
+    </div>
+
+    <div class="tabs" data-reveal style="--i: 2">
+      <div class="tabs__list" role="tablist" aria-label="Audience">
+        <button class="tabs__tab" role="tab" aria-selected="false" aria-controls="who-ug" id="t-ug" tabindex="-1">Undergraduates</button>
+        <button class="tabs__tab" role="tab" aria-selected="false" aria-controls="who-ms" id="t-ms" tabindex="-1">Master's students</button>
+        <button class="tabs__tab" role="tab" aria-selected="true" aria-controls="who-phd" id="t-phd">PhD candidates</button>
+        <button class="tabs__tab" role="tab" aria-selected="false" aria-controls="who-ac" id="t-ac" tabindex="-1">Academic staff</button>
+        <button class="tabs__tab" role="tab" aria-selected="false" aria-controls="who-med" id="t-med" tabindex="-1">Clinicians</button>
+        <button class="tabs__tab" role="tab" aria-selected="false" aria-controls="who-ind" id="t-ind" tabindex="-1">Industry and policy</button>
+      </div>
+
+      <div class="tabs__panel on-ink" role="tabpanel" id="who-ug" aria-labelledby="t-ug" hidden>
+        <h3>Undergraduates</h3>
+        <p class="tabs__what">Find sources, understand a paper and cite it correctly in your first research essays.</p>
+        <ul class="tabs__uses" aria-label="Most used">
+          <li><span class="tabmark" aria-hidden="true"></span>Find Papers</li><li><span class="tabmark" aria-hidden="true"></span>Chat with PDF</li><li><span class="tabmark" aria-hidden="true"></span>Citation Generator</li>
+        </ul>
+        <p class="tabs__go"><a class="link" href="#who" data-path="/for/undergraduates">The page for undergraduates</a></p>
+      </div>
+      <div class="tabs__panel on-ink" role="tabpanel" id="who-ms" aria-labelledby="t-ms" hidden>
+        <h3>Master's students</h3>
+        <p class="tabs__what">Plan the thesis, review the literature and get each chapter checked before your supervisor reads it.</p>
+        <ul class="tabs__uses" aria-label="Most used">
+          <li><span class="tabmark" aria-hidden="true"></span>Deep Research</li><li><span class="tabmark" aria-hidden="true"></span>Thesis Suite</li><li><span class="tabmark" aria-hidden="true"></span>Reviewer</li>
+        </ul>
+        <p class="tabs__go"><a class="link" href="#who" data-path="/for/masters">The page for master's students</a></p>
+      </div>
+      <div class="tabs__panel on-ink" role="tabpanel" id="who-phd" aria-labelledby="t-phd">
+        <h3>PhD candidates</h3>
+        <p class="tabs__what">Systematic review, thesis chapters, defence preparation.</p>
+        <ul class="tabs__uses" aria-label="Most used">
+          <li><span class="tabmark" aria-hidden="true"></span>Systematic Review</li><li><span class="tabmark" aria-hidden="true"></span>Writing Studio</li><li><span class="tabmark" aria-hidden="true"></span>Thesis Suite</li>
+        </ul>
+        <p class="tabs__go"><a class="link" href="#who" data-path="/for/phd">The page for PhD candidates</a></p>
+      </div>
+      <div class="tabs__panel on-ink" role="tabpanel" id="who-ac" aria-labelledby="t-ac" hidden>
+        <h3>Academic staff and supervisors</h3>
+        <p class="tabs__what">Review student drafts, keep a shared Library and turn a finished thesis into a manuscript.</p>
+        <ul class="tabs__uses" aria-label="Most used">
+          <li><span class="tabmark" aria-hidden="true"></span>Reviewer</li><li><span class="tabmark" aria-hidden="true"></span>Library</li><li><span class="tabmark" aria-hidden="true"></span>Thesis to Manuscript</li>
+        </ul>
+        <p class="tabs__go"><a class="link" href="#who" data-path="/for/academics">The page for academic staff</a></p>
+      </div>
+      <div class="tabs__panel on-ink" role="tabpanel" id="who-med" aria-labelledby="t-med" hidden>
+        <h3>Clinicians and medical researchers</h3>
+        <p class="tabs__what">Search PubMed, filter by study type and check a claim against the trials behind it.</p>
+        <ul class="tabs__uses" aria-label="Most used">
+          <li><span class="tabmark" aria-hidden="true"></span>Deep Research, Medical</li><li><span class="tabmark" aria-hidden="true"></span>Find Papers</li><li><span class="tabmark" aria-hidden="true"></span>Systematic Review</li>
+        </ul>
+        <p class="tabs__go"><a class="link" href="#who" data-path="/for/medicine">The page for medicine</a></p>
+      </div>
+      <div class="tabs__panel on-ink" role="tabpanel" id="who-ind" aria-labelledby="t-ind" hidden>
+        <h3>Industry and policy analysts</h3>
+        <p class="tabs__what">Map a field, check the evidence behind a claim and write it up as a cited report.</p>
+        <ul class="tabs__uses" aria-label="Most used">
+          <li><span class="tabmark" aria-hidden="true"></span>Deep Research</li><li><span class="tabmark" aria-hidden="true"></span>Data Lab</li><li><span class="tabmark" aria-hidden="true"></span>Writing Studio</li>
+        </ul>
+        <p class="tabs__go"><a class="link" href="#who" data-path="/for/industry">The page for industry</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features" aria-labelledby="features-title">
+  <div class="features__head">
+    <h2 class="head" id="features-title" data-reveal>Switch on what you need</h2>
+  </div>
+  <div class="band is-on" style="--on: var(--pink)">
+    <div><p class="band__say">Answers cite real papers, never invented ones.</p><p class="band__then">Every citation is a record you can open, from an index of 250M+ scholarly works.</p></div>
+    <button class="switch" role="switch" aria-checked="true" aria-label="Answers cite real papers" data-ui></button>
+  </div>
+  <div class="band is-on" style="--on: var(--sand)">
+    <div><p class="band__say">Search papers, the web, PubMed or your Library.</p><p class="band__then">Four sources in one box: All papers, Medical (PubMed), Web, My Library.</p></div>
+    <button class="switch" role="switch" aria-checked="true" aria-label="Search every source" data-ui></button>
+  </div>
+  <div class="band" style="--on: var(--sage)">
+    <div><p class="band__say">Filter by year, study type and journal quality.</p><p class="band__then">Years 2000–2026, five study types, journals Q1–Q4, citations, open access. Retracted papers stay out.</p></div>
+    <button class="switch" role="switch" aria-checked="false" aria-label="Filter the sources" data-ui></button>
+  </div>
+  <div class="band" style="--on: var(--peach)">
+    <div><p class="band__say">Research in chat, or write in the editor.</p><p class="band__then">Two ways to work on one project: a chat that cites, and an editor with suggestions and citations in 10,000+ styles.</p></div>
+    <button class="switch" role="switch" aria-checked="false" aria-label="Chat and editor" data-ui></button>
+  </div>
+  <div class="band" style="--on: var(--periwinkle-deep)">
+    <div><p class="band__say">Share a project with your supervisor.</p><p class="band__then">Supervisors and co-authors open the same papers, reviews and drafts. Project sharing is part of Pro.</p></div>
+    <button class="switch" role="switch" aria-checked="false" aria-label="Share a project" data-ui></button>
+  </div>
+</section>
+
+<section class="tools field" id="tools" aria-labelledby="tools-title">
+  <div class="wrap grid">
+    <div class="tools__stage" data-reveal>
+      <span class="tools__tab" data-tool-tab>Deep Research</span>
+      <div class="tools__frame">
+        <div class="tools__shot u-panel" data-ui data-tool-shot aria-live="off">
+          <h4>Does sleep after learning improve memory consolidation?</h4>
+          <p>Sleep in the hours after learning improves later recall of declarative material compared with an equal period awake <span class="u-cite">1</span><span class="u-cite">2</span>. The effect is linked to slow-wave sleep and hippocampal replay <span class="u-cite">2</span><span class="u-cite">3</span>.</p>
+          <div>
+            <p class="u-small">14 of 18 studies report a benefit</p>
+            <div class="consensus" role="img" aria-label="Supports 14, mixed 3, does not support 1"><i class="yes" style="flex: 14"></i><i class="mix" style="flex: 3"></i><i class="no" style="flex: 1"></i></div>
+          </div>
+          <div>
+            <p class="kv"><span><b>Diekelmann and Born</b> · Nature Reviews Neuroscience</span><span class="u-muted nums">2010</span></p>
+            <p class="kv"><span><b>Rasch and Born</b> · Physiological Reviews</span><span class="u-muted nums">2013</span></p>
+            <p class="kv"><span><b>Stickgold</b> · Nature</span><span class="u-muted nums">2005</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tools__list">
+      <h2 class="head" id="tools-title" data-reveal>Nine tools to start</h2>
+      <ul class="tools__rows" data-tools>
+        <li class="tool is-active" data-tool="deep"><a class="tool__row" href="app.html#research"><span class="tool__name">Deep Research</span><span class="tool__hub">Research</span></a><p class="tool__desc">Ask a question in Summary, Deep or Detailed mode and get a cited report with a consensus line and the sources behind it.</p></li>
+        <li class="tool" data-tool="find"><a class="tool__row" href="app.html#home"><span class="tool__name">Find Papers</span><span class="tool__hub">Research</span></a><p class="tool__desc">Search 250M+ scholarly works and filter by year, study type, journal quality and citations. No credits used.</p></li>
+        <li class="tool" data-tool="pdf"><a class="tool__row" href="app.html#home"><span class="tool__name">Chat with PDF</span><span class="tool__hub">Library</span></a><p class="tool__desc">Upload a paper and ask about it. Answers point to the page they come from.</p></li>
+        <li class="tool" data-tool="library"><a class="tool__row" href="app.html#home"><span class="tool__name">Library</span><span class="tool__hub">Library</span></a><p class="tool__desc">Your saved papers and PDFs in one place, with Zotero and Mendeley import.</p></li>
+        <li class="tool" data-tool="thesis"><a class="tool__row" href="app.html#home"><span class="tool__name">Thesis Suite</span><span class="tool__hub">Write</span></a><p class="tool__desc">Outline the thesis, build the method, find similar papers and plan each chapter by word count.</p></li>
+        <li class="tool" data-tool="proposal"><a class="tool__row" href="app.html#home"><span class="tool__name">Proposal Studio</span><span class="tool__hub">Write</span></a><p class="tool__desc">Draft a research or grant proposal section by section, from aims to ethics, and share it for comments.</p></li>
+        <li class="tool" data-tool="manuscript"><a class="tool__row" href="app.html#home"><span class="tool__name">Thesis to Manuscript</span><span class="tool__hub">Write</span></a><p class="tool__desc">Cut a thesis chapter down to a journal article and keep every reference attached.</p></li>
+        <li class="tool" data-tool="cite"><a class="tool__row" href="app.html#home"><span class="tool__name">Citation Generator</span><span class="tool__hub">Library</span></a><p class="tool__desc">Paste a DOI or a title and copy the reference in APA, MLA, Chicago or 10,000+ other styles. No credits used.</p></li>
+        <li class="tool" data-tool="human"><a class="tool__row" href="app.html#home"><span class="tool__name">Text Humanizer</span><span class="tool__hub">Write</span></a><p class="tool__desc">A natural-style rewrite of stiff or repetitive text. Your meaning and your citations stay as they are.</p></li>
+      </ul>
+      <a class="tools__all link" href="app.html#home">All 40+ tools</a>
+    </div>
+  </div>
+</section>
+
+<section class="depth" id="depth" aria-labelledby="depth-title" data-depth>
+  <h2 id="depth-title">A <span data-depth-word>Deep</span> answer</h2>
+  <p class="depth__say" aria-live="polite" data-depth-say>A structured report from 20–40 papers: findings, disagreements, limits and open questions.</p>
+  <dl class="depth__facts nums">
+    <dt>Credits</dt><dd data-depth-credits>5</dd>
+    <dt>Papers</dt><dd data-depth-papers>20–40</dd>
+    <dt>On Free</dt><dd data-depth-free>6 a month</dd>
+  </dl>
+  <div class="depth__ctl" data-ui data-depth-ctl>
+    <div class="seg" role="radiogroup" aria-label="Mode" data-mode-group>
+      <button type="button" role="radio" aria-checked="false" data-mode="summary">Summary</button>
+      <button type="button" role="radio" aria-checked="true" data-mode="deep">Deep</button>
+      <button type="button" role="radio" aria-checked="false" data-mode="detailed">Detailed</button>
+    </div>
+  </div>
+</section>
+
+<section class="plans field" id="pricing" aria-labelledby="pricing-title">
+  <div class="wrap">
+    <div class="plans__grid">
+      <h2 id="pricing-title" data-reveal>Plans that grow with the work</h2>
+      <p class="plans__lede" data-reveal style="--i: 1">Start free. Pay when the thesis gets serious, and stop when it is done.</p>
+
+      <article class="plan" style="--f: var(--periwinkle); --f-deep: var(--periwinkle-deep); --h: 400px; --i: 0" data-reveal>
+        <div class="plan__body">
+          <h3><span class="plan__tab">Free</span> <span class="plan__price nums">$0</span></h3>
+          <p class="plan__per">No card needed</p>
+          <ul class="plan__lines">
+            <li>30 credits a month</li>
+            <li>Summary and Deep modes</li>
+            <li>A preview of each workspace</li>
+          </ul>
+        </div>
+        <a class="plan__go" href="app.html#home">Start free</a>
+      </article>
+
+      <article class="plan" style="--f: var(--sage); --f-deep: var(--sage-deep); --h: 480px; --i: 1" data-reveal>
+        <div class="plan__body">
+          <h3><span class="plan__tab">Plus</span> <span class="plan__price nums">$12</span></h3>
+          <p class="plan__per">a month, or $8 a month billed yearly ($96)</p>
+          <ul class="plan__lines">
+            <li>500 credits a month</li>
+            <li>For students writing every week</li>
+            <li>All three modes, Detailed included</li>
+            <li>Full use of every workspace</li>
+          </ul>
+        </div>
+        <a class="plan__go" href="app.html#home">Choose Plus</a>
+      </article>
+
+      <article class="plan" style="--f: var(--pink); --f-deep: var(--pink-deep); --h: 560px; --i: 2" data-reveal>
+        <div class="plan__body">
+          <h3><span class="plan__tab">Pro</span> <span class="plan__price nums">$29</span></h3>
+          <p class="plan__per">a month, or $19 a month billed yearly ($228)</p>
+          <ul class="plan__lines">
+            <li>1,500 credits a month</li>
+            <li>Theses and systematic reviews</li>
+            <li>High-quality mode</li>
+            <li>Project sharing</li>
+            <li>Everything in Plus</li>
+          </ul>
+        </div>
+        <a class="plan__go" href="app.html#home">Choose Pro</a>
+      </article>
+
+      <article class="plan" style="--f: var(--sand); --f-deep: var(--sand-deep); --h: 640px; --i: 3" data-reveal>
+        <div class="plan__body">
+          <h3><span class="plan__tab">Team</span> <span class="plan__price nums">$25</span></h3>
+          <p class="plan__per">a seat a month, billed yearly, 3 seats or more</p>
+          <ul class="plan__lines">
+            <li>2,000 credits a seat, pooled</li>
+            <li>For labs and departments</li>
+            <li>Shared Library</li>
+            <li>One invoice</li>
+            <li>Everything in Pro for each member</li>
+          </ul>
+        </div>
+        <a class="plan__go" href="mailto:support@aiforresearch.app?subject=Team%20plan">Talk to us</a>
+      </article>
+    </div>
+
+    <div class="pass" data-reveal>
+      <div>
+        <p class="pass__name">Defence Pass: $49 once</p>
+        <p>90 days of Pro, no renewal. For the last stretch before you submit and defend.</p>
+      </div>
+      <a class="btn" href="app.html#home">Get the pass</a>
+    </div>
+
+    <div class="credits" data-reveal>
+      <h3>What a credit buys</h3>
+      <dl class="nums">
+        <dt>Summary answer</dt><dd>1</dd>
+        <dt>Deep report</dt><dd>5</dd>
+        <dt>Detailed report</dt><dd>20</dd>
+        <dt>Document review</dt><dd>10</dd>
+        <dt>Slide deck</dt><dd>10</dd>
+      </dl>
+      <p>Paper search, citations, autocomplete and the Library do not use credits. Run out early? A top-up of 500 credits is $7.</p>
+    </div>
+  </div>
+</section>
+
+<section class="faq field" id="faq" aria-labelledby="faq-title">
+  <div class="wrap grid">
+    <div class="faq__col">
+      <h2 class="head" id="faq-title" data-reveal>Questions, filed</h2>
+      <div data-reveal style="--i: 1">
+        <details class="card" name="faq" open style="--n: 0">
+          <summary><span class="card__tab">Sources</span><span class="card__q">Where do the sources come from?</span></summary>
+          <p class="card__a"><span>From an index of 250M+ scholarly works (the OpenAlex catalogue), from PubMed when you choose Medical, from the web when you choose Web, and from the PDFs in your own Library. You pick the source before you ask.</span></p>
+        </details>
+        <details class="card" name="faq" style="--n: 1">
+          <summary><span class="card__tab">Citations</span><span class="card__q">Can it make up a citation?</span></summary>
+          <p class="card__a"><span>Citations come from search results, not from the model's memory, so each one is a real record you can open. The sentences around a citation are still written by AI, so check that the paper says what the answer claims.</span></p>
+        </details>
+        <details class="card" name="faq" style="--n: 2">
+          <summary><span class="card__tab">University rules</span><span class="card__q">Is it allowed at my university?</span></summary>
+          <p class="card__a"><span>Rules differ by university, course and journal. Check yours before you submit, and say how you used AI where they ask. Treat every draft as a starting point and rewrite it in your own words.</span></p>
+        </details>
+        <details class="card" name="faq" style="--n: 3">
+          <summary><span class="card__tab">Free plan</span><span class="card__q">What do I get for free?</span></summary>
+          <p class="card__a"><span>30 credits a month for Summary and Deep answers, and a preview of each workspace. Paper search, citations, autocomplete and the Library do not use credits. No card is needed.</span></p>
+        </details>
+        <details class="card" name="faq" style="--n: 4">
+          <summary><span class="card__tab">Credits</span><span class="card__q">What is a credit?</span></summary>
+          <p class="card__a"><span>Credits pay for the heavy work. A Summary answer costs 1, a Deep report 5, a Detailed report 20, a document review 10 and a slide deck 10.</span></p>
+        </details>
+        <details class="card" name="faq" style="--n: 5">
+          <summary><span class="card__tab">Your Library</span><span class="card__q">Can I use my own PDFs and Zotero library?</span></summary>
+          <p class="card__a"><span>Yes. Upload PDF, Word, Markdown or text files, or import from Zotero and Mendeley. Choose My Library as the source to ask across them.</span></p>
+        </details>
+        <details class="card" name="faq" style="--n: 6">
+          <summary><span class="card__tab">Cancelling</span><span class="card__q">Can I cancel any time?</span></summary>
+          <p class="card__a"><span>Yes. Cancel from your account page and the plan runs to the end of the period you paid for. The Defence Pass is one payment and never renews.</span></p>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot field" aria-labelledby="foot-title">
+  <div class="wrap">
+    <h2 class="sr-only" id="foot-title">AI for Research</h2>
+    <svg class="mark mark--wide" viewBox="0 0 1400 300" role="img" aria-label="AI for Research" data-blocks><g style="--i: 0"><polygon points="18.0,54.0 82.2,54.0 100.2,300 0.0,300" fill="var(--ink)"/><text x="50.1" y="279.0" text-anchor="middle" font-size="104" fill="var(--bg)">A</text></g><g style="--i: 1"><polygon points="122.3,0.0 186.4,0.0 204.4,300 104.2,300" fill="var(--peach)"/><text x="154.3" y="279.0" text-anchor="middle" font-size="104" fill="var(--ink)">I</text></g><g style="--i: 2"><polygon points="275.6,96.0 339.7,96.0 357.8,300 257.5,300" fill="var(--sand)"/><text x="307.7" y="279.0" text-anchor="middle" font-size="104" fill="var(--ink)">f</text></g><g style="--i: 3"><polygon points="379.8,30.0 444.0,30.0 462.0,300 361.8,300" fill="var(--pink)"/><text x="411.9" y="279.0" text-anchor="middle" font-size="104" fill="var(--ink)">o</text></g><g style="--i: 4"><polygon points="484.0,78.0 548.2,78.0 566.2,300 466.0,300" fill="var(--sage)"/><text x="516.1" y="279.0" text-anchor="middle" font-size="104" fill="var(--ink)">r</text></g><g style="--i: 5"><polygon points="588.3,0.0 652.4,0.0 670.4,300 570.2,300" fill="var(--ink)"/><text x="620.3" y="279.0" text-anchor="middle" font-size="104" fill="var(--bg)">R</text></g><g style="--i: 6"><polygon points="692.5,90.0 756.6,90.0 774.7,300 674.4,300" fill="var(--sand)"/><text x="724.6" y="279.0" text-anchor="middle" font-size="104" fill="var(--ink)">e</text></g><g style="--i: 7"><polygon points="796.7,42.0 860.8,42.0 878.9,300 778.7,300" fill="var(--peach)"/><text x="828.8" y="279.0" text-anchor="middle" font-size="104" fill="var(--ink)">s</text></g><g style="--i: 8"><polygon points="900.9,108.0 965.1,108.0 983.1,300 882.9,300" fill="var(--sage)"/><text x="933.0" y="279.0" text-anchor="middle" font-size="104" fill="var(--ink)">e</text></g><g style="--i: 9"><polygon points="1005.1,18.0 1069.3,18.0 1087.3,300 987.1,300" fill="var(--pink)"/><text x="1037.2" y="279.0" text-anchor="middle" font-size="104" fill="var(--ink)">a</text></g><g style="--i: 10"><polygon points="1109.4,84.0 1173.5,84.0 1191.6,300 1091.3,300" fill="var(--surface)"/><text x="1141.4" y="279.0" text-anchor="middle" font-size="104" fill="var(--ink)">r</text></g><g style="--i: 11"><polygon points="1213.6,36.0 1277.7,36.0 1295.8,300 1195.6,300" fill="var(--sand)"/><text x="1245.7" y="279.0" text-anchor="middle" font-size="104" fill="var(--ink)">c</text></g><g style="--i: 12"><polygon points="1317.8,66.0 1382.0,66.0 1400.0,300 1299.8,300" fill="var(--ink)"/><text x="1349.9" y="279.0" text-anchor="middle" font-size="104" fill="var(--bg)">h</text></g></svg>
+    <svg class="mark mark--phone" viewBox="0 0 400 308" role="img" aria-label="AI for Research" data-blocks><g style="--i: 0"><polygon points="13.8,27.0 63.0,27.0 76.8,150 0.0,150" fill="var(--ink)"/><text x="38.4" y="139.5" text-anchor="middle" font-size="66" fill="var(--bg)">A</text></g><g style="--i: 1"><polygon points="94.6,0.0 143.8,0.0 157.6,150 80.8,150" fill="var(--peach)"/><text x="119.2" y="139.5" text-anchor="middle" font-size="66" fill="var(--ink)">I</text></g><g style="--i: 2"><polygon points="175.4,48.0 224.6,48.0 238.4,150 161.6,150" fill="var(--sand)"/><text x="200.0" y="139.5" text-anchor="middle" font-size="66" fill="var(--ink)">f</text></g><g style="--i: 3"><polygon points="256.2,15.0 305.4,15.0 319.2,150 242.4,150" fill="var(--pink)"/><text x="280.8" y="139.5" text-anchor="middle" font-size="66" fill="var(--ink)">o</text></g><g style="--i: 4"><polygon points="337.0,39.0 386.2,39.0 400.0,150 323.2,150" fill="var(--sage)"/><text x="361.6" y="139.5" text-anchor="middle" font-size="66" fill="var(--ink)">r</text></g><g style="--i: 5"><polygon points="8.4,158.0 38.1,158.0 46.5,308 0.0,308" fill="var(--ink)"/><text x="23.3" y="297.5" text-anchor="middle" font-size="66" fill="var(--bg)">R</text></g><g style="--i: 6"><polygon points="58.9,203.0 88.6,203.0 97.0,308 50.5,308" fill="var(--sand)"/><text x="73.8" y="297.5" text-anchor="middle" font-size="66" fill="var(--ink)">e</text></g><g style="--i: 7"><polygon points="109.4,179.0 139.1,179.0 147.5,308 101.0,308" fill="var(--peach)"/><text x="124.3" y="297.5" text-anchor="middle" font-size="66" fill="var(--ink)">s</text></g><g style="--i: 8"><polygon points="159.9,212.0 189.6,212.0 198.0,308 151.5,308" fill="var(--sage)"/><text x="174.8" y="297.5" text-anchor="middle" font-size="66" fill="var(--ink)">e</text></g><g style="--i: 9"><polygon points="210.4,167.0 240.1,167.0 248.5,308 202.0,308" fill="var(--pink)"/><text x="225.3" y="297.5" text-anchor="middle" font-size="66" fill="var(--ink)">a</text></g><g style="--i: 10"><polygon points="260.9,200.0 290.6,200.0 299.0,308 252.5,308" fill="var(--surface)"/><text x="275.8" y="297.5" text-anchor="middle" font-size="66" fill="var(--ink)">r</text></g><g style="--i: 11"><polygon points="311.4,176.0 341.1,176.0 349.5,308 303.0,308" fill="var(--sand)"/><text x="326.3" y="297.5" text-anchor="middle" font-size="66" fill="var(--ink)">c</text></g><g style="--i: 12"><polygon points="361.9,191.0 391.6,191.0 400.0,308 353.5,308" fill="var(--ink)"/><text x="376.8" y="297.5" text-anchor="middle" font-size="66" fill="var(--bg)">h</text></g></svg>
+
+    <div class="foot__links">
+      <div><h3>Research</h3><ul class="plain"><li><a href="app.html#research">Deep Research</a></li><li><a href="app.html#home">Find Papers</a></li><li><a href="app.html#home">Library</a></li><li><a href="app.html#home">All tools</a></li></ul></div>
+      <div><h3>Workspaces</h3><ul class="plain"><li><a href="app.html#home">Writing Studio</a></li><li><a href="app.html#home">Thesis Suite</a></li><li><a href="app.html#home">Proposal Studio</a></li><li><a href="app.html#home">Systematic Review</a></li><li><a href="app.html#reviewer">Reviewer</a></li><li><a href="app.html#home">Data Lab</a></li></ul></div>
+      <div><h3>For</h3><ul class="plain"><li><a href="#who">Undergraduates</a></li><li><a href="#who">Master's students</a></li><li><a href="#who">PhD candidates</a></li><li><a href="#who">Academic staff</a></li><li><a href="#who">Medicine</a></li><li><a href="#who">Industry</a></li></ul></div>
+      <div><h3>Company</h3><ul class="plain"><li><a href="#pricing">Pricing</a></li><li><a href="#faq">Questions</a></li><li><a href="#top">Privacy</a></li><li><a href="#top">Terms</a></li></ul></div>
+      <div class="foot__contact"><h3>Contact</h3><ul class="plain"><li><a href="mailto:support@aiforresearch.app">support@aiforresearch.app</a></li><li>aiforresearch.app</li></ul></div>
+    </div>
+
+    <div class="foot__last">
+      <span>© 2026 AI for Research</span>
+      <a class="btn" href="#ask">Ask a question</a>
+    </div>
+  </div>
+</footer>
+
+<script src="page.js" defer></script>
+</body>
+</html>

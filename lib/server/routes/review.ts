@@ -10,6 +10,7 @@ import type { Slots } from '../slots/types.js';
 import { llmModelName } from '../slots/llm.js';
 import { BLOCK_REVIEW_SYSTEM_PROMPT, blockReviewPrompt } from '../lib/prompts.js';
 import { completeMetered, countWords, currentUser, extractJsonObject, parseBody, withHttpErrors } from '../lib/assist-llm.js';
+import { planQuota } from '../lib/plans.js';
 
 const optionalText = z.string().nullish();
 
@@ -94,7 +95,8 @@ export function reviewRoutes(slots: Slots) {
   const app = new Hono<{ Variables: AppVariables }>();
 
   // requireUser per route: a use('*') here would also guard every other /api/ai-editor route.
-  app.post('/review', requireUser, async (c) => {
+  // A document review check: CREDIT_COSTS.review, back when it fails.
+  app.post('/review', requireUser, planQuota('review'), async (c) => {
     const user = currentUser(c);
     const body = await parseBody(c, ReviewRequest);
     return withHttpErrors(async () => {

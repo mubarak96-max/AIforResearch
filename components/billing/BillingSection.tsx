@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { LuCreditCard, LuDownload, LuExternalLink, LuPlus, LuTrash2, LuZap } from 'react-icons/lu';
 import { Button, Card, CardHeader, EmptyState, StatusPill } from '@/components/app/ui';
 import { api, refreshSession } from '@/lib/session';
-import { money, openPricing, startCheckout, usePlans, type Interval } from '@/lib/billing';
+import { money, openPricing, refreshCredits, startCheckout, usePlans, type CreditSummary, type Interval } from '@/lib/billing';
+import { CreditsCard, type Pack, type Purchase } from './CreditsCard';
 
 type SavedCard = { id: string; brand: string; last4: string; exp_month: number; exp_year: number; name: string | null; funding: string | null; default: boolean };
 type Invoice = {
@@ -15,8 +16,11 @@ type UsageRow = { key: string; label: string; used: number; limit: number | null
 export type Billing = {
   plan: { id: string; name: string; is_default: boolean };
   subscription: { plan_id: string | null; status: string; source: string; interval: string | null; period_end: string | null; cancel_at_period_end: boolean } | null;
-  limits: { latex_export: boolean; library_pdfs: number | null };
+  limits: { latex_export: boolean; library_pdfs: number | null; detailed_mode?: boolean; high_quality?: boolean; projects?: number | null };
   usage: UsageRow[];
+  credits?: CreditSummary;
+  purchases?: Purchase[];
+  packs?: Pack[];
   library: { used: number; limit: number | null };
   cards: SavedCard[];
   invoices: Invoice[];
@@ -60,8 +64,24 @@ export function BillingSection() {
     const subscription = params.get('subscription_id');
     const upgrade = params.get('upgrade');
     const clean = () => window.history.replaceState(null, '', `${window.location.pathname}${window.location.hash}`);
+    const purchase = params.get('purchase');
+    const payment = params.get('payment_id');
     (async () => {
-      if (outcome && outcome !== 'cancelled' && subscription) {
+      if (purchase && payment) {
+        clean();
+        setBusy('return');
+        try {
+          const done = await api<{ status: string; applied: { kind: string; credits: number; pass_end: string | null; converted: boolean } | null }>('/api/billing/purchases/complete', { method: 'POST', body: JSON.stringify({ payment }) });
+          const applied = done.applied;
+          setNotice(!applied ? 'Payment is still processing. Your purchase is added as soon as it clears.'
+            : applied.kind === 'pass' && !applied.converted ? `Your Defence Pass is on: Pro until ${applied.pass_end ? day(applied.pass_end) : 'its end date'}.`
+            : applied.converted ? `You already pay for a plan, so the Defence Pass was added as ${applied.credits.toLocaleString('en-US')} extra credits.`
+            : `${applied.credits.toLocaleString('en-US')} credits added. They are kept for 12 months.`);
+          await refreshSession().catch(() => undefined);
+          refreshCredits().catch(() => undefined);
+        } catch (caught) { setError((caught as Error).message); }
+        setBusy(null);
+      } else if (outcome && outcome !== 'cancelled' && subscription) {
         clean();
         setBusy('return');
         try {
@@ -117,16 +137,19 @@ export function BillingSection() {
   const shown = plans?.find((plan) => plan.id === billing.plan.id);
   const interval: Interval = sub?.interval === 'year' ? 'year' : 'month';
   const price = shown && paying ? (interval === 'year' ? `${money(shown.yearly_cents, shown.currency)} / year` : `${money(shown.monthly_cents, shown.currency)} / month`) : null;
-  const status = !sub || sub.source === 'default' || (!paying && !lapsed && sub.source !== 'admin')
+  const onPass = Boolean(sub && sub.source === 'pass' && sub.status === 'active' && sub.period_end && Date.parse(sub.period_end) > Date.now());
+  const status = !sub || sub.source === 'default' || (!paying && !lapsed && sub.source !== 'admin' && !onPass)
     ? null
     : sub.source === 'admin' ? { tone: 'brand' as const, label: 'Given by AI for Research' }
+    : sub.source === 'pass' ? { tone: 'brand' as const, label: 'Defence Pass' }
     : sub.status === 'past_due' ? { tone: 'negative' as const, label: 'Payment failed' }
     : sub.status === 'trialing' ? { tone: 'brand' as const, label: 'Trial' }
     : sub.cancel_at_period_end ? { tone: 'warning' as const, label: 'Cancelled' }
     : paying ? { tone: 'positive' as const, label: 'Active' } : null;
-  const periodLine = paying && sub?.period_end
-    ? sub.cancel_at_period_end ? `Ends ${day(sub.period_end)}, then Free` : `${sub.status === 'trialing' ? 'Trial ends' : 'Renews'} ${day(sub.period_end)}`
-    : null;
+  const periodLine = onPass && sub?.period_end ? `Paid once · ends ${day(sub.period_end)}, then Free. It does not renew.`
+    : paying && sub?.period_end
+      ? sub.cancel_at_period_end ? `Ends ${day(sub.period_end)}, then Free` : `${sub.status === 'trialing' ? 'Trial ends' : 'Renews'} ${day(sub.period_end)}`
+      : null;
 
   return (
     <div className="flex flex-col gap-5">
@@ -210,12 +233,23 @@ export function BillingSection() {
         <div className="grid gap-x-8 gap-y-4 border-t border-line-2 px-5 py-5 sm:grid-cols-2">
           {billing.usage.map((row) => <Meter key={row.key} label={row.label} used={row.used} limit={row.limit} per={row.per} />)}
           <Meter label="PDFs in Library" used={billing.library.used} limit={billing.library.limit} />
-          <div className="flex items-center justify-between text-[14px]">
-            <span className="text-ink-2">LaTeX export</span>
-            {billing.limits.latex_export ? <StatusPill tone="positive">Included</StatusPill> : <StatusPill>Paid plans</StatusPill>}
-          </div>
+          {([
+            ['Detailed reports', billing.limits.detailed_mode, 'Paid plans'],
+            ['High-quality mode', billing.limits.high_quality, 'Pro'],
+            ['LaTeX and PowerPoint export', billing.limits.latex_export, 'Paid plans'],
+          ] as const).map(([label, included, where]) => (
+            <div key={label} className="flex items-center justify-between text-[14px]">
+              <span className="text-ink-2">{label}</span>
+              {included ? <StatusPill tone="positive">Included</StatusPill> : <StatusPill>{where}</StatusPill>}
+            </div>
+          ))}
         </div>
       </Card>
+
+      {billing.credits && (
+        <CreditsCard credits={billing.credits} purchases={billing.purchases ?? []} packs={billing.packs ?? []} paymentsEnabled={billing.payments_enabled}
+          onPass={onPass} passEnd={onPass ? sub?.period_end ?? null : null} busy={busy} onBuy={(key, path, body) => void go(key, path, body)} />
+      )}
 
       <Card>
         <CardHeader title="Payment methods" />

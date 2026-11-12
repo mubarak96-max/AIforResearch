@@ -8,6 +8,8 @@ import { showSideload, useMobileTabBarHidden, useSideloads, type SideloadTool } 
 const glyph = (paths: React.ReactNode) => (
   <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths}</svg>
 );
+const HOME_ICON = glyph(<><path d="M3 11 12 4l9 7" /><path d="M5 10v10h14V10" /></>);
+const RESEARCH_ICON = glyph(<><path d="M12 3v3M12 18v3M3 12h3M18 12h3" /><circle cx="12" cy="12" r="4" /></>);
 const DOCS_ICON = glyph(<><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5M9 13h6M9 17h4" /></>);
 // Library, Papers and Chat open full-screen panels over the page, never separate pages.
 const TOOLS: { id: SideloadTool; label: string; icon: React.ReactNode }[] = [
@@ -29,7 +31,7 @@ function useKeyboardOpen() {
   return open;
 }
 
-/** The mockup's phone tab bar: Docs, Library, a blue centre button for a new document, Papers, Chat. */
+/** The phone tab bar: Home, Research, a centre button for new research, Library and Documents. */
 export function MobileTabBar() {
   const pathname = usePathname() || '';
   const hiddenByEditor = useMobileTabBarHidden();
@@ -37,30 +39,25 @@ export function MobileTabBar() {
   const sideloads = useSideloads();
   if (hiddenByEditor || keyboardOpen) return null;
   const label = (active: boolean) => `flex flex-col items-center gap-[3px] text-[11px] font-semibold ${active ? 'text-brand' : 'text-subtle'}`;
-  const tool = (item: (typeof TOOLS)[number]) => {
-    const active = item.id === 'chat' ? sideloads.chat : sideloads.drawer === item.id;
-    return (
-      <button key={item.id} type="button" onClick={() => showSideload(item.id)} aria-pressed={active} className={label(active)}>
-        {item.icon}{item.label}
-      </button>
-    );
+  const link = (href: string, text: string, icon: React.ReactNode) => {
+    const active = pathname === href || pathname.startsWith(`${href}/`);
+    return <Link key={href} href={href} aria-current={active ? 'page' : undefined} className={label(active && !sideloads.drawer)}>{icon}{text}</Link>;
   };
-  const docsActive = pathname === '/editor' && !sideloads.drawer && !sideloads.chat;
   return (
     <>
       <div className="h-[84px] md:hidden" aria-hidden="true" />
-      <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-[60] grid h-[84px] grid-cols-5 border-t border-line bg-surface/95 px-1.5 pt-2 pb-[max(22px,env(safe-area-inset-bottom))] backdrop-blur md:hidden">
-        <Link href="/editor" aria-current={docsActive ? 'page' : undefined} className={label(docsActive)}>
-          {DOCS_ICON}Docs
-        </Link>
-        {tool(TOOLS[0])}
-        <Link href="/editor?new=1" aria-label="New document" className="flex justify-center">
+      <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-[60] grid h-[84px] grid-cols-5 border-t border-line bg-surface px-1.5 pt-2 pb-[max(22px,env(safe-area-inset-bottom))] md:hidden">
+        {link('/home', 'Home', HOME_ICON)}
+        {link('/deep-research', 'Research', RESEARCH_ICON)}
+        <Link href="/home?new=1" aria-label="New research" className="flex justify-center">
           <span className="-mt-3.5 grid h-12 w-12 place-items-center rounded-2xl bg-brand shadow-[0_10px_20px_-8px_rgba(var(--brand-rgb),.8)]">
             <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
           </span>
         </Link>
-        {tool(TOOLS[1])}
-        {tool(TOOLS[2])}
+        <button type="button" onClick={() => showSideload('library')} aria-pressed={sideloads.drawer === 'library'} className={label(sideloads.drawer === 'library')}>
+          {TOOLS[0].icon}{TOOLS[0].label}
+        </button>
+        {link('/editor', 'Docs', DOCS_ICON)}
       </nav>
     </>
   );

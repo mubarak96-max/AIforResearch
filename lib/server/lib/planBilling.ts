@@ -322,7 +322,7 @@ export async function listInvoices(dodo: Dodo, customer: string) {
       total: payment.total_amount, amount_due: payment.status === 'succeeded' ? 0 : payment.total_amount,
       currency: payment.currency.toLowerCase(), created: Math.floor(Date.parse(payment.created_at) / 1000), due_date: null,
       hosted_url: null, pdf: payment.invoice_url ?? null,
-      description: payment.subscription_id ? 'Plan' : payment.metadata?.writeorbit_kind === 'credits' || payment.metadata?.writeorbit_kind === 'credits_topup' ? 'Credits' : null,
+      description: payment.subscription_id ? 'Plan' : payment.metadata?.writeorbit_kind === 'pass' ? 'Defence Pass' : ['topup', 'credits', 'credits_topup'].includes(String(payment.metadata?.writeorbit_kind)) ? 'Credits' : null,
       subscription: payment.subscription_id ?? null,
     }));
 }

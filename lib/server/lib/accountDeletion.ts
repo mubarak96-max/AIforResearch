@@ -42,7 +42,16 @@ export async function deleteUserData(uid: string) {
   await deletePrefix(`library/${uid}`);
   const matrices = await col(C.reviewMatrices).where('user_id', '==', uid).select().get();
   for (const matrix of matrices.docs) await deleteDeep(matrix.ref);
-  for (const name of [C.libraryFolders, C.chatThreads, C.libraryConnections, C.libraryImportJobs, C.authorshipReports]) {
+  // Their history, projects they own (with any systematic reviews in them) and memberships in others' projects.
+  const reviews = await col(C.reviews).where('user_id', '==', uid).select().get();
+  for (const review of reviews.docs) await deleteDeep(review.ref);
+  await deleteQuery(col(C.projects).where('owner_user_id', '==', uid));
+  const shared = await col(C.projects).where('member_ids', 'array-contains', uid).get();
+  for (const project of shared.docs) {
+    const data = project.data() as { members?: { user_id: string | null }[] };
+    await project.ref.update({ member_ids: FieldValue.arrayRemove(uid), members: (data.members ?? []).filter((member) => member.user_id !== uid) }).catch(() => undefined);
+  }
+  for (const name of [C.tasks, C.libraryFolders, C.chatThreads, C.libraryConnections, C.libraryImportJobs, C.authorshipReports]) {
     await deleteQuery(col(name).where('user_id', '==', uid));
   }
   // DOI and source-id markers are keyed `{uid}__…`.

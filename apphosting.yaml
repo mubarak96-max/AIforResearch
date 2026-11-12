@@ -9,8 +9,8 @@ runConfig:
   concurrency: 80
   minInstances: 0
   maxInstances: 20
-  # Long AI answers stream for a while.
-  timeoutSeconds: 300
+  # Long AI answers stream for a while; a whole-thesis review or a Detailed report can take several minutes.
+  timeoutSeconds: 900
   # Reach services/convert, which runs with internal ingress (see services/convert/README.md).
   # vpcAccess:
   #   egress: PRIVATE_RANGES_ONLY
@@ -87,6 +87,17 @@ env:
     secret: LLM_API_KEY
   - variable: SCHOLAR_API_KEY
     secret: SCHOLAR_API_KEY
+  # More scholarly sources and the Web source (set the secrets you use; each is optional).
+  # - variable: OPENALEX_API_KEY
+  #   secret: OPENALEX_API_KEY
+  # - variable: NCBI_API_KEY
+  #   secret: NCBI_API_KEY
+  # - variable: SEMANTIC_SCHOLAR_API_KEY
+  #   secret: SEMANTIC_SCHOLAR_API_KEY
+  # - variable: WEB_SEARCH_API_KEY
+  #   secret: WEB_SEARCH_API_KEY
+  # - variable: WEB_SEARCH_PROVIDER
+  #   value: tavily
   - variable: DODO_PAYMENTS_API_KEY
     secret: DODO_PAYMENTS_API_KEY
   - variable: DODO_PAYMENTS_WEBHOOK_KEY

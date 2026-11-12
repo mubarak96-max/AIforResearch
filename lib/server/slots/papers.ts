@@ -51,7 +51,7 @@ export class PapersError extends Error {
   }
 }
 
-export type PapersSettings = Pick<typeof env, 'papersProvider' | 'scholarUrl' | 'scholarApiKey' | 'openalexEmail'>;
+export type PapersSettings = Pick<typeof env, 'papersProvider' | 'scholarUrl' | 'scholarApiKey' | 'openalexEmail'> & { openalexApiKey?: string };
 
 type Endpoint = { provider: string; base: string; headers: Record<string, string>; params: Record<string, string>; unavailable: string | null };
 
@@ -63,7 +63,7 @@ function openalexEndpoint(settings: PapersSettings): Endpoint {
     provider: 'openalex',
     base: OPENALEX_BASE,
     headers: { 'User-Agent': `${USER_AGENT} mailto:${settings.openalexEmail}` },
-    params: settings.openalexEmail ? { mailto: settings.openalexEmail } : {},
+    params: { ...(settings.openalexEmail ? { mailto: settings.openalexEmail } : {}), ...((settings.openalexApiKey ?? env.openalexApiKey) ? { api_key: (settings.openalexApiKey ?? env.openalexApiKey)! } : {}) },
     unavailable: null,
   };
 }
