@@ -125,11 +125,14 @@ export function createFakeFirestore() {
 
   const firestore = {
     collection: (name: string) => query(name),
+    getAll: async (...refs: any[]) => Promise.all(refs.map((ref) => ref.get())),
+    recursiveDelete: async (ref: { path: string }) => { for (const path of store.keys()) if (path === ref.path || path.startsWith(`${ref.path}/`)) store.delete(path); },
     batch,
     runTransaction: async <T>(run: (tx: any) => Promise<T>) => {
       const writes: (() => Promise<void>)[] = [];
       const tx = {
         get: (target: any) => target.get(),
+        getAll: (...targets: any[]) => Promise.all(targets.map((target) => target.get())),
         set: (ref: any, data: Data, options?: any) => { writes.push(() => ref.set(data, options)); },
         update: (ref: any, data: Data) => { writes.push(() => ref.update(data)); },
         create: (ref: any, data: Data) => { writes.push(() => ref.create(data)); },

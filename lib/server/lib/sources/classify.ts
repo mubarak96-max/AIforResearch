@@ -39,8 +39,8 @@ export function classifyStudy(input: { title?: string | null; labels?: (string |
   return null;
 }
 
-/** Normalized title for de-duplication: lower case letters and digits only. */
-export const titleKey = (title: string | null | undefined) => (title || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '').slice(0, 160);
+/** Preserve letters in every script; ASCII-only keys collapse distinct non-Latin titles. */
+export const titleKey = (title: string | null | undefined) => (title || '').toLowerCase().normalize('NFKD').replace(/(\p{Script=Latin})\p{M}+/gu, '$1').replace(/[^\p{L}\p{N}\p{M}]+/gu, '').slice(0, 160);
 
 /** A DOI in lower case without its resolver prefix, or null. */
 export function doiKey(doi: string | null | undefined): string | null {

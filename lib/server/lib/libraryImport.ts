@@ -1,8 +1,9 @@
 import { USER_AGENT } from '../env.js';
 import { randomUUID } from 'node:crypto';
-import { C, col, db, increment, row, rows } from '../firebase.js';
+import { C, col, db, increment, row, rows, searchTerms } from '../firebase.js';
 import { checkLibraryRoom, HARD_UPLOAD_MB, PlanLimitError } from './plans.js';
-import { createLibraryDocument, libraryDoc, storeFile, writeChunks } from './libraryFiles.js';
+import { createLibraryDocument, documentWithExternalId, libraryDoc, storeFile, writeChunks, type LibraryRow } from './libraryFiles.js';
+import { mergeReferenceImport, providerMetadata, referenceSnapshot } from './referenceImportMerge.js';
 import { isPublicHttpsUrl, fetchPublic } from './safeUrl.js';
 import { scholarPdf } from './scholar.js';
 import { readFileBytes, saveFile, deleteFile } from './storage.js';
@@ -23,7 +24,7 @@ import type { AuthUser } from '../auth.js';
  * Event functions stop after 9 minutes, so a long import works in turns: when a turn runs
  * out of time it saves how many entries it got through (`processed`) and raises `attempt`;
  * the function (an onDocumentWritten trigger) starts the next turn when `attempt` goes up.
- * Items already imported are skipped anyway (same DOI or same source id).
+ * Exact source identities can refresh unedited reference fields; DOI-only duplicates are skipped.
  *
  * Each item becomes a reference; its PDF is added when the source has one and the plan has
  * room (PDFs count towards the plan's Library size, references do not). Saving the PDF to
@@ -40,7 +41,7 @@ export type ImportEntry = {
   journal: string | null;
   url: string | null;
   abstract: string | null;
-  /** "zotero:ABCD1234": importing the same item again is skipped. */
+  /** Provider + account + item identity. The same item can refresh imported fields. */
   externalId?: string | null;
   /** Extra details kept on the document (BibTeX, source keys, OpenAlex work id…). */
   metadata?: Record<string, unknown>;
@@ -55,11 +56,12 @@ export type ImportEntry = {
 export type ImportSpec =
   | { kind: 'file'; source: 'bibtex' | 'ris'; items: ReferenceItem[] }
   | { kind: 'ids'; ids: PastedId[] }
-  | { kind: 'zotero' | 'mendeley'; collection: string | null };
+  | { kind: 'zotero' | 'mendeley'; collection: string | null; group_id?: string | null };
 
 export type ImportJob = {
   id: string; source: ImportSource; label: string; status: 'running' | 'done' | 'failed';
   total: number; added: number; pdfs: number; skipped: number; failed: number; pdfs_over_limit: number;
+  updated?: number; preserved?: number;
   error: string | null; created_at: Date; finished_at: Date | null;
 };
 
@@ -94,7 +96,7 @@ export async function startImportJob(
   const now = new Date();
   await ref.create({
     user_id: user.id, account_id: user.account_id, source, label: label.slice(0, 200), status: 'running',
-    total: options.total ?? 0, added: 0, pdfs: 0, skipped: 0, failed: 0, pdfs_over_limit: 0, error: null,
+    total: options.total ?? 0, added: 0, updated: 0, preserved: 0, pdfs: 0, skipped: 0, failed: 0, pdfs_over_limit: 0, error: null,
     folder_id: options.folderId, find_pdfs: options.findPdfs, spec_key: specKey,
     processed: 0, attempt: 0, claimed_attempt: null, created_at: now, updated_at: now, finished_at: null,
   });
@@ -109,6 +111,7 @@ export async function importJob(userId: string, jobId: string): Promise<ImportJo
   return {
     id: job.id, source: job.source, label: job.label, status: job.status, total: job.total, added: job.added, pdfs: job.pdfs,
     skipped: job.skipped, failed: job.failed, pdfs_over_limit: job.pdfs_over_limit, error: job.error ?? null,
+    updated: job.updated ?? 0, preserved: job.preserved ?? 0,
     created_at: job.created_at, finished_at: job.finished_at ?? null,
   };
 }
@@ -180,7 +183,7 @@ async function* specEntries(spec: ImportSpec, userId: string, findPdfs: boolean,
     }
     return;
   }
-  const source = spec.kind === 'zotero' ? await zoteroImport(userId, spec.collection) : await mendeleyImport(userId, spec.collection);
+  const source = spec.kind === 'zotero' ? await zoteroImport(userId, spec.collection, spec.group_id) : await mendeleyImport(userId, spec.collection);
   let index = 0;
   for await (const entry of source.entries) {
     if (index++ < skip) continue;
@@ -217,14 +220,50 @@ async function hasTitle(userId: string, title: string) {
   return !exact.empty;
 }
 
-/** Adds one entry; says what happened to it. */
-async function importEntry(job: JobDoc, entry: ImportEntry, state: { roomLeft: boolean }): Promise<{ added: boolean; pdf: boolean; overLimit: boolean }> {
+/** Refreshes a source item without overwriting local edits, folder choices or PDF contents. */
+export async function refreshImportedReference(userId: string, entry: ImportEntry): Promise<{ updated: boolean; preserved: boolean } | null> {
+  if (!entry.externalId) return null;
+  const found = await documentWithExternalId(userId, entry.externalId);
+  if (!found) return null;
+  const ref = libraryDoc(found.id);
+  return db().runTransaction(async (tx) => {
+    const current = row<LibraryRow>(await tx.get(ref));
+    if (!current || current.user_id !== userId || current.external_id !== entry.externalId) return null;
+    const merged = mergeReferenceImport(current, entry);
+    const patch = { ...merged.patch };
+    // Imported reference abstracts have a single source chunk. Keep that source current in
+    // the same transaction; an attached PDF's page chunks always stay untouched.
+    if (current.file_type === 'reference' && current.chunk_count <= 1 && ('title' in patch || 'abstract' in patch)) {
+      const abstract = 'abstract' in patch ? patch.abstract : current.abstract;
+      const title = 'title' in patch ? patch.title : current.title;
+      const chunk = ref.collection(C.chunks).doc('0');
+      if (typeof abstract === 'string' && abstract.trim()) {
+        const content = `${title ?? ''}\n\n${abstract}`.slice(0, 20000);
+        tx.set(chunk, { user_id: userId, document_id: current.id, chunk_index: 0, page: null, content, terms: searchTerms(content, 200) });
+        patch.chunk_count = 1;
+      } else { tx.delete(chunk); patch.chunk_count = 0; }
+    }
+    tx.update(ref, { ...patch, metadata: merged.metadata, updated_at: new Date() });
+    return { updated: merged.changed, preserved: merged.conflicts.length > 0 };
+  });
+}
+
+/** Adds or refreshes one entry; says what happened to it. */
+async function importEntry(job: JobDoc, entry: ImportEntry, state: { roomLeft: boolean }): Promise<{ added: boolean; pdf: boolean; overLimit: boolean; updated?: boolean; preserved?: boolean }> {
+  if (job.source === 'zotero' || job.source === 'mendeley') {
+    const refreshed = await refreshImportedReference(job.user_id, entry);
+    if (refreshed) return { added: false, pdf: false, overLimit: false, ...refreshed };
+  }
   if (!entry.doi && !entry.externalId && (await hasTitle(job.user_id, entry.title))) return { added: false, pdf: false, overLimit: false };
   const id = await createLibraryDocument(job.user_id, {
     folder_id: job.folder_id, filename: entry.title.slice(0, 300), file_type: 'reference', title: entry.title.slice(0, 1000),
     authors: entry.authors.slice(0, 200), doi: entry.doi, publisher: entry.journal?.slice(0, 500) ?? null, publication_date: entry.year,
     abstract: entry.abstract?.slice(0, 20000) ?? null,
-    metadata: { source: job.source, url: entry.url, journal: entry.journal, ...(entry.metadata || {}) },
+    metadata: {
+      ...providerMetadata(entry).values, source: job.source, url: entry.url, journal: entry.journal,
+      provider_metadata_keys: providerMetadata(entry).keys,
+      ...(entry.externalId ? { import_snapshot: referenceSnapshot(entry) } : {}),
+    },
     processing_status: 'completed', external_id: entry.externalId ?? null,
   });
   if (!id) return { added: false, pdf: false, overLimit: false };
@@ -270,10 +309,11 @@ export async function runImportJob(jobId: string, options: { turnMs?: number; sl
 
   const counts = {
     total: job.total ?? 0, added: job.added ?? 0, pdfs: job.pdfs ?? 0, skipped: job.skipped ?? 0, failed: job.failed ?? 0, pdfs_over_limit: job.pdfs_over_limit ?? 0,
+    updated: job.updated ?? 0, preserved: job.preserved ?? 0,
   };
   let processed = job.processed ?? 0;
   const save = (extra: Record<string, unknown> = {}) => ref.update({
-    ...counts, total: Math.max(counts.total, counts.added + counts.skipped + counts.failed), processed, updated_at: new Date(), ...extra,
+    ...counts, total: Math.max(counts.total, counts.added + counts.updated + counts.skipped + counts.failed), processed, updated_at: new Date(), ...extra,
   });
   const finish = async (extra: Record<string, unknown>) => {
     await save({ ...extra, finished_at: new Date() });
@@ -296,7 +336,9 @@ export async function runImportJob(jobId: string, options: { turnMs?: number; sl
       try {
         const result = await importEntry(job, entry, state);
         if (result.added) counts.added += 1;
+        else if (result.updated) counts.updated += 1;
         else counts.skipped += 1;
+        if (result.preserved) counts.preserved += 1;
         if (result.pdf) counts.pdfs += 1;
         if (result.overLimit) counts.pdfs_over_limit += 1;
       } catch (error) {
@@ -324,7 +366,7 @@ export async function closeInterruptedImports() {
     if (new Date(job.updated_at ?? job.created_at).getTime() > cutoff) continue;
     await jobs().doc(job.id).update({
       status: 'failed', finished_at: new Date(),
-      error: 'The import stopped before it finished. Import again to finish: items already added are skipped.',
+      error: 'The import stopped before it finished. Import again to finish; existing references are kept and refreshed safely.',
     });
     if (job.spec_key) await deleteFile(job.spec_key);
   }

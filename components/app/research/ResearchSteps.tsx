@@ -24,11 +24,11 @@ const STEPS: Record<StepId, { label: string; what: string; icon: React.ReactNode
   plan: { label: 'Plan', what: 'Split the question into sub-questions and searches', icon: <LuListTree /> },
   search: { label: 'Search', what: 'Search the chosen sources and remove duplicates', icon: <LuSearch /> },
   screen: { label: 'Screen', what: 'Read titles and abstracts; keep what is on the question', icon: <LuFilter /> },
-  rank: { label: 'Rank', what: 'Weigh study design, relevance, citations and recency', icon: <LuListOrdered /> },
+  rank: { label: 'Rank', what: 'Rank sources for the selected research approach', icon: <LuListOrdered /> },
   read: { label: 'Read', what: 'Pull each paper’s finding, sample, limits and effect size', icon: <LuBookOpen /> },
   gaps: { label: 'Fill gaps', what: 'Search again where the evidence is thin or conflicting', icon: <LuSearchCheck /> },
   write: { label: 'Write', what: 'Outline, write each section and draw the figures, citing every claim', icon: <LuPenLine /> },
-  verify: { label: 'Verify', what: 'Check each citation against its source and each reference at Crossref', icon: <LuShieldCheck /> },
+  verify: { label: 'Verify', what: 'Check cited narrative within the depth limit; show unverified claims and reference notices', icon: <LuShieldCheck /> },
 };
 
 const PROVIDERS: Record<string, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', pubmed: 'PubMed', europepmc: 'Europe PMC', arxiv: 'arXiv', web: 'Web', library: 'My Library' };
@@ -73,7 +73,7 @@ export function ResearchSteps({ steps, running }: { steps: StepView[]; running: 
       search?.found ? `${Number(search.found).toLocaleString('en-US')} found` : null,
       screen ? `${screen.kept} relevant` : null,
       byId('rank')?.data?.kept ? `${Number(byId('rank')!.data!.kept) + Number(gaps?.added ?? 0)} used` : null,
-      verify?.claims?.checked ? `${verify.claims.supported}/${verify.claims.checked} citations supported` : null,
+      verify?.claims ? verifySummary(verify.claims) : null,
     ].filter(Boolean);
     return (
       <button type="button" onClick={() => setShown(true)} aria-expanded="false"
@@ -215,13 +215,13 @@ function StepDetails({ step, plan }: { step: StepView; plan: SubQuestion[] }) {
                 <span className="grid h-5 min-w-5 place-items-center rounded bg-accent-50 px-1 text-[11px] font-bold text-accent-600">{item.n}</span>
                 <span className="min-w-0 flex-1 truncate text-ink" title={item.title}>{item.title}</span>
                 {item.design && <span className="hidden shrink-0 text-[12px] text-muted sm:inline">{item.design}</span>}
-                <span className="h-1.5 w-12 shrink-0 overflow-hidden rounded-full bg-line-2" title={`Evidence score ${Math.round((item.score ?? 0) * 100)}`}>
+                  <span className="h-1.5 w-12 shrink-0 overflow-hidden rounded-full bg-line-2" title={`Retrieval rank ${Math.round((item.score ?? 0) * 100)}; not a certainty rating`}>
                   <span className="block h-full bg-brand" style={{ width: `${Math.round((item.score ?? 0) * 100)}%` }} />
                 </span>
               </li>
             ))}
           </ol>
-          <p className="mt-2 text-[12px] text-muted">Score: relevance 45%, study design 25%, citations a year 15%, recency 8%, journal 7%.</p>
+          <p className="mt-2 text-[12px] text-muted">{data.ranking_description ?? 'Legacy ranking: relevance 45%, study design 25%, citations a year 15%, recency 8%, journal 7%. This is not a quality assessment.'}</p>
         </>
       );
     case 'read': {
@@ -280,24 +280,53 @@ function StepDetails({ step, plan }: { step: StepView; plan: SubQuestion[] }) {
   }
 }
 
+/** Older reports counted failed checks as supported and recorded no coverage, so they get no N/N figure. */
+function verifySummary(claims: Record<string, any>): string {
+  if (!Number.isFinite(claims.total) || !Number.isFinite(claims.completed)) return 'Older report: check coverage not recorded';
+  const unverified = claims.unverified ? `, ${claims.unverified} unverified` : '';
+  return `${claims.completed}/${claims.total} cited sentences checked${unverified}`;
+}
+
 type Flag = { kind: string; text: string; revised?: string | null; note: string | null; n?: number | null };
 const FLAG_LABEL: Record<string, string> = {
-  revised: 'Narrowed to match its sources', unsupported: 'Not supported by its sources', retracted: 'Retracted paper',
-  corrected: 'Correction published', concern: 'Expression of concern', unconfirmed: 'Reference not confirmed',
+  revised: 'Narrower draft — review the revision', unsupported: 'Not supported by the source excerpts', partly_supported: 'Only partly supported', unverified: 'Claim not verified', retracted: 'Retracted paper',
+  corrected: 'Correction published', concern: 'Expression of concern', unconfirmed: 'Reference not confirmed', reference_unverified: 'Reference check incomplete',
 };
 
 function VerifyDetails({ data }: { data: Record<string, any> }) {
   const claims = data.claims ?? {};
   const refs = data.references ?? {};
   const flags = (data.flags ?? []) as Flag[];
+  const coverageRecorded = Number.isFinite(claims.total) && Number.isFinite(claims.completed);
   return (
     <>
       <ul className="space-y-0.5">
-        <li><span className="font-semibold text-ink">{claims.supported ?? 0} of {claims.checked ?? 0}</span> cited sentences are fully supported by the sources they cite{claims.partly ? `; ${claims.partly} only partly` : ''}{claims.unsupported ? `; ${claims.unsupported} not at all` : ''}.</li>
-        {claims.revised ? <li><span className="font-semibold text-ink">{claims.revised}</span> sentence{claims.revised === 1 ? ' was' : 's were'} rewritten to say only what the sources show.</li> : null}
+        {coverageRecorded ? <li><span className="font-semibold text-ink">{claims.completed} of {claims.total}</span> cited narrative sentences in the initial draft received an assessment; {claims.attempted ?? 0} were sent for checking{claims.no_source_text ? ` and ${claims.no_source_text} could not be checked because a cited source had no usable text` : ''}.</li> : <li className="text-amber-700">This older report did not record complete verification coverage. Its saved assessment counts cannot establish how much of the report was checked.</li>}
+        <li><span className="font-semibold text-ink">{claims.supported ?? 0}</span> judged supported by AI against the source excerpts{claims.partly ? `; ${claims.partly} partly supported` : ''}{claims.unsupported ? `; ${claims.unsupported} unsupported` : ''}.</li>
+        {claims.unverified ? <li className="text-amber-700"><span className="font-semibold">{claims.unverified} unverified</span>{claims.not_checked ? `, including ${claims.not_checked} outside this depth’s check limit` : ''}. These do not count as supported.</li> : null}
+        {claims.revised ? <li><span className="font-semibold text-ink">{claims.revised}</span> sentence{claims.revised === 1 ? ' was' : 's were'} rewritten. The counts describe the initial draft; inspect each revision against its sources before accepting it.</li> : null}
         {refs.checked ? <li><span className="font-semibold text-ink">{refs.confirmed} of {refs.checked}</span> references confirmed at Crossref{refs.retracted ? `; ${refs.retracted} retracted` : ''}{refs.corrected ? `; ${refs.corrected} with a correction or concern` : ''}.</li> : null}
+        {refs.total != null && <li>{refs.attempted ?? 0} of {refs.total} reference checks attempted{refs.unverified ? `; ${refs.unverified} unverified` : ''}{refs.no_doi ? `; ${refs.no_doi} without a DOI` : ''}{refs.notices_unverified ? `; ${refs.notices_unverified} notice checks incomplete or outside coverage` : ''}.</li>}
         {data.dropped_markers ? <li>{data.dropped_markers} citation marker{data.dropped_markers === 1 ? '' : 's'} pointing at no source {data.dropped_markers === 1 ? 'was' : 'were'} removed.</li> : null}
       </ul>
+      <p className="mt-2 text-[12px] text-muted">These checks cover cited narrative sentences, not uncited statements or computed tables. A found DOI establishes a reference’s identity, not support for a claim.</p>
+      {Array.isArray(claims.uncited_sentences) && claims.uncited_sentences.length > 0 && <details className="mt-3"><summary className="cursor-pointer font-semibold text-amber-700">{claims.uncited_sentences.length} uncited sentences to review</summary><p className="mt-1 text-[12px] text-muted">A conservative prose heuristic found no citation markers in these sentences. They were not assessed for support. This list is not a factual-claim classification or a complete count of claims.</p><ul className="mt-2 max-h-72 list-disc space-y-2 overflow-y-auto pl-5">{claims.uncited_sentences.map((sentence: string, at: number) => <li key={at}>{sentence}</li>)}</ul></details>}
+      {Array.isArray(claims.items) && claims.items.length > 0 && (
+        <details className="mt-3">
+          <summary className="cursor-pointer font-semibold text-ink">Inspect sentence checks and source basis</summary>
+          <ol className="mt-2 max-h-96 space-y-3 overflow-y-auto pr-2">
+            {claims.items.map((item: { text: string; verdict: string; note?: string | null; sources?: { n: number; basis: string }[]; revised_text?: string }, index: number) => (
+              <li key={index} className="rounded-lg border border-line bg-surface p-3">
+                <p className="font-semibold text-ink">{item.verdict === 'yes' ? 'AI judged supported' : item.verdict === 'partly' ? 'Partly supported' : item.verdict === 'no' ? 'Unsupported' : 'Unverified'}</p>
+                <p className="mt-1">{item.text}</p>
+                <p className="mt-1 flex flex-wrap gap-x-3 text-[12px]">{item.sources?.map((source) => <a key={source.n} href={`#source-${source.n}`} className="text-brand hover:underline">Source {source.n}: {source.basis.replaceAll('_', ' ')}</a>)}</p>
+                {item.note && <p className="mt-1 text-[12px] text-muted">{item.note}</p>}
+                {item.revised_text && <p className="mt-1 text-[12px] text-muted">Revision awaiting review: {item.revised_text}</p>}
+              </li>
+            ))}
+          </ol>
+        </details>
+      )}
       {flags.length > 0 && <VerifyFlags flags={flags} />}
     </>
   );

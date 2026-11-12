@@ -200,6 +200,7 @@ describe('the pricing page’s credit table', () => {
     expect(cost('Deep Research')).toBe(String(CREDIT_COSTS.deep));
     expect(cost('Document review')).toBe(String(CREDIT_COSTS.review_standard));
     expect(cost('Slide deck')).toBe(String(CREDIT_COSTS.slides));
+    expect(cost('Reporting-guideline check')).toBe(String(CREDIT_COSTS.guideline_check));
     expect(cost('Full draft')).toBe(`${CREDIT_COSTS.write}–${CREDIT_COSTS.draft}`);
     expect(cost('Detailed report')).toBe(String(CREDIT_COSTS.detailed));
     expect(cost('Data Lab')).toBe(String(CREDIT_COSTS.data_ai));

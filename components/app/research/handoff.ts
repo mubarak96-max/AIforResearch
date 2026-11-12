@@ -66,7 +66,7 @@ export function taskHref(task: Pick<TaskRecord, 'id' | 'kind' | 'module'>): stri
   const id = encodeURIComponent(task.id);
   switch (task.kind) {
     case 'research': return `/deep-research?task=${id}`;
-    case 'review': case 'claim_check': case 'citation_check': return `/reviewer?task=${id}`;
+    case 'review': case 'claim_check': case 'citation_check': case 'guideline_check': return `/reviewer?task=${id}`;
     case 'thesis': return `/thesis?task=${id}`;
     case 'proposal': return `/proposals?task=${id}`;
     case 'writing': return `/write?task=${id}`;
@@ -80,7 +80,7 @@ export function taskHref(task: Pick<TaskRecord, 'id' | 'kind' | 'module'>): stri
 }
 
 export const KIND_LABELS: Record<string, string> = {
-  research: 'Deep Research', papers: 'Find Papers', review: 'Reviewer', claim_check: 'Claim check', citation_check: 'Citation check', thesis: 'Thesis Suite',
+  research: 'Deep Research', papers: 'Find Papers', review: 'Reviewer', claim_check: 'Claim check', citation_check: 'Citation check', guideline_check: 'Guideline check', thesis: 'Thesis Suite',
   proposal: 'Proposal Studio', writing: 'Writing Studio', systematic_review: 'Systematic Review', data: 'Data Lab', citation_map: 'Citation Map',
   landscape: 'Landscape', slides: 'Slides', tool: 'Tool', chat_pdf: 'Chat with PDF',
 };

@@ -86,7 +86,7 @@ describe('the report', () => {
     expect(text).toContain('We searched OpenAlex, Semantic Scholar, PubMed and Europe PMC on 12 November 2026, with 11 searches built from the question and 5 sub-questions, limited to papers published from 2015 and peer reviewed (no preprints).');
     expect(text).toContain('which added 40 records');
     expect(text).toContain('the 240 best-matching records were screened by title and abstract and 50 were judged relevant');
-    expect(text).toContain('The 40 strongest papers');
+    expect(text).toContain('The 40 selected papers');
     expect(text).toContain('A second round of 4 searches aimed at the gaps the first reading left added 5 papers.');
   });
 

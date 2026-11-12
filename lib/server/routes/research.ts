@@ -22,10 +22,15 @@ import { researchProfile } from '../lib/users.js';
 import { DEPTHS, DEPTH_SETTINGS, ResearchEmptyError, applyHeadings, followUpPrompt, hasHeadings, headingsPrompt, stripHeadings, usage0, type Depth, type ResearchSource } from '../lib/research.js';
 import { cleanPlan, planResearch, runResearch } from '../lib/researchPipeline.js';
 import { SOURCE_GROUPS, STUDY_TYPES, JOURNAL_TIER_ORDER, searchSources, sourceGroups } from '../lib/sources/index.js';
-import { extractText } from '../lib/fileText.js';
-import { createTask, deleteTask, failTask, finishTask, getTaskFor, listTasks, runningResearch, updateTask, updateTaskResult, TASK_KINDS } from '../lib/history.js';
+import { checkedOcrLanguages, extractText, ocrCapabilities } from '../lib/fileText.js';
+import {
+  createTask, deleteTask, failTask, finishTask, getTaskFor, listTasks, publicTask, runningResearch, updateTask, updateTaskResult, TASK_KINDS,
+} from '../lib/history.js';
 import { addMember, createProject, deleteProject, getProjectFor, listProjects, publicProject, removeMember, updateProject } from '../lib/projects.js';
 import { rateLimit } from '../lib/rateLimit.js';
+import { env } from '../env.js';
+import { enqueueResearch, cancelResearch, researchJobExists } from '../lib/researchJobs.js';
+import { RESEARCH_METHODS } from '../../researchMethods.js';
 
 export const Filters = z.object({
   from_year: z.number().int().min(1800).max(2100).nullish(),
@@ -72,6 +77,9 @@ const ResearchRequest = z.object({
   attachments: z.array(z.object({ name: z.string().trim().max(200), text: z.string().max(200_000) })).max(5).default([]),
   role: z.string().trim().max(40).nullish(),
   language: z.string().trim().max(40).nullish(),
+  method: z.enum(RESEARCH_METHODS).default('general'),
+  search_languages: z.array(z.string().trim().min(2).max(60)).max(8).default([]),
+  background: z.boolean().default(false),
   project_id: z.string().max(64).nullish(),
   /** The plan the person reviewed (Detailed). */
   plan: Plan.nullish(),
@@ -89,7 +97,7 @@ export function researchRoutes(slots: Slots) {
   const searches = rateLimit({ key: 'sources-search', limit: 240, windowSeconds: 3600 });
   const plans = rateLimit({ key: 'research-plan', limit: 60, windowSeconds: 3600 });
 
-  app.get('/sources/groups', (c) => c.json({ groups: sourceGroups(), study_types: STUDY_TYPES, journal_tiers: JOURNAL_TIER_ORDER }));
+  app.get('/sources/groups', (c) => c.json({ groups: sourceGroups(), study_types: STUDY_TYPES, journal_tiers: JOURNAL_TIER_ORDER, background_research: env.researchJobsEnabled }));
 
   app.post('/sources/search', searches, async (c) => {
     const user = currentUser(c);
@@ -101,11 +109,13 @@ export function researchRoutes(slots: Slots) {
     return c.json(result);
   });
 
+  app.get('/files/ocr', async (c) => c.json(await ocrCapabilities()));
   app.post('/files/text', async (c) => {
     const form = await c.req.formData().catch(() => null);
     const file = form?.get('file');
     if (!file || typeof file === 'string') throw new HTTPException(422, { message: 'Attach a file.' });
-    const result = await extractText(file.name || 'file', new Uint8Array(await file.arrayBuffer()));
+    const ocrLanguages = checkedOcrLanguages(String(form?.get('ocr_languages') || '').split(/[+,]/).map((item) => item.trim()).filter(Boolean));
+    const result = await extractText(file.name || 'file', new Uint8Array(await file.arrayBuffer()), { ocrLanguages });
     return c.json({ ...result, pages: undefined });
   });
 
@@ -113,13 +123,13 @@ export function researchRoutes(slots: Slots) {
   // before paying for it. Charged work starts at POST /research with the reviewed plan.
   app.post('/research/plan', plans, async (c) => {
     const user = currentUser(c);
-    const body = await parseBody(c, z.object({ question: ResearchRequest.shape.question, depth: z.enum(DEPTHS).default('detailed') }));
+    const body = await parseBody(c, z.object({ question: ResearchRequest.shape.question, depth: z.enum(DEPTHS).default('detailed'), method: ResearchRequest.shape.method, search_languages: ResearchRequest.shape.search_languages }));
     const unavailable = llmUnavailable(slots.llm);
     if (unavailable) throw new HTTPException(503, { message: unavailable });
     if (body.depth === 'detailed') await requireFeature(user.account_id, 'detailed_mode');
     const usage = usage0();
     try {
-      const plan = await planResearch(slots.llm, body.question, body.depth, usage);
+      const plan = await planResearch(slots.llm, body.question, body.depth, usage, undefined, { method: body.method, searchLanguages: body.search_languages });
       await meterTokens(user, usage, { feature: 'research:plan', provider: slots.llm.provider, model: llmModelName(slots.llm, 'fast') });
       const settings = DEPTH_SETTINGS[body.depth];
       return c.json({ ...plan, max_sub_questions: 8, suggested: settings.subQuestions });
@@ -132,6 +142,7 @@ export function researchRoutes(slots: Slots) {
   app.post('/research', async (c) => {
     const user = currentUser(c);
     const body = await parseBody(c, ResearchRequest);
+    if (body.background && !env.researchJobsEnabled) throw new HTTPException(503, { message: 'Background research is not enabled on this server yet. Use the current research mode.' });
     const unavailable = llmUnavailable(slots.llm);
     if (unavailable) throw new HTTPException(503, { message: unavailable });
     if (body.depth === 'detailed') await requireFeature(user.account_id, 'detailed_mode');
@@ -141,19 +152,42 @@ export function researchRoutes(slots: Slots) {
       await checkQuota(user.account_id, 'research_runs');
       await checkRunning(user.account_id, await runningResearch(user.account_id));
     }
+    // Read settings before debiting: a profile lookup failure must not consume credits.
+    const profile = await researchProfile(user.id);
     const credits = researchCredits(body.depth, body.high_quality);
     const charge = await spendCredits(user.account_id, credits, `A ${body.depth === 'summary' ? 'Summary answer' : body.depth === 'deep' ? 'Deep report' : 'Detailed report'}`);
     let taskId: string;
     try {
       taskId = await createTask(user, {
         kind: 'research', module: body.depth, title: body.question.split('\n')[0].slice(0, 200), project_id: body.project_id ?? null, credits,
-        inputs: { question: body.question, depth: body.depth, groups: body.groups, filters: body.filters, headings: body.headings, high_quality: body.high_quality, library_document_ids: body.library_document_ids, attachments: body.attachments.map((file) => file.name), role: body.role ?? null, plan: body.plan ? cleanPlan(body.plan, 8, 3) : null },
+        inputs: { question: body.question, depth: body.depth, groups: body.groups, filters: body.filters, headings: body.headings, high_quality: body.high_quality, library_document_ids: body.library_document_ids, attachments: body.attachments.map((file) => file.name), role: body.role ?? null, language: body.language ?? null, method: body.method, search_languages: body.search_languages, background: body.background, plan: body.plan ? cleanPlan(body.plan, 8, 3) : null },
       });
     } catch (error) {
       await refundCredits(charge);
       throw error;
     }
-    const profile = await researchProfile(user.id);
+    if (body.background) {
+      try {
+        await enqueueResearch(user, taskId, {
+          question: body.question, depth: body.depth, groups: body.groups, filters: toFilters(body.filters), headings: body.headings,
+          highQuality: body.high_quality, libraryDocumentIds: body.library_document_ids, attachments: body.attachments, profile,
+          role: body.role, language: body.language, method: body.method, searchLanguages: body.search_languages, plan: body.plan ?? null,
+        }, charge);
+        return c.json({ task_id: taskId, credits, background: true }, 202);
+      } catch (error) {
+        // create() can commit and still throw (e.g. a timeout). A job that exists settles its own charge.
+        const queued = await researchJobExists(taskId).catch(() => null);
+        if (queued) return c.json({ task_id: taskId, credits, background: true }, 202);
+        if (queued === null) {
+          // Unknown state: refunding here could double-refund, so leave settlement to job recovery.
+          console.error('research enqueue state unknown', error);
+          throw error;
+        }
+        await refundCredits(charge);
+        await failTask(taskId, 'The background job could not be queued. Your credits were returned.');
+        throw error;
+      }
+    }
     const abort = new AbortController();
     c.req.raw.signal?.addEventListener('abort', () => abort.abort(), { once: true });
     const encoder = new TextEncoder();
@@ -170,7 +204,7 @@ export function researchRoutes(slots: Slots) {
           const result = await runResearch(slots.llm, {
             question: body.question, depth: body.depth, groups: body.groups, filters: toFilters(body.filters), headings: body.headings,
             highQuality: body.high_quality, libraryDocumentIds: body.library_document_ids, attachments: body.attachments, profile, role: body.role, language: body.language,
-            plan: body.plan ?? null,
+            plan: body.plan ?? null, method: body.method, searchLanguages: body.search_languages,
           }, { userId: user.id, signal: abort.signal }, {
             step: (step) => send('step', step),
             sources: (sources, web, searched) => send('sources', { sources, web, ...searched }),
@@ -178,13 +212,13 @@ export function researchRoutes(slots: Slots) {
             figures: (figures) => send('figures', { figures }),
             markdown: (text) => send('markdown', { text }),
           });
-          await meterTokens(user, result.usage, { feature: `research:${body.depth}`, provider: slots.llm.provider, model: llmModelName(slots.llm, body.high_quality || body.depth !== 'summary' ? 'review' : 'fast') });
           const saved = {
             markdown: result.markdown, summary: result.summary, sources: result.sources, all_sources: result.all_sources, consensus: result.consensus, queries: result.queries,
             searched: result.searched, plan: result.plan, steps: result.steps, verification: result.verification, figures: result.figures, follow_ups: [],
             ...(result.markdown_headed ? { markdown_headed: result.markdown_headed, markdown_plain: result.markdown_plain } : {}),
           };
           await finishTask(taskId, saved);
+          await meterTokens(user, result.usage, { feature: `research:${body.depth}`, provider: slots.llm.provider, model: llmModelName(slots.llm, body.high_quality || body.depth !== 'summary' ? 'review' : 'fast') }).catch((error) => console.error('research metering', error));
           if (body.depth !== 'summary') await countUse(user.account_id, 'research_runs').catch((error) => console.error('report not counted', error));
           send('done', { task_id: taskId, credits, ...saved });
         } catch (error) {
@@ -206,6 +240,8 @@ export function researchRoutes(slots: Slots) {
     });
     return new Response(stream, { headers: { 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-cache, no-transform', 'X-Accel-Buffering': 'no' } });
   });
+
+  app.post('/research/:id/cancel', async (c) => { await cancelResearch(currentUser(c), c.req.param('id')); return c.json({ ok: true }); });
 
   app.post('/research/:id/follow-up', async (c) => {
     const user = currentUser(c);
@@ -283,7 +319,7 @@ export function researchRoutes(slots: Slots) {
       tasks: await listTasks(user, { projectId: c.req.query('project') || null, kind: kind && (TASK_KINDS as readonly string[]).includes(kind) ? kind : null, limit: Number(c.req.query('limit')) || 50 }),
     });
   });
-  app.get('/history/:id', async (c) => c.json(await getTaskFor(currentUser(c), c.req.param('id'))));
+  app.get('/history/:id', async (c) => c.json(publicTask(await getTaskFor(currentUser(c), c.req.param('id')))));
   app.patch('/history/:id', async (c) => {
     const patch = await parseBody(c, z.object({ title: z.string().max(200).optional(), starred: z.boolean().optional(), project_id: z.string().max(64).nullable().optional() }));
     return c.json(await updateTask(currentUser(c), c.req.param('id'), patch));

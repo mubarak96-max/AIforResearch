@@ -91,9 +91,11 @@ export async function connectZotero(userId: string, apiKey: string) {
   if (response.status === 404 || response.status === 403) throw new SourceError('Zotero does not know this key. Copy it again from zotero.org/settings/keys.');
   if (!response.ok) throw new SourceError('Zotero could not be reached. Try again in a minute.', 503);
   const info: any = await response.json();
-  if (!info?.userID || info?.access?.user?.library !== true) throw new SourceError('This key cannot read your library. Create one with "Allow library access" ticked.');
-  await saveConnection(userId, 'zotero', String(info.userID), String(info.username || `Zotero user ${info.userID}`), { apiKey: key, files: info.access.user.files === true });
-  return { name: String(info.username || ''), files: info.access.user.files === true };
+  const personal = info?.access?.user?.library === true;
+  const groups = Object.values(info?.access?.groups ?? {}).some((grant: any) => grant?.library === true);
+  if (!info?.userID || (!personal && !groups)) throw new SourceError('This key cannot read a library. Grant read access to your personal library or a selected group.');
+  await saveConnection(userId, 'zotero', String(info.userID), String(info.username || `Zotero user ${info.userID}`), { apiKey: key, files: info.access?.user?.files === true, library: personal });
+  return { name: String(info.username || ''), files: info.access?.user?.files === true };
 }
 
 // Zotero sign-in (OAuth 1.0a) when an admin registered an app at zotero.org/oauth/apps; the
@@ -143,16 +145,59 @@ export async function finishZotero(token: string, verifier: string) {
   return pending.next.startsWith('/') && !pending.next.startsWith('//') ? pending.next : '/editor?tool=library';
 }
 
-export async function zoteroCollections(userId: string) {
+type ZoteroConnection = NonNullable<Awaited<ReturnType<typeof connectionOf>>>;
+export type ZoteroGroupLibrary = { id: string; name: string };
+const groupAccess = (access: any, groupId: string) => access?.groups?.[groupId]?.library === true || access?.groups?.all?.library === true;
+
+/** Group selection never broadens OAuth scopes. Check the existing key's live grants. */
+async function zoteroLibrary(connection: ZoteroConnection, groupId?: string | null) {
+  if (!groupId) {
+    if (connection.credentials.library === false) throw new SourceError('This key does not read your personal library. Choose a group library below.', 403);
+    return { base: `/users/${connection.external_user_id}`, files: connection.credentials.files === true };
+  }
+  if (!/^[1-9]\d{0,19}$/.test(groupId)) throw new SourceError('Choose a valid Zotero group library.');
+  const { data } = await zotero('/keys/current', connection.credentials.apiKey);
+  if (String(data?.userID) !== connection.external_user_id || !groupAccess(data?.access, groupId)) {
+    throw new SourceError('This Zotero connection has no read permission for that group. Reconnect with a key that explicitly grants read access to the selected group.', 403);
+  }
+  // Zotero group grants normally carry only library/write flags, and read access covers attachment
+  // downloads. Respect an explicit refusal when a grant does include one.
+  const grant = data?.access?.groups?.[groupId] ?? data?.access?.groups?.all;
+  return { base: `/groups/${groupId}`, files: grant?.files !== false };
+}
+
+/** Only groups explicitly readable with the current key, never all public groups. */
+export async function zoteroGroupLibraries(userId: string): Promise<{ groups: ZoteroGroupLibrary[]; warning: string | null }> {
   const connection = await connectionOf(userId, 'zotero');
   if (!connection) throw new SourceError('Connect Zotero first.', 409);
+  const { data: key } = await zotero('/keys/current', connection.credentials.apiKey);
+  if (String(key?.userID) !== connection.external_user_id) throw new SourceError('Reconnect Zotero to confirm this account.', 403);
+  const groups: ZoteroGroupLibrary[] = [];
+  const grants = key?.access?.groups ?? {};
+  if (Object.values(grants).some((grant: any) => grant?.library === true)) {
+    for (let start = 0; start < 5000; start += 100) {
+      const { data, total } = await zotero(`/users/${connection.external_user_id}/groups?limit=100&start=${start}`, connection.credentials.apiKey);
+      for (const group of Array.isArray(data) ? data : []) {
+        const id = String(group.id ?? group.data?.id ?? '');
+        if (/^[1-9]\d{0,19}$/.test(id) && groupAccess(key.access, id)) groups.push({ id, name: String(group.data?.name || group.name || `Group ${id}`).slice(0, 200) });
+      }
+      if (start + 100 >= total) break;
+    }
+  }
+  return { groups: groups.sort((a, b) => a.name.localeCompare(b.name)), warning: groups.length ? null : 'No group read permissions were found. To import a group, reconnect with a Zotero API key granting read access to that group. Personal-library sign-in permissions are unchanged.' };
+}
+
+export async function zoteroCollections(userId: string, groupId?: string | null) {
+  const connection = await connectionOf(userId, 'zotero');
+  if (!connection) throw new SourceError('Connect Zotero first.', 409);
+  const { base } = await zoteroLibrary(connection, groupId);
   const collections: { key: string; name: string; parent: string | null; items: number }[] = [];
   for (let start = 0; start < 5000; start += 100) {
-    const { data, total } = await zotero(`/users/${connection.external_user_id}/collections?limit=100&start=${start}`, connection.credentials.apiKey);
+    const { data, total } = await zotero(`${base}/collections?limit=100&start=${start}`, connection.credentials.apiKey);
     for (const item of data as any[]) collections.push({ key: item.key, name: item.data?.name || 'Untitled', parent: item.data?.parentCollection || null, items: item.meta?.numItems ?? 0 });
     if (start + 100 >= total) break;
   }
-  const { total } = await zotero(`/users/${connection.external_user_id}/items/top?limit=1&itemType=-attachment`, connection.credentials.apiKey);
+  const { total } = await zotero(`${base}/items/top?limit=1&itemType=-attachment`, connection.credentials.apiKey);
   return { collections: collections.sort((a, b) => a.name.localeCompare(b.name)), library_items: total };
 }
 
@@ -161,11 +206,11 @@ function zoteroName(creator: any) {
 }
 
 /** Every top-level item in the library or one collection, with its first PDF attachment. */
-export async function zoteroImport(userId: string, collectionKey: string | null) {
+export async function zoteroImport(userId: string, collectionKey: string | null, groupId?: string | null) {
   const found = await connectionOf(userId, 'zotero');
   if (!found) throw new SourceError('Connect Zotero first.', 409);
   const connection = found;
-  const base = `/users/${connection.external_user_id}`;
+  const { base, files } = await zoteroLibrary(connection, groupId);
   const apiKey: string = connection.credentials.apiKey;
   const list = collectionKey ? `${base}/collections/${encodeURIComponent(collectionKey)}/items/top` : `${base}/items/top`;
   const first = await zotero(`${list}?limit=1&itemType=-attachment`, apiKey);
@@ -185,9 +230,9 @@ export async function zoteroImport(userId: string, collectionKey: string | null)
           journal: fields.publicationTitle || fields.bookTitle || fields.proceedingsTitle || fields.publisher || null,
           url: fields.url || null,
           abstract: fields.abstractNote || null,
-          externalId: `zotero:${connection.external_user_id}:${item.key}`,
-          metadata: { zotero_key: item.key, item_type: fields.itemType },
-          pdf: connection.credentials.files && (item.meta?.numChildren ?? 0) > 0 ? async () => {
+          externalId: groupId ? `zotero:${connection.external_user_id}:group:${groupId}:${item.key}` : `zotero:${connection.external_user_id}:${item.key}`,
+          metadata: { zotero_key: item.key, zotero_group_id: groupId || null, item_type: fields.itemType ?? null, source_version: item.version ?? null, source_modified: fields.dateModified ?? null },
+          pdf: files && (item.meta?.numChildren ?? 0) > 0 ? async () => {
             const { data: children } = await zotero(`${base}/items/${item.key}/children`, apiKey);
             const attachment = (children as any[]).find((child) => child.data?.itemType === 'attachment' && child.data?.contentType === 'application/pdf'
               && ['imported_file', 'imported_url'].includes(child.data?.linkMode));
@@ -310,7 +355,7 @@ export async function mendeleyImport(userId: string, folderId: string | null) {
           url: document.websites?.[0] || null,
           abstract: document.abstract || null,
           externalId: `mendeley:${connection.external_user_id}:${document.id}`,
-          metadata: { mendeley_id: document.id, item_type: document.type },
+          metadata: { mendeley_id: document.id, item_type: document.type ?? null, source_modified: document.last_modified ?? null },
           pdf: document.file_attached !== false ? async () => {
             const { data: files } = await mendeley(`/files?document_id=${document.id}`, token, 'application/vnd.mendeley-file.1+json');
             const file = (files as any[]).find((item) => item.mime_type === 'application/pdf');

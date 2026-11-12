@@ -28,7 +28,7 @@ export type Filters = {
   from_year?: number | null; to_year?: number | null; study_types?: string[] | null; open_access?: boolean | null;
   min_citations?: number | null; journal_tier?: string | null; exclude_retracted?: boolean | null; exclude_preprints?: boolean | null;
 };
-export type Attachment = { name: string; text: string; words: number };
+export type Attachment = { name: string; text: string; words: number; warnings?: string[] };
 export type LibraryPick = { id: string; title: string };
 
 export type Source = {
@@ -38,7 +38,8 @@ export type Source = {
   is_preprint: boolean; is_retracted: boolean; providers: string[]; abstract: string | null; tldr: string | null;
   stance?: 'supports' | 'mixed' | 'against' | 'unclear' | null; finding?: string | null;
   sample?: string | null; limits?: string | null; relevance?: number | null; rank_score?: number | null; sub_questions?: number[]; full_text?: boolean;
-  check?: { status: 'confirmed' | 'retracted' | 'corrected' | 'concern' | 'unconfirmed' | 'no_doi'; note: string | null } | null;
+  passage?: string | null; evidence_basis?: string;
+  check?: { status: 'confirmed' | 'retracted' | 'corrected' | 'concern' | 'unconfirmed' | 'unverified' | 'no_doi'; note: string | null; attempted?: boolean; notices_checked?: boolean } | null;
 };
 
 /** A paper from POST /api/sources/search. */
@@ -278,8 +279,24 @@ export function AttachMenu({ files, onFiles, library, onLibrary, max = 5, onBloc
   const [busy, setBusy] = useState(false);
   const [picker, setPicker] = useState(false);
   const [accept, setAccept] = useState(ACCEPT_ALL);
+  const [ocr, setOcr] = useState<{ available: boolean; languages: string[]; default_languages: string[] } | null>(null);
+  const [ocrLanguages, setOcrLanguages] = useState<string[]>([]);
   const root = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!open || onBlocked || ocr) return;
+    let cancelled = false;
+    api<{ available: boolean; languages: string[]; default_languages: string[] }>('/api/files/ocr').then((info) => {
+      if (!cancelled) { setOcr(info); setOcrLanguages(info.default_languages.filter((code) => info.languages.includes(code))); }
+    }).catch(() => { if (!cancelled) setOcr({ available: false, languages: [], default_languages: [] }); });
+    return () => { cancelled = true; };
+  }, [open, onBlocked, ocr]);
+  const ocrOptions = useMemo(() => (ocr?.languages ?? []).map((value) => {
+    let label = value.startsWith('script/') ? `${value.slice(7)} script` : value;
+    try { if (!value.includes('/')) label = new Intl.DisplayNames(['en'], { type: 'language' }).of(value) || value; } catch { /* retain the installed language label */ }
+    return { value, label };
+  }), [ocr]);
 
   useEffect(() => {
     if (!open) return;
@@ -304,8 +321,8 @@ export function AttachMenu({ files, onFiles, library, onLibrary, max = 5, onBloc
     const next = [...files];
     for (const file of Array.from(list).slice(0, Math.max(0, max - files.length))) {
       try {
-        const read = await fileText(file);
-        next.push({ name: read.name, text: read.text, words: read.words });
+        const read = await fileText(file, ocrLanguages);
+        next.push({ name: read.name, text: read.text, words: read.words, warnings: read.warnings });
         if (read.truncated) toast(`${read.name} is long; the first 30,000 words are used.`);
       } catch (error) {
         showError(error);
@@ -333,6 +350,8 @@ export function AttachMenu({ files, onFiles, library, onLibrary, max = 5, onBloc
               <span className="shrink-0 text-[12px] text-subtle">{kind.detail}</span>
             </button>
           ))}
+          {ocr?.available && <div role="none" className="border-t border-line-2 px-2 py-2"><MultiSelect label="Scanned PDF languages" value={ocrLanguages} options={ocrOptions} onChange={(values) => setOcrLanguages(values.slice(0, 8))} min={0} /><p className="mt-1 text-[11.5px] text-muted">Choose the document’s languages before uploading a scan.</p></div>}
+          {ocr && !ocr.available && <p className="px-2 py-1 text-[11.5px] text-muted">Scanned-page reading is unavailable. PDFs with selectable text can still be read.</p>}
           <div className="my-1 border-t border-line-2" />
           <button role="menuitem" type="button" onClick={() => { setOpen(false); if (onBlocked) onBlocked(); else setPicker(true); }} className={item}>
             <LuLibrary className="h-4 w-4 text-muted" aria-hidden="true" />Add from my Library
@@ -372,6 +391,7 @@ export function AttachmentList({ files, onFiles, library, onLibrary }: { files: 
           <button type="button" aria-label={`Remove ${pick.title}`} onClick={() => onLibrary(library.filter((item) => item.id !== pick.id))} className="grid h-6 w-6 place-items-center rounded-md hover:bg-line"><LuX className="h-3 w-3" /></button>
         </span>
       ))}
+      {files.filter((file) => file.warnings?.length).map((file, index) => <details key={`${file.name}-${index}-warnings`} className="basis-full text-[12.5px] text-amber-700"><summary className="cursor-pointer">Check text extraction: {file.name}</summary><ul className="mt-1 list-disc space-y-1 pl-5">{file.warnings!.map((warning, at) => <li key={at}>{warning}</li>)}</ul></details>)}
     </div>
   );
 }
@@ -510,16 +530,20 @@ export function SourceRow({ source, highlighted = false, extra }: { source: Sour
             {source.is_preprint && <Tag tone="warning" title="Not peer reviewed">Preprint</Tag>}
             {source.is_retracted && <Tag tone="negative">Retracted</Tag>}
             {source.is_oa && source.kind === 'paper' && <Tag tone="positive">Open access</Tag>}
-            {source.full_text && <Tag tone="brand" title="Read from the paper's open full text, not only the abstract">Full text read</Tag>}
-            {source.check?.status === 'confirmed' && <Tag tone="positive" title="The DOI resolves at Crossref to this paper, with no retraction or correction notice">DOI verified</Tag>}
+            {source.full_text && <Tag tone="brand" title="The retained passages were extracted from the open PDF; the entire paper was not necessarily read">Full-text excerpts</Tag>}
+            {!source.full_text && (source.kind === 'paper' || source.kind === 'library') && <Tag tone="warning">{source.abstract ? 'Abstract only' : source.tldr ? 'Source summary only' : 'Metadata only'}</Tag>}
+            {source.check?.status === 'confirmed' && <Tag tone="positive" title="The DOI record matches this paper. This does not verify claims or guarantee that all notices were found.">DOI record matched</Tag>}
             {(source.check?.status === 'corrected' || source.check?.status === 'concern') && <Tag tone="warning" title={source.check.note ?? undefined}>{source.check.status === 'concern' ? 'Expression of concern' : 'Corrected'}</Tag>}
             {source.check?.status === 'unconfirmed' && <Tag tone="warning" title={source.check.note ?? undefined}>DOI not confirmed</Tag>}
+            {source.check?.status === 'unverified' && <Tag tone="warning" title={source.check.note ?? undefined}>Reference check incomplete</Tag>}
+            {source.check?.attempted && source.check.notices_checked === false && <Tag tone="warning" title={source.check.note ?? undefined}>Notice check incomplete</Tag>}
           </div>
           {source.finding && <p className="mt-2 text-[14px] leading-relaxed text-ink-2">{source.finding}</p>}
           {(source.sample || source.limits) && (
             <p className="mt-1 text-[13px] leading-relaxed text-muted">{[source.sample && `Studied: ${source.sample}`, source.limits && `Limitation: ${source.limits}`].filter(Boolean).join(' · ')}</p>
           )}
           {open && source.abstract && <p className="mt-2 text-[14px] leading-relaxed text-ink-2">{source.abstract}</p>}
+          {source.passage && <details className="mt-2 text-[13px]"><summary className="cursor-pointer font-semibold text-brand">Inspect retained source passages</summary><blockquote className="mt-2 whitespace-pre-wrap border-l-2 border-line pl-3 text-ink-2">{source.passage}</blockquote></details>}
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] font-semibold">
             {source.abstract && <button type="button" onClick={() => setOpen(!open)} className="text-brand hover:underline">{open ? 'Hide' : source.kind === 'file' ? 'Show excerpt' : 'Abstract'}</button>}
             {source.pdf_url && <a href={source.pdf_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-brand hover:underline">PDF<LuExternalLink className="h-3 w-3" aria-hidden="true" /></a>}
@@ -547,7 +571,7 @@ export function ConsensusBar({ consensus }: { consensus: { applicable: boolean; 
         <span className="bg-amber-400" style={{ width: `${(mixed / total) * 100}%` }} />
         <span className="bg-red-500" style={{ width: `${(against / total) * 100}%` }} />
       </div>
-      <p className="mt-1.5 text-[12.5px] text-muted">Counted from how each cited study bears on the question. Check the studies before you rely on it.</p>
+      <p className="mt-1.5 text-[12.5px] text-muted">An AI-labelled count within this selected source set, not a pooled effect, certainty rating or exhaustive scientific consensus. Inspect the studies and their limitations.</p>
     </div>
   );
 }

@@ -9,7 +9,7 @@ import { ownFolder } from './libraryImport.js';
 import {
   SourceError, connectZotero, connectionOf, disconnect, finishMendeley, finishZotero, mendeleyAuthorizeUrl, mendeleyConfigured,
   mendeleyFolders, mendeleyImport, mendeleyRedirectUri, zoteroAuthorizeUrl, zoteroCallbackUrl, zoteroCollections, zoteroImport,
-  zoteroOAuthConfigured, type Provider,
+  zoteroOAuthConfigured, zoteroGroupLibraries, type Provider,
 } from '../lib/referenceManagers.js';
 
 /** Zotero and Mendeley in the Library: connect, list collections/folders, import (in the background). */
@@ -115,7 +115,8 @@ export function libraryConnectionRoutes() {
   app.post('/zotero/start', start('zotero'));
   app.post('/mendeley/start', start('mendeley'));
 
-  app.get('/zotero/collections', async (c) => c.json(await guard(() => zoteroCollections(c.get('user')!.id))));
+  app.get('/zotero/groups', async (c) => c.json(await guard(() => zoteroGroupLibraries(c.get('user')!.id))));
+  app.get('/zotero/collections', async (c) => c.json(await guard(() => zoteroCollections(c.get('user')!.id, c.req.query('group_id')))));
   app.get('/mendeley/folders', async (c) => c.json(await guard(() => mendeleyFolders(c.get('user')!.id))));
 
   const importFrom = (providerName: Provider) => async (c: Context<{ Variables: AppVariables }>) => {
@@ -128,6 +129,7 @@ export function libraryConnectionRoutes() {
       collection_name: z.string().max(200).nullable().optional(),
       folder_id: z.string().uuid().nullable().optional(),
       find_pdfs: z.boolean().default(true),
+      group_id: z.string().regex(/^[1-9]\d{0,19}$/).nullable().optional(),
     }).safeParse(await c.req.json().catch(() => ({})));
     if (!body.success) throw new HTTPException(422, { message: 'Choose what to import.' });
     let folderId = body.data.folder_id ?? null;
@@ -137,11 +139,12 @@ export function libraryConnectionRoutes() {
       // A Zotero collection or Mendeley folder lands in a Library collection of the same name.
       folderId = await folderNamed(user.id, body.data.collection_name, provider.data);
     }
-    const source = await guard(() => (provider.data === 'zotero' ? zoteroImport(user.id, body.data.collection ?? null) : mendeleyImport(user.id, body.data.collection ?? null)));
-    const label = body.data.collection_name || (provider.data === 'zotero' ? 'your Zotero library' : 'your Mendeley library');
+    if (provider.data !== 'zotero' && body.data.group_id) throw new HTTPException(422, { message: 'Group libraries are available for Zotero imports.' });
+    const source = await guard(() => (provider.data === 'zotero' ? zoteroImport(user.id, body.data.collection ?? null, body.data.group_id) : mendeleyImport(user.id, body.data.collection ?? null)));
+    const label = body.data.collection_name || (provider.data === 'zotero' ? body.data.group_id ? `Zotero group ${body.data.group_id}` : 'your Zotero library' : 'your Mendeley library');
     // The entries are read again by the import function; here only the count is needed (and the
     // check that the connection works). An unread generator makes no further requests.
-    const jobId = await startImportJob(user, provider.data, label, { kind: provider.data, collection: body.data.collection ?? null },
+    const jobId = await startImportJob(user, provider.data, label, { kind: provider.data, collection: body.data.collection ?? null, ...(body.data.group_id ? { group_id: body.data.group_id } : {}) },
       { folderId, findPdfs: body.data.find_pdfs, total: source.total });
     return c.json({ job_id: jobId, total: source.total, folder_id: folderId }, 202);
   };

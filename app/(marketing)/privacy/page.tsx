@@ -1,5 +1,6 @@
 import { COMPANY, ContactLine, LegalPage, type LegalSection } from '@/components/marketing/LegalPage';
 import { pageMetadata } from '@/components/marketing/seo';
+import { PrivacySettingsButton } from '@/components/analytics/PrivacyControls';
 
 export const metadata = pageMetadata({
   title: 'Privacy policy',
@@ -52,6 +53,7 @@ const SECTIONS: LegalSection[] = [
           <li>Our AI provider: answering AI requests, as described above.</li>
           <li>Our email provider: account emails and, if you subscribe, the newsletter.</li>
           <li>Scholarly databases: we send your search terms (not your documents) to find papers to cite.</li>
+          <li>If you opt in: Google analytics services measure public-page visits, and Microsoft Clarity records interactions on public information pages only when you separately allow recordings. Private workspaces, sign-in pages and interactive tools do not load these tracking scripts.</li>
         </ul>
         <p>Documents you share are visible to the people you invite, with the role you give them. We may also disclose data when the law requires it.</p>
       </>
@@ -82,7 +84,7 @@ const SECTIONS: LegalSection[] = [
   {
     id: 'cookies',
     title: 'Cookies and local storage',
-    body: <p>We use only what the site needs to work: your sign-in session, a small cookie that tells the site you are signed in, and your theme setting. We do not use advertising or cross-site tracking cookies.</p>,
+    body: <><p>Essential storage supports sign-in, security and your preferences. Optional analytics and public-page session recordings are off until you choose them. Content-free editor events, if allowed, are stored as daily totals without document, account or user identifiers; these counters do not include your writing, research questions or source names. Advertising consent stays denied.</p><p><PrivacySettingsButton />. Choices apply to this browser for 180 days and can be withdrawn at any time. Withdrawal stops future collection, not data already collected. See <a href="/cookies" className="underline underline-offset-4">cookies and browser storage</a> for details.</p></>,
   },
   {
     id: 'children',
@@ -105,7 +107,7 @@ export default function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy policy"
-      updated="2026-11-06"
+      updated="2026-11-12"
       intro={<p>This policy explains what {COMPANY.name} collects when you use AI for Research, why, and the choices you have. The short version: your documents are yours, they stay private to you and the people you share them with, and we never use them to train AI.</p>}
       sections={SECTIONS}
     />

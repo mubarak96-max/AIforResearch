@@ -65,6 +65,8 @@ export const CREDIT_COSTS = {
   review_standard: 10,
   review_high: 30,
   review_preview: 3,
+  /** A reporting-guideline check (CONSORT, STROBE, PRISMA, CARE …), per 10,000 words. */
+  guideline_check: 5,
   /** A slide deck. */
   slides: 10,
   /** An AI-written analysis in Data Lab (the statistics themselves are computed in the browser). */
@@ -173,7 +175,7 @@ export const DEFAULT_PLANS: (Omit<PlanRow, 'dodo_monthly_product_id' | 'dodo_yea
       { label: '5,000 AI autocompletes a month', included: true },
       { label: 'Unlimited PDFs in your Library, up to 50 MB each', included: true },
       { label: '10 projects, 3 people on each', included: true },
-      { label: 'Zotero and Mendeley sync', included: true },
+      { label: 'Zotero and Mendeley import and updates', included: true },
       { label: 'Word, PDF, LaTeX and PowerPoint export', included: true },
     ],
   },

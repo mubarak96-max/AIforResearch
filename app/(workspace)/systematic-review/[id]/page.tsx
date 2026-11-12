@@ -12,9 +12,10 @@ import { showError } from '@/components/app/research/parts';
 import { ProtocolTab, SearchTab } from '@/components/app/systematic-review/SetupTabs';
 import { ScreeningTab } from '@/components/app/systematic-review/ScreeningTab';
 import { ExtractionTab, ReportTab } from '@/components/app/systematic-review/ResultTabs';
+import { AuditTab } from '@/components/app/systematic-review/AuditTab';
 import type { ReviewState, SrRecord } from '@/components/app/systematic-review/types';
 
-const TABS = [['protocol', 'Protocol'], ['search', 'Search'], ['screening', 'Screening'], ['extraction', 'Extraction'], ['report', 'Report']] as const;
+const TABS = [['protocol', 'Protocol'], ['search', 'Search'], ['screening', 'Screening'], ['extraction', 'Extraction'], ['report', 'Report'], ['history', 'Decision history']] as const;
 type Tab = (typeof TABS)[number][0];
 
 function Workspace() {
@@ -85,6 +86,7 @@ function Workspace() {
       {tab === 'screening' && <ScreeningTab state={state} setRecords={setRecords} reload={reload} />}
       {tab === 'extraction' && <ExtractionTab state={state} reload={reload} />}
       {tab === 'report' && <ReportTab state={state} reload={reload} />}
+      {tab === 'history' && <AuditTab state={state} />}
     </AppFrame>
   );
 }

@@ -108,7 +108,18 @@ function inline(text: string): string {
 
 const isTableRow = (line: string) => /^\s*\|.*\|\s*$/.test(line);
 const isTableRule = (line: string) => /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/.test(line);
-const cells = (line: string) => line.trim().replace(/^\||\|$/g, '').split('|').map((cell) => cell.trim());
+const cells = (line: string) => {
+  const input = line.trim().replace(/^\||\|$/g, '');
+  const values: string[] = []; let value = '';
+  for (let index = 0; index < input.length; index += 1) {
+    const char = input[index];
+    if (char === '\\' && (input[index + 1] === '|' || input[index + 1] === '\\')) { value += input[index + 1]; index += 1; }
+    else if (char === '|') { values.push(value.trim()); value = ''; }
+    else value += char;
+  }
+  values.push(value.trim());
+  return values;
+};
 
 /**
  * The Markdown the tools produce, as HTML: headings, paragraphs, bullet and numbered lists, tables,

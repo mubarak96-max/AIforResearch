@@ -165,6 +165,8 @@ export interface ImportJob {
   status: 'running' | 'done' | 'failed';
   total: number;
   added: number;
+  updated?: number;
+  preserved?: number;
   pdfs: number;
   skipped: number;
   failed: number;
@@ -206,16 +208,18 @@ export const startReferenceSignIn = (provider: ReferenceProvider, next: string) 
 export const disconnectReferenceManager = (provider: ReferenceProvider) => request<{ ok: true }>(`/api/library/connections/${provider}`, { method: 'DELETE' });
 
 /** The collections (Zotero) or folders (Mendeley) to pick from, and the whole library's size when known. */
-export async function getReferenceCollections(provider: ReferenceProvider): Promise<{ collections: ReferenceCollection[]; library_items: number | null }> {
+export async function getReferenceCollections(provider: ReferenceProvider, groupId?: string | null): Promise<{ collections: ReferenceCollection[]; library_items: number | null }> {
   if (provider === 'zotero') {
-    const result = await request<{ collections: { key: string; name: string; parent: string | null; items: number }[]; library_items: number }>('/api/library/zotero/collections');
+    const result = await request<{ collections: { key: string; name: string; parent: string | null; items: number }[]; library_items: number }>(`/api/library/zotero/collections${groupId ? `?group_id=${encodeURIComponent(groupId)}` : ''}`);
     return { collections: result.collections.map((item) => ({ id: item.key, name: item.name, parent: item.parent, items: item.items })), library_items: result.library_items };
   }
   const result = await request<{ folders: { id: string; name: string; parent: string | null }[] }>('/api/library/mendeley/folders');
   return { collections: result.folders.map((item) => ({ ...item, items: null })), library_items: null };
 }
 
-export const startReferenceImport = (provider: ReferenceProvider, options: { collection: string | null; collection_name: string | null; folder_id: string | null; find_pdfs: boolean }) =>
+export const getZoteroGroups = () => request<{ groups: { id: string; name: string }[]; warning: string | null }>('/api/library/zotero/groups');
+
+export const startReferenceImport = (provider: ReferenceProvider, options: { collection: string | null; collection_name: string | null; folder_id: string | null; find_pdfs: boolean; group_id?: string | null }) =>
   request<{ job_id: string; total: number; folder_id: string | null }>(`/api/library/${provider}/import`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(options),
   });

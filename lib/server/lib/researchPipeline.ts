@@ -33,7 +33,7 @@ import {
 } from './sources/index.js';
 import { net } from './sources/http.js';
 import {
-  DEPTH_SETTINGS, ResearchEmptyError, STEP_IDS, addUsage, consensusOf, fileSource, paperSource, parseJson, relevantPassages, researchPrompt, stripHeadings, usage0, webSource,
+  DEPTH_SETTINGS, ResearchEmptyError, STEP_IDS, addUsage, consensusOf, fileSource, paperSource, parseJson, relevantPassages, researchPrompt, sourceEvidenceBasis, stripHeadings, usage0, webSource,
   type Depth, type ResearchEvents, type ResearchInput, type ResearchPlan, type ResearchResult, type ResearchSource, type ResearchStep, type Stance,
   type StepId, type SubQuestion, type Verification,
 } from './research.js';
@@ -41,6 +41,7 @@ import { checkedEffect, type Effect, type PrismaData, type ResearchFigure } from
 import {
   buildFigures, cleanOutline, closingPrompt, comparisonTable, glanceText, methodsText, outlinePrompt, sectionPrompt, summaryPrompt,
 } from './researchReport.js';
+import { RANKING_DESCRIPTIONS, RESEARCH_METHOD_LABELS, appraisalGuidance, researchMethod, searchLanguageGuidance, type ResearchMethod } from '../../researchMethods.js';
 
 type Signal = AbortSignal | undefined;
 
@@ -82,7 +83,7 @@ export function cleanPlan(raw: unknown, maxSubs: number, maxQueries: number): Re
 }
 
 /** Sub-questions that together answer the question. Summary keeps the question whole (no model call). */
-export async function planResearch(llm: LlmSlot, question: string, depth: Depth, usage: LlmUsage, signal?: Signal): Promise<ResearchPlan> {
+export async function planResearch(llm: LlmSlot, question: string, depth: Depth, usage: LlmUsage, signal?: Signal, options?: { method?: ResearchMethod; searchLanguages?: string[] }): Promise<ResearchPlan> {
   const base = clip(question, 300);
   const whole: ResearchPlan = { sub_questions: [{ question: base, queries: [base] }] };
   const settings = DEPTH_SETTINGS[depth];
@@ -95,7 +96,8 @@ export async function planResearch(llm: LlmSlot, question: string, depth: Depth,
           role: 'system',
           content: 'You plan literature reviews. Answer with JSON only: {"sub_questions": [{"question": "…", "queries": ["…"]}]}. '
             + 'Sub-questions are short, answerable from published studies, do not overlap, and are written in the language of the research question. '
-            + 'Queries are 3 to 8 keywords for a scholarly search engine, in English, with no Boolean operators and no quotes.',
+            + 'Queries are 3 to 8 keywords for a scholarly search engine, with no Boolean operators and no quotes. '
+            + searchLanguageGuidance(options?.searchLanguages) + ' ' + appraisalGuidance(options?.method),
         },
         {
           role: 'user',
@@ -233,9 +235,18 @@ const DESIGN_WEIGHT: Partial<Record<StudyType, number>> = {
 };
 const TIER_WEIGHT: Record<string, number> = { top: 1, high: 0.75, medium: 0.5, low: 0.25 };
 
-/** Evidence score 0-1: relevance 45%, study design 25%, citations a year 15%, recency 8%, journal 7%; preprints lose a little. */
-export function evidenceScore(paper: Pick<FoundPaper, 'study_type' | 'cited_by_count' | 'year' | 'journal' | 'is_preprint'>, relevance: number, now = new Date().getUTCFullYear()): number {
+/** Retrieval ranking, not a quality assessment. The three-argument call retains the clinical ranking. */
+export function evidenceScore(paper: Pick<FoundPaper, 'study_type' | 'cited_by_count' | 'year' | 'journal' | 'is_preprint'>, relevance: number, now = new Date().getUTCFullYear(), method: ResearchMethod = 'clinical'): number {
   const rel = [0, 0.25, 0.6, 1][Math.max(0, Math.min(3, relevance))];
+  if (method === 'general' || method === 'humanities') return rel;
+  if (method === 'qualitative') {
+    const fit = paper.study_type === 'qualitative' ? 1 : paper.study_type === 'systematic-review' || paper.study_type === 'review' ? 0.7 : 0.5;
+    return Math.round((rel * 0.85 + fit * 0.15) * 1000) / 1000;
+  }
+  if (method === 'policy' || method === 'quantitative') {
+    const recency = paper.year ? Math.max(0, 1 - Math.max(0, now - paper.year) / 15) : 0.5;
+    return Math.round((rel * 0.95 + recency * 0.05) * 1000) / 1000;
+  }
   const design = paper.study_type ? DESIGN_WEIGHT[paper.study_type] ?? 0.4 : 0.4;
   const age = paper.year ? Math.max(0, now - paper.year) : 10;
   const perYear = (paper.cited_by_count ?? 0) / (age + 1);
@@ -289,7 +300,15 @@ export async function openFullText(link: string | null | undefined, question: st
     const bytes = new Uint8Array(await response.arrayBuffer());
     // %PDF: a landing page served instead of the file is skipped.
     if (bytes.byteLength > MAX_PDF_BYTES || bytes[0] !== 0x25 || bytes[1] !== 0x50 || bytes[2] !== 0x44 || bytes[3] !== 0x46) return null;
-    const { text } = await extractText('paper.pdf', bytes);
+    const { text, pages } = await extractText('paper.pdf', bytes);
+    if (pages?.length) {
+      // Each retained excerpt keeps its actual converter page; no page number is inferred by AI.
+      const terms = new Set(question.toLowerCase().match(/[\p{L}\p{N}]{3,}/gu) ?? []);
+      const selected = pages.filter((page) => page.text.trim()).map((page) => ({
+        ...page, score: (page.text.toLowerCase().match(/[\p{L}\p{N}]{3,}/gu) ?? []).reduce((sum, word) => sum + (terms.has(word) ? 1 : 0), 0),
+      })).sort((a, b) => b.score - a.score).slice(0, 3).sort((a, b) => a.page - b.page);
+      return selected.map((page) => `[Page ${page.page}]\n${relevantPassages(page.text, question, 950)}`).join('\n\n') || null;
+    }
     return text.trim() ? relevantPassages(text, question, 3000) : null;
   } catch {
     return null;
@@ -369,7 +388,7 @@ async function readFullTexts(items: { paper: FoundPaper; source: ResearchSource 
 export type Gap = { sub: number; gap: string; query: string };
 
 /** Where the evidence read so far is thin, conflicting or missing a population, outcome or design, each with a new search. */
-export async function findGaps(llm: LlmSlot, question: string, plan: ResearchPlan, sources: ResearchSource[], ran: string[], count: number, usage: LlmUsage, signal?: Signal): Promise<Gap[]> {
+export async function findGaps(llm: LlmSlot, question: string, plan: ResearchPlan, sources: ResearchSource[], ran: string[], count: number, usage: LlmUsage, signal?: Signal, options?: { method?: ResearchMethod; searchLanguages?: string[] }): Promise<Gap[]> {
   if (count <= 0) return [];
   const papers = sources.filter((source) => source.kind === 'paper' || source.kind === 'library');
   const bySub = plan.sub_questions.map((sub, index) => {
@@ -386,7 +405,8 @@ export async function findGaps(llm: LlmSlot, question: string, plan: ResearchPla
           content: 'You review the evidence gathered so far for a literature review and find its gaps. Answer with JSON only: {"gaps": [{"sub": 1, "gap": "…", "query": "…"}]}. '
             + 'A gap is a sub-question with few or weak studies, conflicting findings that need more studies, or an important population, outcome, comparison or study design not yet covered. '
             + '"sub": the sub-question number it belongs to (0 for the question as a whole). "gap": what is missing, in at most 15 words, in the language of the question. '
-            + '"query": 3 to 8 keywords for a scholarly search engine, in English, no Boolean operators and no quotes, different from the searches already run. '
+            + '"query": 3 to 8 keywords for a scholarly search engine, no Boolean operators and no quotes, different from the searches already run. '
+            + searchLanguageGuidance(options?.searchLanguages) + ' ' + appraisalGuidance(options?.method) + ' '
             + `At most ${count} gaps, the most important first; none when the evidence is already well covered.`,
         },
         { role: 'user', content: `Question: ${clip(question, 400)}\n\nWhat was found, by sub-question:\n${bySub}\n\nSearches already run:\n${ran.map((query) => `- ${query}`).join('\n')}` },
@@ -430,13 +450,52 @@ export function citedClaims(markdown: string): { text: string; markers: number[]
   return claims;
 }
 
-type ClaimVerdict = { verdict: 'yes' | 'partly' | 'no'; note: string | null };
+/** Conservative review candidates only: prose with no source marker, not proven factual claims. */
+export function uncitedSentences(markdown: string): string[] {
+  const out: string[] = [];
+  let fenced = false;
+  let references = false;
+  const referenceHeading = (text: string) => /^(?:references|bibliography|works cited|sources|referencias|bibliografia|referenzen|literaturverzeichnis)\b/i.test(text)
+    || /^(?:参考文献|參考文獻|المراجع)$/.test(text);
+  for (const line of markdown.split('\n')) {
+    const text = line.trim();
+    if (/^(```|~~~)/.test(text)) { fenced = !fenced; continue; }
+    if (fenced || !text) continue;
+    if (/^#{1,6}\s/.test(text)) {
+      const heading = text.replace(/^#+\s*/, '').replace(/^\d+[.)]?\s+/, '').normalize('NFD').replace(/\p{M}/gu, '').trim();
+      references = referenceHeading(heading);
+      continue;
+    }
+    if (text.length < 40 && referenceHeading(text.replace(/^[*_]+|[*_:]+$/g, '').trim())) { references = true; continue; }
+    if (references || text.includes('|') || /^\[.*\]:/.test(text) || /^!\[/.test(text)
+      || /^(?:[*_]{0,2})?(?:figure|fig\.?|table|caption|figura|abbildung|图|圖|表)\s*\d*\s*[:.\-–—]/i.test(text)
+      || /^\[S\d+\]/.test(text)) continue;
+    const prose = text.replace(/^([-*+>]\s+|\d+[.)]\s+)/, '');
+    const parts = prose.split(/(?<=[.!?](?:\s*\[[^\]]+\])?)\s+(?=[\p{Lu}\p{Lo}\d“"(])|(?<=[。！？])(?!\s*\[S\d)\s*/u);
+    for (const part of parts) {
+      const sentence = part.trim();
+      if (markersIn(sentence).length || !/[.!。！]["'”’)]*$/.test(sentence)) continue;
+      const letters = sentence.match(/[\p{L}\p{N}]/gu)?.length ?? 0;
+      if (letters < 30 || /^https?:\/\//.test(sentence) || /^this (?:review|report|section|answer) (?:summari[sz]es|outlines|describes|discusses|examines)\b/i.test(sentence)) continue;
+      out.push(sentence);
+    }
+  }
+  return out;
+}
 
-/** Checks each claim against the sources it cites. Claims the model could not check count as supported. */
+/** `skipped` marks a claim that was never sent to the model, so it is not an attempted check. */
+export type ClaimVerdict = { verdict: 'yes' | 'partly' | 'no' | 'unverified'; note: string | null; skipped?: 'no_source_text' };
+
+/** Checks source text, never generated findings. Failed, missing and invalid responses remain unverified. */
 export async function checkClaims(llm: LlmSlot, claims: { text: string; markers: number[] }[], sources: ResearchSource[], usage: LlmUsage, signal?: Signal): Promise<ClaimVerdict[]> {
-  const out: ClaimVerdict[] = claims.map(() => ({ verdict: 'yes', note: null }));
+  const out: ClaimVerdict[] = claims.map(() => ({ verdict: 'unverified', note: 'The check did not return a valid assessment.' }));
   const byN = new Map(sources.map((source) => [source.n, source]));
-  await mapLimit(chunk(claims.map((claim, index) => ({ claim, index })), 15), 4, async (batch) => {
+  const eligible = claims.map((claim, index) => ({ claim, index })).filter(({ claim, index }) => {
+    const ready = claim.markers.length > 0 && claim.markers.every((n) => byN.has(n) && !['metadata_only', 'source_summary'].includes(sourceEvidenceBasis(byN.get(n)!)));
+    if (!ready) out[index] = { verdict: 'unverified', note: 'Source text is unavailable for one or more cited references.', skipped: 'no_source_text' };
+    return ready;
+  });
+  await mapLimit(chunk(eligible, 15), 4, async (batch) => {
     const cited = [...new Set(batch.flatMap(({ claim }) => claim.markers))].map((n) => byN.get(n)).filter(Boolean) as ResearchSource[];
     if (!cited.length) return;
     try {
@@ -451,22 +510,43 @@ export async function checkClaims(llm: LlmSlot, claims: { text: string; markers:
           },
           {
             role: 'user',
-            content: `Sources:\n${cited.map((source) => `[S${source.n}] ${clip(source.title, 200)}. ${source.finding ? `Finding: ${source.finding} ` : ''}${clip(source.abstract || source.tldr, 700)}${source.passage ? ` Full text: ${clip(source.passage, 700)}` : ''}`).join('\n')}\n\nClaims:\n${batch.map(({ claim, index }) => `i=${index}: ${clip(claim.text, 500)}`).join('\n')}`,
+            content: `Sources:\n${cited.map((source) => `[S${source.n}] ${clip(source.title, 200)}. Basis: ${sourceEvidenceBasis(source)}. ${clip(source.abstract || source.tldr, 1200)}${source.passage ? ` Full-text excerpt: ${clip(source.passage, 2600)}` : ''}`).join('\n')}\n\nClaims:\n${batch.map(({ claim, index }) => `i=${index}: ${clip(claim.text, 500)}`).join('\n')}`,
           },
         ],
       });
       addUsage(usage, used);
-      for (const item of parseJson<{ items?: { i: number; v: string; note?: string }[] }>(text)?.items ?? []) {
-        const index = Number(item.i);
+      const raw = parseJson<{ items?: unknown }>(text)?.items;
+      const items = Array.isArray(raw) ? raw : [];
+      const seen = new Set<number>();
+      for (const item of items) {
+        if (!item || typeof item !== 'object' || !Number.isInteger(item.i)) continue;
+        const index = item.i;
         if (!batch.some((entry) => entry.index === index)) continue;
-        const verdict = item.v === 'no' ? 'no' : item.v === 'partly' ? 'partly' : 'yes';
-        out[index] = { verdict, note: verdict === 'yes' ? null : clip(item.note, 160) || null };
+        if (seen.has(index)) { out[index] = { verdict: 'unverified', note: 'The check returned duplicate assessments.' }; continue; }
+        seen.add(index);
+        if (!['yes', 'partly', 'no'].includes(item.v)) continue;
+        const verdict = item.v as 'yes' | 'partly' | 'no';
+        out[index] = { verdict, note: verdict === 'yes' ? null : typeof item.note === 'string' ? clip(item.note, 160) || null : null };
       }
     } catch (error) {
       if (signal?.aborted) throw error;
     }
   });
   return out;
+}
+
+/** Coverage never treats failures or claims outside the depth limit as successful checks. */
+export function claimCoverage(total: number, verdicts: ClaimVerdict[]) {
+  const completed = verdicts.filter((item) => item.verdict !== 'unverified').length;
+  const notChecked = Math.max(0, total - verdicts.length);
+  const noSourceText = verdicts.filter((item) => item.skipped === 'no_source_text').length;
+  return {
+    total, attempted: verdicts.length - noSourceText, completed, checked: completed, no_source_text: noSourceText,
+    supported: verdicts.filter((item) => item.verdict === 'yes').length,
+    partly: verdicts.filter((item) => item.verdict === 'partly').length,
+    unsupported: verdicts.filter((item) => item.verdict === 'no').length,
+    unverified: total - completed, not_checked: notChecked,
+  };
 }
 
 /** Rewrites claims to say only what their sources support. A rewrite that drops or invents a marker is refused. */
@@ -506,11 +586,14 @@ export async function reviseClaims(llm: LlmSlot, items: { text: string; markers:
 /** The cited papers' DOIs at Crossref: does the record exist, and has the paper been retracted or corrected? */
 export async function checkReferences(sources: ResearchSource[], max: number): Promise<void> {
   const papers = sources.filter((source) => source.kind === 'paper' || source.kind === 'library');
-  for (const source of papers) source.check = { status: 'no_doi', note: null };
+  for (const source of papers) source.check = source.is_retracted ? { status: 'retracted', note: 'Retraction reported by the source index.', attempted: false, notices_checked: false }
+    : doiKey(source.doi) ? { status: 'unverified', note: /^10\.(48550|5281)\//.test(doiKey(source.doi)!) ? 'This DOI registry is outside the Crossref check.' : 'Not checked within this report depth’s reference limit.', attempted: false, notices_checked: false }
+      : { status: 'no_doi', note: 'No DOI available for this reference.', attempted: false, notices_checked: false };
   // DataCite DOIs (arXiv, Zenodo) are not at Crossref.
   const withDoi = papers.filter((source) => doiKey(source.doi) && !/^10\.(48550|5281)\//.test(doiKey(source.doi)!)).slice(0, max);
   await mapLimit(withDoi, 5, async (source) => {
-    const [work, notices] = await Promise.all([crossrefWork(source.doi!).catch(() => undefined), crossrefUpdates(source.doi!).catch(() => [])]);
+    const [work, foundNotices] = await Promise.all([crossrefWork(source.doi!).catch(() => undefined), crossrefUpdates(source.doi!).catch(() => undefined)]);
+    const notices = foundNotices ?? [];
     const retraction = notices.find((notice) => /retract|withdraw/i.test(notice.type));
     const correction = notices.find((notice) => /correct|errat/i.test(notice.type));
     const concern = notices.find((notice) => /concern/i.test(notice.type));
@@ -527,8 +610,11 @@ export async function checkReferences(sources: ResearchSource[], max: number): P
       const same = Boolean(a && b && (a.startsWith(b.slice(0, 30)) || b.startsWith(a.slice(0, 30))));
       source.check = same ? { status: 'confirmed', note: null } : { status: 'unconfirmed', note: 'The DOI points to a record with a different title' };
     } else {
-      source.check = { status: 'unconfirmed', note: work === null ? 'DOI not found at Crossref' : 'Crossref did not answer' };
+      source.check = { status: work === null ? 'unconfirmed' : 'unverified', note: work === null ? 'DOI not found at Crossref' : 'The Crossref identity check did not complete.' };
     }
+    source.check.attempted = true;
+    source.check.notices_checked = foundNotices !== undefined;
+    if (foundNotices === undefined) source.check.note = [source.check.note, 'The retraction/correction notice lookup did not complete.'].filter(Boolean).join(' ');
   });
 }
 
@@ -634,11 +720,11 @@ async function writeReport(llm: LlmSlot, input: ResearchInput, context: {
   const byN = new Map(all.map((source) => [source.n, source]));
 
   // The computed parts and the figures, sent first so the browser can draw them as the text arrives.
-  const consensus = consensusOf(papers);
+  const consensus = consensusOf(papers, input.method);
   const { figures, methods: methodFigures, glance: glanceFigures } = buildFigures({ depth: input.depth, plan, papers, prisma });
   events.figures(figures);
   const methods = [methodsText({
-    groups: input.groups, searches: context.searches, subQuestions: plan.sub_questions.length, seeds: settings.snowball, prisma, gapSearches: context.gapSearches, filters: input.filters,
+    groups: input.groups, searches: context.searches, subQuestions: plan.sub_questions.length, seeds: settings.snowball, prisma, gapSearches: context.gapSearches, filters: input.filters, method: input.method,
   }), ...methodFigures].join('\n\n');
   const glance = [glanceText(papers, consensus?.applicable ? consensus.line : null), ...glanceFigures].join('\n\n');
   const head = `## ${outline.labels.methods}\n\n${methods}\n\n## ${outline.labels.glance}\n\n${glance}`;
@@ -721,7 +807,7 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
     // 1. Plan
     track.start('plan', settings.subQuestions > 1 ? 'Breaking the question into sub-questions' : 'Reading your question');
     const reviewed = input.plan ? cleanPlan(input.plan, 8, 3) : null;
-    const plan = reviewed?.sub_questions.length ? reviewed : await planResearch(llm, input.question, input.depth, usage, signal);
+    const plan = reviewed?.sub_questions.length ? reviewed : await planResearch(llm, input.question, input.depth, usage, signal, input);
     const searches = planSearches(input.question, plan, settings.queries);
     track.done('plan', plan.sub_questions.length > 1 ? `${plural(plan.sub_questions.length, 'sub-question')}, ${plural(searches.length, 'search', 'searches')}` : 'One focused search',
       { sub_questions: plan.sub_questions, reviewed: Boolean(reviewed?.sub_questions.length) });
@@ -756,8 +842,9 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
     if (!kept.length && !input.attachments.length && !searched.web.length) throw new ResearchEmptyError();
 
     // 4. Rank
-    track.start('rank', 'Weighing study design, relevance, citations and recency');
-    const scored = kept.map((item) => ({ ...item, score: evidenceScore(item.paper, item.relevance), subs: [...(searched.subsOf.get(paperKey(item.paper)) ?? [])] }));
+    const method = researchMethod(input.method);
+    track.start('rank', `Ranking for ${RESEARCH_METHOD_LABELS[method].toLowerCase()}`);
+    const scored = kept.map((item) => ({ ...item, score: evidenceScore(item.paper, item.relevance, undefined, method), subs: [...(searched.subsOf.get(paperKey(item.paper)) ?? [])] }));
     const picked = pickPapers(scored, settings.papers, plan.sub_questions.length);
     const designs = new Map<string, number>();
     for (const item of picked) if (item.paper.study_type && item.paper.study_type !== 'other') designs.set(item.paper.study_type, (designs.get(item.paper.study_type) ?? 0) + 1);
@@ -773,7 +860,7 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
     const webSources = searched.web.map((result, index) => webSource(result, numbered.length + 1 + index));
     if (!numbered.length && !webSources.length) throw new ResearchEmptyError();
     track.done('rank', `Kept the best ${plural(picked.length, 'paper')}${designs.size ? ` · ${[...designs].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([type, count]) => `${count} ${numbered.find((source) => source.study_type === type)?.study_type_label?.toLowerCase() ?? type}`).join(', ')}` : ''}`, {
-      kept: picked.length,
+      kept: picked.length, method, method_label: RESEARCH_METHOD_LABELS[method], ranking_description: RANKING_DESCRIPTIONS[method],
       top: numbered.filter((source) => source.kind !== 'file').slice(0, 12).map((source) => ({ n: source.n, title: source.title, year: source.year, design: source.study_type_label, score: source.rank_score, cited_by: source.cited_by_count })),
       covered: plan.sub_questions.map((_, sub) => numbered.filter((source) => source.sub_questions?.includes(sub)).length),
     });
@@ -808,7 +895,7 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
     let gapAdded = 0;
     if (settings.gapQueries > 0 && reading.length) {
       track.start('gaps', 'Looking for gaps in the evidence');
-      const gaps = await findGaps(llm, input.question, plan, numbered, queries, settings.gapQueries, usage, signal);
+      const gaps = await findGaps(llm, input.question, plan, numbered, queries, settings.gapQueries, usage, signal, input);
       if (!gaps.length) {
         track.done('gaps', 'No important gaps found', { gaps: [], added: 0 });
       } else {
@@ -828,7 +915,7 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
         const gapPicked = fresh
           .map((paper, index) => ({ paper, relevance: gapScreening[index]?.relevance ?? 0, gap: gaps[gapOf.get(paperKey(paper)) ?? 0] }))
           .filter((item) => item.relevance >= 2)
-          .map((item) => ({ ...item, score: evidenceScore(item.paper, item.relevance) }))
+          .map((item) => ({ ...item, score: evidenceScore(item.paper, item.relevance, undefined, method) }))
           .sort((a, b) => b.score - a.score)
           .slice(0, settings.gapPapers);
         const nextN = Math.max(0, ...numbered.map((source) => source.n), ...webSources.map((source) => source.n)) + 1;
@@ -906,13 +993,15 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
     ].filter(Boolean).join(' · '), { words, sections, figures: figures.map((figure) => figure.title) });
 
     // 8. Verify: only the written text; the computed parts (Methods, overview, table) are not claims.
-    const claims = citedClaims(written).slice(0, settings.claims);
+    const allClaims = citedClaims(written);
+    const uncited = uncitedSentences(written);
+    const claims = allClaims.slice(0, settings.claims);
     track.start('verify', `Checking ${plural(claims.length, 'citation')} against their sources`);
     const [verdictsOfClaims] = await Promise.all([
       checkClaims(llm, claims, all, usage, signal),
       checkReferences(usedSources(markdown, all), settings.references),
     ]);
-    const wrong = claims.map((claim, index) => ({ ...claim, ...verdictsOfClaims[index] })).filter((claim) => claim.verdict !== 'yes');
+    const wrong = claims.map((claim, index) => ({ ...claim, ...verdictsOfClaims[index] })).filter((claim) => claim.verdict === 'no' || claim.verdict === 'partly');
     const toRevise = wrong.slice(0, settings.revise);
     const revisions = (await mapLimit(chunk(toRevise, 12), 3, (batch) => reviseClaims(llm, batch.map((claim) => ({ text: claim.text, markers: claim.markers, note: claim.note })), input.language, usage, signal))).flat();
     const flags: Verification['flags'] = [];
@@ -921,31 +1010,43 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
       if (revised && markdown.includes(claim.text)) {
         markdown = markdown.replace(claim.text, revised);
         flags.push({ kind: 'revised', text: claim.text, revised, note: claim.note });
-      } else if (claim.verdict === 'no') {
-        flags.push({ kind: 'unsupported', text: claim.text, note: claim.note });
+      } else {
+        flags.push({ kind: claim.verdict === 'no' ? 'unsupported' : 'partly_supported', text: claim.text, note: claim.note });
       }
     });
-    for (const claim of wrong.slice(settings.revise)) if (claim.verdict === 'no') flags.push({ kind: 'unsupported', text: claim.text, note: claim.note });
+    for (const claim of wrong.slice(settings.revise)) flags.push({ kind: claim.verdict === 'no' ? 'unsupported' : 'partly_supported', text: claim.text, note: claim.note });
+    const checkedItems: Verification['claims']['items'] = allClaims.map((claim, index) => {
+      const verdict = verdictsOfClaims[index] ?? { verdict: 'unverified' as const, note: 'Not checked within this report depth’s limit.' };
+      const revision = flags.find((flag) => flag.kind === 'revised' && flag.text === claim.text)?.revised;
+      if (verdict.verdict === 'unverified') flags.push({ kind: 'unverified', text: claim.text, note: verdict.note });
+      return { ...claim, ...verdict, sources: claim.markers.map((n) => ({ n, basis: all.find((source) => source.n === n) ? sourceEvidenceBasis(all.find((source) => source.n === n)!) : 'metadata_only' })), ...(revision ? { revised_text: revision } : {}) };
+    });
     const cited = usedSources(markdown, all);
     const refs = cited.filter((source) => source.check && source.check.status !== 'no_doi');
     for (const source of refs) {
       const status = source.check!.status;
       if (status === 'retracted' || status === 'corrected' || status === 'concern' || status === 'unconfirmed') flags.push({ kind: status, text: source.title, note: source.check!.note, n: source.n });
+      if (status === 'unverified') flags.push({ kind: 'reference_unverified', text: source.title, note: source.check!.note, n: source.n });
     }
     const verification: Verification = {
       claims: {
-        checked: claims.length, supported: claims.length - wrong.length, partly: wrong.filter((claim) => claim.verdict === 'partly').length,
-        unsupported: wrong.filter((claim) => claim.verdict === 'no').length, revised: flags.filter((flag) => flag.kind === 'revised').length,
+        ...claimCoverage(allClaims.length, verdictsOfClaims), revised: flags.filter((flag) => flag.kind === 'revised').length,
+        scope: 'initial_cited_narrative', items: checkedItems, uncited_sentences: uncited,
       },
       references: {
-        checked: refs.length, confirmed: refs.filter((source) => source.check!.status === 'confirmed').length, retracted: refs.filter((source) => source.check!.status === 'retracted').length,
+        checked: refs.filter((source) => source.check!.attempted && source.check!.status !== 'unverified').length, confirmed: refs.filter((source) => source.check!.status === 'confirmed').length, retracted: refs.filter((source) => source.check!.status === 'retracted').length,
         corrected: refs.filter((source) => source.check!.status === 'corrected' || source.check!.status === 'concern').length, unconfirmed: refs.filter((source) => source.check!.status === 'unconfirmed').length,
+        total: cited.filter((source) => source.check).length, attempted: refs.filter((source) => source.check!.attempted).length,
+        unverified: refs.filter((source) => source.check!.status === 'unverified').length, no_doi: cited.filter((source) => source.check?.status === 'no_doi').length,
+        notices_unverified: refs.filter((source) => !source.check!.notices_checked).length,
       },
       flags,
       dropped_markers: droppedMarkers,
     };
     track.done('verify', [
-      claims.length ? `${verification.claims.supported} of ${plural(claims.length, 'citation')} supported` : 'No citations to check',
+      allClaims.length ? `${verification.claims.completed} of ${plural(allClaims.length, 'cited sentence')} checked; ${verification.claims.supported} supported` : 'No cited narrative sentences to check',
+      verification.claims.unverified ? `${verification.claims.unverified} unverified` : null,
+      uncited.length ? `${uncited.length} uncited sentences to review` : null,
       verification.claims.revised ? `${verification.claims.revised} revised` : null,
       refs.length ? `${verification.references.confirmed} of ${plural(refs.length, 'reference')} confirmed` : null,
       verification.references.retracted ? `${verification.references.retracted} retracted` : null,
@@ -954,7 +1055,7 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
     // A report asked for without headings keeps both versions, so turning them on later is free.
     const headedCopy = input.depth !== 'summary' && !input.headings ? markdown : null;
     if (headedCopy) markdown = stripHeadings(markdown);
-    const consensus = consensusOf(cited);
+    const consensus = consensusOf(cited, input.method);
     const summary = markdown.replace(/```figure[\s\S]*?```/g, '').replace(/^#+.*$/gm, '').replace(/\[S\d+(?:[,\s]*S?\d+)*\]/g, '').replace(/[*_>`|]/g, '').replace(/\s+/g, ' ').trim().slice(0, 300);
     return {
       markdown, ...(headedCopy ? { markdown_headed: headedCopy, markdown_plain: markdown } : {}), figures,
@@ -967,8 +1068,7 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
   }
 }
 
-/** A source as the browser and the saved task keep it: without the long full-text passages. */
-function publicSource(source: ResearchSource): ResearchSource {
-  const { passage: _passage, ...rest } = source;
-  return rest;
+/** Keep the actual source excerpts with the result so a reader can inspect the evidence later. */
+export function publicSource(source: ResearchSource): ResearchSource {
+  return { ...source, evidence_basis: sourceEvidenceBasis(source) };
 }

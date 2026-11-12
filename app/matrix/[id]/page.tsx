@@ -7,13 +7,14 @@ import { LuDownload, LuFileText, LuPencil, LuPlay, LuPlus, LuRotateCw, LuSquare,
 import { AppFrame } from '@/components/app/AppFrame';
 import { Button, inputClass } from '@/components/app/ui';
 import { PaperPicker } from '@/components/matrix/PaperPicker';
+import { matrixDocumentBlocks } from '@/components/matrix/document';
 import { api, useSession } from '@/lib/session';
 
 type Column = { id: string; label: string; prompt: string };
 type Cell = { value: string; quote: string | null; page: number | null; status: 'done' | 'empty' | 'error'; basis: 'full_text' | 'abstract' | 'none' | 'writer'; edited: boolean };
-type Paper = { id: string; title: string; authors: string[]; year: string | null; doi: string | null; has_abstract: boolean };
+type Paper = { id: string; title: string; authors: string[]; year: string | null; doi: string | null; has_abstract: boolean; departed?: boolean };
 type Row = { paper: Paper; cells: Record<string, Cell> };
-type Matrix = { id: string; title: string; columns: Column[]; paper_count: number; rows: Row[] };
+type Matrix = { id: string; title: string; columns: Column[]; paper_count: number; rows: Row[]; project_id?: string | null; can_edit?: boolean; can_share?: boolean; can_delete?: boolean; archived?: boolean };
 
 const CONCURRENCY = 3;
 
@@ -43,6 +44,7 @@ export default function MatrixPage() {
   const [columnDialog, setColumnDialog] = useState<Column | 'new' | null>(null);
   const [adding, setAdding] = useState(false);
   const [title, setTitle] = useState<string | null>(null);
+  const [projects, setProjects] = useState<{ id: string; name: string; role: string }[]>([]);
   const stopRef = useRef(false);
   const autoFilled = useRef(false);
 
@@ -55,6 +57,7 @@ export default function MatrixPage() {
     if (loading) return;
     if (!user) { router.replace(`/login?next=/matrix/${encodeURIComponent(id)}`); return; }
     void load();
+    api<{ projects: typeof projects }>('/api/projects').then((data) => setProjects(data.projects)).catch(() => undefined);
   }, [id, load, loading, router, user]);
 
   const missing = useCallback((current: Matrix, columnIds?: string[]) =>
@@ -65,7 +68,7 @@ export default function MatrixPage() {
 
   /** Fills rows a few at a time; each answer appears as soon as it arrives. */
   const fill = useCallback(async (rows: Row[], columnIds?: string[]) => {
-    if (!rows.length || filling) return;
+    if (!rows.length || filling || matrix?.can_edit === false) return;
     stopRef.current = false;
     setError(null);
     setFilling({ done: 0, total: rows.length });
@@ -94,7 +97,7 @@ export default function MatrixPage() {
     };
     await Promise.all(Array.from({ length: Math.min(CONCURRENCY, rows.length) }, worker));
     setFilling(null);
-  }, [filling, path]);
+  }, [filling, path, matrix?.can_edit]);
 
   useEffect(() => {
     if (!matrix || autoFilled.current || new URLSearchParams(window.location.search).get('fill') !== '1') return;
@@ -153,25 +156,21 @@ export default function MatrixPage() {
 
   const openAsDocument = async () => {
     if (!matrix) return;
-    const text = (value: string) => (value ? [{ type: 'text', text: value, styles: {} }] : []);
-    const bold = (value: string) => [{ type: 'text', text: value, styles: { bold: true } }];
-    const blocks = [
-      { type: 'heading', props: { level: 1 }, content: text(matrix.title) },
-      { type: 'paragraph', content: text(`Literature review matrix of ${matrix.rows.length} papers, made with AI for Research. Check each cell against the paper before citing it.`) },
-      {
-        type: 'table',
-        content: {
-          type: 'tableContent',
-          rows: [
-            { cells: [bold('Paper'), ...matrix.columns.map((column) => bold(column.label))] },
-            ...matrix.rows.map((row) => ({ cells: [text(`${paperLabel(row.paper)}. ${row.paper.title}`), ...matrix.columns.map((column) => text(row.cells[column.id]?.value || ''))] })),
-          ],
-        },
-      },
-    ];
+    const blocks = matrixDocumentBlocks(matrix);
     try {
       const created = await api<{ id: string }>('/api/ai-editor/documents', { method: 'POST', body: JSON.stringify({ title: matrix.title, blocks }) });
       router.push(`/editor?doc=${encodeURIComponent(created.id)}`);
+    } catch (caught) { setError((caught as Error).message); }
+  };
+
+  const exportAudit = async () => {
+    if (!matrix) return;
+    try {
+      const bundle = await api<unknown>(`${path}/export`);
+      const url = URL.createObjectURL(new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' }));
+      const link = document.createElement('a');
+      link.href = url; link.download = `${matrix.title.replace(/[^\w\s-]/g, '').trim() || 'matrix'}-audit.json`;
+      link.click(); URL.revokeObjectURL(url);
     } catch (caught) { setError((caught as Error).message); }
   };
 
@@ -185,11 +184,12 @@ export default function MatrixPage() {
         <>
           {filling ? (
             <Button onClick={() => { stopRef.current = true; }}><LuSquare className="h-4 w-4" />Stop ({filling.done}/{filling.total})</Button>
-          ) : toFill.length ? (
+          ) : toFill.length && matrix.can_edit !== false ? (
             <Button variant="primary" onClick={() => void fill(toFill)}><LuPlay className="h-4 w-4" />Fill {toFill.length} paper{toFill.length === 1 ? '' : 's'}</Button>
           ) : null}
-          <Button onClick={() => setAdding(true)}><LuPlus className="h-4 w-4" />Papers</Button>
+          <Button disabled={matrix.can_edit === false} onClick={() => setAdding(true)}><LuPlus className="h-4 w-4" />Papers</Button>
           <Button onClick={exportCsv}><LuDownload className="h-4 w-4" />CSV</Button>
+          <Button onClick={() => void exportAudit()}><LuDownload className="h-4 w-4" />Evidence and audit</Button>
           <Button onClick={() => void openAsDocument()}><LuFileText className="h-4 w-4" />Open as document</Button>
         </>
       ) : null}
@@ -202,12 +202,19 @@ export default function MatrixPage() {
             {title !== null ? (
               <input autoFocus value={title} onChange={(event) => setTitle(event.target.value)} onBlur={() => void saveTitle()} onKeyDown={(event) => { if (event.key === 'Enter') void saveTitle(); if (event.key === 'Escape') setTitle(null); }} className={`${inputClass} h-9 max-w-md`} />
             ) : (
-              <button type="button" onClick={() => setTitle(matrix.title)} className="inline-flex items-center gap-1.5 rounded-lg px-1.5 py-0.5 font-medium hover:bg-soft">{matrix.title}<LuPencil className="h-3.5 w-3.5 text-subtle" /></button>
+              <button type="button" disabled={matrix.can_edit === false} onClick={() => setTitle(matrix.title)} className="inline-flex items-center gap-1.5 rounded-lg px-1.5 py-0.5 font-medium hover:bg-soft">{matrix.title}<LuPencil className="h-3.5 w-3.5 text-subtle" /></button>
             )}
-            <button type="button" onClick={() => void deleteMatrix()} className="ml-auto inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[13px] font-medium text-red-600 hover:bg-red-50"><LuTrash2 className="h-4 w-4" />Delete matrix</button>
+            <button type="button" disabled={!matrix.can_delete} onClick={() => void deleteMatrix()} className="ml-auto inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[13px] font-medium text-red-600 hover:bg-red-50 disabled:opacity-40"><LuTrash2 className="h-4 w-4" />Delete matrix</button>
           </>
         ) : null}
       </div>
+
+      {matrix?.can_share && matrix.can_edit !== false && <label className="mb-4 block text-sm font-medium">Share this matrix and its selected evidence
+        <select className={`${inputClass} ml-2 max-w-xs`} value={matrix.project_id || ''} onChange={async (event) => { try { await api(path, { method: 'PATCH', body: JSON.stringify({ project_id: event.target.value || null }) }); await load(); } catch (caught) { setError((caught as Error).message); } }}>
+          <option value="">Private</option>{projects.filter((project) => ['owner', 'edit'].includes(project.role)).map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
+        </select>
+      </label>}
+      {matrix?.archived ? <p className="mb-4 rounded-xl border border-line bg-soft p-3 text-sm text-muted">This project was deleted. Your matrix retains its saved findings, audit history and source summaries as a read-only snapshot. It no longer reads collaborators' Library documents. Create a new matrix from your own sources to continue editing.</p> : matrix?.can_edit === false && <p className="mb-4 text-sm text-muted">You can inspect and export this shared matrix. Your project role does not allow changes.</p>}
 
       {filling ? (
         <div className="mb-3 h-1.5 overflow-hidden rounded-full bg-line-2" role="progressbar" aria-valuemin={0} aria-valuemax={filling.total} aria-valuenow={filling.done}>
@@ -228,12 +235,12 @@ export default function MatrixPage() {
                     <th key={column.id} className="min-w-[200px] border-b border-line px-3 py-2.5 align-top font-semibold">
                       <div className="flex items-start gap-1">
                         <span className="min-w-0 flex-1" title={column.prompt}>{column.label}</span>
-                        <button type="button" onClick={() => setColumnDialog(column)} aria-label={`Edit column ${column.label}`} className="grid h-6 w-6 shrink-0 place-items-center rounded-md text-subtle hover:bg-line-2 hover:text-ink"><LuPencil className="h-3.5 w-3.5" /></button>
+                        <button type="button" disabled={matrix.can_edit === false} onClick={() => setColumnDialog(column)} aria-label={`Edit column ${column.label}`} className="grid h-6 w-6 shrink-0 place-items-center rounded-md text-subtle hover:bg-line-2 hover:text-ink"><LuPencil className="h-3.5 w-3.5" /></button>
                       </div>
                     </th>
                   ))}
                   <th className="w-[52px] border-b border-line px-2 py-2.5">
-                    {matrix.columns.length < 12 ? <button type="button" onClick={() => setColumnDialog('new')} aria-label="Add column" title="Add column" className="grid h-7 w-7 place-items-center rounded-md text-brand hover:bg-brand-50"><LuPlus className="h-4 w-4" /></button> : null}
+                    {matrix.columns.length < 12 && matrix.can_edit !== false ? <button type="button" onClick={() => setColumnDialog('new')} aria-label="Add column" title="Add column" className="grid h-7 w-7 place-items-center rounded-md text-brand hover:bg-brand-50"><LuPlus className="h-4 w-4" /></button> : null}
                   </th>
                 </tr>
               </thead>
@@ -243,11 +250,12 @@ export default function MatrixPage() {
                     <td className="sticky left-0 z-10 border-b border-r border-line bg-surface px-3 py-2.5">
                       <div className="font-semibold text-ink">{paperLabel(row.paper)}</div>
                       <div className="mt-0.5 line-clamp-3 text-[12.5px] leading-snug text-muted">{row.paper.title}</div>
+                      {row.paper.departed ? <div className="mt-1 text-[11.5px] text-muted">Contributor left the project · values kept, no refill</div> : null}
                       <div className="mt-1.5 flex items-center gap-1">
                         {rowState[row.paper.id] === 'filling' ? <span className="text-[12px] text-brand">Reading…</span> : null}
                         {rowState[row.paper.id] === 'error' ? <span className="text-[12px] text-red-600">Could not fill</span> : null}
-                        <button type="button" disabled={Boolean(filling)} onClick={() => void fill([row])} title="Fill this paper again" aria-label="Fill this paper again" className="ml-auto grid h-6 w-6 place-items-center rounded-md text-subtle hover:bg-line-2 hover:text-ink disabled:opacity-40"><LuRotateCw className="h-3.5 w-3.5" /></button>
-                        <button type="button" onClick={() => void removePaper(row)} title="Remove from matrix" aria-label="Remove from matrix" className="grid h-6 w-6 place-items-center rounded-md text-subtle hover:bg-red-50 hover:text-red-600"><LuX className="h-3.5 w-3.5" /></button>
+                        <button type="button" disabled={Boolean(filling) || matrix.can_edit === false} onClick={() => void fill([row])} title="Fill this paper again" aria-label="Fill this paper again" className="ml-auto grid h-6 w-6 place-items-center rounded-md text-subtle hover:bg-line-2 hover:text-ink disabled:opacity-40"><LuRotateCw className="h-3.5 w-3.5" /></button>
+                        <button type="button" disabled={matrix.can_edit === false} onClick={() => void removePaper(row)} title="Remove from matrix" aria-label="Remove from matrix" className="grid h-6 w-6 place-items-center rounded-md text-subtle hover:bg-red-50 hover:text-red-600"><LuX className="h-3.5 w-3.5" /></button>
                       </div>
                     </td>
                     {matrix.columns.map((column) => {
@@ -282,7 +290,7 @@ export default function MatrixPage() {
         ) : (
           <div className="rounded-2xl border border-line px-6 py-12 text-center">
             <p className="text-[16px] font-semibold">No papers in this matrix</p>
-            <div className="mt-4"><Button variant="primary" onClick={() => setAdding(true)}><LuPlus className="h-4 w-4" />Add papers</Button></div>
+            <div className="mt-4"><Button disabled={matrix.can_edit === false} variant="primary" onClick={() => setAdding(true)}><LuPlus className="h-4 w-4" />Add papers</Button></div>
           </div>
         )
       ) : null}
@@ -291,6 +299,7 @@ export default function MatrixPage() {
 
       {editing && matrix ? (
         <CellDialog
+          readOnly={matrix.can_edit === false}
           row={editing.row}
           column={editing.column}
           cell={matrix.rows.find((row) => row.paper.id === editing.row.paper.id)?.cells[editing.column.id]}
@@ -366,7 +375,7 @@ function Dialog({ title, onClose, children, footer }: { title: string; onClose: 
   );
 }
 
-function CellDialog({ row, column, cell, onClose, onSave }: { row: Row; column: Column; cell?: Cell; onClose: () => void; onSave: (value: string) => Promise<void> }) {
+function CellDialog({ row, column, cell, onClose, onSave, readOnly = false }: { row: Row; column: Column; cell?: Cell; onClose: () => void; onSave: (value: string) => Promise<void>; readOnly?: boolean }) {
   const [value, setValue] = useState(cell?.value || '');
   const [busy, setBusy] = useState(false);
   const save = async (next: string) => { setBusy(true); try { await onSave(next); } finally { setBusy(false); } };
@@ -376,9 +385,9 @@ function CellDialog({ row, column, cell, onClose, onSave }: { row: Row; column: 
       onClose={onClose}
       footer={(
         <>
-          {cell?.edited ? <Button variant="ghost" disabled={busy} onClick={() => void save('')} className="mr-auto">Let AI for Research fill it</Button> : null}
+          {cell?.edited && !readOnly ? <Button variant="ghost" disabled={busy} onClick={() => void save('')} className="mr-auto">Let AI for Research fill it</Button> : null}
           <Button onClick={onClose}>Cancel</Button>
-          <Button variant="primary" disabled={busy || !value.trim() || value.trim() === cell?.value} onClick={() => void save(value)}>Save</Button>
+          {!readOnly && <Button variant="primary" disabled={busy || !value.trim() || value.trim() === cell?.value} onClick={() => void save(value)}>Save</Button>}
         </>
       )}
     >
@@ -392,7 +401,7 @@ function CellDialog({ row, column, cell, onClose, onSave }: { row: Row; column: 
         <p className="mt-3 rounded-xl bg-amber-50 px-3.5 py-2.5 text-[13px] text-amber-800">No exact quote was found for this answer{cell.page ? ` (around page ${cell.page})` : ''}. Check it in the paper.</p>
       ) : null}
       <label className="mt-4 block text-[13px] font-medium text-muted" htmlFor="cell-value">Cell</label>
-      <textarea id="cell-value" value={value} onChange={(event) => setValue(event.target.value)} rows={5} className="mt-1 w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-[15px] text-ink focus:border-brand focus:outline-none" />
+      <textarea id="cell-value" readOnly={readOnly} value={value} onChange={(event) => setValue(event.target.value)} rows={5} className="mt-1 w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-[15px] text-ink focus:border-brand focus:outline-none" />
       <p className="mt-1 text-[12px] text-subtle">Text you write here is kept when the matrix is filled again.</p>
     </Dialog>
   );

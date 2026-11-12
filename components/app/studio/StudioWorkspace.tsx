@@ -9,7 +9,7 @@
  * runs cite its sources and build on its text, and a finished result becomes what the next
  * module (or template) continues from.
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -414,11 +414,14 @@ export function StudioWorkspace({ workspace, intro }: { workspace: WorkspaceId; 
       {intro?.({ from: from ?? finished, startTemplate })}
       <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
         <nav aria-label={`${info.title} modules`} className="-mx-[18px] flex gap-1.5 overflow-x-auto px-[18px] pb-1 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0">
-          {modules.map((item) => (
-            <button key={item.id} type="button" onClick={() => choose(item.id)} aria-current={item.id === moduleId ? 'true' : undefined}
+          {modules.map((item, index) => (
+            <Fragment key={item.id}>
+            {item.group && item.group !== modules[index - 1]?.group && <p className="hidden px-3 pb-1 pt-3 text-[12px] font-medium text-subtle lg:block">{item.group}</p>}
+            <button type="button" onClick={() => choose(item.id)} aria-current={item.id === moduleId ? 'true' : undefined}
               className={`shrink-0 rounded-[10px] px-3 py-2 text-left text-[14px] font-medium lg:w-full ${item.id === moduleId ? 'bg-brand-50 text-brand' : 'text-ink-2 hover:bg-soft'}`}>
               {item.label}
             </button>
+            </Fragment>
           ))}
         </nav>
 

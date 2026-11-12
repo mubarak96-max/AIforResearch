@@ -132,6 +132,25 @@ describe('data lab report', () => {
     expect(messages[1].content).toContain('- r: .42');
     expect(messages[0].content).toContain('Use only the numbers given');
   });
+
+  it('rejects a raw dataset unless saving it was explicitly selected', async () => {
+    const response = await post('/data/save', { ...body, dataset_snapshot: 'secret,values\n1,2' });
+    expect(response.status).toBe(422);
+    expect(state.tasks).toHaveLength(0);
+  });
+
+  it('checks the fingerprint, saves opted-in data separately, and keeps it out of the AI prompt', async () => {
+    const { createHash } = await import('node:crypto');
+    const snapshot = 'private_record,score\nCONFIDENTIAL_PARTICIPANT,81';
+    const sha = createHash('sha256').update(snapshot).digest('hex');
+    const reproduction = { schema: 1, software: 'data-lab-2026-11-12', created_at: new Date().toISOString(), dataset_sha256: sha, rows: 1, columns: ['private_record', 'score'], truncated: false, column_kinds: {}, transformations: [], analyses: [], notes: '' };
+    expect((await post('/data/save', { ...body, save_dataset: true, dataset_snapshot: snapshot + 'tampered', reproducibility: reproduction })).status).toBe(422);
+    const response = await post('/data/report', { ...body, save_dataset: true, dataset_snapshot: snapshot, reproducibility: reproduction });
+    expect(response.status).toBe(200);
+    expect(state.tasks[0].result.dataset_snapshot).toBe(snapshot);
+    expect(state.tasks[0].result.reproducibility.dataset_sha256).toBe(sha);
+    expect(state.llm).not.toContain('CONFIDENTIAL_PARTICIPANT');
+  });
 });
 
 describe('data lab statistics', () => {

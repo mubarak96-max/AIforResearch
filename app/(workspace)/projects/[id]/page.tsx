@@ -11,6 +11,8 @@ import { useSignedIn } from '@/components/app/useSignedIn';
 import { api } from '@/lib/session';
 import { KIND_LABELS, taskHref, type TaskRecord } from '@/components/app/research/handoff';
 import { showError } from '@/components/app/research/parts';
+import { ProjectEvidence } from '@/components/app/ProjectEvidence';
+import { ProjectHub } from '@/components/app/ProjectHub';
 
 type Member = { email: string; name: string | null; role: 'edit' | 'comment' | 'view'; pending: boolean };
 type Project = {
@@ -95,6 +97,8 @@ function ProjectPage() {
               ))}
             </ul>
           )}
+          <ProjectHub id={id} role={project.role} members={project.members} onChange={load} />
+          <ProjectEvidence projectId={id} role={project.role} />
         </section>
         <aside aria-labelledby="people-title">
           <Card className="p-4">

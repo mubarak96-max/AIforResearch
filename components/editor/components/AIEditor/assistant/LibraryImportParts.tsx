@@ -24,7 +24,7 @@ export function UpgradeCard({ title, text, onUpgrade }: { title: string; text: s
 
 /** Progress of a background import, then what it did. */
 export function ImportProgress({ job, onAgain }: { job: ImportJob; onAgain: () => void }) {
-  const done = job.added + job.skipped + job.failed;
+  const done = job.added + (job.updated ?? 0) + job.skipped + job.failed;
   const share = job.total ? Math.min(100, Math.round((done / job.total) * 100)) : job.status === 'running' ? 8 : 100;
   return (
     <div className="rounded-xl border border-line bg-surface p-4" data-testid="import-progress">
@@ -35,12 +35,14 @@ export function ImportProgress({ job, onAgain }: { job: ImportJob; onAgain: () =
       <div className="mt-3 h-2 overflow-hidden rounded-full bg-line-2"><div className="h-full rounded-full bg-[var(--theme-primary,var(--color-brand))] transition-[width]" style={{ width: `${share}%` }} /></div>
       <p className="mt-2.5 text-[13px] text-ink-3">
         {plural(job.added, 'item')} added{job.pdfs ? `, ${plural(job.pdfs, 'PDF')}` : ''}
+        {job.updated ? ` · ${job.updated.toLocaleString('en-US')} updated` : ''}
         {job.skipped ? ` · ${job.skipped.toLocaleString('en-US')} already in your Library` : ''}
         {job.failed ? ` · ${job.failed.toLocaleString('en-US')} not found` : ''}
         {job.total ? ` · ${done.toLocaleString('en-US')} of ${job.total.toLocaleString('en-US')}` : ''}
       </p>
       {job.pdfs_over_limit > 0 && <p className="mt-1.5 text-[13px] text-[#b45309]">{plural(job.pdfs_over_limit, 'PDF')} not added: your plan's Library is full. The references were added.</p>}
       {job.error && <p className="mt-1.5 text-[13px] text-[#dc2626]">{job.error}</p>}
+      {!!job.preserved && <p className="mt-1.5 text-[13px] text-[#b45309]">Your local values were kept for {plural(job.preserved, 'item')}. Expand the source in your Library to compare imported values.</p>}
       {job.status !== 'running' && (
         <button type="button" onClick={onAgain} className="mt-3 text-[13px] font-semibold text-[var(--theme-primary,var(--color-brand))] hover:underline">Import more</button>
       )}
@@ -59,7 +61,7 @@ export function useImportJob() {
       const next = await getImportJob(id).catch(() => null);
       if (next) setJob(next);
       if (next && next.status !== 'running') { notifyLibraryChanged(); return; }
-      if (next && next.added) notifyLibraryChanged();
+      if (next && (next.added || next.updated || next.preserved)) notifyLibraryChanged();
       timer.current = window.setTimeout(() => void tick(), 1500);
     };
     void tick();

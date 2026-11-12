@@ -9,8 +9,12 @@ export type SrRecord = {
   abstract: string | null; url: string | null; source: string; duplicate_of: string | null; dup_reason: string | null; order: number;
   votes: Partial<Record<Stage, Record<string, Vote>>>; ai: Partial<Record<Stage, { decision: Decision; reason: string } | null>>;
   resolved: Partial<Record<Stage, Vote | null>>;
-  extraction?: Record<string, { value: string; quote?: string | null; ai?: boolean }>;
+  extraction?: Record<string, { value: string; quote?: string | null; page?: number | null; ai?: boolean; status?: string; source_revision?: string | null }>;
   rob?: Record<string, string>;
+  appraisal_template?: string;
+  appraisal_notes?: Record<string, string>;
+  blinded?: Partial<Record<Stage, boolean>>;
+  full_text?: { revision: string; library_document_id: string; title: string; sha256: string; pages: number; characters: number; attached_by: string; attached_at: string } | null;
   title_state: StageState; full_state: StageState | null;
 };
 
@@ -26,14 +30,15 @@ export type Review = {
 
 export type Prisma = {
   identified: { source: string; count: number }[]; identified_total: number; duplicates: number; screened: number; excluded_title: number;
-  awaiting_title: number; conflicts_title: number; sought: number; assessed: number; excluded_full: { reason: string; count: number }[];
+  awaiting_title: number; conflicts_title: number; sought: number; assessed: number; not_retrieved?: number; excluded_full: { reason: string; count: number }[];
   excluded_full_total: number; awaiting_full: number; conflicts_full: number; included: number;
 };
 
 export type Agreement = { n: number; percent: number | null; kappa: number | null; label: string | null; with: string };
 
 export type ReviewState = {
-  review: Review; role: string; can_edit: boolean; me: string;
+  review: Review; role: string; can_edit: boolean; me: string; can_adjudicate?: boolean;
+  appraisal_templates?: Record<string, { label: string; fields: [string, string][] }>;
   preset: { label: string; framework: string; reasons: string[]; note: string };
   frameworks: Record<string, [string, string][]>;
   reviewers: { id: string; name: string }[]; dual: boolean; ai_second: boolean;

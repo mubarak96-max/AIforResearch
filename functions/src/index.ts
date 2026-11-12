@@ -3,6 +3,8 @@ import { onObjectFinalized } from 'firebase-functions/v2/storage';
 import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import * as v1 from 'firebase-functions/v1';
+import { runResearchJob, recoverResearchJobs } from '../../lib/server/lib/researchJobs.js';
+import { runDueMonitors } from '../../lib/server/lib/monitoring.js';
 import { closeInterruptedImports, deleteUserData, newsletterOn, processPdf, ready, runImportJob, syncNewsletter } from '../../lib/server/jobs.js';
 
 /**
@@ -51,8 +53,30 @@ export const closeStuckImports = onSchedule({ schedule: 'every 60 minutes' }, as
   await closeInterruptedImports();
 });
 
-/** A Firebase Auth user was deleted (from the app or the console): remove their data. */
+/** Saved research inputs are processed independently of the browser. Existing services stay in place. */
+export const onResearchJobWritten = onDocumentWritten({ document: 'research_jobs/{id}', timeoutSeconds: 540, memory: '1GiB', retry: true }, async (event) => {
+  const next = event.data?.after.data();
+  if (!next || next.status !== 'queued') return;
+  await ready();
+  await runResearchJob(event.params.id);
+});
+
+export const recoverStuckResearch = onSchedule({ schedule: 'every 5 minutes', timeoutSeconds: 540 }, async () => {
+  await ready();
+  await recoverResearchJobs();
+});
+
+/** Check saved searches without changing any previously approved findings. */
+export const checkSavedResearch = onSchedule({ schedule: 'every 60 minutes', timeoutSeconds: 540, memory: '1GiB' }, async () => {
+  await ready();
+  await runDueMonitors();
+});
+
+/**
+ * A Firebase Auth user was deleted (from the app or the console): remove their data. The login is
+ * already gone, so Team conflicts are resolved by detaching rather than refusing (deleteUserData).
+ */
 export const onUserDeleted = v1.auth.user().onDelete(async (user) => {
   await ready();
-  await deleteUserData(user.uid);
+  await deleteUserData(user.uid, { authDeleted: true });
 });

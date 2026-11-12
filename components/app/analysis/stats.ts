@@ -148,7 +148,7 @@ export function sampleSizeProportions(p1: number, p2: number, alpha = 0.05, powe
 // ------------------------------------------------------------------ test chooser
 
 export type ChooserAnswers = {
-  goal: 'compare' | 'relate' | 'predict' | 'describe';
+  goal: 'compare' | 'relate' | 'predict' | 'describe' | 'diagnostic' | 'survival' | 'reliability';
   outcome: 'numeric' | 'ordinal' | 'categorical';
   groups: 'two' | 'three-plus' | 'none';
   paired: boolean;
@@ -160,28 +160,39 @@ export type Recommendation = { test: string; inDataLab: string | null; why: stri
 /** The test that fits the design, with what it assumes and how to report it. Rule-based. */
 export function chooseTest(answers: ChooserAnswers): Recommendation {
   const parametric = answers.outcome === 'numeric' && answers.normal !== 'no';
+  if (answers.goal === 'diagnostic') {
+    return answers.outcome === 'numeric'
+      ? { test: 'ROC curve and AUC', inDataLab: 'ROC curve and AUC', why: 'How well a numeric score or measurement separates people with and without a condition, and the best cut-off.', assumptions: ['A reference standard applied to everyone', 'Independent cases'], report: 'AUC = __ (95% CI __–__); at a cut-off of __, sensitivity __% and specificity __%.', alternative: 'Diagnostic accuracy (2 × 2) once you fix a cut-off' }
+      : { test: 'Diagnostic accuracy (sensitivity and specificity)', inDataLab: 'Diagnostic accuracy (2 × 2)', why: 'A positive/negative test result compared with a reference standard.', assumptions: ['A reference standard applied to everyone', 'Predictive values only transfer to settings with similar prevalence'], report: 'Sensitivity __% (95% CI __–__), specificity __% (95% CI __–__), PPV __%, NPV __%.', alternative: null };
+  }
+  if (answers.goal === 'survival') {
+    return { test: 'Kaplan-Meier curves with the log-rank test', inDataLab: 'Survival (Kaplan-Meier, log-rank)', why: 'Time until an event (death, relapse, discharge) when some people are followed without the event happening (censored).', assumptions: ['Censoring unrelated to the outcome', 'Proportional hazards for the log-rank test (curves that do not cross)'], report: 'Median survival __ (95% CI __–__) vs __ (95% CI __–__), log-rank χ²(__) = __, p = __.', alternative: 'Cox regression to adjust for other variables (in a statistics package)' };
+  }
+  if (answers.goal === 'reliability') {
+    return { test: 'Cronbach’s alpha', inDataLab: 'Reliability (Cronbach’s alpha)', why: 'How consistently the items of a questionnaire scale measure the same thing.', assumptions: ['Items measure one construct', 'Negatively worded items reverse-scored first'], report: 'Cronbach’s α = __ (__ items, N = __).', alternative: 'McDonald’s omega in a statistics package when items load unequally' };
+  }
   if (answers.goal === 'describe') {
     return { test: 'Descriptive statistics', inDataLab: 'Describe', why: 'You want to summarise, not test.', assumptions: [], report: answers.outcome === 'numeric' ? 'M = __, SD = __ (or Mdn = __, IQR = __ for skewed data), n = __.' : '__ of __ participants (__%).', alternative: null };
   }
   if (answers.goal === 'predict') {
-    if (answers.outcome === 'categorical') return { test: 'Logistic regression', inDataLab: null, why: 'A categorical (yes/no) outcome predicted from one or more variables.', assumptions: ['Independent cases', 'No strong multicollinearity', 'About 10 events per predictor'], report: 'OR = __, 95% CI [__, __], p = __.', alternative: 'Chi-square test for one categorical predictor' };
-    return { test: 'Linear regression', inDataLab: 'Linear regression', why: 'A numeric outcome predicted from a numeric variable.', assumptions: ['Linear relationship', 'Independent cases', 'Residuals roughly normal with equal spread'], report: 'b = __, t(__) = __, p = __, R² = __.', alternative: answers.normal === 'no' ? 'Spearman correlation if the relationship is monotonic but not linear' : null };
+    if (answers.outcome === 'categorical') return { test: 'Logistic regression', inDataLab: 'Logistic regression', why: 'A categorical (yes/no) outcome predicted from one or more variables.', assumptions: ['Independent cases', 'No strong multicollinearity', 'About 10 events per predictor'], report: 'OR = __, 95% CI [__, __], p = __.', alternative: 'Chi-square test for one categorical predictor' };
+    return { test: 'Linear regression', inDataLab: 'Linear regression', why: 'A numeric outcome predicted from a numeric variable.', assumptions: ['Linear relationship', 'Independent cases', 'Residuals roughly normal with equal spread'], report: 'b = __, t(__) = __, p = __, R² = __.', alternative: answers.normal === 'no' ? 'Spearman correlation if the relationship is monotonic but not linear' : 'Logistic regression for a yes/no outcome' };
   }
   if (answers.goal === 'relate') {
-    if (answers.outcome === 'categorical') return { test: 'Chi-square test of independence', inDataLab: 'Chi-square', why: 'Two categorical variables.', assumptions: ['Independent cases', 'Expected count of 5 or more in most cells'], report: 'χ²(__, N = __) = __, p = __, Cramér’s V = __.', alternative: 'Fisher’s exact test for small 2 × 2 tables' };
-    if (parametric) return { test: 'Pearson correlation', inDataLab: 'Correlation', why: 'Two numeric variables that are roughly normal.', assumptions: ['Linear relationship', 'Roughly normal variables', 'No extreme outliers'], report: 'r(__) = __, p = __.', alternative: 'Spearman correlation if not normal' };
-    return { test: 'Spearman rank correlation', inDataLab: null, why: 'Ordinal or non-normal numeric variables.', assumptions: ['Monotonic relationship', 'Independent cases'], report: 'rs(__) = __, p = __.', alternative: null };
+    if (answers.outcome === 'categorical') return { test: 'Chi-square test of independence', inDataLab: 'Chi-square', why: 'Two categorical variables.', assumptions: ['Independent cases', 'Expected count of 5 or more in most cells'], report: 'χ²(__, N = __) = __, p = __, Cramér’s V = __.', alternative: 'Fisher’s exact test for small 2 × 2 tables (in Data Lab)' };
+    if (parametric) return { test: 'Pearson correlation', inDataLab: 'Correlation', why: 'Two numeric variables that are roughly normal.', assumptions: ['Linear relationship', 'Roughly normal variables', 'No extreme outliers'], report: 'r(__) = __, p = __.', alternative: 'Spearman correlation if not normal (in Data Lab)' };
+    return { test: 'Spearman rank correlation', inDataLab: 'Correlation (Spearman)', why: 'Ordinal or non-normal numeric variables.', assumptions: ['Monotonic relationship', 'Independent cases'], report: 'rs(__) = __, p = __.', alternative: null };
   }
   // compare
   if (answers.outcome === 'categorical') {
     return answers.paired
-      ? { test: 'McNemar’s test', inDataLab: null, why: 'A yes/no outcome measured twice on the same cases.', assumptions: ['Paired observations', 'Two categories'], report: 'χ²(1, N = __) = __, p = __.', alternative: null }
-      : { test: 'Chi-square test', inDataLab: 'Chi-square', why: 'Comparing proportions between independent groups.', assumptions: ['Independent cases', 'Expected count of 5 or more in most cells'], report: 'χ²(__, N = __) = __, p = __.', alternative: 'Fisher’s exact test for small tables' };
+      ? { test: 'McNemar’s test', inDataLab: 'McNemar (paired yes/no)', why: 'A yes/no outcome measured twice on the same cases.', assumptions: ['Paired observations', 'Two categories'], report: 'χ²(1, N = __) = __, p = __.', alternative: null }
+      : { test: 'Chi-square test', inDataLab: 'Chi-square', why: 'Comparing proportions between independent groups.', assumptions: ['Independent cases', 'Expected count of 5 or more in most cells'], report: 'χ²(__, N = __) = __, p = __.', alternative: 'Fisher’s exact test for small 2 × 2 tables' };
   }
   if (answers.groups === 'two') {
     if (answers.paired) return parametric
       ? { test: 'Paired t-test', inDataLab: 'Paired t-test', why: 'The same cases measured twice, numeric outcome.', assumptions: ['Differences roughly normal', 'Paired observations'], report: 't(__) = __, p = __, dz = __.', alternative: 'Wilcoxon signed-rank test if the differences are not normal' }
-      : { test: 'Wilcoxon signed-rank test', inDataLab: null, why: 'The same cases measured twice, ordinal or non-normal outcome.', assumptions: ['Paired observations', 'Symmetric differences'], report: 'Z = __, p = __, r = __.', alternative: null };
+      : { test: 'Wilcoxon signed-rank test', inDataLab: 'Wilcoxon signed-rank', why: 'The same cases measured twice, ordinal or non-normal outcome.', assumptions: ['Paired observations', 'Symmetric differences'], report: 'Z = __, p = __, r = __.', alternative: null };
     return parametric
       ? { test: 'Independent t-test (Welch)', inDataLab: 'Independent t-test', why: 'Two independent groups, numeric outcome. Welch’s version does not assume equal variances.', assumptions: ['Independent groups', 'Outcome roughly normal in each group (or 30+ per group)'], report: 't(__) = __, p = __, d = __.', alternative: 'Mann-Whitney U if not normal' }
       : { test: 'Mann-Whitney U test', inDataLab: 'Mann-Whitney U', why: 'Two independent groups, ordinal or non-normal outcome.', assumptions: ['Independent groups', 'Similar shapes if you compare medians'], report: 'U = __, z = __, p = __, r = __.', alternative: null };
@@ -191,7 +202,7 @@ export function chooseTest(answers: ChooserAnswers): Recommendation {
     : { test: 'Friedman test', inDataLab: null, why: 'The same cases measured three or more times, ordinal or non-normal outcome.', assumptions: ['Repeated measures on the same cases'], report: 'χ²F(__) = __, p = __.', alternative: null };
   return parametric
     ? { test: 'One-way ANOVA', inDataLab: 'One-way ANOVA', why: 'Three or more independent groups, numeric outcome.', assumptions: ['Independent groups', 'Roughly normal in each group', 'Similar variances (else Welch’s ANOVA)'], report: 'F(__, __) = __, p = __, η² = __. Follow with post-hoc tests.', alternative: 'Kruskal-Wallis test if not normal' }
-    : { test: 'Kruskal-Wallis test', inDataLab: null, why: 'Three or more independent groups, ordinal or non-normal outcome.', assumptions: ['Independent groups'], report: 'H(__) = __, p = __.', alternative: null };
+    : { test: 'Kruskal-Wallis test', inDataLab: 'Kruskal-Wallis', why: 'Three or more independent groups, ordinal or non-normal outcome.', assumptions: ['Independent groups'], report: 'H(__) = __, p = __.', alternative: null };
 }
 
 // ------------------------------------------------------------------ export

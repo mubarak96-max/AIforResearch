@@ -1,7 +1,7 @@
 'use client';
 
 /** The Extraction and Report tabs of a systematic review. */
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { LuDownload, LuLoaderCircle, LuPlus, LuSparkles } from 'react-icons/lu';
 import { api } from '@/lib/session';
@@ -10,8 +10,8 @@ import { CitedMarkdown, CreditCost, creditsChanged, showError } from '@/componen
 import { downloadFile } from './client';
 import { PrismaDiagram, downloadPrisma } from './Prisma';
 import type { ReviewState, SrRecord } from './types';
+import { FullTextPanel } from './FullTextPanel';
 
-const ROB = [['randomisation', 'Randomisation'], ['allocation', 'Allocation concealment'], ['blinding', 'Blinding']] as const;
 const ROB_VALUES = ['low', 'some concerns', 'high', 'unclear', 'not applicable'];
 
 const included = (records: SrRecord[]) => records.filter((record) => !record.duplicate_of && record.full_state?.status === 'final' && record.full_state.decision === 'include');
@@ -20,13 +20,36 @@ const shortCite = (record: SrRecord) => `${record.authors[0]?.split(/\s+/).pop()
 function Cell({ record, column, canEdit, onSave }: { record: SrRecord; column: { id: string; label: string }; canEdit: boolean; onSave: (value: string) => void }) {
   const cell = record.extraction?.[column.id];
   const [value, setValue] = useState(cell?.value ?? '');
+  useEffect(() => setValue(cell?.value ?? ''), [cell?.value]);
   return (
     <td className="min-w-[180px] border-t border-line-2 px-2 py-1.5 align-top">
       <textarea aria-label={`${column.label} for ${shortCite(record)}`} value={value} disabled={!canEdit} rows={2} onChange={(event) => setValue(event.target.value)}
         onBlur={() => { if (value !== (cell?.value ?? '')) onSave(value); }} className="w-full resize-y rounded-md border border-transparent bg-transparent px-1.5 py-1 text-[13.5px] hover:border-line focus:border-brand focus:outline-none" />
-      {cell?.ai && cell.quote && <p className="px-1.5 text-[12px] italic text-muted" title="The words in the abstract this came from">“{cell.quote}”</p>}
+      {cell?.ai && cell.quote && <p className="px-1.5 text-[12px] italic text-muted" title="This quotation was matched against the attached source. Check that it supports the interpretation.">“{cell.quote}” {cell.page ? `(p. ${cell.page})` : '(page unavailable)'}</p>}
+      {cell?.status && <p className="px-1.5 text-[11px] text-muted">{cell.status === 'verified_quote' ? 'Source quote matched · check interpretation' : cell.status.replaceAll('_', ' ')}</p>}
     </td>
   );
+}
+
+function Appraisal({ record, state, reload }: { record: SrRecord; state: ReviewState; reload: () => Promise<void> }) {
+  const templates = state.appraisal_templates ?? {};
+  const selected = record.appraisal_template ?? (state.review.review_type === 'qualitative' ? 'qualitative' : 'intervention');
+  const fields = templates[selected]?.fields ?? [];
+  const save = async (body: Record<string, unknown>, refresh = false) => {
+    try {
+      await api(`/api/systematic-reviews/${state.review.id}/records/${record.id}`, { method: 'PATCH', body: JSON.stringify(body) });
+      if (refresh) await reload();
+    } catch (error) { showError(error); }
+  };
+  return <details className="min-w-[270px] text-[13px]">
+    <summary className="cursor-pointer font-semibold">{templates[selected]?.label ?? 'Appraisal'} · {fields.filter(([id]) => record.rob?.[id]).length}/{fields.length} domains</summary>
+    <label className="mt-2 block">Study approach<select value={selected} disabled={!state.can_edit} onChange={(event) => save({ appraisal_template: event.target.value }, true)} className={`${inputClass} mt-1 h-9`}>{Object.entries(templates).map(([id, template]) => <option key={id} value={id}>{template.label}</option>)}</select></label>
+    <p className="my-2 text-[12px] text-muted">Assisted appraisal prompts. Use your protocol's chosen instrument; these fields do not produce a validated quality score.</p>
+    {fields.map(([id, name]) => <div key={id} className="mt-3">
+      <label className="block">{name}<select aria-label={`${name} for ${shortCite(record)}`} disabled={!state.can_edit} defaultValue={record.rob?.[id] ?? ''} onChange={(event) => save({ rob: { [id]: event.target.value } })} className={`${inputClass} mt-1 h-8`}><option value="">Not rated</option>{ROB_VALUES.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+      <textarea aria-label={`Rationale and source for ${name}`} disabled={!state.can_edit} defaultValue={record.appraisal_notes?.[id] ?? ''} onBlur={(event) => { if (event.target.value !== (record.appraisal_notes?.[id] ?? '')) save({ appraisal_notes: { [id]: event.target.value } }); }} placeholder="Rationale, quotation and page" rows={2} className={`${inputClass} mt-1 h-auto py-2 text-[12px]`} />
+    </div>)}
+  </details>;
 }
 
 export function ExtractionTab({ state, reload }: { state: ReviewState; reload: () => Promise<void> }) {
@@ -45,8 +68,8 @@ export function ExtractionTab({ state, reload }: { state: ReviewState; reload: (
   const fill = async () => {
     setBusy(true);
     try {
-      const result = await api<{ filled: number }>(`/api/systematic-reviews/${review.id}/extract/ai`, { method: 'POST', body: JSON.stringify({ limit: 10 }) });
-      toast.success(`${result.filled} studies filled from their abstracts. Check each against the full text.`);
+      const result = await api<{ filled: number; unavailable?: { id: string; reason: string }[] }>(`/api/systematic-reviews/${review.id}/extract/ai`, { method: 'POST', body: JSON.stringify({ limit: 10 }) });
+      toast(`${result.filled} reports extracted from attached full texts.${result.unavailable?.length ? ` ${result.unavailable.length} unavailable: ${result.unavailable[0].reason}` : ' Check each value and supporting quotation.'}`);
       await reload();
     } catch (error) { showError(error); } finally { setBusy(false); creditsChanged(); }
   };
@@ -76,14 +99,14 @@ export function ExtractionTab({ state, reload }: { state: ReviewState; reload: (
           </div>
         </div>
       )}
-      <p className="text-[13.5px] text-muted">AI values come from the abstract only, with the words they are based on. Check them against the full text; anything you type is never overwritten.</p>
+      <p className="text-[13.5px] text-muted">AI reads the attached full text and matches supporting quotations to its pages. Unmatched answers are marked unverified. Check the interpretation; anything you type is never overwritten.</p>
       <div className="overflow-x-auto rounded-2xl border border-line">
         <table className="text-[13.5px]">
           <thead>
             <tr className="bg-soft text-left text-[12.5px] text-muted">
               <th className="sticky left-0 z-10 min-w-[220px] bg-soft px-3 py-2 font-medium">Study</th>
               {columns.map((column) => <th key={column.id} className="px-3 py-2 font-medium">{column.label}</th>)}
-              {ROB.map(([, name]) => <th key={name} className="px-3 py-2 font-medium">{name}</th>)}
+              <th className="px-3 py-2 font-medium">Appraisal</th>
             </tr>
           </thead>
           <tbody>
@@ -92,15 +115,10 @@ export function ExtractionTab({ state, reload }: { state: ReviewState; reload: (
                 <td className="sticky left-0 z-10 border-t border-line-2 bg-surface px-3 py-2 align-top">
                   <p className="font-semibold text-ink">{shortCite(record)}</p>
                   <p className="line-clamp-3 text-[12.5px] text-muted">{record.title}</p>
+                  <details className="mt-2"><summary className="cursor-pointer text-xs text-brand">Source evidence</summary><FullTextPanel reviewId={review.id} record={record} canEdit={canEdit} reload={reload} /></details>
                 </td>
                 {columns.map((column) => <Cell key={column.id} record={record} column={column} canEdit={canEdit} onSave={(value) => save(record, { [column.id]: value })} />)}
-                {ROB.map(([key, name]) => (
-                  <td key={key} className="border-t border-line-2 px-2 py-1.5 align-top">
-                    <select aria-label={`${name} for ${shortCite(record)}`} disabled={!canEdit} defaultValue={record.rob?.[key] ?? ''} onChange={(event) => save(record, {}, { [key]: event.target.value })} className="h-8 rounded-md border border-line px-1.5 text-[13px]">
-                      <option value="">Not rated</option>{ROB_VALUES.map((value) => <option key={value} value={value}>{value}</option>)}
-                    </select>
-                  </td>
-                ))}
+                <td className="border-t border-line-2 px-3 py-2 align-top"><Appraisal record={record} state={state} reload={reload} /></td>
               </tr>
             ))}
           </tbody>

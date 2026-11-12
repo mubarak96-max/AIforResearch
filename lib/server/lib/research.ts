@@ -22,6 +22,7 @@ import type { LlmSlot, ChatMessage, LlmUsage } from '../slots/types.js';
 import { STUDY_TYPE_LABELS, type FoundPaper, type SearchFilters, type SourceGroup, type WebResult } from './sources/index.js';
 import type { ResearchProfile } from './users.js';
 import type { Effect, ResearchFigure } from './researchFigures.js';
+import { appraisalGuidance, searchLanguageGuidance, type ResearchMethod } from '../../researchMethods.js';
 
 export const DEPTHS = ['summary', 'deep', 'detailed'] as const;
 export type Depth = (typeof DEPTHS)[number];
@@ -81,6 +82,10 @@ export type ResearchInput = {
   /** Overrides the profile's role for this task. */
   role?: string | null;
   language?: string | null;
+  /** The question's method, independent of the reader's location. */
+  method?: ResearchMethod;
+  /** Optional source languages, independent of the answer language. */
+  searchLanguages?: string[];
   /** A plan the person reviewed (Detailed); planned by the model when absent. */
   plan?: ResearchPlan | null;
 };
@@ -120,9 +125,10 @@ export type ResearchSource = {
   rank_score?: number | null;
   /** The sub-questions (0-based) whose searches found it. */
   sub_questions?: number[];
-  /** Whether Read had the open full text, and the passages it used (not saved with the task). */
+  /** Whether Read had an open full-text excerpt, and the exact passages retained with the task. */
   full_text?: boolean;
   passage?: string | null;
+  evidence_basis?: EvidenceBasis;
   /** Verify's reference check: the DOI at Crossref, and any retraction or correction notice. */
   check?: ReferenceCheck | null;
   /** An effect size with its 95% interval, kept only when its numbers are written in the paper (Read). */
@@ -131,7 +137,12 @@ export type ResearchSource = {
   gap?: boolean;
 };
 
-export type ReferenceCheck = { status: 'confirmed' | 'retracted' | 'corrected' | 'concern' | 'unconfirmed' | 'no_doi'; note: string | null };
+export type ReferenceCheck = { status: 'confirmed' | 'retracted' | 'corrected' | 'concern' | 'unconfirmed' | 'unverified' | 'no_doi'; note: string | null; attempted?: boolean; notices_checked?: boolean };
+export type EvidenceBasis = 'full_text_excerpt' | 'abstract' | 'source_summary' | 'web_summary' | 'file_excerpt' | 'metadata_only';
+export const sourceEvidenceBasis = (source: ResearchSource): EvidenceBasis => source.passage?.trim() ? 'full_text_excerpt'
+  : source.kind === 'file' && source.abstract?.trim() ? 'file_excerpt'
+    : source.kind === 'web' && source.abstract?.trim() ? 'web_summary'
+      : source.abstract?.trim() ? 'abstract' : source.tldr?.trim() ? 'source_summary' : 'metadata_only';
 
 export type Stance = 'supports' | 'mixed' | 'against' | 'unclear';
 export type Consensus = { applicable: boolean; line: string | null; counts: Record<Stance, number>; total: number };
@@ -171,10 +182,21 @@ export type ResearchResult = {
 
 /** What Verify found: claims checked against their sources, and references checked at Crossref. */
 export type Verification = {
-  claims: { checked: number; supported: number; partly: number; unsupported: number; revised: number };
-  references: { checked: number; confirmed: number; retracted: number; corrected: number; unconfirmed: number };
+  claims: {
+    /** Initial-draft narrative checks. A rewrite is not itself a verified claim. */
+    checked: number; supported: number; partly: number; unsupported: number; revised: number;
+    total: number; attempted: number; completed: number; unverified: number; not_checked: number;
+    /** Claims never sent for checking because a cited source had no usable text. */
+    no_source_text?: number;
+    scope: 'initial_cited_narrative';
+    /** Heuristic review candidates, not a factuality classification or completed checks. */
+    uncited_sentences?: string[];
+    items: { text: string; markers: number[]; verdict: 'yes' | 'partly' | 'no' | 'unverified'; note: string | null;
+      skipped?: 'no_source_text'; sources: { n: number; basis: EvidenceBasis }[]; revised_text?: string }[];
+  };
+  references: { checked: number; confirmed: number; retracted: number; corrected: number; unconfirmed: number; total?: number; attempted?: number; unverified?: number; no_doi?: number; notices_unverified?: number };
   /** Claims Verify changed or could not fix, and references with a notice, for the reader to see. */
-  flags: { kind: 'revised' | 'unsupported' | 'retracted' | 'corrected' | 'concern' | 'unconfirmed'; text: string; revised?: string | null; note: string | null; n?: number | null }[];
+  flags: { kind: 'revised' | 'unsupported' | 'partly_supported' | 'unverified' | 'reference_unverified' | 'retracted' | 'corrected' | 'concern' | 'unconfirmed'; text: string; revised?: string | null; note: string | null; n?: number | null }[];
   dropped_markers: number;
 };
 
@@ -206,7 +228,7 @@ export async function planQueries(llm: LlmSlot, question: string, count: number,
     const { text, usage: used } = await llm.complete({
       task: 'fast', temperature: 0.2, maxTokens: 400, json: true,
       messages: [
-        { role: 'system', content: 'You plan literature searches. Answer with JSON only: {"queries": ["…"]}. Each query is 3 to 8 keywords for a scholarly search engine (no Boolean operators, no quotes), in English.' },
+        { role: 'system', content: 'You plan literature searches. Answer with JSON only: {"queries": ["…"]}. Each query is 3 to 8 keywords for a scholarly search engine (no Boolean operators, no quotes). ' + searchLanguageGuidance() },
         { role: 'user', content: `Research question: ${base}\n\nWrite ${count} different search queries that together find the evidence: the main question, the key mechanisms or outcomes, the populations or settings, and the counter-evidence or limits.` },
       ],
     });
@@ -290,7 +312,7 @@ export function researchPrompt(input: ResearchInput, sources: ResearchSource[]):
     `Write for ${reader}${field}, in clear, plain, formal language; prefer short common words and direct sentences.`,
     'Cite every factual claim with its source marker in square brackets right after the claim, e.g. [S2] or [S1, S4]. Cite only what a source says; never invent sources, authors, years, numbers or markers, and do not write a reference list.',
     'Markers are not words: never write "S2 suggests"; describe the finding and put the marker after it.',
-    'Weigh the evidence: meta-analyses and systematic reviews outweigh single studies, larger and more recent studies outweigh smaller ones, and preprints are not peer reviewed. Say so where it matters.',
+    appraisalGuidance(input.method),
     'If the sources do not answer part of the question, say that plainly instead of guessing.',
     `Length: about ${settings.words} words. ${structure}`,
     `Answer in ${input.language || 'the language of the question'}. Markdown only; no title line, no preamble, no closing offer of help; never mention being an AI.`,
@@ -302,7 +324,8 @@ export function researchPrompt(input: ResearchInput, sources: ResearchSource[]):
 }
 
 /** "14 of 18 studies support…": counted from the labels, shown only when most sources test the question. */
-export function consensusOf(sources: ResearchSource[]): Consensus | null {
+export function consensusOf(sources: ResearchSource[], method?: ResearchMethod): Consensus | null {
+  if (method === 'qualitative' || method === 'humanities') return null;
   const labelled = sources.filter((source) => source.kind !== 'web' && source.stance);
   if (!labelled.length) return null;
   const counts: Record<Stance, number> = { supports: 0, mixed: 0, against: 0, unclear: 0 };

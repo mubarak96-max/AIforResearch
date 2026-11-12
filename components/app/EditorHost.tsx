@@ -6,6 +6,7 @@ import { WriteOrbitEditorProvider, type WriteOrbitEditorConfig } from '@/compone
 import { getToken, useSession } from '@/lib/session';
 import { openPricing } from '@/lib/billing';
 import { AppNav } from '@/components/app/AppNav';
+import { trackEditorEvent } from '@/lib/productAnalytics';
 
 /** Connects the editor package to this app: session, sign-in, upgrades and analytics. */
 export function EditorHost({ children }: { children: React.ReactNode }) {
@@ -28,7 +29,7 @@ export function EditorHost({ children }: { children: React.ReactNode }) {
     onUpgrade: (info) => openPricing(info?.message ?? null),
     // One navigation everywhere: the editor shows the app's own.
     renderNavigation: () => <AppNav className="flex h-full" />,
-    onEvent: () => {},
+    onEvent: trackEditorEvent,
   }), [user, loading, pathname, searchParams, router]);
 
   return <WriteOrbitEditorProvider config={config}>{children}</WriteOrbitEditorProvider>;

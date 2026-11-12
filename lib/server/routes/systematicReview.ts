@@ -34,7 +34,7 @@ import { parseExport, toCsv, toRis, type ImportedRecord } from '../lib/systemati
 import {
   DATABASES, DATABASE_LABELS, ROB_FIELDS, addRecords, countSearch, createReview, deleteReview, extractRows, listReviews, loadRecords,
   methodsPrompt, protocolPrompt, resolve, reviewFor, reviewState, reviewerSetup, runSearch, saveExtraction, storeExtraction,
-  storeSuggestions, suggestDecisions, updateReview, vote, type RecordRow,
+  storeSuggestions, suggestDecisions, updateReview, vote, attachFullText, fullTextPages, withFullTexts, reviewAudit, type RecordRow,
 } from '../lib/systematicReview.js';
 
 const Decision = z.enum(['include', 'exclude', 'maybe']);
@@ -109,6 +109,20 @@ export function systematicReviewRoutes(slots: Slots) {
   });
 
   app.get('/:id', async (c) => c.json(await reviewState(currentUser(c), c.req.param('id'))));
+
+  app.get('/:id/audit', async (c) => c.json({ events: await reviewAudit(currentUser(c), c.req.param('id')) }));
+
+  app.post('/:id/records/:rid/full-text', async (c) => {
+    const body = await parseBody(c, z.object({ library_document_id: z.string().uuid() }));
+    return c.json({ full_text: await attachFullText(currentUser(c), c.req.param('id'), c.req.param('rid'), body.library_document_id) });
+  });
+
+  app.get('/:id/records/:rid/full-text', async (c) => {
+    await reviewFor(currentUser(c), c.req.param('id'));
+    const record = (await loadRecords(c.req.param('id'))).find((item) => item.id === c.req.param('rid'));
+    if (!record) throw new HTTPException(404, { message: 'Record not found' });
+    return c.json({ full_text: record.full_text ?? null, pages: await fullTextPages(c.req.param('id'), record) });
+  });
 
   app.patch('/:id', async (c) => {
     const body = await parseBody(c, PatchBody);
@@ -193,8 +207,8 @@ export function systematicReviewRoutes(slots: Slots) {
   });
 
   app.patch('/:id/records/:rid', async (c) => {
-    const body = await parseBody(c, z.object({ values: z.record(z.string().max(4000)).default({}), rob: z.record(z.string().max(40)).default({}) }));
-    await saveExtraction(currentUser(c), c.req.param('id'), c.req.param('rid'), body.values, Object.fromEntries(Object.entries(body.rob).filter(([key]) => (ROB_FIELDS as readonly string[]).includes(key))));
+    const body = await parseBody(c, z.object({ values: z.record(z.string().max(4000)).default({}), rob: z.record(z.string().max(40)).default({}), appraisal_template: z.enum(['intervention', 'observational', 'qualitative', 'documentary']).optional(), appraisal_notes: z.record(z.string().max(2000)).optional() }));
+    await saveExtraction(currentUser(c), c.req.param('id'), c.req.param('rid'), body.values, Object.fromEntries(Object.entries(body.rob).filter(([key]) => (ROB_FIELDS as readonly string[]).includes(key))), { template: body.appraisal_template, notes: body.appraisal_notes });
     return c.json({ ok: true });
   });
 
@@ -206,24 +220,27 @@ export function systematicReviewRoutes(slots: Slots) {
     const setup = await reviewerSetup(review);
     const records = await loadRecords(review.id);
     // Records not yet suggested at this stage (and, at full text, only those that passed title screening).
-    const wanted = records.filter((record) => !record.duplicate_of && !record.ai?.[body.stage]
+    const candidates = records.filter((record) => !record.duplicate_of && !record.ai?.[body.stage]
       && (!body.record_ids || body.record_ids.includes(record.id))
       && (body.stage === 'title' || passesTitle(stageState(record, 'title', setup)))).slice(0, body.limit);
-    if (!wanted.length) return c.json({ suggested: 0, credits: 0 });
+    const fullTexts = body.stage === 'full' ? await withFullTexts(review.id, candidates) : null;
+    const wanted = fullTexts?.ready ?? candidates;
+    if (!wanted.length) return c.json({ suggested: 0, credits: 0, ...(fullTexts ? { unavailable: fullTexts.unavailable } : {}) });
     const credits = Math.ceil(wanted.length / 25) * CREDIT_COSTS.screening;
     const suggested = await charged(user.account_id, credits, 'AI screening', async () => {
       let count = 0;
-      for (let index = 0; index < wanted.length; index += 25) {
-        const { suggestions, usage } = await suggestDecisions(slots.llm, review, body.stage, wanted.slice(index, index + 25));
+      const batchSize = body.stage === 'full' ? 1 : 25;
+      for (let index = 0; index < wanted.length; index += batchSize) {
+        const { suggestions, usage } = await suggestDecisions(slots.llm, review, body.stage, wanted.slice(index, index + batchSize));
         await meter(c, usage, 'screening');
         const known = new Map([...suggestions].filter(([id]) => wanted.some((record) => record.id === id)));
-        await storeSuggestions(review.id, body.stage, known);
+        await storeSuggestions(review.id, body.stage, known, user.id, new Map(wanted.map((record) => [record.id, record.full_text?.revision ?? null])));
         count += known.size;
       }
       if (!count) throw new HTTPException(503, { message: 'The AI gave no usable suggestions. Try again.' });
       return count;
     });
-    return c.json({ suggested, credits });
+    return c.json({ suggested, credits, ...(fullTexts ? { unavailable: fullTexts.unavailable } : {}) });
   });
 
   app.post('/:id/extract/ai', async (c) => {
@@ -238,23 +255,24 @@ export function systematicReviewRoutes(slots: Slots) {
       const title = stageState(record, 'title', setup);
       return passesTitle(title) && stageState(record, 'full', setup).decision === 'include';
     });
-    const wanted = included.filter((record) => (body.record_ids ? body.record_ids.includes(record.id) : !Object.values(record.extraction ?? {}).some((cell) => cell.ai))).slice(0, body.limit);
-    if (!wanted.length) return c.json({ filled: 0, credits: 0 });
+    const candidates = included.filter((record) => (body.record_ids ? body.record_ids.includes(record.id) : !Object.values(record.extraction ?? {}).some((cell) => cell.ai))).slice(0, body.limit);
+    const { ready: wanted, unavailable } = await withFullTexts(review.id, candidates);
+    if (!wanted.length) return c.json({ filled: 0, credits: 0, unavailable });
     const credits = Math.ceil(wanted.length / 10) * CREDIT_COSTS.section;
     const filled = await charged(user.account_id, credits, 'AI extraction', async () => {
       let count = 0;
       const byId = new Map(records.map((record) => [record.id, record]));
-      for (let index = 0; index < wanted.length; index += 10) {
-        const { rows, usage } = await extractRows(slots.llm, review, wanted.slice(index, index + 10));
+      for (let index = 0; index < wanted.length; index += 1) {
+        const { rows, usage } = await extractRows(slots.llm, review, wanted.slice(index, index + 1));
         await meter(c, usage, 'extraction');
         const known = new Map([...rows].filter(([id]) => byId.has(id)));
-        await storeExtraction(review.id, known, byId);
+        await storeExtraction(review.id, known, byId, user.id);
         count += known.size;
       }
       if (!count) throw new HTTPException(503, { message: 'The AI gave no usable rows. Try again.' });
       return count;
     });
-    return c.json({ filled, credits });
+    return c.json({ filled, credits, unavailable });
   });
 
   app.post('/:id/methods/draft', async (c) => {
@@ -287,11 +305,11 @@ export function systematicReviewRoutes(slots: Slots) {
     }
     const columns = state.review.extraction_columns;
     const header = ['Title', 'Authors', 'Year', 'Journal', 'DOI', 'PMID', 'Source', 'Duplicate of', 'Title/abstract', 'Full text', 'Final decision', 'Reason',
-      ...columns.map((column) => column.label), 'Randomisation', 'Allocation concealment', 'Blinding'];
-    const body = rowsOut.map((record: RecordRow & { title_state: any; full_state: any }) => [
+      ...columns.flatMap((column) => [column.label, `${column.label}: quote`, `${column.label}: page`, `${column.label}: status`, `${column.label}: source version`]), 'Appraisal approach', ...ROB_FIELDS, ...ROB_FIELDS.map((field) => `${field}: rationale`)];
+    const body = rowsOut.map((record) => [
       record.title, record.authors.join('; '), record.year, record.venue, record.doi, record.pmid, record.source, record.duplicate_of ?? '',
       record.title_state.decision ?? record.title_state.status, record.full_state ? record.full_state.decision ?? record.full_state.status : '', decisionOf(record), reasonOf(record),
-      ...columns.map((column) => record.extraction?.[column.id]?.value ?? ''), record.rob?.randomisation ?? '', record.rob?.allocation ?? '', record.rob?.blinding ?? '',
+      ...columns.flatMap((column) => { const cell = record.extraction?.[column.id]; return [cell?.value ?? '', cell?.quote ?? '', cell?.page ?? '', cell?.status ?? '', cell?.source_revision ?? '']; }), record.appraisal_template ?? 'intervention', ...ROB_FIELDS.map((field) => record.rob?.[field] ?? ''), ...ROB_FIELDS.map((field) => record.appraisal_notes?.[field] ?? ''),
     ]);
     return new Response(`﻿${toCsv([header, ...body])}`, { headers: { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': `attachment; filename="${name}.csv"` } });
   });

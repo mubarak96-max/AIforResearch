@@ -1,9 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { LuLock } from 'react-icons/lu';
+import { LuBuilding2, LuLock } from 'react-icons/lu';
 import { Button, Card, CardHeader, StatusPill } from '@/components/app/ui';
-import { disconnectProvider, getMyMethods, PROVIDER_NAMES, PROVIDERS, startProvider, type MyMethods } from '@/lib/signin';
+import { disconnectInstitutionalProvider, disconnectProvider, getMyMethods, PROVIDER_NAMES, PROVIDERS, startInstitutionalProvider, startProvider, type MyMethods } from '@/lib/signin';
 import { ProviderLogo } from './ProviderLogo';
 
 /** Account › Sign-in methods: password and connected Google (from Firebase Auth). */
@@ -68,6 +68,14 @@ export function SignInMethodsCard() {
             </div>
           );
         })}
+        {(mine.sso ?? []).map((provider) => <div key={provider.id} className={row}>
+          <span className="grid h-9 w-9 place-items-center rounded-lg bg-soft"><LuBuilding2 className="h-[18px] w-[18px] text-ink-2" aria-hidden="true" /></span>
+          <span className="min-w-0 flex-1"><span className="block text-[14.5px] font-medium">{provider.label}</span><span className="block truncate text-[13px] text-muted">{provider.connected ? provider.email || 'Institutional sign-in connected' : 'Institutional sign-in'}</span></span>
+          <Button variant={provider.connected ? 'ghost' : 'primary'} size="sm" disabled={busy !== null}
+            onClick={() => void run(provider.id, () => provider.connected ? disconnectInstitutionalProvider(provider.id) : startInstitutionalProvider(provider.id, { mode: 'connect' }), `${provider.label} ${provider.connected ? 'disconnected' : 'connected'}.`)}>
+            {busy === provider.id ? 'Working…' : provider.connected ? 'Disconnect' : 'Connect'}
+          </Button>
+        </div>)}
       </div>
     </Card>
   );

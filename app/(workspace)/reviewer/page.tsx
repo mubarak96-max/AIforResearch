@@ -12,13 +12,15 @@ import { loadFromTask, type TaskRecord } from '@/components/app/research/handoff
 import { ReviewerPanel, ReviewResultView, type ReviewResult } from '@/components/app/reviewer/ReviewerPanel';
 import { ClaimResults, ClaimsPanel, type ClaimsResult } from '@/components/app/reviewer/ClaimsPanel';
 import { CitationResults, CitationsPanel, type CitationsResult } from '@/components/app/reviewer/CitationsPanel';
+import { GuidelineResults, GuidelinesPanel, type GuidelineResult } from '@/components/app/reviewer/GuidelinesPanel';
 
-type Module = 'reviewer' | 'claims' | 'citations';
-type Result = { module: 'reviewer'; data: ReviewResult } | { module: 'claims'; data: ClaimsResult } | { module: 'citations'; data: CitationsResult };
+type Module = 'reviewer' | 'guidelines' | 'claims' | 'citations';
+type Result = { module: 'reviewer'; data: ReviewResult } | { module: 'guidelines'; data: GuidelineResult } | { module: 'claims'; data: ClaimsResult } | { module: 'citations'; data: CitationsResult };
 
-const MODULE_OF_KIND: Record<string, Module> = { review: 'reviewer', claim_check: 'claims', citation_check: 'citations' };
+const MODULE_OF_KIND: Record<string, Module> = { review: 'reviewer', guideline_check: 'guidelines', claim_check: 'claims', citation_check: 'citations' };
 const SUBTITLES: Record<Module, string> = {
   reviewer: 'A scorecard and comments on a thesis, proposal or manuscript, at your level.',
+  guidelines: 'Check a manuscript against CONSORT, STROBE, PRISMA, CARE, STARD, COREQ, SRQR or SQUIRE, item by item.',
   claims: 'See which papers support each claim, and how strong the evidence is.',
   citations: 'Check that every reference exists, is not retracted and has the right details.',
 };
@@ -28,7 +30,7 @@ function Reviewer() {
   const router = useRouter();
   const params = useSearchParams();
   const requested = params.get('module');
-  const [module, setModule] = useState<Module>(requested === 'claims' || requested === 'citations' ? requested : 'reviewer');
+  const [module, setModule] = useState<Module>(requested === 'claims' || requested === 'citations' || requested === 'guidelines' ? requested : 'reviewer');
   const [result, setResult] = useState<Result | null>(null);
   const [fromSources, setFromSources] = useState<Source[] | null>(null);
   const [fromText, setFromText] = useState('');
@@ -64,9 +66,10 @@ function Reviewer() {
     <AppFrame wide={Boolean(result)} title="Reviewer" subtitle={SUBTITLES[module]}
       actions={result ? <Button onClick={() => { setResult(null); router.replace(module === 'reviewer' ? '/reviewer' : `/reviewer?module=${module}`); }}><LuPlus className="h-4 w-4" />New check</Button> : null}>
       <div className="mb-5">
-        <Segmented label="Module" value={module} onChange={switchTo} options={[{ value: 'reviewer', label: 'Reviewer' }, { value: 'claims', label: 'Claim check' }, { value: 'citations', label: 'Citation check' }]} />
+        <Segmented label="Module" value={module} onChange={switchTo} options={[{ value: 'reviewer', label: 'Reviewer' }, { value: 'guidelines', label: 'Guideline check' }, { value: 'claims', label: 'Claim check' }, { value: 'citations', label: 'Citation check' }]} />
       </div>
       {result?.module === 'reviewer' && <ReviewResultView result={result.data} />}
+      {result?.module === 'guidelines' && <GuidelineResults result={result.data} />}
       {result?.module === 'claims' && <ClaimResults result={result.data} />}
       {result?.module === 'citations' && (
         <div>
@@ -75,6 +78,7 @@ function Reviewer() {
         </div>
       )}
       {!result && module === 'reviewer' && <ReviewerPanel onDone={(data) => done({ module: 'reviewer', data })} />}
+      {!result && module === 'guidelines' && <GuidelinesPanel onDone={(data) => done({ module: 'guidelines', data })} />}
       {!result && module === 'claims' && <ClaimsPanel initialText={fromText} onDone={(data) => done({ module: 'claims', data })} />}
       {!result && module === 'citations' && <CitationsPanel fromSourcesList={fromSources} onDone={(data) => done({ module: 'citations', data })} />}
       {!result && (

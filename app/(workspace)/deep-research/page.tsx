@@ -11,7 +11,7 @@ import { api } from '@/lib/session';
 import { AskComposer, askCredits, type AskRequest } from '@/components/app/research/AskComposer';
 import { PlanReview, applyStep, type StepView, type SubQuestion } from '@/components/app/research/ResearchSteps';
 import { ResearchView, type ResearchState } from '@/components/app/research/ResearchView';
-import { postStream } from '@/components/app/research/stream';
+import { postStream, watchResearchTask } from '@/components/app/research/stream';
 import { creditsChanged, showError } from '@/components/app/research/parts';
 import { PENDING_KEY, type TaskRecord } from '@/components/app/research/handoff';
 
@@ -32,8 +32,33 @@ function fromTask(task: TaskRecord): ResearchState {
     request: task.inputs ? {
       question: task.inputs.question, depth: task.inputs.depth, groups: task.inputs.groups, filters: task.inputs.filters ?? {},
       headings: task.inputs.headings, high_quality: task.inputs.high_quality, role: task.inputs.role ?? null,
+      method: task.inputs.method ?? 'general', search_languages: task.inputs.search_languages ?? [],
+      language: task.inputs.language ?? undefined, project_id: task.project_id ?? undefined,
+      library_document_ids: task.inputs.library_document_ids ?? [],
     } : undefined,
   };
+}
+
+/** The person's choice of background mode is remembered per browser; it is off unless they turn it on. */
+const BACKGROUND_KEY = 'research.background';
+function readBackgroundChoice(): boolean {
+  try { return localStorage.getItem(BACKGROUND_KEY) === '1'; } catch { return false; }
+}
+function saveBackgroundChoice(on: boolean) {
+  try { localStorage.setItem(BACKGROUND_KEY, on ? '1' : '0'); } catch { /* storage blocked: the choice lasts this visit */ }
+}
+
+function BackgroundChoice({ checked, onChange }: { checked: boolean; onChange: (on: boolean) => void }) {
+  return (
+    <label className="mt-3 flex items-start gap-2 text-[14px] text-muted">
+      <input type="checkbox" className="mt-1" checked={checked} onChange={(event) => onChange(event.target.checked)} />
+      <span>
+        <span className="font-medium text-ink">Run in the background.</span>{' '}
+        The report keeps going if you close the tab and you reopen it from History. Progress updates every few seconds
+        instead of streaming live.
+      </span>
+    </label>
+  );
 }
 
 function DeepResearch() {
@@ -42,6 +67,11 @@ function DeepResearch() {
   const params = useSearchParams();
   const taskParam = params.get('task');
   const [state, setState] = useState<ResearchState | null>(null);
+  const [background, setBackground] = useState(false);
+  /** Whether this server offers background runs, and whether the person chose one. */
+  const [backgroundAvailable, setBackgroundAvailable] = useState(false);
+  const [preferBackground, setPreferBackground] = useState(false);
+  const [connectionNotice, setConnectionNotice] = useState('');
   const [recent, setRecent] = useState<TaskRecord[] | null>(null);
   /** A Detailed report waiting on its plan review (plan null while it is being planned). */
   const [review, setReview] = useState<{ request: AskRequest; plan: SubQuestion[] | null } | null>(null);
@@ -61,7 +91,7 @@ function DeepResearch() {
       setState(null);
       setReview({ request, plan: null });
       try {
-        const plan = await api<{ sub_questions: SubQuestion[] }>('/api/research/plan', { method: 'POST', body: JSON.stringify({ question: request.question, depth: request.depth }), signal: controller.signal });
+        const plan = await api<{ sub_questions: SubQuestion[] }>('/api/research/plan', { method: 'POST', body: JSON.stringify({ question: request.question, depth: request.depth, method: request.method, search_languages: request.search_languages }), signal: controller.signal });
         setReview((current) => (current?.request === request ? { request, plan: plan.sub_questions } : current));
       } catch (error) {
         if ((error as Error).name === 'AbortError') return;
@@ -71,14 +101,21 @@ function DeepResearch() {
       return;
     }
     setReview(null);
+    setConnectionNotice('');
     setState({ ...blank(request), running: true, steps: [{ id: 'plan', state: 'active', detail: 'Starting', data: null, ms: null }] });
     try {
-      await postStream('/api/research', request, (event, data) => {
+      const capabilities = await api<{ background_research?: boolean }>('/api/sources/groups', { signal: controller.signal });
+      // Live streaming stays the default; background mode is used only when offered and chosen.
+      const inBackground = Boolean(capabilities.background_research) && readBackgroundChoice();
+      setBackground(inBackground);
+      await postStream('/api/research', { ...request, background: inBackground }, (event, data) => {
         // Outside the state updater: Next.js turns replaceState into a router update (taskParam).
         if (event === 'task') window.history.replaceState(null, '', `/deep-research?task=${data.id}`);
+        if (event === 'watch_status') setConnectionNotice(data.message || '');
         setState((current) => {
           if (!current) return current;
           switch (event) {
+            case 'snapshot': return fromTask(data);
             case 'task': return { ...current, taskId: data.id };
             case 'step': return { ...current, steps: applyStep(current.steps, data) };
             case 'sources': return { ...current, allSources: data.sources, web: data.web, searched: { counts: data.counts, errors: data.errors, queries: data.queries } };
@@ -125,7 +162,16 @@ function DeepResearch() {
       return;
     }
     if (taskParam && state?.taskId !== taskParam) {
-      api<TaskRecord>(`/api/history/${encodeURIComponent(taskParam)}`).then((task) => setState(fromTask(task))).catch((error) => { showError(error); router.replace('/deep-research'); });
+      api<TaskRecord>(`/api/history/${encodeURIComponent(taskParam)}`).then((task) => {
+        setState(fromTask(task));
+        setBackground(Boolean(task.inputs?.background));
+        if (task.status === 'running' && task.inputs?.background) {
+          const controller = new AbortController();
+          abort.current = controller;
+          watchResearchTask(task.id, (event, data) => { if (event === 'snapshot') setState(fromTask(data)); if (event === 'watch_status') setConnectionNotice(data.message || ''); }, controller.signal)
+            .catch((error) => { if (error.name !== 'AbortError') showError(error); });
+        }
+      }).catch((error) => { showError(error); router.replace('/deep-research'); });
       return;
     }
     if (!taskParam) {
@@ -134,6 +180,13 @@ function DeepResearch() {
       api<{ tasks: TaskRecord[] }>('/api/history?kind=research&limit=12').then((result) => setRecent(result.tasks)).catch(() => setRecent([]));
     }
   }, [userId, taskParam]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!userId) return;
+    setPreferBackground(readBackgroundChoice());
+    api<{ background_research?: boolean }>('/api/sources/groups')
+      .then((capabilities) => setBackgroundAvailable(Boolean(capabilities.background_research)))
+      .catch(() => setBackgroundAvailable(false));
+  }, [userId]);
   // Stop the stream on a real unmount only: Strict Mode's mount-unmount-mount in development
   // would otherwise abort the run the handoff just started.
   useEffect(() => {
@@ -154,9 +207,21 @@ function DeepResearch() {
       </AppFrame>
     );
   }
+  const cancelBackground = async () => {
+    if (!state?.taskId) return;
+    try {
+      await api(`/api/research/${state.taskId}/cancel`, { method: 'POST' });
+      setState(fromTask(await api<TaskRecord>(`/api/history/${state.taskId}`)));
+    } catch (error) { showError(error); }
+  };
   if (state) {
     return (
       <AppFrame wide title={state.question || 'Deep Research'} actions={<Button onClick={() => { abort.current?.abort(); router.push('/deep-research'); }}><LuPlus className="h-4 w-4" />New research</Button>}>
+        {connectionNotice && <p role="status" className="mb-3 text-sm text-muted">{connectionNotice}</p>}
+        {background && state.running && <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-soft p-4 text-sm" role="status">
+          <p>This research is saved and continues if you close the tab. Reopen it from History.</p>
+          <Button size="sm" onClick={cancelBackground}>Cancel research</Button>
+        </div>}
         <ResearchView state={state} onRetry={run} />
       </AppFrame>
     );
@@ -164,6 +229,9 @@ function DeepResearch() {
   return (
     <AppFrame title="Deep Research" subtitle="Ask a question and get an answer built from real papers, every claim cited.">
       <AskComposer key={draft ? 'draft' : 'new'} onSubmit={run} autoFocus initialQuestion={params.get('q') ?? ''} initialRequest={draft ?? undefined} />
+      {backgroundAvailable && (
+        <BackgroundChoice checked={preferBackground} onChange={(on) => { setPreferBackground(on); saveBackgroundChoice(on); }} />
+      )}
       <section aria-labelledby="recent-title" className="mt-10">
         <h2 id="recent-title" className="text-[17px] font-bold">Recent research</h2>
         {recent === null && <p className="mt-3 text-[14px] text-muted">Loading…</p>}

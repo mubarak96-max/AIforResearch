@@ -28,6 +28,7 @@ Two problems with the new features:
 | Full paper, proposal or literature-review draft | 15 | |
 | Document review, standard | 10 | Up to 10,000 words; 5 more per further 10,000 |
 | Document review, high quality | 30 | Same length rule. Pro and above. |
+| Reporting-guideline check | 5 | Per 10,000 words (at most 40,000 read). CONSORT, STROBE, PRISMA, CARE, STARD, COREQ, SRQR, SQUIRE. |
 | Slide deck | 10 | |
 | Data Lab analysis with AI | 2 | In-browser tests cost nothing |
 | Systematic review: AI screening | 1 per 25 records | |

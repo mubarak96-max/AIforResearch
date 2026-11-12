@@ -13,11 +13,13 @@ import {
   AttachMenu, AttachmentList, CreditCost, DepthSwitch, FiltersToggle, RoleSelect, SourcePicker, filterCount,
   type Attachment, type Depth, type Filters, type LibraryPick, type SourceGroup,
 } from './parts';
-import { Check } from './controls';
+import { Check, Select } from './controls';
+import { RESEARCH_METHODS, RESEARCH_METHOD_LABELS, researchMethod, type ResearchMethod } from '@/lib/researchMethods';
 
 export type AskRequest = {
   question: string; depth: Depth; groups: SourceGroup[]; filters: Filters; headings: boolean; high_quality: boolean;
   library_document_ids: string[]; attachments: { name: string; text: string }[]; role: string | null; project_id: string | null;
+  method?: ResearchMethod; language?: string | null; search_languages?: string[];
   /** The plan the person reviewed (Detailed), sent with the run. */
   plan?: { sub_questions: { question: string; queries: string[] }[] } | null;
 };
@@ -52,6 +54,9 @@ export function AskComposer({ onSubmit, busy = false, initialQuestion = '', init
   const [files, setFiles] = useState<Attachment[]>([]);
   const [library, setLibrary] = useState<LibraryPick[]>([]);
   const [role, setRole] = useState(initialRequest?.role ?? user?.profile?.role ?? '');
+  const [method, setMethod] = useState<ResearchMethod>(researchMethod(initialRequest?.method));
+  const [language, setLanguage] = useState(initialRequest?.language ?? user?.profile?.language ?? '');
+  const [sourceLanguages, setSourceLanguages] = useState((initialRequest?.search_languages ?? []).join(', '));
   useEffect(() => { if (user?.profile?.role && !role) setRole(user.profile.role); }, [user?.profile?.role]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (initialQuestion) setQuestion(initialQuestion); }, [initialQuestion]);
 
@@ -70,6 +75,7 @@ export function AskComposer({ onSubmit, busy = false, initialQuestion = '', init
     onSubmit({
       question: question.trim(), depth, groups: effectiveGroups, filters, headings, high_quality: highQuality,
       library_document_ids: library.map((pick) => pick.id), attachments: files.map(({ name, text }) => ({ name, text })), role: role || null, project_id: projectId,
+      method, language: language.trim() || null, search_languages: [...new Set(sourceLanguages.split(',').map((value) => value.trim()).filter(Boolean))].slice(0, 8),
     });
   };
 
@@ -95,12 +101,25 @@ export function AskComposer({ onSubmit, busy = false, initialQuestion = '', init
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-line-2 pt-2">
         <RoleSelect value={role} onChange={changeRole} />
+        <Select value={method} onChange={setMethod} label="Research approach" prefix="Approach" options={RESEARCH_METHODS.map((value) => ({ value, label: RESEARCH_METHOD_LABELS[value] }))} />
         <Check size="sm" checked={headings} onChange={setHeadings}>With headings</Check>
         <Check size="sm" title="The stronger model and longer answers, for 3× the credits" checked={highQuality} onChange={(on) => (limits.highQuality ? setHighQuality(on) : openPricing('High-quality mode is part of the Pro plan.'))}>
           High quality{!limits.highQuality && <LuLock className="h-3.5 w-3.5 text-muted" aria-label="Pro plan" />}
         </Check>
         <CreditCost credits={credits} className="sm:hidden" />
       </div>
+      <details className="mt-2 border-t border-line-2 pt-2 text-[13px] text-muted">
+        <summary className="cursor-pointer rounded py-1 font-medium text-ink-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand">Language preferences</summary>
+        <div className="mt-2 grid gap-3 pb-1 sm:grid-cols-2">
+          <label className="grid gap-1">Answer language
+            <input value={language} onChange={(event) => setLanguage(event.target.value)} maxLength={40} placeholder="Use the question’s language" className="rounded-lg border border-line bg-surface px-3 py-2 text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand" />
+          </label>
+          <label className="grid gap-1">Source languages (optional, separated by commas)
+            <input value={sourceLanguages} onChange={(event) => setSourceLanguages(event.target.value)} maxLength={480} placeholder="Use languages relevant to the question" className="rounded-lg border border-line bg-surface px-3 py-2 text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand" />
+          </label>
+        </div>
+        <p className="pb-1 text-[12px]">Source languages guide search terms; they do not filter out evidence in other languages. Coverage depends on the selected sources.</p>
+      </details>
     </form>
   );
 }

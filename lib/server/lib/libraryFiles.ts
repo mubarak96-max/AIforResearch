@@ -67,6 +67,14 @@ export async function documentWithDoi(userId: string, doi: string | null | undef
   return (await libraryDoc(documentId).get()).exists ? documentId : null;
 }
 
+/** Exact provider/account/item identity only; DOI matches do not authorize an update. */
+export async function documentWithExternalId(userId: string, externalId: string): Promise<LibraryRow | null> {
+  const marker = await externalMarker(userId, externalId).get();
+  if (!marker.exists) return null;
+  const document = await ownLibraryDocument(userId, String(marker.get('document_id')));
+  return document?.external_id === externalId ? document : null;
+}
+
 /**
  * Creates a Library document unless one with the same DOI or source id exists (the markers are
  * claimed in the same transaction, which is what the unique indexes did in Postgres).
@@ -169,7 +177,7 @@ export async function processPdf(documentId: string, fileKey: string) {
     form.append('file', new Blob([new Uint8Array(bytes)], { type: 'application/pdf' }), 'document.pdf');
     const response = await fetch(`${env.convertUrl}/pdf/text`, { method: 'POST', headers: await serviceAuthHeaders(env.convertUrl), body: form, signal: AbortSignal.timeout(180_000) });
     if (!response.ok) throw new Error(`text extraction failed (${response.status})`);
-    const result = (await response.json()) as { pages: { page: number; text: string }[]; title?: string | null; metadata?: Record<string, unknown> };
+    const result = (await response.json()) as { pages: { page: number; text: string }[]; title?: string | null; metadata?: Record<string, unknown>; warnings?: string[]; extraction?: Record<string, unknown> };
     // The PDF's own title, authors and DOI, when they look real (the upload starts with the file name).
     const title = pdfTitle(result.title);
     const authors = pdfAuthors(result.metadata?.Author);
@@ -182,8 +190,9 @@ export async function processPdf(documentId: string, fileKey: string) {
       const doc = snapshot.data() as LibraryRow;
       const update: Record<string, unknown> = {
         processing_status: count ? 'completed' : 'failed',
-        processing_error: count ? null : 'No text found in this PDF (it may be a scan).',
+        processing_error: count ? null : result.warnings?.[0] || 'No text found in this PDF. Scanned pages need OCR with the document’s language.',
         chunk_count: count, processed_at: new Date(), updated_at: new Date(),
+        metadata: { ...(doc.metadata ?? {}), extraction_warnings: result.warnings ?? [], ...(result.extraction ? { extraction: result.extraction } : {}) },
       };
       const fileTitle = (doc.filename || '').replace(/\.pdf$/i, '');
       if (title && (!doc.title || doc.title === fileTitle)) update.title = title;

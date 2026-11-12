@@ -5,6 +5,7 @@ import { C, col } from '../firebase.js';
 import { requireUser, type AppVariables } from '../auth.js';
 import { dodoClient } from '../lib/dodoBilling.js';
 import { creditSummary, loadPlans, publicPlan, usageSummary } from '../lib/plans.js';
+import { managedTeamBilling } from '../lib/team.js';
 import { TOPUP_PACKS, completePurchase, listPurchases, publicPacks, startPackPurchase, sweepExpiredTopups } from '../lib/creditPurchases.js';
 import {
   billingPortal, completeCheckout, ensureCustomer, listCards, listInvoices, removeCard, renewPlan, setCancelAtPeriodEnd,
@@ -42,6 +43,17 @@ async function friendly<T>(work: () => Promise<T>): Promise<T> {
 export function billingRoutes() {
   const app = new Hono<{ Variables: AppVariables }>();
   app.use('*', requireUser);
+  app.use('*', async (c, next) => {
+    const access = await managedTeamBilling(c.get('user')!);
+    c.set('user', { ...c.get('user')!, account_id: access.account_id });
+    const path = c.req.path.replace(/^.*\/billing/, '') || '/';
+    if (access.managed && c.req.method !== 'GET') {
+      if (!access.can_manage) throw new HTTPException(403, { message: 'Team billing is managed by a Team owner or administrator.' });
+      if (['/checkout', '/pass/checkout', '/renew'].includes(path)) throw new HTTPException(409, { message: 'Contact your Team account administrator or sales to change a provisioned Team plan.' });
+    }
+    if (access.managed && !access.can_manage && c.req.method === 'GET' && !['/', '/credits'].includes(path)) throw new HTTPException(403, { message: 'Only Team owners and administrators can view billing records.' });
+    await next();
+  });
   const accountOf = (c: { get: (key: 'user') => AppVariables['user'] }) => c.get('user')!.account_id;
 
   /** Credits left this month, for the app's credit meter and every job's start button. */
@@ -76,7 +88,10 @@ export function billingRoutes() {
   });
 
   app.get('/', async (c) => {
-    const accountId = accountOf(c);
+    const access = await managedTeamBilling(c.get('user')!);
+    // The user may have left a Team since middleware ran. Bind billing records
+    // to the same fresh account that granted administrative access.
+    const accountId = access.account_id;
     await sweepExpiredTopups(accountId).catch((error) => console.warn('top-up expiry sweep failed', (error as Error).message));
     const summary = await usageSummary(accountId);
     const [library, accountSnapshot] = await Promise.all([
@@ -89,13 +104,13 @@ export function billingRoutes() {
     let payments = true;
     try {
       const dodo = dodoClient();
-      if (dodo && account?.dodo_customer_id) {
+      if (access.can_manage && dodo && account?.dodo_customer_id) {
         [cards, invoices] = await Promise.all([
           listCards(dodo, account.dodo_customer_id, account.dodo_payment_method_id ?? null),
           listInvoices(dodo, account.dodo_customer_id),
         ]);
       }
-      payments = Boolean(dodo);
+      payments = access.can_manage && Boolean(dodo);
     } catch (error) {
       console.warn('billing summary: Dodo Payments unavailable', (error as Error).message);
       payments = false;
@@ -110,8 +125,10 @@ export function billingRoutes() {
       limits,
       usage: counts,
       credits,
-      purchases: await listPurchases(accountId).catch(() => []),
-      packs: publicPacks(),
+      managed_team: access.managed,
+      can_manage_billing: access.can_manage,
+      purchases: access.can_manage ? await listPurchases(accountId).catch(() => []) : [],
+      packs: access.can_manage ? publicPacks().filter((pack) => !access.managed || pack.kind !== 'pass') : [],
       library: { used: Number(library.count) || 0, limit: limits.library_pdfs },
       cards,
       invoices,

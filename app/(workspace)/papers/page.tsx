@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { LuArrowUpDown, LuSearch, LuShare2 } from 'react-icons/lu';
 import { Select } from '@/components/app/research/controls';
 import { AppFrame } from '@/components/app/AppFrame';
+import { SourcesNav } from '@/components/app/SourcesNav';
 import { Button, Card } from '@/components/app/ui';
 import { useSignedIn } from '@/components/app/useSignedIn';
 import { api } from '@/lib/session';
@@ -63,6 +64,7 @@ function FindPapers() {
 
   return (
     <AppFrame wide title="Find Papers" subtitle="Search papers, PubMed, preprints, the web and your Library at once, with filters for year, study type and journal.">
+      <SourcesNav />
       <form onSubmit={(event) => { event.preventDefault(); search(25); }} className="flex gap-2">
         <label htmlFor="paper-query" className="sr-only">Search</label>
         <div className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-xl border border-line bg-surface px-3 focus-within:border-brand">

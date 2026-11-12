@@ -1,5 +1,7 @@
 **AI for Research: product opportunities and gaps**
 
+Implementation follow-up: [what was added, how it connects, activation requirements and remaining validation](product-opportunity-implementation-2026-11-12.md). The findings below describe the pre-implementation audit. Workflows are defined by audiences and work requirements, with no geographic access restrictions.
+
 Prepared 12 November 2026. Based on a static review of the current repository and official product/source documentation. This is a product strategy audit, not a production acceptance test. Competitor features are vendor-documented capabilities; demand, willingness to pay, and proposed priorities remain hypotheses to validate with users.
 
 **Recommendation**
@@ -171,4 +173,8 @@ Run a manually supported pilot of the literature-review workflow and compare:
 
 Set quality gates before running the evaluation. Use representative tasks across fields and languages rather than a single impressive demo. The editor already has analytics hooks, but its host passes a no-op event callback (`components/app/EditorHost.tsx:31`); measure completed workflows while keeping research content out of analytics.
 
-The immediate commercial hypothesis is that researchers will pay to reduce the work of assembling, checking, sharing and submitting evidence. The audit supports building and testing that hypothesis first; it does not yet establish product-market fit.
+The immediate commercial hypothesis is that researchers will pay to reduce the work of assembling, checking, sharing and submitting evidence. The audit supports building and testing that hypothesis first; it does not yet establish product-market fit.  
+
+
+
+

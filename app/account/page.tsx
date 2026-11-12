@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation';
 import { AppFrame } from '@/components/app/AppFrame';
 import { Button, Card, CardHeader } from '@/components/app/ui';
 import { BillingSection } from '@/components/billing/BillingSection';
+import { TeamSettings } from '@/components/billing/TeamSettings';
 import { SignInMethodsCard } from '@/components/auth/SignInMethodsCard';
 import { EmailCard } from '@/components/auth/EmailCard';
 import { ThemeChooser } from '@/components/theme/theme';
 import { api, clearSession, useSession } from '@/lib/session';
+import { PrivacySettingsButton } from '@/components/analytics/PrivacyControls';
 
 export default function AccountPage() {
   const router = useRouter();
@@ -40,6 +42,7 @@ export default function AccountPage() {
     >
       <div className="flex flex-col gap-5">
         {user && <BillingSection />}
+        {user && <TeamSettings />}
 
         <Card>
           <CardHeader title="Profile" />
@@ -60,6 +63,10 @@ export default function AccountPage() {
         {user && <SignInMethodsCard />}
 
         {user && <EmailCard />}
+
+        <Card>
+          <CardHeader title="Privacy choices" description="Optional usage analytics and public-page recordings. Private workspaces are never recorded." actions={<PrivacySettingsButton className="text-sm" />} />
+        </Card>
 
         {user && (
           <Card>

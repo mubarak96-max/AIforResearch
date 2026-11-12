@@ -4,6 +4,7 @@
  * Small SVG charts for Landscape and Data Lab: one hue (the brand) per chart, 3–5 faint
  * gridlines, round ticks above the maximum, no chart library.
  */
+import { useState } from 'react';
 import { quantile } from '@/lib/stats';
 
 const W = 640;
@@ -155,5 +156,65 @@ export function Scatter({ x, y, label, names }: { x: (number | null)[]; y: (numb
       <text x={(W + left) / 2} y={height - 6} textAnchor="middle" fontSize="12" fill="var(--color-muted)">{names[0]} ({fmt(x0)} to {fmt(x1)})</text>
       <text x={12} y={height / 2} textAnchor="middle" fontSize="12" fill="var(--color-muted)" transform={`rotate(-90 12 ${height / 2})`}>{names[1]}</text>
     </svg>
+  );
+}
+
+const SERIES = Array.from({ length: 8 }, (_, i) => `var(--series-${i + 1})`);
+
+/**
+ * Survival curves (steps) or a ROC curve (lines, with the chance diagonal). Both axes run from 0;
+ * the y axis from 0 to 1. A legend names every series; hovering shows each series' value.
+ */
+export function CurveChart({ chart, label }: { chart: { kind: 'survival' | 'roc'; x: string; y: string; series: { name: string; points: [number, number][] }[] }; label: string }) {
+  const [hover, setHover] = useState<number | null>(null);
+  const series = chart.series.slice(0, 8);
+  const maxX = chart.kind === 'roc' ? 1 : Math.max(1e-9, ...series.flatMap((item) => item.points.map(([x]) => x)));
+  const ticksX = chart.kind === 'roc' ? [0, 0.25, 0.5, 0.75, 1] : niceTicks(maxX);
+  const topX = ticksX.at(-1)!;
+  const height = 300; const left = 48; const bottom = 40; const right = 12;
+  const px = (value: number) => left + (value / topX) * (W - left - right);
+  const py = (value: number) => 8 + (1 - value) * (height - bottom - 8);
+  const path = (points: [number, number][]) => points.map(([x, y], i) => {
+    if (i === 0) return `M${px(x)},${py(y)}`;
+    return chart.kind === 'survival' ? `H${px(x)}V${py(y)}` : `L${px(x)},${py(y)}`;
+  }).join('');
+  /** The value of a series at x: the last point at or before it. */
+  const at = (points: [number, number][], x: number) => { let value = points[0]?.[1] ?? 0; for (const [px_, py_] of points) { if (px_ > x) break; value = py_; } return value; };
+  const move = (event: React.MouseEvent<SVGSVGElement>) => {
+    const box = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - box.left) / box.width) * W;
+    setHover(x < left ? null : Math.max(0, Math.min(topX, ((x - left) / (W - left - right)) * topX)));
+  };
+  return (
+    <figure>
+      {series.length > 1 && (
+        <figcaption className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-[12.5px] text-ink-2">
+          {series.map((item, i) => <span key={item.name} className="inline-flex items-center gap-1.5"><span className="inline-block h-0.5 w-4 rounded" style={{ background: SERIES[i] }} aria-hidden="true" />{item.name}</span>)}
+        </figcaption>
+      )}
+      <div className="relative">
+        <svg viewBox={`0 0 ${W} ${height}`} role="img" aria-label={label} className="h-auto w-full" onMouseMove={move} onMouseLeave={() => setHover(null)}>
+          {[0, 0.25, 0.5, 0.75, 1].map((tick) => (
+            <g key={tick}>
+              <line x1={left} x2={W - right} y1={py(tick)} y2={py(tick)} stroke="var(--color-line-2)" />
+              <text x={left - 6} y={py(tick) + 4} textAnchor="end" fontSize="11" fill="var(--color-muted)">{tick}</text>
+            </g>
+          ))}
+          {ticksX.map((tick) => <text key={tick} x={px(tick)} y={height - bottom + 16} textAnchor="middle" fontSize="11" fill="var(--color-muted)">{fmt(tick)}</text>)}
+          <line x1={left} x2={W - right} y1={py(0)} y2={py(0)} stroke="var(--color-line)" strokeWidth={1.5} />
+          {chart.kind === 'roc' && <line x1={px(0)} y1={py(0)} x2={px(1)} y2={py(1)} stroke="var(--color-subtle)" strokeDasharray="4 4" />}
+          {series.map((item, i) => <path key={item.name} d={path(item.points)} fill="none" stroke={SERIES[i]} strokeWidth={2} strokeLinejoin="round" />)}
+          {hover !== null && <line x1={px(hover)} x2={px(hover)} y1={py(1)} y2={py(0)} stroke="var(--color-ink-3)" strokeDasharray="2 3" />}
+          <text x={(W + left) / 2} y={height - 6} textAnchor="middle" fontSize="12" fill="var(--color-muted)">{chart.x}</text>
+          <text x={12} y={(height - bottom) / 2} textAnchor="middle" fontSize="12" fill="var(--color-muted)" transform={`rotate(-90 12 ${(height - bottom) / 2})`}>{chart.y}</text>
+        </svg>
+        {hover !== null && (
+          <div className="pointer-events-none absolute top-2 rounded-lg border border-line bg-surface px-2.5 py-1.5 text-[12.5px] shadow-sm" style={{ left: `${Math.min(70, (px(hover) / W) * 100)}%` }}>
+            <p className="font-semibold text-ink">{chart.x}: {fmt(hover)}</p>
+            {series.map((item, i) => <p key={item.name} className="flex items-center gap-1.5 text-ink-2"><span className="inline-block h-2 w-2 rounded-full" style={{ background: SERIES[i] }} aria-hidden="true" />{series.length > 1 ? `${item.name}: ` : ''}{at(item.points, hover).toFixed(2)}</p>)}
+          </div>
+        )}
+      </div>
+    </figure>
   );
 }

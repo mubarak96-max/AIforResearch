@@ -8,6 +8,7 @@ export const CREDIT_TABLE: { job: string; credits: string; note?: string }[] = [
   { job: 'Section, abstract, outline or gap analysis', credits: '3' },
   { job: 'Deep Research report', credits: '15', note: '45+ papers, figures, a gap search, every citation checked' },
   { job: 'Document review', credits: '10', note: 'per 10,000 words' },
+  { job: 'Reporting-guideline check', credits: '5', note: 'CONSORT, STROBE, PRISMA, CARE and more; per 10,000 words' },
   { job: 'Slide deck', credits: '10' },
   { job: 'Full draft: paper, proposal, literature review', credits: '10–15' },
   { job: 'Detailed report', credits: '45', note: '90+ papers, figures and a study table, plan reviewed first, paid plans' },

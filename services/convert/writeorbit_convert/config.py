@@ -29,6 +29,20 @@ IMPORT_CONVERT_TIMEOUT = _int("CONVERT_IMPORT_TIMEOUT", 120)  # .doc/.odt/.rtf -
 PDF_EXPORT_TIMEOUT = _int("CONVERT_PDF_TIMEOUT", 120)  # generated .docx -> PDF
 DOCX_TO_PDF_TIMEOUT = _int("CONVERT_DOCX_TO_PDF_TIMEOUT", 60)  # uploaded .docx/.doc -> PDF
 PDF_TEXT_TIMEOUT = _int("CONVERT_PDF_TEXT_TIMEOUT", 120)  # PDF -> text (pypdfium2 subprocess)
+# OCR for scanned PDF pages, using the Tesseract engine installed in the image (see Dockerfile).
+# Fixed in code, not read from the environment. It never downloads engines or language data; where
+# Tesseract is not installed (local development), scanned pages are reported as unread instead.
+OCR_ENABLED = True
+OCR_EXECUTABLE = "tesseract"
+OCR_LANGUAGES = "eng"  # default when a request names no language; must match packs installed in the Dockerfile
+OCR_DPI = 216  # render resolution, further capped by OCR_MAX_PIXELS
+OCR_MAX_PIXELS = 12_000_000  # pixels rendered per page
+OCR_PAGE_TIMEOUT = 15  # seconds per page
+OCR_BUDGET_SECONDS = max(0, min(PDF_TEXT_TIMEOUT - 15, 80))  # seconds per PDF, kept below the worker timeout
+OCR_MAX_PAGES = 40  # sparse pages attempted per PDF
+OCR_TEXT_THRESHOLD = 20  # a page with fewer native text characters than this is sparse
+# A sparse page is only sent to OCR when images cover at least this share of it (a scan, not a figure or blank).
+OCR_MIN_IMAGE_COVERAGE = 0.5
 METAFILE_TIMEOUT = 60  # one EMF/WMF image -> PNG
 METAFILE_BUDGET_SECONDS = 90  # all EMF/WMF images of one import
 MAX_METAFILES = 20

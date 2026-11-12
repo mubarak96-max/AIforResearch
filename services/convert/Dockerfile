@@ -25,6 +25,12 @@ RUN apt-get update \
       fonts-liberation fonts-liberation2 fonts-dejavu-core fonts-crosextra-carlito fonts-crosextra-caladea \
  && rm -rf /var/lib/apt/lists/*
 
+# OCR for scanned PDF pages (settings in writeorbit_convert/config.py). Add language packs here,
+# e.g. tesseract-ocr-fra tesseract-ocr-ara, to let requests choose those languages.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-eng \
+ && rm -rf /var/lib/apt/lists/*
+
 RUN useradd --system --create-home --uid 10001 --home-dir /home/convert --shell /usr/sbin/nologin convert
 
 WORKDIR /app

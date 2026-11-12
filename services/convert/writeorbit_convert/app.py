@@ -319,8 +319,14 @@ async def docx_to_pdf(file: UploadFile = File(...)):
 
 
 @app.post("/pdf/text")
-async def pdf_text(file: UploadFile = File(...)):
-    """A PDF -> its text, page by page (pypdfium2, no OCR)."""
+async def pdf_text(file: UploadFile = File(...), ocr_languages: Optional[str] = Form(None, max_length=200)):
+    """A PDF -> text per page, with optional installed OCR language packs and quality warnings."""
+    if ocr_languages:
+        from .ocr import language_codes
+        try:
+            language_codes(ocr_languages)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc))
     data = await file.read(config.MAX_EXPORT_BYTES + 1)
     if not data:
         raise HTTPException(status_code=400, detail="The file is empty.")
@@ -328,8 +334,13 @@ async def pdf_text(file: UploadFile = File(...)):
         raise HTTPException(status_code=413, detail="PDFs up to 50 MB can be read")
     if b"%PDF-" not in data[:1024]:
         raise HTTPException(status_code=400, detail="Upload a PDF file.")
-    body = await run_job(jobs.pdf_text_job, data)
+    body = await run_job(jobs.pdf_text_job, data, ocr_languages)
     return Response(content=body, media_type="application/json")
+
+
+@app.get("/pdf/ocr")
+async def pdf_ocr_capabilities():
+    return await run_job(jobs.ocr_capabilities_job)
 
 
 class EmbedRequest(BaseModel):

@@ -464,8 +464,9 @@ export async function crossrefWork(doi: string): Promise<CrossrefRecord | null> 
   const clean = doiKey(doi);
   if (!clean) return null;
   const data = await fetchSource(`https://api.crossref.org/works/${encodeURIComponent(clean)}?${mailto()}`, { source: 'Crossref' });
+  if (data === null) return null;
   const work = data?.message;
-  if (!work) return null;
+  if (!work || typeof work !== 'object' || Array.isArray(work)) throw new SourceError('Crossref', 'Crossref returned an incomplete DOI record.');
   return {
     doi: clean,
     title: Array.isArray(work.title) ? work.title[0] ?? null : null,
@@ -483,6 +484,7 @@ export async function crossrefUpdates(doi: string): Promise<UpdateNotice[]> {
   const clean = doiKey(doi);
   if (!clean) return [];
   const data = await fetchSource(`https://api.crossref.org/works?filter=updates:${encodeURIComponent(clean)}&rows=20&${mailto()}`, { source: 'Crossref' });
+  if (!Array.isArray(data?.message?.items)) throw new SourceError('Crossref', 'Crossref returned an incomplete notice response.');
   const notices: UpdateNotice[] = [];
   for (const item of data?.message?.items ?? []) {
     for (const update of item?.['update-to'] ?? []) {

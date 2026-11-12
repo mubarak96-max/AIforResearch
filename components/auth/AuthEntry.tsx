@@ -3,9 +3,9 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { LuArrowLeft, LuArrowRight } from 'react-icons/lu';
+import { LuArrowLeft, LuArrowRight, LuBuilding2 } from 'react-icons/lu';
 import { hasSession, signIn, signUp } from '@/lib/session';
-import { getMethods, PROVIDER_NAMES, PROVIDERS, startProvider, type Methods, type Provider } from '@/lib/signin';
+import { finishProviderRedirect, getMethods, PROVIDER_NAMES, PROVIDERS, startInstitutionalProvider, startProvider, type Methods, type Provider } from '@/lib/signin';
 import { btnPrimary, focusRing } from '@/components/marketing/styles';
 import { LegalNote } from './AuthCard';
 import { ProviderLogo } from './ProviderLogo';
@@ -86,6 +86,7 @@ export function AuthEntry() {
   useEffect(() => {
     if (hasSession()) { router.replace(target); return; }
     getMethods().then(setMethods).catch(() => setMethods({ password: true, google: true }));
+    finishProviderRedirect().then((signedIn) => { if (signedIn) router.replace(target); }).catch((caught) => setError(errorMessage(caught)));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -102,10 +103,19 @@ export function AuthEntry() {
 
   const providerList = () => PROVIDERS.filter((provider) => methods?.[provider]);
 
+  const goInstitution = async (id: string) => {
+    setBusy(id); setError('');
+    try {
+      const signedIn = await startInstitutionalProvider(id);
+      if (signedIn) router.replace(target);
+    } catch (caught) { setError(errorMessage(caught)); setBusy(null); }
+  };
+
   const options = () => {
     const items = providerList().map((provider) => ({
       key: provider, icon: <ProviderLogo provider={provider} size={20} />, name: PROVIDER_NAMES[provider], run: () => void goProvider(provider),
-    }));
+    })) as { key: string; icon: ReactNode; name: string; run: () => void }[];
+    for (const provider of methods?.sso ?? []) items.push({ key: provider.id, icon: <LuBuilding2 className="h-5 w-5" />, name: provider.label, run: () => void goInstitution(provider.id) });
     if (!items.length) return null;
     const compact = items.length >= 3;
     return (

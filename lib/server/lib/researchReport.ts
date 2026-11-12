@@ -14,6 +14,7 @@
  *   ## Where studies disagree …      one model call for all closing sections
  */
 import type { ChatMessage } from '../slots/types.js';
+import { RANKING_DESCRIPTIONS, RESEARCH_METHOD_LABELS, appraisalGuidance, researchMethod, type ResearchMethod } from '../../researchMethods.js';
 import {
   DEPTH_SETTINGS, parseJson, sourcesBlock,
   type Depth, type ResearchInput, type ResearchPlan, type ResearchSource, type Stance,
@@ -45,7 +46,7 @@ function writerRules(input: ResearchInput): string[] {
     `Write for ${reader}${field}, in clear, plain, formal language; prefer short common words and direct sentences.`,
     'Cite every factual claim with its source marker in square brackets right after the claim, e.g. [S2] or [S1, S4]. Cite only what a source says; never invent sources, authors, years, numbers or markers, and do not write a reference list.',
     'Markers are not words: never write "S2 suggests"; describe the finding and put the marker after it.',
-    'Weigh the evidence: meta-analyses and systematic reviews outweigh single studies, larger and more recent studies outweigh smaller ones, and preprints are not peer reviewed. Give sample sizes and effect sizes where the sources give them. Say where evidence is thin.',
+    appraisalGuidance(input.method),
     'Compare and connect studies rather than listing them one by one.',
     `Write in ${input.language || 'the language of the question'}. Markdown only; no preamble, no closing offer of help; never mention being an AI.`,
   ];
@@ -200,7 +201,7 @@ const list = (items: string[]) => (items.length <= 1 ? items.join('') : `${items
 
 export type MethodsFacts = {
   groups: string[]; searches: number; subQuestions: number; seeds: number; prisma: PrismaData; gapSearches: number;
-  filters: ResearchInput['filters']; date?: Date;
+  filters: ResearchInput['filters']; date?: Date; method?: ResearchMethod;
 };
 
 /** "How this review was done": what was searched, how much, and how it was narrowed. */
@@ -218,9 +219,9 @@ export function methodsText(facts: MethodsFacts): string {
     `We searched ${list(facts.groups.flatMap((group) => GROUP_NAMES[group] ?? [group]))} on ${date}, with ${plural(facts.searches, 'search', 'searches')} built from the question${facts.subQuestions > 1 ? ` and ${plural(facts.subQuestions, 'sub-question')}` : ''}${limits.length ? `, limited to papers ${list(limits)}` : ''}.`,
     facts.seeds && prisma.chased ? `We also followed the references and citations of the ${plural(facts.seeds, 'strongest paper')} (citation chasing), which added ${plural(prisma.chased, 'record')}.` : null,
     `The searches returned ${plural(prisma.identified, 'record')}; after ${plural(prisma.duplicates, 'duplicate')} were removed, the ${plural(prisma.screened, 'best-matching record')} were screened by title and abstract and ${prisma.relevant.toLocaleString('en-US')} were judged relevant.`,
-    `The ${plural(prisma.included - prisma.gap_added, 'strongest paper')}, ranked by relevance, study design, citations a year, recency and journal, were read for their findings, samples and limitations${prisma.full_text ? `, ${prisma.full_text} of them in the open full text` : ''}.`,
+    `The ${plural(prisma.included - prisma.gap_added, 'selected paper')} were ranked for ${RESEARCH_METHOD_LABELS[researchMethod(facts.method)].toLowerCase()}. ${RANKING_DESCRIPTIONS[researchMethod(facts.method)]} They were read for their findings, samples and limitations${prisma.full_text ? `, using open full-text excerpts for ${prisma.full_text} of them` : ''}.`,
     facts.gapSearches ? `A second round of ${plural(facts.gapSearches, 'search', 'searches')} aimed at the gaps the first reading left ${prisma.gap_added ? `added ${plural(prisma.gap_added, 'paper')}` : 'found no further relevant papers'}.` : null,
-    'Every cited sentence was then checked against the sources it cites, and each cited DOI against Crossref for retractions and corrections. Screening, reading and writing were done by AI; check the key sources before relying on them.',
+    'AI checks of cited narrative sentences and DOI notices are attempted within the report’s limits. The verification panel records completed checks, source basis and unverified claims; computed tables and uncited statements are outside those narrative checks. Screening, reading and writing were done by AI; inspect the key sources and any revised sentences before relying on them.',
   ];
   return sentences.filter(Boolean).join(' ');
 }
@@ -297,7 +298,7 @@ export function buildFigures(context: FigureContext): { figures: ResearchFigure[
     add(glance, {
       kind: 'bars', name: 'Included papers by study design',
       data: { orientation: 'horizontal', unit: 'Papers', bars: [...designCounts].sort((a, b) => b[1] - a[1]).map(([label, value]) => ({ label, value })) },
-      caption: 'Study designs as classified from each paper’s metadata and abstract. Higher designs (meta-analyses, systematic reviews, randomized trials) weigh more in the report.',
+      caption: 'Study designs as classified from each paper’s metadata and abstract. Design labels describe this source set; they do not establish validity or certainty.',
     });
   }
 
