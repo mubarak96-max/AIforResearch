@@ -1,7 +1,7 @@
 /** Shared app UI pieces, styled from the approved mockups (source/base.css). */
 import Link from 'next/link';
 
-type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'ghost' | 'danger'; size?: 'sm' | 'md' | 'lg' };
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & { ref?: React.Ref<HTMLButtonElement>; variant?: 'primary' | 'secondary' | 'ghost' | 'danger'; size?: 'sm' | 'md' | 'lg' };
 
 const variants = {
   primary: 'bg-brand text-on-brand shadow-brand hover:bg-brand-600 disabled:bg-subtle disabled:shadow-none',

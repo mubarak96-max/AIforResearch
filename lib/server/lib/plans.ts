@@ -321,7 +321,7 @@ export async function creditSummary(accountId: string) {
   const { plan, limits, account } = await effectivePlan(accountId);
   const month = periodOf('month');
   const usage = await usageRef(accountId, 'credits', month).get();
-  const used = usage.exists ? Number(usage.get('amount') ?? 0) : 0;
+  const used = usage.exists ? Number(usage.get('amount') ?? 0) || 0 : 0;
   const topup = account?.credit_topup ?? 0;
   const allowance = limits.credits;
   const left = allowance === null ? null : Math.max(0, allowance - used) + topup;
@@ -470,7 +470,7 @@ export async function usageSummary(accountId: string) {
   const auto = await usageRef(accountId, 'autocomplete', periodOf(limits.autocomplete.per)).get();
   const counts = [
     { key: 'credits', label: LIMIT_DEFS.credits.label, used: credits.used, limit: limits.credits, per: 'month' as const },
-    { key: 'autocomplete', label: LIMIT_DEFS.autocomplete.label, used: auto.exists ? Number(auto.get('amount') ?? 0) : 0, limit: limits.autocomplete.amount, per: limits.autocomplete.per },
+    { key: 'autocomplete', label: LIMIT_DEFS.autocomplete.label, used: auto.exists ? Number(auto.get('amount') ?? 0) || 0 : 0, limit: limits.autocomplete.amount, per: limits.autocomplete.per },
   ];
   return { plan, limits, account, counts, credits };
 }

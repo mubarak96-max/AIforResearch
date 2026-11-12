@@ -335,7 +335,9 @@ function InvoiceStatus({ status }: { status: string | null }) {
   return <StatusPill>{status || '—'}</StatusPill>;
 }
 
-function Meter({ label, used, limit, per }: { label: string; used: number; limit: number | null; per?: 'day' | 'month' }) {
+function Meter({ label, used: rawUsed, limit, per }: { label: string; used: number | null; limit: number | null; per?: 'day' | 'month' }) {
+  // A count the server could not read arrives as null (NaN in JSON); show it as nothing used.
+  const used = Number.isFinite(rawUsed) ? (rawUsed as number) : 0;
   const share = limit === null ? 0 : limit === 0 ? 1 : Math.min(1, used / limit);
   const full = limit !== null && used >= limit;
   return (

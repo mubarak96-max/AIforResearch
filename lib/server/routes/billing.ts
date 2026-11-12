@@ -112,7 +112,7 @@ export function billingRoutes() {
       credits,
       purchases: await listPurchases(accountId).catch(() => []),
       packs: publicPacks(),
-      library: { used: library.count, limit: limits.library_pdfs },
+      library: { used: Number(library.count) || 0, limit: limits.library_pdfs },
       cards,
       invoices,
       payments_enabled: payments,

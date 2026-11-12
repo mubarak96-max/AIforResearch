@@ -6,7 +6,7 @@
 import type { ChatMessage } from '../slots/types.js';
 import type { ResearchSource } from './research.js';
 import { sourcesBlock } from './research.js';
-import type { StudioModule } from './studioCatalog.js';
+import { template, type StudioModule } from './studioCatalog.js';
 
 export type StudioLength = 'short' | 'standard' | 'long';
 export type StudioContext = {
@@ -18,6 +18,8 @@ export type StudioContext = {
   length: StudioLength;
   language: string | null;
   highQuality: boolean;
+  /** The earlier result this run continues (a research answer or another module's text), its markers renumbered to `sources`. */
+  prior?: { title: string; markdown: string } | null;
 };
 export type StudioPrompt = { messages: ChatMessage[]; maxTokens: number; task: 'fast' | 'review'; temperature: number; json?: boolean };
 
@@ -89,6 +91,19 @@ const BUILDERS: Record<string, Builder> = {
     user: `Write ${c.inputs.format === 'unstructured' ? 'a one-paragraph abstract' : 'a structured abstract with bold labels Background, Methods, Results and Conclusions'} of about ${c.inputs.words || '250'} words for this paper. Then add a line "**Keywords:**" with 5 keywords.\n\nThe paper:\n${(c.inputs.text || '').slice(0, 60000)}`,
     maxTokens: 900,
   }),
+  template: (c) => {
+    const chosen = template(c.inputs.template) ?? template('imrad')!;
+    const sections = chosen.sections.filter(([heading]) => !/^references/i.test(heading));
+    const base = chosen.id === 'conference-abstract' ? 300 : chosen.id === 'poster' ? 700 : chosen.id === 'thesis-chapter' ? 2500 : 2000;
+    return {
+      user: `Write a complete ${chosen.label.toLowerCase()} on "${c.inputs.topic}", about ${words(base, c)} words, for ${reader(c)}. ` +
+        `Use exactly these sections as "##" headings, in this order, and write real content under each (never leave a section empty or repeat the guidance):\n` +
+        sections.map(([heading, hint]) => `- ${heading}${hint ? `: ${hint}` : ''}`).join('\n') +
+        '\nWhere a section needs facts only the writer has (their own data, sample, results, team, amounts, dates), write a clear [placeholder] in square brackets instead of inventing them. ' +
+        'Generic section names such as "Theme 1" or "Section 1" should be replaced by a heading that names the theme.' + notesLine(c.inputs.notes),
+      maxTokens: chosen.id === 'conference-abstract' ? 1200 : chosen.id === 'poster' ? 2000 : 6500, grounded: true,
+    };
+  },
   paraphrase: (c) => ({
     system: `${BASE} Keep the meaning, every fact, number, name, quotation and citation exactly; change only the wording. Keep the paragraph breaks.`,
     user: `Paraphrase this text in a natural, human style${{ light: ', keeping the sentence structure close', strong: ' with new sentence structures' }[c.inputs.strength] ?? ''}. Return only the paraphrase.\n\n${(c.inputs.text || '').slice(0, 40000)}`,
@@ -202,13 +217,22 @@ const BUILDERS: Record<string, Builder> = {
 
 export const hasStudioPrompt = (id: string) => Boolean(BUILDERS[id]);
 
+/** The earlier work, for modules that write from a topic (those that take the writer's text get it in the form instead). */
+function priorPart(context: StudioContext) {
+  const prior = context.prior?.markdown?.trim();
+  if (!prior) return '';
+  return `\n\nThis continues the writer's earlier work, "${context.prior!.title.slice(0, 160)}" (its source markers match the sources below). ` +
+    'Build on it: keep its findings, argument and citations, go further where the task asks, and do not contradict it unless a source does.\n' +
+    `<earlier_work>\n${prior.slice(0, 24000)}\n</earlier_work>`;
+}
+
 /** The messages and settings for one run of a module. */
 export function buildStudioPrompt(module: StudioModule, context: StudioContext): StudioPrompt {
   const built = BUILDERS[module.id](context);
   const cited = context.sources.length > 0;
   const system = built.system ?? `${BASE} Write for ${reader(context)}. ${language(context)}${cited ? ` ${CITE}` : ' Do not cite sources you were not given; where a claim needs a source, write [citation needed].'}`;
   return {
-    messages: [{ role: 'system', content: built.system && cited ? `${system} ${CITE}` : system }, { role: 'user', content: `${built.user}${sourcesPart(context)}` }],
+    messages: [{ role: 'system', content: built.system && cited ? `${system} ${CITE}` : system }, { role: 'user', content: `${built.user}${built.system ? '' : priorPart(context)}${sourcesPart(context)}` }],
     maxTokens: context.highQuality ? Math.round(built.maxTokens * 1.4) : built.maxTokens,
     task: context.highQuality || built.task === 'review' ? 'review' : 'fast',
     temperature: built.json ? 0.3 : 0.5,

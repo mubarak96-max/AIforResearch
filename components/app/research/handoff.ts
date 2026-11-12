@@ -40,12 +40,16 @@ export async function loadFromTask(id: string | null | undefined): Promise<{ top
   return { topic: String(task.inputs?.question ?? task.inputs?.topic ?? task.title), sources, markdown: String(task.result?.markdown ?? ''), task };
 }
 
+/** Text with its [S1] markers removed, for forms that take plain text (abstract, paraphrase, improve…). */
+export const withoutMarkers = (markdown: string) => markdown.replace(/\s?\[S\d+(?:[,;\s]*S?\d+)*\]/g, '');
+
 /** Where each follow-on tool lives, with the task it continues from. */
 export function followOnLinks(taskId: string) {
   const from = `from=${encodeURIComponent(taskId)}`;
   return [
     { label: 'Write a literature review', href: `/write?module=literature-review&${from}` },
     { label: 'Write a paper', href: `/write?module=paper&${from}` },
+    { label: 'Fill a template', href: `/write?module=template&${from}` },
     { label: 'Find gaps', href: `/thesis?module=gaps&${from}` },
     { label: 'Thesis outline', href: `/thesis?module=outline&${from}` },
     { label: 'Write abstract', href: `/write?module=abstract&${from}` },

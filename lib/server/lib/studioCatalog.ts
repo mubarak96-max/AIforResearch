@@ -71,6 +71,18 @@ const DEGREE = select('degree', 'Degree', [['masters', 'Master’s'], ['phd', 'P
 
 const fixed = (action: CreditAction) => () => ({ action, units: 1 });
 
+/** Starting documents for the editor: headings and short prompts, no AI (and the sections the "template" module writes). */
+export const TEMPLATES: { id: string; label: string; short: string; sections: [string, string][] }[] = [
+  { id: 'imrad', label: 'Research paper (IMRaD)', short: 'Title, abstract, introduction, methods, results, discussion.', sections: [['Abstract', 'Background, aim, methods, results and conclusion in 150–250 words.'], ['Introduction', 'The problem, what is known, the gap, and your aim.'], ['Methods', 'Design, participants or data, measures, procedure and analysis.'], ['Results', 'What you found, in the order of your aims. Tables and figures here.'], ['Discussion', 'What the results mean, how they fit the literature, limits, and implications.'], ['Conclusion', 'The answer to your question in a few sentences.'], ['References', '']] },
+  { id: 'literature-review', label: 'Literature review', short: 'Introduction, search approach, themes, gaps, conclusion.', sections: [['Introduction', 'The topic, why it matters, and the scope of the review.'], ['How the literature was found', 'Databases, search terms, years and inclusion criteria.'], ['Theme 1', 'What studies show, where they agree and disagree.'], ['Theme 2', ''], ['Theme 3', ''], ['Gaps and future research', 'What is not yet known.'], ['Conclusion', ''], ['References', '']] },
+  { id: 'thesis-chapter', label: 'Thesis chapter', short: 'Chapter introduction, sections, summary.', sections: [['Chapter introduction', 'What this chapter does and how it links to the previous one.'], ['Section 1', ''], ['Section 2', ''], ['Section 3', ''], ['Chapter summary', 'The main points and how they lead to the next chapter.']] },
+  { id: 'research-proposal', label: 'Research proposal', short: 'Aims, background, methods, timeline, budget, ethics.', sections: [['Title', ''], ['Aims and objectives', 'The research question and 2–4 objectives.'], ['Background and significance', 'Why this matters and what is known.'], ['Literature review', ''], ['Methods', 'Design, sample, data collection, analysis.'], ['Timeline', 'Phases and milestones.'], ['Budget', ''], ['Ethical considerations', ''], ['References', '']] },
+  { id: 'grant', label: 'Grant proposal', short: 'Summary, aims, significance, approach, impact, budget.', sections: [['Summary', 'The project in 200 words for a non-specialist reviewer.'], ['Aims', ''], ['Significance and innovation', ''], ['Approach and work plan', 'Work packages, methods, milestones, risks and mitigations.'], ['Team', ''], ['Impact and dissemination', ''], ['Budget justification', ''], ['References', '']] },
+  { id: 'conference-abstract', label: 'Conference abstract', short: 'Background, methods, results, conclusions in 250–300 words.', sections: [['Title', ''], ['Background', ''], ['Methods', ''], ['Results', ''], ['Conclusions', '']] },
+  { id: 'poster', label: 'Poster text', short: 'Short blocks for a research poster.', sections: [['Title and authors', ''], ['Introduction', '3–4 sentences.'], ['Methods', 'A short list or diagram.'], ['Results', 'Your key figure and 2–3 findings.'], ['Conclusions', '2–3 bullet points.'], ['References and contact', '']] },
+];
+export const template = (id: string) => TEMPLATES.find((item) => item.id === id) ?? null;
+
 export const STUDIO_MODULES: StudioModule[] = [
   // ---------------------------------------------------------------- Writing Studio
   {
@@ -107,6 +119,11 @@ export const STUDIO_MODULES: StudioModule[] = [
     id: 'paraphrase', workspace: 'write', label: 'Paraphrase', short: 'Rewrite a passage in your own natural style, keeping its meaning and citations.',
     fields: [text('Text to paraphrase', 'Paste the passage.', 40_000, 20), select('strength', 'How much to change', [['standard', 'Standard'], ['light', 'Light: keep the structure'], ['strong', 'Strong: new sentence structure']])],
     grounded: false, output: 'markdown', topicField: 'text', cost: (inputs) => ({ action: 'ai_edit', units: rewriteUnits(inputs.text || '') }),
+  },
+  {
+    id: 'template', workspace: 'write', label: 'Fill a template', short: 'A template written out section by section from your topic or research, with real citations.',
+    fields: [select('template', 'Template', TEMPLATES.map((item): [string, string] => [item.id, item.label])), topic('Topic or title', 'e.g. Sleep and memory consolidation in adults'), notes()],
+    grounded: 'multi', output: 'markdown', topicField: 'topic', cost: fixed('draft'), lengthOption: true,
   },
 
   // ---------------------------------------------------------------- Thesis Suite
@@ -214,14 +231,3 @@ export function studioCredits(module: StudioModule, inputs: Record<string, strin
   if (!action) return 0;
   return (costs[action] ?? 0) * Math.max(1, units) * (highQuality ? 3 : 1);
 }
-
-/** Starting documents for the editor: headings and short prompts, no AI. */
-export const TEMPLATES: { id: string; label: string; short: string; sections: [string, string][] }[] = [
-  { id: 'imrad', label: 'Research paper (IMRaD)', short: 'Title, abstract, introduction, methods, results, discussion.', sections: [['Abstract', 'Background, aim, methods, results and conclusion in 150–250 words.'], ['Introduction', 'The problem, what is known, the gap, and your aim.'], ['Methods', 'Design, participants or data, measures, procedure and analysis.'], ['Results', 'What you found, in the order of your aims. Tables and figures here.'], ['Discussion', 'What the results mean, how they fit the literature, limits, and implications.'], ['Conclusion', 'The answer to your question in a few sentences.'], ['References', '']] },
-  { id: 'literature-review', label: 'Literature review', short: 'Introduction, search approach, themes, gaps, conclusion.', sections: [['Introduction', 'The topic, why it matters, and the scope of the review.'], ['How the literature was found', 'Databases, search terms, years and inclusion criteria.'], ['Theme 1', 'What studies show, where they agree and disagree.'], ['Theme 2', ''], ['Theme 3', ''], ['Gaps and future research', 'What is not yet known.'], ['Conclusion', ''], ['References', '']] },
-  { id: 'thesis-chapter', label: 'Thesis chapter', short: 'Chapter introduction, sections, summary.', sections: [['Chapter introduction', 'What this chapter does and how it links to the previous one.'], ['Section 1', ''], ['Section 2', ''], ['Section 3', ''], ['Chapter summary', 'The main points and how they lead to the next chapter.']] },
-  { id: 'research-proposal', label: 'Research proposal', short: 'Aims, background, methods, timeline, budget, ethics.', sections: [['Title', ''], ['Aims and objectives', 'The research question and 2–4 objectives.'], ['Background and significance', 'Why this matters and what is known.'], ['Literature review', ''], ['Methods', 'Design, sample, data collection, analysis.'], ['Timeline', 'Phases and milestones.'], ['Budget', ''], ['Ethical considerations', ''], ['References', '']] },
-  { id: 'grant', label: 'Grant proposal', short: 'Summary, aims, significance, approach, impact, budget.', sections: [['Summary', 'The project in 200 words for a non-specialist reviewer.'], ['Aims', ''], ['Significance and innovation', ''], ['Approach and work plan', 'Work packages, methods, milestones, risks and mitigations.'], ['Team', ''], ['Impact and dissemination', ''], ['Budget justification', ''], ['References', '']] },
-  { id: 'conference-abstract', label: 'Conference abstract', short: 'Background, methods, results, conclusions in 250–300 words.', sections: [['Title', ''], ['Background', ''], ['Methods', ''], ['Results', ''], ['Conclusions', '']] },
-  { id: 'poster', label: 'Poster text', short: 'Short blocks for a research poster.', sections: [['Title and authors', ''], ['Introduction', '3–4 sentences.'], ['Methods', 'A short list or diagram.'], ['Results', 'Your key figure and 2–3 findings.'], ['Conclusions', '2–3 bullet points.'], ['References and contact', '']] },
-];

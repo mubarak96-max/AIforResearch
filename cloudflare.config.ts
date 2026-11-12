@@ -51,6 +51,9 @@ export default defineConfig({
       OPENALEX_EMAIL: bindings.text(env("OPENALEX_EMAIL")),
       // Optional: the support address shown on sign-in help; hidden when unset.
       ...(process.env.SUPPORT_EMAIL ? { SUPPORT_EMAIL: bindings.text(process.env.SUPPORT_EMAIL) } : {}),
+      // Real payments: Dodo live mode only when the build sets BILLING_LIVE=1 (lib/server/lib/dodoBilling.ts).
+      // Without it the Worker talks to Dodo's test API, which refuses a live key with a 401.
+      ...(process.env.BILLING_LIVE ? { BILLING_LIVE: bindings.text(process.env.BILLING_LIVE) } : {}),
       // Set as encrypted secrets on the Worker (dashboard "Secret" type or `wrangler secret put`),
       // never as plain-text vars — plain vars are printed in deploy diffs.
       DODO_PAYMENTS_API_KEY: bindings.secret(),
