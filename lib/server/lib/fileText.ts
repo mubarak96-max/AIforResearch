@@ -1,7 +1,8 @@
 /**
  * Text from a file someone attaches to a job (Deep Research, Reviewer, Writing Studio…): PDF
  * through the converter's /pdf/text, Word .docx with mammoth here, older Word, .odt and .rtf
- * through the converter's /word/import, Markdown and plain text as they are. The file is not
+ * through the converter's /word/import, web pages and XML with their tags stripped, and Markdown,
+ * plain text, CSV/TSV, JSON, LaTeX and BibTeX/RIS as they are. The file is not
  * stored; only its text goes into the job.
  */
 import { HTTPException } from 'hono/http-exception';
@@ -9,7 +10,23 @@ import mammoth from 'mammoth';
 import { env } from '../env.js';
 import { serviceAuthHeaders } from './serviceAuth.js';
 
-export const ATTACHMENT_TYPES = ['pdf', 'docx', 'doc', 'odt', 'rtf', 'md', 'markdown', 'txt'] as const;
+export const ATTACHMENT_TYPES = [
+  'pdf', 'docx', 'doc', 'odt', 'rtf', 'md', 'markdown', 'txt', 'csv', 'tsv', 'json', 'html', 'htm', 'xml', 'tex', 'bib', 'ris',
+] as const;
+const MARKUP_TYPES = ['html', 'htm', 'xml'];
+
+/** Readable text from HTML or XML: scripts, styles and tags dropped, common entities decoded. */
+function markupText(source: string): string {
+  return source
+    .replace(/<(script|style|noscript|svg|head)[\s\S]*?<\/\1>/gi, ' ')
+    .replace(/<!--[\s\S]*?-->/g, ' ')
+    .replace(/<\/(p|div|section|article|li|tr|h[1-6]|blockquote|pre|table)>|<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&amp;/g, '&')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/ *\n */g, '\n');
+}
+
 export const MAX_ATTACHMENT_BYTES = 25 * 1024 * 1024;
 /** Characters of text kept per file (about 30,000 words). */
 export const MAX_ATTACHMENT_CHARS = 200_000;
@@ -50,7 +67,7 @@ async function converter(path: string, name: string, bytes: Uint8Array, type: st
 
 export async function extractText(name: string, bytes: Uint8Array): Promise<FileText> {
   const kind = extensionOf(name);
-  if (!(ATTACHMENT_TYPES as readonly string[]).includes(kind)) throw new HTTPException(415, { message: 'Attach a PDF, Word (.docx or .doc), Markdown or text file.' });
+  if (!(ATTACHMENT_TYPES as readonly string[]).includes(kind)) throw new HTTPException(415, { message: 'Attach a PDF, Word, Markdown, text, CSV, JSON, HTML, LaTeX or BibTeX file.' });
   if (bytes.byteLength > MAX_ATTACHMENT_BYTES) throw new HTTPException(413, { message: 'Files can be up to 25 MB.' });
   if (!bytes.byteLength) throw new HTTPException(422, { message: 'The file is empty.' });
   let text = '';
@@ -65,6 +82,8 @@ export async function extractText(name: string, bytes: Uint8Array): Promise<File
   } else if (kind === 'doc' || kind === 'odt' || kind === 'rtf') {
     const result = await converter('/word/import', name, bytes, 'application/octet-stream');
     text = blocksText(result.blocks ?? []);
+  } else if (MARKUP_TYPES.includes(kind)) {
+    text = markupText(new TextDecoder('utf-8').decode(bytes));
   } else {
     text = new TextDecoder('utf-8').decode(bytes);
   }

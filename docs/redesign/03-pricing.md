@@ -22,8 +22,8 @@ Two problems with the new features:
 | --- | --- | --- |
 | Summary answer | 1 | |
 | Chat with PDF question, AI edit, short rewrite | 1 | |
-| Deep Research report | 5 | 20–40 papers |
-| Detailed report | 20 | 50+ papers, tables. Paid plans. |
+| Deep Research report | 7 | 20–40 papers; screened, ranked, every citation checked |
+| Detailed report | 25 | 50+ papers, tables, plan reviewed first, citation chasing. Paid plans. |
 | Section draft, abstract, outline, gap analysis | 3 | |
 | Full paper, proposal or literature-review draft | 15 | |
 | Document review, standard | 10 | Up to 10,000 words; 5 more per further 10,000 |
@@ -75,7 +75,7 @@ The rule: **the user sees real output before the paywall, and the paywall sits o
 | Data Lab | In-browser tests on files up to 2 MB | AI analysis, regression, charts for publication, the report |
 | Slides | The first five slides on screen | The full deck and PowerPoint export |
 
-Thirty credits is, for example, three Deep reports, one preview review, an outline and nine quick answers. Enough to decide; not enough to write a thesis.
+Thirty credits is, for example, three Deep reports, one preview review, an outline and three quick answers. Enough to decide; not enough to write a thesis.
 
 Signed-out visitors keep what exists today: free tool pages with three AI runs a day per address.
 
@@ -99,14 +99,16 @@ Estimated worst case for a free account that spends everything, every month: abo
 
 | Job | Tokens read / written | Estimated cost | Credits | Cost per credit |
 | --- | --- | --- | --- | --- |
-| Summary answer | 12k / 0.6k | $0.004 | 1 | $0.004 |
-| Deep report | 80k / 5k | $0.03 | 5 | $0.006 |
-| Detailed report | 300k / 15k | $0.11 | 20 | $0.0055 |
+| Summary answer | 19k / 2k | $0.008 | 1 | $0.008 |
+| Deep report | 110k / 9k | $0.044 | 7 | $0.0063 |
+| Detailed report | 395k / 23k | $0.146 | 25 | $0.0058 |
 | Standard review, 10,000 words | 70k / 8k | $0.03 | 10 | $0.003 |
 | High-quality review (premium model writes the final pass) | 70k economy + 30k / 8k premium | $0.23 | 30 | $0.008 |
 | Slide deck | 40k / 6k | $0.02 | 10 | $0.002 |
 
 Target: **no more than $0.006 of cost per credit on average.**
+
+**Research steps (12 November 2026).** Deep Research now runs seven steps the person watches: Plan, Search, Screen, Rank, Read, Write, Verify. Screen (titles and abstracts), Read (one finding per paper, plus open full texts: 4 on Deep, 8 on Detailed) and Verify (each cited sentence checked against its sources, overstated ones rewritten, each DOI checked at Crossref) add economy-model calls; Rank, citation chasing and the Crossref checks cost nothing. The old stance-labelling call is gone (Read does it). Deep went from 5 to 7 credits and Detailed from 20 to 25 to stay near the target. Summary stays at 1 credit as the free entry point, about $0.008 a credit; a user who spent a whole Plus allowance on Summary answers would cost about $4 instead of $3, and the plan stays positive. Allowances are unchanged: every job is now priced at its cost, so a month's credits buy a little fewer reports than before but each one does more. Measure the real tokens per step (meterTokens records `research:<depth>` and `research:plan`) and revisit after a month.
 
 | Plan | Revenue a month | Fees | Credits at full use | Autocomplete, hosting | Left at full use | Left at typical use (40% of credits) |
 | --- | --- | --- | --- | --- | --- | --- |

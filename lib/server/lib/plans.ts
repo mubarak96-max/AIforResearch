@@ -40,17 +40,17 @@ export const HARD_UPLOAD_MB = 100;
  * runs; a failed job is refunded. Keep in step with docs/redesign/03-pricing.md.
  */
 export const CREDIT_COSTS = {
-  /** A short cited answer (Deep Research, Summary depth). */
+  /** A short cited answer (Deep Research, Summary depth): plan, search, screen, rank, read, write, verify. */
   summary: 1,
   /** A chat message, a Chat with PDF question, an AI edit or a short rewrite. */
   chat: 1,
   ai_edit: 1,
   /** One editor check (claim check, proofread, tone, source quality). */
   review: 2,
-  /** A structured report from 20–40 papers. */
-  deep: 5,
-  /** A long report from 50+ papers with tables. Paid plans only. */
-  detailed: 20,
+  /** A structured report from 20–40 papers: 3 sub-questions, screening, a few full texts, every citation checked. */
+  deep: 7,
+  /** A long report from 50+ papers with tables: 5 sub-questions to review, citation chasing, 8 full texts. Paid plans only. */
+  detailed: 25,
   /** A section, abstract, outline or gap analysis. */
   section: 3,
   /** A whole draft: paper, proposal or literature review (Write with AI counts here). */
@@ -138,7 +138,7 @@ export const DEFAULT_PLANS: (Omit<PlanRow, 'dodo_monthly_product_id' | 'dodo_yea
     },
     features: [
       { label: '30 credits a month for AI research, reviews and drafts', included: true },
-      { label: 'Summary and Deep research answers from every source', included: true },
+      { label: 'Summary and Deep research from every source, each claim checked against its paper', included: true },
       { label: 'Unlimited paper search, filters and citations', included: true },
       { label: 'The full editor, 10 AI autocompletes a day', included: true },
       { label: '25 PDFs in your Library, 1 project', included: true },
@@ -156,7 +156,7 @@ export const DEFAULT_PLANS: (Omit<PlanRow, 'dodo_monthly_product_id' | 'dodo_yea
     },
     features: [
       { label: '500 credits a month', included: true },
-      { label: 'Detailed reports from 50+ papers', included: true },
+      { label: 'Detailed reports from 50+ papers: review the plan first, with citation chasing', included: true },
       { label: '5,000 AI autocompletes a month', included: true },
       { label: 'Unlimited PDFs in your Library, up to 50 MB each', included: true },
       { label: '10 projects, 3 people on each', included: true },

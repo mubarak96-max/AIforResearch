@@ -2,8 +2,10 @@
  * Research core, mounted at /api:
  *   GET  /sources/groups            the source picker and which groups work on this server
  *   POST /sources/search            Find Papers: search the chosen groups with filters (no credits)
- *   POST /research                  Deep Research (Server-Sent Events: task, status, sources, delta, done | error)
+ *   POST /research/plan             the sub-questions a Detailed report will research, to review first (no credits)
+ *   POST /research                  Deep Research (Server-Sent Events: task, step, sources, delta, done | error)
  *   POST /research/:id/follow-up    a follow-up answered from the same sources (1 credit)
+ *   POST /research/:id/headings     headings on or off for a finished answer (off is free; adding them is 1 credit)
  *   POST /files/text                text from an attached PDF, Word, Markdown or text file
  *   GET|PATCH|DELETE /history…      History of every job
  *   /projects…                      Projects and sharing
@@ -17,7 +19,8 @@ import { LlmError, llmModelName, llmUnavailable } from '../slots/llm.js';
 import { currentUser, meterTokens, parseBody } from '../lib/assist-llm.js';
 import { CREDIT_COSTS, creditCost, refundCredits, requireFeature, spendCredits, type CreditCharge } from '../lib/plans.js';
 import { researchProfile } from '../lib/users.js';
-import { DEPTHS, ResearchEmptyError, followUpPrompt, runResearch, type ResearchSource } from '../lib/research.js';
+import { DEPTHS, DEPTH_SETTINGS, ResearchEmptyError, applyHeadings, followUpPrompt, hasHeadings, headingsPrompt, stripHeadings, usage0, type Depth, type ResearchSource } from '../lib/research.js';
+import { cleanPlan, planResearch, runResearch } from '../lib/researchPipeline.js';
 import { SOURCE_GROUPS, STUDY_TYPES, JOURNAL_TIER_ORDER, searchSources, sourceGroups } from '../lib/sources/index.js';
 import { extractText } from '../lib/fileText.js';
 import { createTask, deleteTask, failTask, finishTask, getTaskFor, listTasks, updateTask, updateTaskResult, TASK_KINDS } from '../lib/history.js';
@@ -54,6 +57,10 @@ const SearchRequest = z.object({
   library_document_ids: z.array(z.string()).max(200).default([]),
 });
 
+const Plan = z.object({
+  sub_questions: z.array(z.object({ question: z.string().trim().min(3).max(300), queries: z.array(z.string().trim().max(200)).max(4).default([]) })).min(1).max(8),
+});
+
 const ResearchRequest = z.object({
   question: z.string().trim().min(3, 'Ask a question of at least a few words.').max(2000),
   depth: z.enum(DEPTHS).default('deep'),
@@ -66,6 +73,8 @@ const ResearchRequest = z.object({
   role: z.string().trim().max(40).nullish(),
   language: z.string().trim().max(40).nullish(),
   project_id: z.string().max(64).nullish(),
+  /** The plan the person reviewed (Detailed). */
+  plan: Plan.nullish(),
 });
 
 const sse = (event: string, data: unknown) => `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
@@ -78,6 +87,7 @@ export function researchRoutes(slots: Slots) {
   // Signed in only. Mounted at /api, so each prefix is guarded by name (a '*' here would guard every /api route).
   for (const prefix of ['/sources/*', '/files/*', '/research', '/research/*', '/history', '/history/*', '/projects', '/projects/*']) app.use(prefix, requireUser);
   const searches = rateLimit({ key: 'sources-search', limit: 240, windowSeconds: 3600 });
+  const plans = rateLimit({ key: 'research-plan', limit: 60, windowSeconds: 3600 });
 
   app.get('/sources/groups', (c) => c.json({ groups: sourceGroups(), study_types: STUDY_TYPES, journal_tiers: JOURNAL_TIER_ORDER }));
 
@@ -99,6 +109,26 @@ export function researchRoutes(slots: Slots) {
     return c.json({ ...result, pages: undefined });
   });
 
+  // The plan is free: a small model call, so the person sees what a 25-credit report will research
+  // before paying for it. Charged work starts at POST /research with the reviewed plan.
+  app.post('/research/plan', plans, async (c) => {
+    const user = currentUser(c);
+    const body = await parseBody(c, z.object({ question: ResearchRequest.shape.question, depth: z.enum(DEPTHS).default('detailed') }));
+    const unavailable = llmUnavailable(slots.llm);
+    if (unavailable) throw new HTTPException(503, { message: unavailable });
+    if (body.depth === 'detailed') await requireFeature(user.account_id, 'detailed_mode');
+    const usage = usage0();
+    try {
+      const plan = await planResearch(slots.llm, body.question, body.depth, usage);
+      await meterTokens(user, usage, { feature: 'research:plan', provider: slots.llm.provider, model: llmModelName(slots.llm, 'fast') });
+      const settings = DEPTH_SETTINGS[body.depth];
+      return c.json({ ...plan, max_sub_questions: 8, suggested: settings.subQuestions });
+    } catch (error) {
+      if (error instanceof LlmError) throw new HTTPException(error.status, { message: error.message });
+      throw error;
+    }
+  });
+
   app.post('/research', async (c) => {
     const user = currentUser(c);
     const body = await parseBody(c, ResearchRequest);
@@ -112,7 +142,7 @@ export function researchRoutes(slots: Slots) {
     try {
       taskId = await createTask(user, {
         kind: 'research', module: body.depth, title: body.question.split('\n')[0].slice(0, 200), project_id: body.project_id ?? null, credits,
-        inputs: { question: body.question, depth: body.depth, groups: body.groups, filters: body.filters, headings: body.headings, high_quality: body.high_quality, library_document_ids: body.library_document_ids, attachments: body.attachments.map((file) => file.name), role: body.role ?? null },
+        inputs: { question: body.question, depth: body.depth, groups: body.groups, filters: body.filters, headings: body.headings, high_quality: body.high_quality, library_document_ids: body.library_document_ids, attachments: body.attachments.map((file) => file.name), role: body.role ?? null, plan: body.plan ? cleanPlan(body.plan, 8, 3) : null },
       });
     } catch (error) {
       await refundCredits(charge);
@@ -135,13 +165,17 @@ export function researchRoutes(slots: Slots) {
           const result = await runResearch(slots.llm, {
             question: body.question, depth: body.depth, groups: body.groups, filters: toFilters(body.filters), headings: body.headings,
             highQuality: body.high_quality, libraryDocumentIds: body.library_document_ids, attachments: body.attachments, profile, role: body.role, language: body.language,
+            plan: body.plan ?? null,
           }, { userId: user.id, signal: abort.signal }, {
-            status: (stage, detail) => send('status', { stage, detail }),
+            step: (step) => send('step', step),
             sources: (sources, web, searched) => send('sources', { sources, web, ...searched }),
             delta: (text) => send('delta', { text }),
           });
           await meterTokens(user, result.usage, { feature: `research:${body.depth}`, provider: slots.llm.provider, model: llmModelName(slots.llm, body.high_quality || body.depth !== 'summary' ? 'review' : 'fast') });
-          const saved = { markdown: result.markdown, summary: result.summary, sources: result.sources, all_sources: result.all_sources, consensus: result.consensus, queries: result.queries, searched: result.searched, follow_ups: [] };
+          const saved = {
+            markdown: result.markdown, summary: result.summary, sources: result.sources, all_sources: result.all_sources, consensus: result.consensus, queries: result.queries,
+            searched: result.searched, plan: result.plan, steps: result.steps, verification: result.verification, follow_ups: [],
+          };
           await finishTask(taskId, saved);
           send('done', { task_id: taskId, credits, ...saved });
         } catch (error) {
@@ -180,6 +214,49 @@ export function researchRoutes(slots: Slots) {
       await updateTaskResult(task.id, { ...task.result, follow_ups: followUps });
       charge = null;
       return c.json({ question, answer, follow_ups: followUps });
+    } catch (error) {
+      if (error instanceof LlmError) throw new HTTPException(error.status, { message: error.message });
+      throw error;
+    } finally {
+      await refundCredits(charge);
+    }
+  });
+
+  // Headings on or off. Both versions are kept on the task (markdown_headed, markdown_plain), so
+  // switching back is free; only adding headings to an answer written without them uses the AI.
+  app.post('/research/:id/headings', async (c) => {
+    const user = currentUser(c);
+    const { headings } = await parseBody(c, z.object({ headings: z.boolean() }));
+    const task = await getTaskFor(user, c.req.param('id'), 'edit');
+    if (task.kind !== 'research' || task.status !== 'done' || !task.result) throw new HTTPException(409, { message: 'This research is not finished.' });
+    const result = task.result;
+    const current = String(result.markdown ?? '');
+    const respond = (markdown: string, credits = 0) => c.json({ markdown, headings: hasHeadings(markdown), headed_copy: Boolean(result.markdown_headed) || hasHeadings(markdown), credits });
+    if (hasHeadings(current) === headings) return respond(current);
+
+    if (!headings) {
+      const plain = typeof result.markdown_plain === 'string' ? result.markdown_plain : stripHeadings(current);
+      await updateTaskResult(task.id, { ...result, markdown: plain, markdown_headed: current, markdown_plain: plain });
+      result.markdown_headed = current;
+      return respond(plain);
+    }
+    if (typeof result.markdown_headed === 'string') {
+      await updateTaskResult(task.id, { ...result, markdown: result.markdown_headed, markdown_plain: current });
+      return respond(result.markdown_headed);
+    }
+
+    const unavailable = llmUnavailable(slots.llm);
+    if (unavailable) throw new HTTPException(503, { message: unavailable });
+    let charge: CreditCharge | null = await spendCredits(user.account_id, CREDIT_COSTS.chat, 'Headings for a research answer');
+    try {
+      const depth = (DEPTHS as readonly string[]).includes(String(task.module)) ? (task.module as Depth) : 'deep';
+      const { text, usage } = await slots.llm.complete({ messages: headingsPrompt(current, depth), task: 'fast', json: true, maxTokens: 800, temperature: 0.2 });
+      await meterTokens(user, usage, { feature: 'research:headings', provider: slots.llm.provider, model: llmModelName(slots.llm, 'fast') });
+      const headed = applyHeadings(current, text);
+      if (!headed) throw new HTTPException(503, { message: 'The AI could not place headings this time. Try again.' });
+      await updateTaskResult(task.id, { ...result, markdown: headed, markdown_headed: headed, markdown_plain: current });
+      charge = null;
+      return respond(headed, CREDIT_COSTS.chat);
     } catch (error) {
       if (error instanceof LlmError) throw new HTTPException(error.status, { message: error.message });
       throw error;

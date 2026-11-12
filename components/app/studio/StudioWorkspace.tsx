@@ -9,7 +9,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { LuCopy, LuDownload, LuFileInput, LuFilePen, LuLoaderCircle, LuLock, LuPlay, LuUpload, LuX } from 'react-icons/lu';
+import { LuCopy, LuDownload, LuFileInput, LuFilePen, LuLoaderCircle, LuLock, LuPlay, LuQuote, LuRuler, LuUpload, LuX } from 'react-icons/lu';
+import { Check, Select } from '@/components/app/research/controls';
 import { AppFrame } from '@/components/app/AppFrame';
 import { Button, Card } from '@/components/app/ui';
 import { useSignedIn } from '@/components/app/useSignedIn';
@@ -384,23 +385,20 @@ export function StudioWorkspace({ workspace, intro }: { workspace: WorkspaceId; 
                 <RoleSelect value={role} onChange={setRole} />
                 {module.output === 'markdown' && (
                   <>
-                    <label className="flex items-center gap-2 text-[13.5px] text-ink-2"><input type="checkbox" checked={headings} onChange={(event) => setHeadings(event.target.checked)} className="h-4 w-4 accent-[var(--color-brand)]" />With headings</label>
+                    <Check size="sm" checked={headings} onChange={setHeadings}>With headings</Check>
                     {module.lengthOption && (
-                      <select aria-label="Length" value={length} onChange={(event) => setLength(event.target.value as typeof length)} className="h-8 rounded-full border border-line bg-surface px-3 text-[13.5px] font-medium text-ink-2">
-                        <option value="standard">Standard length</option><option value="short">Shorter</option><option value="long">Longer</option>
-                      </select>
+                      <Select label="Length" prefix="Length" icon={<LuRuler />} value={length} onChange={(next) => setLength(next as typeof length)} active={length !== 'standard'}
+                        options={[{ value: 'standard', label: 'Standard' }, { value: 'short', label: 'Shorter', detail: 'About half the usual length' }, { value: 'long', label: 'Longer', detail: 'More depth and detail' }]} />
                     )}
                     {module.grounded && (
-                      <select aria-label="Citation style" value={style} onChange={(event) => setStyle(event.target.value as typeof style)} className="h-8 rounded-full border border-line bg-surface px-3 text-[13.5px] font-medium text-ink-2">
-                        {STYLES.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
-                      </select>
+                      <Select label="Citation style" prefix="Style" icon={<LuQuote />} value={style} onChange={(next) => setStyle(next as typeof style)}
+                        options={STYLES.map(([id, label]) => ({ value: id, label }))} />
                     )}
                   </>
                 )}
-                <label className="flex items-center gap-2 text-[13.5px] text-ink-2" title="The stronger model and longer answers, for 3× the credits">
-                  <input type="checkbox" checked={highQuality} onChange={(event) => (limits.highQuality ? setHighQuality(event.target.checked) : openPricing('High-quality mode is part of the Pro plan.'))} className="h-4 w-4 accent-[var(--color-brand)]" />
+                <Check size="sm" title="The stronger model and longer answers, for 3× the credits" checked={highQuality} onChange={(on) => (limits.highQuality ? setHighQuality(on) : openPricing('High-quality mode is part of the Pro plan.'))}>
                   High quality{!limits.highQuality && <LuLock className="h-3.5 w-3.5 text-muted" aria-label="Pro plan" />}
-                </label>
+                </Check>
               </div>
             )}
             <div className="mt-5 flex items-center gap-3">

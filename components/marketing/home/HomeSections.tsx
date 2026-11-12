@@ -44,7 +44,7 @@ function AskFragment() {
             <span className="rounded-md bg-surface px-2 py-1 text-ink shadow-[0_1px_2px_rgba(15,23,42,.12)]">Deep</span>
             <span className="rounded-md px-2 py-1 text-muted">Detailed</span>
           </span>
-          <span className="ml-auto text-[11.5px] text-muted">5 credits</span>
+          <span className="ml-auto text-[11.5px] text-muted">7 credits</span>
         </div>
         <div className="mt-3 flex flex-wrap gap-1.5 border-t border-line-2 pt-3">
           {chip('✓ All papers', true)}{chip('✓ Medical', true)}{chip('Preprints')}{chip('Web')}{chip('My Library')}

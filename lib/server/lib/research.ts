@@ -1,10 +1,12 @@
 /**
  * Deep Research: a question in, an answer built from real papers out, every claim cited.
  *
- * Three depths:
+ * Every job runs seven steps the person watches (researchPipeline.ts): Plan, Search, Screen,
+ * Rank, Read, Write and Verify. Three depths:
  * - Summary: one search, about 8 papers, a short cited answer (1 credit).
- * - Deep: the question split into 3 searches, about 25 papers, a structured report (5 credits).
- * - Detailed: 6 searches, about 50 papers, a long report with tables (20 credits, paid plans).
+ * - Deep: 3 sub-questions, about 25 papers, a few full texts, a structured report (7 credits).
+ * - Detailed: 5 sub-questions the person can edit first, citation chasing, about 50 papers, a long
+ *   report with tables (25 credits, paid plans).
  * High quality (Pro) uses the stronger model and longer answers, for 3× the credits.
  *
  * Sources are the groups the person picks (All papers, Medical, Preprints, Web, My Library) plus
@@ -13,18 +15,35 @@
  * computed from the cited sources' stances, never typed by the model.
  */
 import type { LlmSlot, ChatMessage, LlmUsage } from '../slots/types.js';
-import { dropInventedMarkers, usedSources } from './assist-papers.js';
-import { searchSources, mergeResults, sortPapers, unpaywall, STUDY_TYPE_LABELS, type FoundPaper, type SearchFilters, type SourceGroup, type WebResult } from './sources/index.js';
+import { STUDY_TYPE_LABELS, type FoundPaper, type SearchFilters, type SourceGroup, type WebResult } from './sources/index.js';
 import type { ResearchProfile } from './users.js';
 
 export const DEPTHS = ['summary', 'deep', 'detailed'] as const;
 export type Depth = (typeof DEPTHS)[number];
 
-export const DEPTH_SETTINGS: Record<Depth, { queries: number; perQuery: number; papers: number; abstractChars: number; words: string; maxTokens: number }> = {
-  summary: { queries: 1, perQuery: 14, papers: 8, abstractChars: 900, words: '150 to 250', maxTokens: 900 },
-  deep: { queries: 3, perQuery: 18, papers: 25, abstractChars: 800, words: '900 to 1,300', maxTokens: 3200 },
-  detailed: { queries: 6, perQuery: 20, papers: 50, abstractChars: 600, words: '2,000 to 3,000', maxTokens: 7000 },
+export type DepthSettings = {
+  /** Sub-questions in the plan, and search queries for each. */
+  subQuestions: number; queriesPer: number;
+  /** Searches in all (the question itself plus the plan's queries), and results asked of each. */
+  queries: number; perQuery: number;
+  /** Candidates screened, papers kept after ranking, open full texts read. */
+  candidates: number; papers: number; fullTexts: number;
+  /** Follow the references and citations of the best papers (citation chasing). */
+  snowball: boolean;
+  /** Most claims and references checked in Verify. */
+  claims: number; references: number;
+  abstractChars: number; words: string; maxTokens: number;
 };
+
+export const DEPTH_SETTINGS: Record<Depth, DepthSettings> = {
+  summary: { subQuestions: 1, queriesPer: 1, queries: 1, perQuery: 14, candidates: 30, papers: 8, fullTexts: 0, snowball: false, claims: 12, references: 8, abstractChars: 900, words: '150 to 250', maxTokens: 900 },
+  deep: { subQuestions: 3, queriesPer: 1, queries: 4, perQuery: 18, candidates: 90, papers: 25, fullTexts: 4, snowball: false, claims: 40, references: 25, abstractChars: 800, words: '900 to 1,300', maxTokens: 3200 },
+  detailed: { subQuestions: 5, queriesPer: 2, queries: 7, perQuery: 20, candidates: 180, papers: 50, fullTexts: 8, snowball: true, claims: 80, references: 40, abstractChars: 600, words: '2,000 to 3,000', maxTokens: 7000 },
+};
+
+/** The research plan: sub-questions that together answer the question, each with its searches. */
+export type SubQuestion = { question: string; queries: string[] };
+export type ResearchPlan = { sub_questions: SubQuestion[] };
 
 export type Attachment = { name: string; text: string };
 
@@ -41,6 +60,8 @@ export type ResearchInput = {
   /** Overrides the profile's role for this task. */
   role?: string | null;
   language?: string | null;
+  /** A plan the person reviewed (Detailed); planned by the model when absent. */
+  plan?: ResearchPlan | null;
 };
 
 /** One numbered source as the browser and the saved task keep it. */
@@ -67,16 +88,36 @@ export type ResearchSource = {
   providers: string[];
   abstract: string | null;
   tldr: string | null;
-  /** Filled after the answer: how this source bears on the question. */
+  /** Filled by Read: how this source bears on the question. */
   stance?: Stance | null;
   finding?: string | null;
+  /** Who or what was studied, and the main limitation (Read). */
+  sample?: string | null;
+  limits?: string | null;
+  /** Screen's relevance (0-3) and Rank's score (0-1). */
+  relevance?: number | null;
+  rank_score?: number | null;
+  /** The sub-questions (0-based) whose searches found it. */
+  sub_questions?: number[];
+  /** Whether Read had the open full text, and the passages it used (not saved with the task). */
+  full_text?: boolean;
+  passage?: string | null;
+  /** Verify's reference check: the DOI at Crossref, and any retraction or correction notice. */
+  check?: ReferenceCheck | null;
 };
+
+export type ReferenceCheck = { status: 'confirmed' | 'retracted' | 'corrected' | 'concern' | 'unconfirmed' | 'no_doi'; note: string | null };
 
 export type Stance = 'supports' | 'mixed' | 'against' | 'unclear';
 export type Consensus = { applicable: boolean; line: string | null; counts: Record<Stance, number>; total: number };
 
+export const STEP_IDS = ['plan', 'search', 'screen', 'rank', 'read', 'write', 'verify'] as const;
+export type StepId = (typeof STEP_IDS)[number];
+/** One step as the browser shows it: its state, a one-line result and the details behind it. */
+export type ResearchStep = { id: StepId; state: 'pending' | 'active' | 'done' | 'failed'; detail: string; data: Record<string, unknown> | null; ms: number | null };
+
 export type ResearchEvents = {
-  status: (stage: 'planning' | 'searching' | 'reading' | 'writing' | 'checking', detail: string) => void;
+  step: (step: ResearchStep) => void;
   sources: (sources: ResearchSource[], web: ResearchSource[], searched: { counts: Record<string, number>; errors: { provider: string; message: string }[]; queries: string[] }) => void;
   delta: (text: string) => void;
 };
@@ -88,8 +129,20 @@ export type ResearchResult = {
   consensus: Consensus | null;
   queries: string[];
   searched: { counts: Record<string, number>; errors: { provider: string; message: string }[] };
+  plan: ResearchPlan;
+  steps: ResearchStep[];
+  verification: Verification;
   usage: LlmUsage;
   summary: string;
+};
+
+/** What Verify found: claims checked against their sources, and references checked at Crossref. */
+export type Verification = {
+  claims: { checked: number; supported: number; partly: number; unsupported: number; revised: number };
+  references: { checked: number; confirmed: number; retracted: number; corrected: number; unconfirmed: number };
+  /** Claims Verify changed or could not fix, and references with a notice, for the reader to see. */
+  flags: { kind: 'revised' | 'unsupported' | 'retracted' | 'corrected' | 'concern' | 'unconfirmed'; text: string; revised?: string | null; note: string | null; n?: number | null }[];
+  dropped_markers: number;
 };
 
 const ROLE_TEXT: Record<string, string> = {
@@ -97,8 +150,8 @@ const ROLE_TEXT: Record<string, string> = {
   academic: 'an academic', researcher: 'a researcher', clinician: 'a clinician', industry: 'a professional in industry', other: 'a researcher',
 };
 
-const usage0 = (): LlmUsage => ({ inputTokens: 0, outputTokens: 0 });
-const addUsage = (total: LlmUsage, more: LlmUsage) => { total.inputTokens += more.inputTokens; total.outputTokens += more.outputTokens; };
+export const usage0 = (): LlmUsage => ({ inputTokens: 0, outputTokens: 0 });
+export const addUsage = (total: LlmUsage, more: LlmUsage) => { total.inputTokens += more.inputTokens; total.outputTokens += more.outputTokens; };
 
 /** JSON from a model answer, tolerating a code fence or text around it. */
 export function parseJson<T>(text: string): T | null {
@@ -145,7 +198,7 @@ export function relevantPassages(text: string, question: string, maxChars = 6000
   return kept.map((item) => item.chunk.trim()).join('\n…\n');
 }
 
-function paperSource(paper: FoundPaper, n: number): ResearchSource {
+export function paperSource(paper: FoundPaper, n: number): ResearchSource {
   return {
     n, marker: `S${n}`, kind: paper.providers.includes('library') ? 'library' : 'paper', id: paper.id, title: paper.title,
     authors: paper.authors.map((author) => author.name), more_authors: paper.extra_author_count ?? 0, year: paper.year, venue: paper.venue,
@@ -156,7 +209,7 @@ function paperSource(paper: FoundPaper, n: number): ResearchSource {
   };
 }
 
-function webSource(result: WebResult, n: number): ResearchSource {
+export function webSource(result: WebResult, n: number): ResearchSource {
   return {
     n, marker: `S${n}`, kind: 'web', id: result.id, title: result.title, authors: [], more_authors: 0, year: Number(result.published?.slice(0, 4)) || null,
     venue: result.site, doi: null, url: result.url, pdf_url: null, is_oa: true, cited_by_count: null, study_type: null, study_type_label: 'Web page',
@@ -164,7 +217,7 @@ function webSource(result: WebResult, n: number): ResearchSource {
   };
 }
 
-function fileSource(file: Attachment, question: string, n: number): ResearchSource {
+export function fileSource(file: Attachment, question: string, n: number): ResearchSource {
   return {
     n, marker: `S${n}`, kind: 'file', id: `file:${n}`, title: file.name, authors: [], more_authors: 0, year: null, venue: 'Attached file',
     doi: null, url: null, pdf_url: null, is_oa: false, cited_by_count: null, study_type: null, study_type_label: 'Your file', journal_tier: null,
@@ -179,7 +232,13 @@ export function sourcesBlock(sources: ResearchSource[], abstractChars: number): 
     const labels = [source.study_type_label, source.is_preprint ? 'preprint, not peer reviewed' : null, source.cited_by_count ? `cited ${source.cited_by_count} times` : null].filter(Boolean).join('; ');
     const limit = source.kind === 'file' ? 6000 : abstractChars;
     const body = (source.abstract || source.tldr || 'No abstract available.').replace(/\s+/g, ' ').slice(0, limit);
-    return `[${source.marker}] ${authors || source.venue || 'Unknown'} (${source.year ?? 'n.d.'}). ${source.title}. ${source.kind === 'paper' || source.kind === 'library' ? source.venue || '' : source.venue || ''}${labels ? ` [${labels}]` : ''}\n${source.kind === 'file' ? 'Excerpt' : source.kind === 'web' ? 'Page summary' : 'Abstract'}: ${body}`;
+    const read = [
+      source.finding ? `Key finding: ${source.finding}` : null,
+      source.sample ? `Studied: ${source.sample}` : null,
+      source.limits ? `Main limitation: ${source.limits}` : null,
+      source.passage ? `Full-text excerpt: ${source.passage.replace(/\s+/g, ' ').slice(0, 2400)}` : null,
+    ].filter(Boolean).join('\n');
+    return `[${source.marker}] ${authors || source.venue || 'Unknown'} (${source.year ?? 'n.d.'}). ${source.title}. ${source.venue || ''}${labels ? ` [${labels}]` : ''}\n${source.kind === 'file' ? 'Excerpt' : source.kind === 'web' ? 'Page summary' : 'Abstract'}: ${body}${read ? `\n${read}` : ''}`;
   }).join('\n\n');
 }
 
@@ -210,30 +269,6 @@ export function researchPrompt(input: ResearchInput, sources: ResearchSource[]):
   ];
 }
 
-/** How each cited source bears on the question, for the consensus line and the evidence table. */
-export async function judgeStances(llm: LlmSlot, question: string, sources: ResearchSource[], usage: LlmUsage): Promise<Map<number, { stance: Stance; finding: string }>> {
-  const out = new Map<number, { stance: Stance; finding: string }>();
-  const papers = sources.filter((source) => source.kind !== 'web');
-  if (!papers.length) return out;
-  try {
-    const { text, usage: used } = await llm.complete({
-      task: 'fast', temperature: 0, maxTokens: Math.min(4000, 120 + papers.length * 70), json: true,
-      messages: [
-        { role: 'system', content: 'You label evidence. Answer with JSON only: {"items": [{"n": 1, "stance": "supports|mixed|against|unclear", "finding": "one sentence, at most 25 words"}]}. "supports" means the source\'s findings say yes to the question (or support its claim), "against" no, "mixed" both, "unclear" when it does not test the question. Base each label only on the text given.' },
-        { role: 'user', content: `Question: ${question}\n\n${papers.map((source) => `n=${source.n}: ${source.title}. ${(source.abstract || source.tldr || '').slice(0, 900)}`).join('\n\n')}` },
-      ],
-    });
-    addUsage(usage, used);
-    for (const item of parseJson<{ items?: { n: number; stance: string; finding: string }[] }>(text)?.items ?? []) {
-      const stance = (['supports', 'mixed', 'against', 'unclear'] as Stance[]).includes(item.stance as Stance) ? (item.stance as Stance) : 'unclear';
-      if (Number.isInteger(item.n)) out.set(item.n, { stance, finding: String(item.finding || '').slice(0, 300) });
-    }
-  } catch {
-    /* no labels: the answer stands without a consensus line */
-  }
-  return out;
-}
-
 /** "14 of 18 studies support…": counted from the labels, shown only when most sources test the question. */
 export function consensusOf(sources: ResearchSource[]): Consensus | null {
   const labelled = sources.filter((source) => source.kind !== 'web' && source.stance);
@@ -248,73 +283,54 @@ export function consensusOf(sources: ResearchSource[]): Consensus | null {
   return { applicable, line, counts, total: labelled.length };
 }
 
-/** Runs one research job end to end. Throws when nothing usable was found or the model fails. */
-export async function runResearch(llm: LlmSlot, input: ResearchInput, context: { userId: string; signal?: AbortSignal }, events: ResearchEvents): Promise<ResearchResult> {
-  const settings = DEPTH_SETTINGS[input.depth];
-  const usage = usage0();
-  events.status('planning', input.depth === 'summary' ? 'Reading your question' : 'Planning the searches');
-  const queries = await planQueries(llm, input.question, settings.queries, usage);
-
-  events.status('searching', `Searching ${input.groups.map((group) => ({ papers: 'papers', medical: 'PubMed and Europe PMC', preprints: 'preprints', web: 'the web', library: 'your Library' })[group]).join(', ')}`);
-  const results = await Promise.all(queries.map((query, index) => searchSources(
-    // My Library and the web only for the main question: their results do not improve with more angles.
-    { query, groups: index === 0 ? input.groups : input.groups.filter((group) => group !== 'library' && group !== 'web'), filters: input.filters, limit: settings.perQuery, libraryDocumentIds: input.libraryDocumentIds },
-    { userId: context.userId },
-  ).catch(() => ({ papers: [], web: [], counts: {}, errors: [{ provider: 'openalex' as const, message: 'search failed' }] }))));
-  const counts: Record<string, number> = {};
-  const errors: { provider: string; message: string }[] = [];
-  for (const result of results) {
-    for (const [provider, count] of Object.entries(result.counts)) counts[provider] = (counts[provider] ?? 0) + (count ?? 0);
-    for (const error of result.errors) if (!errors.some((item) => item.provider === error.provider)) errors.push(error);
-  }
-  const papers = sortPapers(mergeResults(results.map((result) => result.papers))).slice(0, settings.papers);
-  const web = results[0]?.web.slice(0, input.depth === 'summary' ? 3 : 6) ?? [];
-
-  // Open copies for the papers without one (Deep and Detailed): a link the reader can follow.
-  if (input.depth !== 'summary') {
-    events.status('reading', 'Finding open full texts');
-    await Promise.all(papers.filter((paper) => paper.doi && !paper.pdf_url && !paper.oa_url).slice(0, 15).map(async (paper) => {
-      const copy = await unpaywall(paper.doi!).catch(() => null);
-      if (copy) { paper.oa_url = copy.url; paper.pdf_url = copy.pdf; paper.is_oa = true; }
-    }));
-  }
-
-  const numbered: ResearchSource[] = [];
-  for (const file of input.attachments) numbered.push(fileSource(file, input.question, numbered.length + 1));
-  for (const paper of papers) numbered.push(paperSource(paper, numbered.length + 1));
-  const webSources = web.map((result) => webSource(result, numbered.length + 1 + web.indexOf(result)));
-  const all = [...numbered, ...webSources];
-  events.sources(numbered, webSources, { counts, errors, queries });
-  if (!all.length) throw new ResearchEmptyError();
-
-  events.status('writing', `Reading ${all.length} source${all.length === 1 ? '' : 's'} and writing`);
-  let answer = '';
-  const streamed = await llm.stream(
-    { messages: researchPrompt(input, all), task: input.highQuality || input.depth !== 'summary' ? 'review' : 'fast', maxTokens: input.highQuality ? Math.round(settings.maxTokens * 1.5) : settings.maxTokens, temperature: 0.3, signal: context.signal },
-    (text) => { answer += text; events.delta(text); },
-  );
-  addUsage(usage, streamed.usage);
-  const markdown = dropInventedMarkers(answer.trim(), all, '');
-  if (!markdown) throw new Error('The AI returned nothing.');
-  const cited = usedSources(markdown, all);
-
-  events.status('checking', 'Weighing the evidence');
-  const stances = await judgeStances(llm, input.question, cited, usage);
-  for (const source of cited) {
-    const label = stances.get(source.n);
-    source.stance = label?.stance ?? null;
-    source.finding = label?.finding ?? null;
-  }
-  const consensus = consensusOf(cited);
-  const summary = markdown.replace(/^#+.*$/gm, '').replace(/\[S\d+(?:[,\s]*S?\d+)*\]/g, '').replace(/[*_>`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 300);
-  return { markdown, sources: cited, all_sources: all, consensus, queries, searched: { counts, errors }, usage, summary };
-}
-
 export class ResearchEmptyError extends Error {
   constructor() {
     super('No sources found for this question with these sources and filters. Try broader words, fewer filters or more sources.');
     this.name = 'ResearchEmptyError';
   }
+}
+
+// ------------------------------------------------------------------ headings on or off after the fact
+
+const HEADING_LINE = /^#{1,6}[ \t]+\S.*$/gm;
+
+/** Whether a Markdown answer has section headings. */
+export const hasHeadings = (markdown: string) => /^#{1,6}[ \t]+\S/m.test(markdown);
+
+/** The same answer as flowing text: heading lines removed, nothing else touched. */
+export function stripHeadings(markdown: string): string {
+  return markdown.replace(HEADING_LINE, '').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+/** The answer split into blocks (paragraphs, lists, tables) at blank lines. */
+const blocksOf = (markdown: string) => markdown.trim().split(/\n[ \t]*\n+/).map((block) => block.trim()).filter(Boolean);
+
+/** Asks only where headings go and what they say, so the cited text is never rewritten. */
+export function headingsPrompt(markdown: string, depth: Depth): ChatMessage[] {
+  const blocks = blocksOf(markdown);
+  const sections = depth === 'detailed' ? '5 to 8' : depth === 'deep' ? '3 to 6' : '2 to 3';
+  return [
+    {
+      role: 'system',
+      content: `You add section headings to a finished research answer without changing its text. The answer is given as numbered blocks. Answer with JSON only: {"headings": [{"before": 0, "level": 2, "text": "Summary"}]}. "before" is the number of the block the heading goes above. Use level 2 for ${sections} main sections (the first one above block 0, e.g. "Summary") and level 3 only for themes inside a long section. Headings are short (2 to 6 words), plain, in the language of the answer, with no citation markers and no numbering.`,
+    },
+    { role: 'user', content: blocks.map((block, index) => `[${index}]\n${block}`).join('\n\n') },
+  ];
+}
+
+/** Inserts the model's headings above their blocks; returns null when none are usable. */
+export function applyHeadings(markdown: string, answer: string): string | null {
+  const blocks = blocksOf(markdown);
+  const above = new Map<number, string[]>();
+  for (const item of parseJson<{ headings?: { before?: unknown; level?: unknown; text?: unknown }[] }>(answer)?.headings ?? []) {
+    const before = Number(item.before);
+    const text = String(item.text ?? '').replace(/\[S\d+[^\]]*\]/g, '').replace(/[#*_`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 90);
+    if (!Number.isInteger(before) || before < 0 || before >= blocks.length || !text) continue;
+    const line = `${Number(item.level) === 3 ? '###' : '##'} ${text}`;
+    above.set(before, [...(above.get(before) ?? []), line]);
+  }
+  if (!above.size) return null;
+  return blocks.map((block, index) => [...(above.get(index) ?? []), block].join('\n\n')).join('\n\n');
 }
 
 /** A follow-up question answered from the same sources. */

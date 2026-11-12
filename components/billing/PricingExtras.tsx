@@ -6,7 +6,7 @@ import { CreditCostTable } from './CreditsCard';
 import { EXTRAS } from './creditTable';
 
 export const CREDIT_FAQ: { q: string; a: string }[] = [
-  { q: 'What is a credit?', a: 'Credits pay for AI jobs. A short answer costs 1, a Deep Research report 5, a document review 10 per 10,000 words. Paper search, filters, citations, your Library, the editor and exports cost nothing.' },
+  { q: 'What is a credit?', a: 'Credits pay for AI jobs. A short answer costs 1, a Deep Research report 7, a Detailed report 25, a document review 10 per 10,000 words. Paper search, filters, citations, your Library, the editor and exports cost nothing.' },
   { q: 'What do I get for free?', a: '30 credits every month: enough for a few Deep reports, a preview review of your chapter and an outline. Every workspace works on Free so you can see real results before you pay.' },
   { q: 'What happens when I run out?', a: 'Jobs that need credits stop until your credits renew on the first of the month. On a paid plan you can add 500 or 2,000 credits at any time; they are kept for 12 months.' },
   { q: 'Do unused credits roll over?', a: 'The monthly credits do not. Extra credits you buy last 12 months and are used after the month’s credits run out.' },
