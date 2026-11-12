@@ -1,20 +1,24 @@
 /**
  * Deep Research, step by step, the way a literature review is done:
  *
- *   1. Plan    the question split into sub-questions, each with its own searches (Detailed: the
- *              person may edit the plan before anything is charged; see POST /research/plan).
- *   2. Search  every search against the chosen sources, merged and de-duplicated; Detailed also
- *              follows the references and citations of the best papers (citation chasing).
- *   3. Screen  a fast model reads titles and abstracts and scores each paper's relevance (0-3);
- *              retracted and off-topic papers are excluded, each with a reason.
- *   4. Rank    an evidence score (study design, relevance, citations a year, recency, journal),
- *              with every sub-question kept covered. Computed, never typed by a model.
- *   5. Read    the open full texts of the best papers, then one finding, sample and limitation
- *              per paper, and its stance on the question.
- *   6. Write   the answer, streamed, from those findings and excerpts.
- *   7. Verify  each cited sentence checked against its sources (unsupported ones are narrowed
- *              or flagged), invented markers dropped, and each cited DOI checked at Crossref for
- *              retractions and corrections.
+ *   1. Plan      the question split into sub-questions, each with its own searches (Detailed: the
+ *                person may edit the plan before anything is charged; see POST /research/plan).
+ *   2. Search    every search against the chosen sources, merged and de-duplicated; Deep and
+ *                Detailed also follow the references and citations of the best papers.
+ *   3. Screen    a fast model reads titles and abstracts and scores each paper's relevance (0-3);
+ *                retracted and off-topic papers are excluded, each with a reason.
+ *   4. Rank      an evidence score (study design, relevance, citations a year, recency, journal),
+ *                with every sub-question kept covered. Computed, never typed by a model.
+ *   5. Read      the open full texts of the best papers, then one finding, sample, limitation,
+ *                stance and effect size per paper (an effect size is kept only when its numbers
+ *                are written in the paper's text).
+ *   6. Fill gaps Deep and Detailed: the model names where the evidence is thin or conflicting, and
+ *                a second round of searches, screening and reading fills it.
+ *   7. Write     Summary: one streamed answer. Deep and Detailed: an outline, then each section
+ *                from its own sources, with computed Methods, figures and tables (researchReport.ts).
+ *   8. Verify    each cited sentence checked against its sources (unsupported ones are narrowed
+ *                or flagged), invented markers dropped, and each cited DOI checked at Crossref for
+ *                retractions and corrections.
  *
  * Each step sends its start and its result (events.step). The finished steps are saved with the
  * task, so a saved answer shows how it was made.
@@ -29,10 +33,14 @@ import {
 } from './sources/index.js';
 import { net } from './sources/http.js';
 import {
-  DEPTH_SETTINGS, ResearchEmptyError, STEP_IDS, addUsage, consensusOf, fileSource, paperSource, parseJson, relevantPassages, researchPrompt, usage0, webSource,
+  DEPTH_SETTINGS, ResearchEmptyError, STEP_IDS, addUsage, consensusOf, fileSource, paperSource, parseJson, relevantPassages, researchPrompt, stripHeadings, usage0, webSource,
   type Depth, type ResearchEvents, type ResearchInput, type ResearchPlan, type ResearchResult, type ResearchSource, type ResearchStep, type Stance,
   type StepId, type SubQuestion, type Verification,
 } from './research.js';
+import { checkedEffect, type Effect, type PrismaData, type ResearchFigure } from './researchFigures.js';
+import {
+  buildFigures, cleanOutline, closingPrompt, comparisonTable, glanceText, methodsText, outlinePrompt, sectionPrompt, summaryPrompt,
+} from './researchReport.js';
 
 type Signal = AbortSignal | undefined;
 
@@ -131,16 +139,19 @@ type SearchOutcome = {
   unique: number;
   chased: number;
   subsOf: Map<string, Set<number>>;
+  /** Every distinct paper the searches returned, so the gap round looks only at new ones. */
+  seen: Set<string>;
 };
 
 async function searchStep(input: ResearchInput, plan: ResearchPlan, userId: string): Promise<SearchOutcome> {
   const settings = DEPTH_SETTINGS[input.depth];
   const searches = planSearches(input.question, plan, settings.queries);
-  const results = await Promise.all(searches.map(({ query }, index) => searchSources(
+  // A few at a time: Detailed runs over twenty searches, each against several services.
+  const results = await mapLimit(searches, 6, ({ query }, index) => searchSources(
     // My Library and the web only for the main question: their results do not improve with more angles.
     { query, groups: index === 0 ? input.groups : input.groups.filter((group) => group !== 'library' && group !== 'web'), filters: input.filters, limit: settings.perQuery, libraryDocumentIds: input.libraryDocumentIds },
     { userId },
-  ).catch(() => ({ papers: [] as FoundPaper[], web: [], counts: {} as Record<string, number>, errors: [{ provider: 'openalex', message: 'search failed' }] }))));
+  ).catch(() => ({ papers: [] as FoundPaper[], web: [], counts: {} as Record<string, number>, errors: [{ provider: 'openalex', message: 'search failed' }] })));
 
   const counts: Record<string, number> = {};
   const errors: { provider: string; message: string }[] = [];
@@ -159,12 +170,12 @@ async function searchStep(input: ResearchInput, plan: ResearchPlan, userId: stri
   });
   let found = Object.entries(counts).filter(([provider]) => provider !== 'web').reduce((sum, [, count]) => sum + count, 0);
 
-  // Citation chasing: the references and citations of the three best papers so far.
+  // Citation chasing: the references and citations of the best papers so far.
   let chased = 0;
-  if (settings.snowball) {
-    const seeds = sortPapers(mergeResults(lists)).filter((paper) => paper.doi).slice(0, 3);
-    const links = await Promise.all(seeds.flatMap((paper) => (['references', 'citations'] as const).map((direction) =>
-      semanticScholarLinks(`DOI:${paper.doi}`, direction, 25).catch(() => [] as FoundPaper[]))));
+  if (settings.snowball > 0) {
+    const seeds = sortPapers(mergeResults(lists)).filter((paper) => paper.doi).slice(0, settings.snowball);
+    const links = await mapLimit(seeds.flatMap((paper) => (['references', 'citations'] as const).map((direction) => ({ paper, direction }))), 4, ({ paper, direction }) =>
+      semanticScholarLinks(`DOI:${paper.doi}`, direction, 25).catch(() => [] as FoundPaper[]));
     const chasedPapers = applyFilters(links.flat().filter((paper) => paper.title && paper.title !== 'Untitled'), { excludeRetracted: true, ...input.filters });
     chased = chasedPapers.length;
     found += chased;
@@ -174,7 +185,7 @@ async function searchStep(input: ResearchInput, plan: ResearchPlan, userId: stri
   const library = lists.flat().filter((paper) => paper.providers.includes('library'));
   const merged = sortPapers(mergeResults(lists));
   const candidates = [...new Map([...merged.slice(0, settings.candidates), ...merged.filter((paper) => library.some((item) => paperKey(item) === paperKey(paper)))].map((paper) => [paperKey(paper), paper])).values()];
-  return { candidates, web: results[0]?.web.slice(0, input.depth === 'summary' ? 3 : 6) ?? [], counts, errors, found, unique: merged.length, chased, subsOf };
+  return { candidates, web: results[0]?.web.slice(0, input.depth === 'summary' ? 3 : 8) ?? [], counts, errors, found, unique: merged.length, chased, subsOf, seen: new Set(merged.map(paperKey)) };
 }
 
 // ------------------------------------------------------------------ 3. Screen
@@ -285,36 +296,48 @@ export async function openFullText(link: string | null | undefined, question: st
   }
 }
 
-type Reading = { stance: Stance; finding: string; sample: string | null; limits: string | null };
+type Reading = { stance: Stance; finding: string; sample: string | null; limits: string | null; effect: Effect | null };
 
-/** One finding, sample, limitation and stance per paper, from its abstract and any full-text passages. */
+/**
+ * One finding, sample, limitation, stance and effect size per paper, from its abstract and any
+ * full-text passages. An effect size survives only when its estimate and both interval bounds are
+ * written in the text the model read (checkedEffect).
+ */
 export async function readPapers(llm: LlmSlot, question: string, sources: ResearchSource[], usage: LlmUsage, signal?: Signal): Promise<Map<number, Reading>> {
   const out = new Map<number, Reading>();
   const papers = sources.filter((source) => source.kind === 'paper' || source.kind === 'library');
-  await mapLimit(chunk(papers, 10), 3, async (batch) => {
+  const textOf = (source: ResearchSource) => ({ abstract: clip(source.abstract || source.tldr, 1200), passage: source.passage ? clip(source.passage, 2600) : '' });
+  await mapLimit(chunk(papers, 8), 4, async (batch) => {
     try {
       const { text, usage: used } = await llm.complete({
-        task: 'fast', temperature: 0, maxTokens: 150 + batch.length * 110, json: true, signal,
+        task: 'fast', temperature: 0, maxTokens: 150 + batch.length * 160, json: true, signal,
         messages: [
           {
             role: 'system',
-            content: 'You extract evidence for a literature review. Answer with JSON only: {"items": [{"n": 1, "stance": "supports|mixed|against|unclear", "finding": "…", "sample": "…", "limits": "…"}]}, one item per paper. '
-              + '"finding": the result that bears on the question, one sentence of at most 30 words, with the numbers given. '
+            content: 'You extract evidence for a literature review. Answer with JSON only: {"items": [{"n": 1, "stance": "supports|mixed|against|unclear", "finding": "…", "sample": "…", "limits": "…", "effect": null}]}, one item per paper. '
+              + '"finding": the result that bears on the question, one sentence of at most 35 words, with the numbers given. '
               + '"sample": who or what was studied and how many (e.g. "1,204 adults in 3 cohorts"), or null. "limits": the main limitation in at most 12 words, or null. '
-              + '"stance": "supports" when the findings say yes to the question (or support its claim), "against" no, "mixed" both, "unclear" when the paper does not test it. Use only the text given.',
+              + '"stance": "supports" when the findings say yes to the question (or support its claim), "against" no, "mixed" both, "unclear" when the paper does not test it. '
+              + '"effect": the main effect size for the question with its 95% confidence interval, copied exactly as written in the text: {"measure": "OR|RR|HR|IRR|MD|SMD|r", "value": 1.32, "low": 1.10, "high": 1.58, "outcome": "the outcome in at most 8 words"}; '
+              + 'null when the text gives no confidence interval. Never compute, convert or round numbers. Use only the text given.',
           },
           {
             role: 'user',
-            content: `Question: ${clip(question, 400)}\n\n${batch.map((source) => `n=${source.n}: ${clip(source.title, 220)} (${source.year ?? 'n.d.'})${source.study_type_label ? ` [${source.study_type_label}]` : ''}\nAbstract: ${clip(source.abstract || source.tldr, 1000) || 'none'}${source.passage ? `\nFull text: ${clip(source.passage, 2200)}` : ''}`).join('\n\n')}`,
+            content: `Question: ${clip(question, 400)}\n\n${batch.map((source) => {
+              const { abstract, passage } = textOf(source);
+              return `n=${source.n}: ${clip(source.title, 220)} (${source.year ?? 'n.d.'})${source.study_type_label ? ` [${source.study_type_label}]` : ''}\nAbstract: ${abstract || 'none'}${passage ? `\nFull text: ${passage}` : ''}`;
+            }).join('\n\n')}`,
           },
         ],
       });
       addUsage(usage, used);
-      for (const item of parseJson<{ items?: { n: number; stance: string; finding?: string; sample?: string | null; limits?: string | null }[] }>(text)?.items ?? []) {
-        if (!batch.some((source) => source.n === Number(item.n))) continue;
+      for (const item of parseJson<{ items?: { n: number; stance: string; finding?: string; sample?: string | null; limits?: string | null; effect?: unknown }[] }>(text)?.items ?? []) {
+        const source = batch.find((entry) => entry.n === Number(item.n));
+        if (!source) continue;
         const stance = (['supports', 'mixed', 'against', 'unclear'] as Stance[]).includes(item.stance as Stance) ? (item.stance as Stance) : 'unclear';
-        const finding = clip(item.finding, 300);
-        if (finding) out.set(Number(item.n), { stance, finding, sample: clip(item.sample, 120) || null, limits: clip(item.limits, 120) || null });
+        const finding = clip(item.finding, 320);
+        const { abstract, passage } = textOf(source);
+        if (finding) out.set(source.n, { stance, finding, sample: clip(item.sample, 120) || null, limits: clip(item.limits, 120) || null, effect: checkedEffect(item.effect, `${abstract} ${passage}`) });
       }
     } catch (error) {
       if (signal?.aborted) throw error;
@@ -322,6 +345,69 @@ export async function readPapers(llm: LlmSlot, question: string, sources: Resear
     }
   });
   return out;
+}
+
+/** Open full texts for papers that have none yet: Unpaywall for a free copy, then the PDF's passages on the question. */
+async function readFullTexts(items: { paper: FoundPaper; source: ResearchSource }[], max: number, question: string) {
+  if (max <= 0) return;
+  const top = items.slice(0, Math.max(max * 2, 12));
+  await mapLimit(top.filter((item) => item.paper.doi && !item.paper.pdf_url), 5, async (item) => {
+    const copy = await unpaywall(item.paper.doi!).catch(() => null);
+    if (copy) { item.paper.oa_url = copy.url; item.paper.pdf_url = copy.pdf; item.paper.is_oa = true; }
+  });
+  const open = top.filter((item) => item.paper.pdf_url).slice(0, max);
+  await mapLimit(open, 4, async (item) => {
+    item.source.pdf_url = item.paper.pdf_url;
+    item.source.is_oa = item.paper.is_oa;
+    const passage = await openFullText(item.paper.pdf_url, question);
+    if (passage) { item.source.passage = passage; item.source.full_text = true; }
+  });
+}
+
+// ------------------------------------------------------------------ 6. Fill gaps
+
+export type Gap = { sub: number; gap: string; query: string };
+
+/** Where the evidence read so far is thin, conflicting or missing a population, outcome or design, each with a new search. */
+export async function findGaps(llm: LlmSlot, question: string, plan: ResearchPlan, sources: ResearchSource[], ran: string[], count: number, usage: LlmUsage, signal?: Signal): Promise<Gap[]> {
+  if (count <= 0) return [];
+  const papers = sources.filter((source) => source.kind === 'paper' || source.kind === 'library');
+  const bySub = plan.sub_questions.map((sub, index) => {
+    const own = papers.filter((source) => source.sub_questions?.includes(index));
+    const lines = own.slice(0, 12).map((source) => `   - ${source.year ?? 'n.d.'}, ${source.study_type_label ?? 'design unknown'}, ${source.stance ?? 'unread'}: ${clip(source.finding || source.title, 160)}`);
+    return `${index + 1}. ${sub.question} (${own.length} papers)\n${lines.join('\n') || '   - none yet'}`;
+  }).join('\n');
+  try {
+    const { text, usage: used } = await llm.complete({
+      task: 'fast', temperature: 0.2, maxTokens: 120 + count * 90, json: true, signal,
+      messages: [
+        {
+          role: 'system',
+          content: 'You review the evidence gathered so far for a literature review and find its gaps. Answer with JSON only: {"gaps": [{"sub": 1, "gap": "…", "query": "…"}]}. '
+            + 'A gap is a sub-question with few or weak studies, conflicting findings that need more studies, or an important population, outcome, comparison or study design not yet covered. '
+            + '"sub": the sub-question number it belongs to (0 for the question as a whole). "gap": what is missing, in at most 15 words, in the language of the question. '
+            + '"query": 3 to 8 keywords for a scholarly search engine, in English, no Boolean operators and no quotes, different from the searches already run. '
+            + `At most ${count} gaps, the most important first; none when the evidence is already well covered.`,
+        },
+        { role: 'user', content: `Question: ${clip(question, 400)}\n\nWhat was found, by sub-question:\n${bySub}\n\nSearches already run:\n${ran.map((query) => `- ${query}`).join('\n')}` },
+      ],
+    });
+    addUsage(usage, used);
+    const seen = new Set(ran.map((query) => query.toLowerCase()));
+    const gaps: Gap[] = [];
+    for (const item of parseJson<{ gaps?: { sub?: unknown; gap?: unknown; query?: unknown }[] }>(text)?.gaps ?? []) {
+      const query = cleanQuery(item.query);
+      if (query.length <= 3 || seen.has(query.toLowerCase())) continue;
+      seen.add(query.toLowerCase());
+      const sub = Math.round(Number(item.sub));
+      gaps.push({ sub: Number.isInteger(sub) && sub >= 1 && sub <= plan.sub_questions.length ? sub : 0, gap: clip(String(item.gap ?? ''), 140) || query, query });
+      if (gaps.length >= count) break;
+    }
+    return gaps;
+  } catch (error) {
+    if (signal?.aborted) throw error;
+    return [];
+  }
 }
 
 // ------------------------------------------------------------------ 7. Verify
@@ -350,7 +436,7 @@ type ClaimVerdict = { verdict: 'yes' | 'partly' | 'no'; note: string | null };
 export async function checkClaims(llm: LlmSlot, claims: { text: string; markers: number[] }[], sources: ResearchSource[], usage: LlmUsage, signal?: Signal): Promise<ClaimVerdict[]> {
   const out: ClaimVerdict[] = claims.map(() => ({ verdict: 'yes', note: null }));
   const byN = new Map(sources.map((source) => [source.n, source]));
-  await mapLimit(chunk(claims.map((claim, index) => ({ claim, index })), 15), 3, async (batch) => {
+  await mapLimit(chunk(claims.map((claim, index) => ({ claim, index })), 15), 4, async (batch) => {
     const cited = [...new Set(batch.flatMap(({ claim }) => claim.markers))].map((n) => byN.get(n)).filter(Boolean) as ResearchSource[];
     if (!cited.length) return;
     try {
@@ -463,8 +549,17 @@ function stepTracker(events: ResearchEvents) {
       Object.assign(find(id), { state: 'active', detail, data });
       send(find(id));
     },
+    /** A new line for a step that is still working ("Writing section 3 of 6"). */
+    progress(id: StepId, detail: string) {
+      Object.assign(find(id), { detail });
+      send(find(id));
+    },
     done(id: StepId, detail: string, data: Record<string, unknown> | null = null) {
       Object.assign(find(id), { state: 'done', detail, data, ms: Date.now() - (started.get(id) ?? Date.now()) });
+      send(find(id));
+    },
+    skip(id: StepId, detail: string) {
+      Object.assign(find(id), { state: 'skipped', detail, data: null, ms: null });
       send(find(id));
     },
     fail(detail: string) {
@@ -476,7 +571,147 @@ function stepTracker(events: ResearchEvents) {
   };
 }
 
-/** Runs one research job through the seven steps. Throws when nothing usable was found or the model fails. */
+/**
+ * Text from several writers running at once, sent in order: writer 0 streams straight through,
+ * later ones are held until every writer before them has finished.
+ */
+export function orderedOutput(count: number, emit: (text: string) => void) {
+  const held = Array.from({ length: count }, () => '');
+  const finished = Array.from({ length: count }, () => false);
+  let current = 0;
+  return {
+    push(index: number, text: string) {
+      if (index === current) emit(text);
+      else held[index] += text;
+    },
+    finish(index: number) {
+      finished[index] = true;
+      while (current < count && finished[current]) {
+        current += 1;
+        if (current < count && held[current]) { emit(held[current]); held[current] = ''; }
+      }
+    },
+  };
+}
+
+const wordCount = (markdown: string) => (markdown.replace(MARKERS, '').replace(/```figure[\s\S]*?```/g, '').match(/\S+/g) || []).length;
+
+/** A section's body as the writer returned it, tidied: no repeated title, its headings one level down. */
+function tidySection(text: string, heading: string, level: 2 | 3): string {
+  let body = text.trim().replace(/^#{1,6}[ \t]+(.+)\n+/, (line, title: string) => (title.trim().toLowerCase() === heading.toLowerCase() ? '' : line));
+  body = level === 3 ? body.replace(/^#{1,2}[ \t]+/gm, '### ') : body.replace(/^#[ \t]+/gm, '## ');
+  return body.trim();
+}
+
+type Tracker = ReturnType<typeof stepTracker>;
+
+/** Deep and Detailed: outline, sections (three at a time, streamed in order), closing sections, then the Summary. */
+async function writeReport(llm: LlmSlot, input: ResearchInput, context: {
+  plan: ResearchPlan; all: ResearchSource[]; papers: ResearchSource[]; prisma: PrismaData; searches: number; gapSearches: number;
+  usage: LlmUsage; signal: Signal; track: Tracker; events: ResearchEvents;
+}): Promise<{ headed: string; written: string; figures: ResearchFigure[]; sections: string[]; dropped: number }> {
+  const { plan, all, papers, prisma, usage, signal, track, events } = context;
+  const settings = DEPTH_SETTINGS[input.depth];
+  const task = 'review' as const;
+  const tokens = input.highQuality ? Math.round(settings.maxTokens * 1.4) : settings.maxTokens;
+  let dropped = 0;
+  const clean = (text: string, allowed: ResearchSource[]) => {
+    const kept = dropInventedMarkers(text, allowed, '');
+    dropped += Math.max(0, markersIn(text).length - markersIn(kept).length);
+    return kept;
+  };
+
+  // The outline: thematic sections, each with its sources.
+  let outlineRaw: string | null = null;
+  try {
+    const { text, usage: used } = await llm.complete({ messages: outlinePrompt(input, plan, all), task, json: true, maxTokens: 1800, temperature: 0.2, signal });
+    addUsage(usage, used);
+    outlineRaw = text;
+  } catch (error) {
+    if (signal?.aborted) throw error;
+  }
+  const outline = cleanOutline(outlineRaw, input.depth, plan, all);
+  const byN = new Map(all.map((source) => [source.n, source]));
+
+  // The computed parts and the figures, sent first so the browser can draw them as the text arrives.
+  const consensus = consensusOf(papers);
+  const { figures, methods: methodFigures, glance: glanceFigures } = buildFigures({ depth: input.depth, plan, papers, prisma });
+  events.figures(figures);
+  const methods = [methodsText({
+    groups: input.groups, searches: context.searches, subQuestions: plan.sub_questions.length, seeds: settings.snowball, prisma, gapSearches: context.gapSearches, filters: input.filters,
+  }), ...methodFigures].join('\n\n');
+  const glance = [glanceText(papers, consensus?.applicable ? consensus.line : null), ...glanceFigures].join('\n\n');
+  const head = `## ${outline.labels.methods}\n\n${methods}\n\n## ${outline.labels.glance}\n\n${glance}`;
+  events.delta(head);
+
+  // The thematic sections, three at a time, streamed in order.
+  const sections = outline.sections;
+  const out = orderedOutput(sections.length, (text) => events.delta(text));
+  let finished = 0;
+  track.progress('write', `Writing ${sections.length} sections`);
+  const bodies = await mapLimit(sections, 3, async (section, index) => {
+    const own = section.sources.map((n) => byN.get(n)).filter(Boolean) as ResearchSource[];
+    out.push(index, `\n\n## ${section.heading}\n\n`);
+    let text = '';
+    try {
+      const streamed = await llm.stream(
+        { messages: sectionPrompt(input, section, sections, own), task, maxTokens: tokens, temperature: 0.3, signal },
+        (delta) => { text += delta; out.push(index, delta); },
+      );
+      addUsage(usage, streamed.usage);
+    } catch (error) {
+      if (signal?.aborted) throw error;
+      // One failed section does not sink the report; the others still stand.
+      if (!text.trim()) out.push(index, '_This section could not be written this time._');
+    }
+    out.finish(index);
+    finished += 1;
+    track.progress('write', `Wrote ${finished} of ${sections.length} sections`);
+    return clean(tidySection(text, section.heading, 3), own);
+  });
+  const themes = sections.map((section, index) => ({ heading: section.heading, body: bodies[index] })).filter((item) => item.body);
+  if (!themes.length) throw new Error('The AI returned nothing.');
+  let body = themes.map((item) => `## ${item.heading}\n\n${item.body}`).join('\n\n');
+
+  const table = input.depth === 'detailed' ? comparisonTable(papers) : '';
+  if (table) {
+    const part = `## ${outline.labels.comparison}\n\n${table}`;
+    events.delta(`\n\n${part}`);
+    body += `\n\n${part}`;
+  }
+
+  // The closing sections read the whole body, so they come after it.
+  track.progress('write', 'Writing where studies disagree, the limits and the open questions');
+  let closing = '';
+  try {
+    events.delta('\n\n');
+    const streamed = await llm.stream({ messages: closingPrompt(input, body, all), task, maxTokens: input.depth === 'detailed' ? 2600 : 1600, temperature: 0.3, signal }, (delta) => { closing += delta; events.delta(delta); });
+    addUsage(usage, streamed.usage);
+  } catch (error) {
+    if (signal?.aborted) throw error;
+  }
+  closing = clean(tidySection(closing, '', 2), all);
+
+  // The Summary, last, from the finished report.
+  track.progress('write', 'Writing the summary');
+  let summary = '';
+  try {
+    const { text, usage: used } = await llm.complete({ messages: summaryPrompt(input, `${body}\n\n${closing}`), task, maxTokens: input.depth === 'detailed' ? 700 : 450, temperature: 0.2, signal });
+    addUsage(usage, used);
+    summary = clean(text.trim().replace(/^#{1,6}[ \t]+.*\n+/, ''), all);
+  } catch (error) {
+    if (signal?.aborted) throw error;
+  }
+
+  const headed = [
+    summary ? `## ${outline.labels.summary}\n\n${summary}` : null,
+    head, body, closing || null,
+  ].filter(Boolean).join('\n\n').replace(/\n{3,}/g, '\n\n').trim();
+  events.markdown(headed);
+  return { headed, written: [summary, ...themes.map((item) => item.body), closing].filter(Boolean).join('\n\n'), figures, sections: themes.map((item) => item.heading), dropped };
+}
+
+/** Runs one research job through the eight steps. Throws when nothing usable was found or the model fails. */
 export async function runResearch(llm: LlmSlot, input: ResearchInput, context: { userId: string; signal?: AbortSignal }, events: ResearchEvents): Promise<ResearchResult> {
   const settings = DEPTH_SETTINGS[input.depth];
   const usage = usage0();
@@ -528,14 +763,15 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
     for (const item of picked) if (item.paper.study_type && item.paper.study_type !== 'other') designs.set(item.paper.study_type, (designs.get(item.paper.study_type) ?? 0) + 1);
     const numbered: ResearchSource[] = [];
     for (const file of input.attachments) numbered.push(fileSource(file, input.question, numbered.length + 1));
+    const reading: { paper: FoundPaper; source: ResearchSource }[] = [];
     for (const item of picked) {
       const source = paperSource(item.paper, numbered.length + 1);
       Object.assign(source, { relevance: item.relevance, rank_score: item.score, sub_questions: item.subs });
       numbered.push(source);
+      reading.push({ paper: item.paper, source });
     }
     const webSources = searched.web.map((result, index) => webSource(result, numbered.length + 1 + index));
-    const all = [...numbered, ...webSources];
-    if (!all.length) throw new ResearchEmptyError();
+    if (!numbered.length && !webSources.length) throw new ResearchEmptyError();
     track.done('rank', `Kept the best ${plural(picked.length, 'paper')}${designs.size ? ` · ${[...designs].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([type, count]) => `${count} ${numbered.find((source) => source.study_type === type)?.study_type_label?.toLowerCase() ?? type}`).join(', ')}` : ''}`, {
       kept: picked.length,
       top: numbered.filter((source) => source.kind !== 'file').slice(0, 12).map((source) => ({ n: source.n, title: source.title, year: source.year, design: source.study_type_label, score: source.rank_score, cited_by: source.cited_by_count })),
@@ -544,62 +780,141 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
     events.sources(numbered, webSources, { counts: searched.counts, errors: searched.errors, queries });
 
     // 5. Read
-    const papers = numbered.filter((source) => source.kind === 'paper' || source.kind === 'library');
-    track.start('read', `Reading ${plural(papers.length, 'paper')}`);
-    if (settings.fullTexts > 0) {
-      const top = picked.slice(0, Math.max(settings.fullTexts * 2, 12));
-      await mapLimit(top.filter((item) => item.paper.doi && !item.paper.pdf_url), 5, async (item) => {
-        const copy = await unpaywall(item.paper.doi!).catch(() => null);
-        if (copy) { item.paper.oa_url = copy.url; item.paper.pdf_url = copy.pdf; item.paper.is_oa = true; }
-      });
-      const open = top.filter((item) => item.paper.pdf_url).slice(0, settings.fullTexts);
-      await mapLimit(open, 4, async (item) => {
-        const source = numbered.find((entry) => entry.id === item.paper.id);
-        if (!source) return;
-        source.pdf_url = item.paper.pdf_url;
-        source.is_oa = item.paper.is_oa;
-        const passage = await openFullText(item.paper.pdf_url, `${input.question} ${plan.sub_questions.map((sub) => sub.question).join(' ')}`);
-        if (passage) { source.passage = passage; source.full_text = true; }
-      });
-    }
+    const fullTextQuestion = `${input.question} ${plan.sub_questions.map((sub) => sub.question).join(' ')}`;
+    track.start('read', `Reading ${plural(reading.length, 'paper')}`);
+    await readFullTexts(reading, settings.fullTexts, fullTextQuestion);
     const readings = await readPapers(llm, input.question, numbered, usage, signal);
     for (const source of numbered) {
-      const reading = readings.get(source.n);
-      if (reading) Object.assign(source, reading);
+      const found = readings.get(source.n);
+      if (found) Object.assign(source, found);
     }
+    const stancesOf = () => {
+      const stances = { supports: 0, mixed: 0, against: 0, unclear: 0 } as Record<Stance, number>;
+      for (const source of numbered) if (source.stance) stances[source.stance] += 1;
+      return stances;
+    };
+    const firstStances = stancesOf();
     const fullTexts = numbered.filter((source) => source.full_text).length;
-    const stances = { supports: 0, mixed: 0, against: 0, unclear: 0 } as Record<Stance, number>;
-    for (const source of numbered) if (source.stance) stances[source.stance] += 1;
-    track.done('read', [`${plural(readings.size, 'paper')} read`, fullTexts ? `${fullTexts} in full text` : null, stances.supports || stances.against || stances.mixed ? `${stances.supports} support, ${stances.mixed} mixed, ${stances.against} against` : null].filter(Boolean).join(' · '), {
-      read: readings.size, full_texts: fullTexts, stances,
-    });
+    const effects = numbered.filter((source) => source.effect).length;
+    track.done('read', [
+      `${plural(readings.size, 'paper')} read`, fullTexts ? `${fullTexts} in full text` : null,
+      firstStances.supports || firstStances.against || firstStances.mixed ? `${firstStances.supports} support, ${firstStances.mixed} mixed, ${firstStances.against} against` : null,
+      effects ? `${plural(effects, 'effect size')}` : null,
+    ].filter(Boolean).join(' · '), { read: readings.size, full_texts: fullTexts, stances: firstStances, effects });
     events.sources(numbered.map(publicSource), webSources, { counts: searched.counts, errors: searched.errors, queries });
 
-    // 6. Write
-    track.start('write', `Writing from ${plural(all.length, 'source')}`);
-    let answer = '';
-    const streamed = await llm.stream(
-      { messages: researchPrompt(input, all), task: input.highQuality || input.depth !== 'summary' ? 'review' : 'fast', maxTokens: input.highQuality ? Math.round(settings.maxTokens * 1.5) : settings.maxTokens, temperature: 0.3, signal },
-      (text) => { answer += text; events.delta(text); },
-    );
-    addUsage(usage, streamed.usage);
-    const raw = answer.trim();
-    let markdown = dropInventedMarkers(raw, all, '');
-    if (!markdown) throw new Error('The AI returned nothing.');
-    const words = (markdown.replace(MARKERS, '').match(/\S+/g) || []).length;
-    track.done('write', `${words.toLocaleString('en-US')} words, ${plural(usedSources(markdown, all).length, 'source')} cited`, { words });
+    // 6. Fill gaps
+    let gapSearches = 0;
+    let gapAdded = 0;
+    if (settings.gapQueries > 0 && reading.length) {
+      track.start('gaps', 'Looking for gaps in the evidence');
+      const gaps = await findGaps(llm, input.question, plan, numbered, queries, settings.gapQueries, usage, signal);
+      if (!gaps.length) {
+        track.done('gaps', 'No important gaps found', { gaps: [], added: 0 });
+      } else {
+        gapSearches = gaps.length;
+        track.progress('gaps', `Searching ${plural(gaps.length, 'gap')}`);
+        const results = await mapLimit(gaps, 4, (gap) => searchSources(
+          { query: gap.query, groups: input.groups.filter((group) => group !== 'library' && group !== 'web'), filters: input.filters, limit: 20, libraryDocumentIds: [] },
+          { userId: context.userId },
+        ).catch(() => ({ papers: [] as FoundPaper[], web: [], counts: {} as Record<string, number>, errors: [] })));
+        for (const result of results) for (const [provider, count] of Object.entries(result.counts)) searched.counts[provider] = (searched.counts[provider] ?? 0) + (count ?? 0);
+        const gapOf = new Map<string, number>();
+        results.forEach((result, index) => { for (const paper of result.papers) if (!gapOf.has(paperKey(paper))) gapOf.set(paperKey(paper), index); });
+        const fresh = sortPapers(mergeResults(results.map((result) => result.papers))).filter((paper) => !searched.seen.has(paperKey(paper)) && !paper.is_retracted).slice(0, 120);
+        const found = results.reduce((sum, result) => sum + result.papers.length, 0);
+        track.progress('gaps', `Screening ${plural(fresh.length, 'new paper')}`);
+        const gapScreening = fresh.length ? await screenPapers(llm, input.question, plan, fresh, usage, signal) : [];
+        const gapPicked = fresh
+          .map((paper, index) => ({ paper, relevance: gapScreening[index]?.relevance ?? 0, gap: gaps[gapOf.get(paperKey(paper)) ?? 0] }))
+          .filter((item) => item.relevance >= 2)
+          .map((item) => ({ ...item, score: evidenceScore(item.paper, item.relevance) }))
+          .sort((a, b) => b.score - a.score)
+          .slice(0, settings.gapPapers);
+        const nextN = Math.max(0, ...numbered.map((source) => source.n), ...webSources.map((source) => source.n)) + 1;
+        const added: { paper: FoundPaper; source: ResearchSource }[] = gapPicked.map((item, index) => {
+          const source = paperSource(item.paper, nextN + index);
+          Object.assign(source, { relevance: item.relevance, rank_score: item.score, sub_questions: item.gap.sub ? [item.gap.sub - 1] : [], gap: true });
+          return { paper: item.paper, source };
+        });
+        if (added.length) {
+          track.progress('gaps', `Reading ${plural(added.length, 'new paper')}`);
+          await readFullTexts(added, settings.gapFullTexts, fullTextQuestion);
+          const more = await readPapers(llm, input.question, added.map((item) => item.source), usage, signal);
+          for (const item of added) {
+            const read = more.get(item.source.n);
+            if (read) Object.assign(item.source, read);
+            numbered.push(item.source);
+          }
+        }
+        gapAdded = added.length;
+        track.done('gaps', [`${plural(gaps.length, 'gap')} searched`, `${plural(fresh.length, 'new paper')} screened`, `${plural(added.length, 'paper')} added`].join(' · '), {
+          gaps: gaps.map((gap) => ({ ...gap, added: added.filter((item) => item.source.sub_questions?.includes(gap.sub - 1) || (gap.sub === 0 && !item.source.sub_questions?.length)).length })),
+          found, screened: fresh.length, added: added.length, papers: added.map((item) => ({ n: item.source.n, title: item.source.title, year: item.source.year })),
+        });
+        if (added.length) events.sources(numbered.map(publicSource), webSources, { counts: searched.counts, errors: searched.errors, queries: [...queries, ...gaps.map((gap) => gap.query)] });
+      }
+    } else {
+      track.skip('gaps', input.depth === 'summary' ? 'Not part of a Summary answer' : 'Nothing to build on');
+    }
+    const all = [...numbered, ...webSources];
+    const papers = numbered.filter((source) => source.kind === 'paper' || source.kind === 'library');
 
-    // 7. Verify
-    const claims = citedClaims(markdown).slice(0, settings.claims);
+    // 7. Write
+    track.start('write', `Writing from ${plural(all.length, 'source')}`);
+    let markdown: string;
+    let written: string;
+    let figures: ResearchFigure[] = [];
+    let sections: string[] = [];
+    let droppedMarkers = 0;
+    if (input.depth === 'summary') {
+      let answer = '';
+      const streamed = await llm.stream(
+        { messages: researchPrompt(input, all), task: input.highQuality ? 'review' : 'fast', maxTokens: input.highQuality ? Math.round(settings.maxTokens * 1.5) : settings.maxTokens, temperature: 0.3, signal },
+        (text) => { answer += text; events.delta(text); },
+      );
+      addUsage(usage, streamed.usage);
+      const raw = answer.trim();
+      markdown = dropInventedMarkers(raw, all, '');
+      droppedMarkers = Math.max(0, markersIn(raw).length - markersIn(markdown).length);
+      written = markdown;
+    } else {
+      const unique = searched.unique;
+      const prisma: PrismaData = {
+        identified: searched.found, chased: searched.chased, duplicates: Math.max(0, searched.found - unique), unscreened: Math.max(0, unique - verdicts.length),
+        screened: verdicts.length, excluded: excluded.length,
+        reasons: [
+          { label: 'Off-topic', count: excluded.filter((item) => item.relevance === 0 && item.reason !== 'Retracted').length },
+          { label: 'Background only', count: excluded.filter((item) => item.relevance === 1).length },
+          { label: 'Retracted', count: excluded.filter((item) => item.reason === 'Retracted').length },
+        ].filter((reason) => reason.count > 0),
+        relevant: kept.length, included: papers.length, full_text: papers.filter((source) => source.full_text).length,
+        gap_added: gapAdded, files: numbered.filter((source) => source.kind === 'file').length, web: webSources.length,
+      };
+      const report = await writeReport(llm, input, { plan, all, papers, prisma, searches: searches.length, gapSearches, usage, signal, track, events });
+      markdown = report.headed;
+      written = report.written;
+      figures = report.figures;
+      sections = report.sections;
+      droppedMarkers = report.dropped;
+    }
+    if (!markdown) throw new Error('The AI returned nothing.');
+    const words = wordCount(markdown);
+    track.done('write', [
+      `${words.toLocaleString('en-US')} words`, sections.length ? plural(sections.length + 3, 'section') : null, figures.length ? plural(figures.length, 'figure') : null,
+      `${plural(usedSources(markdown, all).length, 'source')} cited`,
+    ].filter(Boolean).join(' · '), { words, sections, figures: figures.map((figure) => figure.title) });
+
+    // 8. Verify: only the written text; the computed parts (Methods, overview, table) are not claims.
+    const claims = citedClaims(written).slice(0, settings.claims);
     track.start('verify', `Checking ${plural(claims.length, 'citation')} against their sources`);
-    const droppedMarkers = Math.max(0, markersIn(raw).length - markersIn(markdown).length);
     const [verdictsOfClaims] = await Promise.all([
       checkClaims(llm, claims, all, usage, signal),
       checkReferences(usedSources(markdown, all), settings.references),
     ]);
     const wrong = claims.map((claim, index) => ({ ...claim, ...verdictsOfClaims[index] })).filter((claim) => claim.verdict !== 'yes');
-    const toRevise = wrong.slice(0, 12);
-    const revisions = await reviseClaims(llm, toRevise.map((claim) => ({ text: claim.text, markers: claim.markers, note: claim.note })), input.language, usage, signal);
+    const toRevise = wrong.slice(0, settings.revise);
+    const revisions = (await mapLimit(chunk(toRevise, 12), 3, (batch) => reviseClaims(llm, batch.map((claim) => ({ text: claim.text, markers: claim.markers, note: claim.note })), input.language, usage, signal))).flat();
     const flags: Verification['flags'] = [];
     toRevise.forEach((claim, index) => {
       const revised = revisions[index];
@@ -610,7 +925,7 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
         flags.push({ kind: 'unsupported', text: claim.text, note: claim.note });
       }
     });
-    for (const claim of wrong.slice(12)) if (claim.verdict === 'no') flags.push({ kind: 'unsupported', text: claim.text, note: claim.note });
+    for (const claim of wrong.slice(settings.revise)) if (claim.verdict === 'no') flags.push({ kind: 'unsupported', text: claim.text, note: claim.note });
     const cited = usedSources(markdown, all);
     const refs = cited.filter((source) => source.check && source.check.status !== 'no_doi');
     for (const source of refs) {
@@ -636,10 +951,14 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
       verification.references.retracted ? `${verification.references.retracted} retracted` : null,
     ].filter(Boolean).join(' · '), verification as unknown as Record<string, unknown>);
 
+    // A report asked for without headings keeps both versions, so turning them on later is free.
+    const headedCopy = input.depth !== 'summary' && !input.headings ? markdown : null;
+    if (headedCopy) markdown = stripHeadings(markdown);
     const consensus = consensusOf(cited);
-    const summary = markdown.replace(/^#+.*$/gm, '').replace(/\[S\d+(?:[,\s]*S?\d+)*\]/g, '').replace(/[*_>`|]/g, '').replace(/\s+/g, ' ').trim().slice(0, 300);
+    const summary = markdown.replace(/```figure[\s\S]*?```/g, '').replace(/^#+.*$/gm, '').replace(/\[S\d+(?:[,\s]*S?\d+)*\]/g, '').replace(/[*_>`|]/g, '').replace(/\s+/g, ' ').trim().slice(0, 300);
     return {
-      markdown, sources: cited.map(publicSource), all_sources: all.map(publicSource), consensus, queries,
+      markdown, ...(headedCopy ? { markdown_headed: headedCopy, markdown_plain: markdown } : {}), figures,
+      sources: cited.map(publicSource), all_sources: all.map(publicSource), consensus, queries,
       searched: { counts: searched.counts, errors: searched.errors }, plan, steps: track.steps, verification, usage, summary,
     };
   } catch (error) {

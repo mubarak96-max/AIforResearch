@@ -47,7 +47,7 @@ export const CATALOG: CatalogItem[] = [
   {
     id: 'deep-research', name: 'Deep Research', hub: 'research', workspace: true,
     description: 'Ask a question and get an answer built from real papers, with every claim cited and a consensus line.',
-    href: '/deep-research', credits: 'Summary 1 credit · Deep 5 · Detailed 20', phase1: true,
+    href: '/deep-research', credits: 'Summary 1 credit · Deep 15 · Detailed 45', phase1: true,
     marketing: '/features/research-assistant', landing: '/features/deep-research', keywords: ['ask', 'chat', 'report', 'consensus', 'summary'],
   },
   {

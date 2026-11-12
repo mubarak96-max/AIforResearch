@@ -1,32 +1,33 @@
 'use client';
 
 /**
- * The seven research steps the person watches: Plan, Search, Screen, Rank, Read, Write, Verify.
+ * The research steps the person watches: Plan, Search, Screen, Rank, Read, Fill gaps, Write, Verify.
  * Live, each step shows what it is doing and, when done, its result; every finished step opens to
  * the details behind it. On a saved answer the same list is "How this answer was made".
  * Also the plan review a Detailed report stops at before any credits are spent.
  */
 import { useEffect, useState } from 'react';
 import {
-  LuBookOpen, LuCheck, LuChevronDown, LuCircleAlert, LuFilter, LuListOrdered, LuListTree, LuLoaderCircle, LuPenLine, LuPlus, LuSearch,
+  LuBookOpen, LuCheck, LuChevronDown, LuCircleAlert, LuFilter, LuListOrdered, LuListTree, LuLoaderCircle, LuMinus, LuPenLine, LuPlus, LuSearch, LuSearchCheck,
   LuShieldCheck, LuTrash2,
 } from 'react-icons/lu';
 import { Button } from '@/components/app/ui';
 import { CreditCost } from './parts';
 
-export type StepId = 'plan' | 'search' | 'screen' | 'rank' | 'read' | 'write' | 'verify';
-export type StepView = { id: StepId; state: 'pending' | 'active' | 'done' | 'failed'; detail: string; data: Record<string, any> | null; ms: number | null };
+export type StepId = 'plan' | 'search' | 'screen' | 'rank' | 'read' | 'gaps' | 'write' | 'verify';
+export type StepView = { id: StepId; state: 'pending' | 'active' | 'done' | 'skipped' | 'failed'; detail: string; data: Record<string, any> | null; ms: number | null };
 export type SubQuestion = { question: string; queries: string[] };
 
-export const STEP_ORDER: StepId[] = ['plan', 'search', 'screen', 'rank', 'read', 'write', 'verify'];
+export const STEP_ORDER: StepId[] = ['plan', 'search', 'screen', 'rank', 'read', 'gaps', 'write', 'verify'];
 
 const STEPS: Record<StepId, { label: string; what: string; icon: React.ReactNode }> = {
   plan: { label: 'Plan', what: 'Split the question into sub-questions and searches', icon: <LuListTree /> },
   search: { label: 'Search', what: 'Search the chosen sources and remove duplicates', icon: <LuSearch /> },
   screen: { label: 'Screen', what: 'Read titles and abstracts; keep what is on the question', icon: <LuFilter /> },
   rank: { label: 'Rank', what: 'Weigh study design, relevance, citations and recency', icon: <LuListOrdered /> },
-  read: { label: 'Read', what: 'Pull each paper’s finding, sample and limits', icon: <LuBookOpen /> },
-  write: { label: 'Write', what: 'Write the answer, citing every claim', icon: <LuPenLine /> },
+  read: { label: 'Read', what: 'Pull each paper’s finding, sample, limits and effect size', icon: <LuBookOpen /> },
+  gaps: { label: 'Fill gaps', what: 'Search again where the evidence is thin or conflicting', icon: <LuSearchCheck /> },
+  write: { label: 'Write', what: 'Outline, write each section and draw the figures, citing every claim', icon: <LuPenLine /> },
   verify: { label: 'Verify', what: 'Check each citation against its source and each reference at Crossref', icon: <LuShieldCheck /> },
 };
 
@@ -38,9 +39,13 @@ const RELEVANCE = [
   { label: 'Off-topic', className: 'bg-line' },
 ];
 
-/** The steps in order, filling in any the server has not reported yet. */
+/**
+ * The steps in order, filling in any the server has not reported yet. Answers saved before the
+ * Fill gaps step (Verify reported, no gaps step) show the seven steps they ran.
+ */
 export function withAllSteps(steps: StepView[] | null | undefined): StepView[] {
-  return STEP_ORDER.map((id) => steps?.find((step) => step.id === id) ?? { id, state: 'pending', detail: '', data: null, ms: null });
+  const older = Boolean(steps?.some((step) => step.id === 'verify' && step.state !== 'pending')) && !steps?.some((step) => step.id === 'gaps');
+  return STEP_ORDER.filter((id) => !(older && id === 'gaps')).map((id) => steps?.find((step) => step.id === id) ?? { id, state: 'pending', detail: '', data: null, ms: null });
 }
 
 /** Applies one `step` event to the list. */
@@ -55,17 +60,19 @@ export function ResearchSteps({ steps, running }: { steps: StepView[]; running: 
   const [open, setOpen] = useState<StepId | null>(null);
   const [shown, setShown] = useState(running);
   useEffect(() => { if (running) setShown(true); }, [running]);
-  const plan = (all[0].data?.sub_questions ?? []) as SubQuestion[];
-  const done = all.filter((step) => step.state === 'done').length;
+  const byId = (id: StepId) => all.find((step) => step.id === id);
+  const plan = (byId('plan')?.data?.sub_questions ?? []) as SubQuestion[];
+  const done = all.filter((step) => step.state === 'done' || step.state === 'skipped').length;
 
   if (!running && !shown) {
-    const search = all[1].data;
-    const screen = all[2].data;
-    const verify = all[6].data;
+    const search = byId('search')?.data;
+    const screen = byId('screen')?.data;
+    const verify = byId('verify')?.data;
+    const gaps = byId('gaps')?.data;
     const facts = [
       search?.found ? `${Number(search.found).toLocaleString('en-US')} found` : null,
       screen ? `${screen.kept} relevant` : null,
-      all[3].data?.kept ? `${all[3].data.kept} used` : null,
+      byId('rank')?.data?.kept ? `${Number(byId('rank')!.data!.kept) + Number(gaps?.added ?? 0)} used` : null,
       verify?.claims?.checked ? `${verify.claims.supported}/${verify.claims.checked} citations supported` : null,
     ].filter(Boolean);
     return (
@@ -83,7 +90,7 @@ export function ResearchSteps({ steps, running }: { steps: StepView[]; running: 
     <section aria-label="Research steps" className="mt-4 rounded-2xl border border-line bg-surface px-4 py-3">
       <div className="flex items-center gap-2">
         <h2 className="text-[14px] font-bold text-ink">{running ? 'Researching' : 'How this answer was made'}</h2>
-        <span className="text-[12.5px] text-muted">{done} of 7 steps</span>
+        <span className="text-[12.5px] text-muted">{done} of {all.length} steps</span>
         {!running && (
           <button type="button" onClick={() => setShown(false)} className="ml-auto text-[13px] font-semibold text-brand hover:underline">Hide</button>
         )}
@@ -102,8 +109,8 @@ export function ResearchSteps({ steps, running }: { steps: StepView[]; running: 
               <div className="min-w-0 flex-1 pb-3">
                 <button type="button" disabled={!expandable} onClick={() => setOpen(isOpen ? null : step.id)} aria-expanded={expandable ? isOpen : undefined}
                   className="group flex w-full items-baseline gap-2 text-left disabled:cursor-default">
-                  <span className={`shrink-0 text-[14.5px] ${step.state === 'pending' ? 'font-medium text-muted' : 'font-semibold text-ink'}`}>{meta.label}</span>
-                  <span className={`min-w-0 flex-1 text-[13.5px] ${step.state === 'failed' ? 'text-red-700' : step.state === 'pending' ? 'text-subtle' : 'text-ink-2'}`}>
+                  <span className={`shrink-0 text-[14.5px] ${step.state === 'pending' || step.state === 'skipped' ? 'font-medium text-muted' : 'font-semibold text-ink'}`}>{meta.label}</span>
+                  <span className={`min-w-0 flex-1 text-[13.5px] ${step.state === 'failed' ? 'text-red-700' : step.state === 'pending' || step.state === 'skipped' ? 'text-subtle' : 'text-ink-2'}`}>
                     {step.state === 'pending' ? meta.what : step.state === 'active' ? `${step.detail}…` : step.detail}
                   </span>
                   {step.state === 'done' && <span className="shrink-0 text-[12px] tabular-nums text-subtle">{seconds(step.ms)}</span>}
@@ -123,6 +130,7 @@ function StepMark({ state, icon }: { state: StepView['state']; icon: React.React
   const base = 'relative z-[1] grid h-7 w-7 shrink-0 place-items-center rounded-full [&>svg]:h-3.5 [&>svg]:w-3.5';
   if (state === 'done') return <span className={`${base} bg-brand text-on-brand`}><LuCheck aria-label="Done" /></span>;
   if (state === 'active') return <span className={`${base} bg-brand-50 text-brand ring-2 ring-brand`}><LuLoaderCircle className="animate-spin" aria-label="Working" /></span>;
+  if (state === 'skipped') return <span className={`${base} border border-line bg-soft text-subtle`}><LuMinus aria-label="Skipped" /></span>;
   if (state === 'failed') return <span className={`${base} bg-red-50 text-red-700`}><LuCircleAlert aria-label="Stopped" /></span>;
   return <span className={`${base} border border-line bg-surface text-subtle`} aria-hidden="true">{icon}</span>;
 }
@@ -220,7 +228,7 @@ function StepDetails({ step, plan }: { step: StepView; plan: SubQuestion[] }) {
       const stances = data.stances ?? {};
       return (
         <>
-          <p>{data.read} papers read{data.full_texts ? `, ${data.full_texts} of them from the open full text` : ' from their abstracts'}.</p>
+          <p>{data.read} papers read{data.full_texts ? `, ${data.full_texts} of them from the open full text` : ' from their abstracts'}.{data.effects ? ` ${data.effects} reported an effect size with a confidence interval that was found word for word in the paper.` : ''}</p>
           <div className="mt-2">
             <Bar parts={[
               { label: 'Support', value: stances.supports ?? 0, className: 'bg-green-600' },
@@ -232,8 +240,39 @@ function StepDetails({ step, plan }: { step: StepView; plan: SubQuestion[] }) {
         </>
       );
     }
+    case 'gaps': {
+      const gaps = (data.gaps ?? []) as { sub: number; gap: string; query: string }[];
+      if (!gaps.length) return <p>The first reading covered every sub-question well enough; no second search was needed.</p>;
+      return (
+        <>
+          <ul className="space-y-1.5">
+            {gaps.map((gap, index) => (
+              <li key={index}>
+                <span className="text-ink">{gap.gap}</span>
+                {gap.sub > 0 && plan[gap.sub - 1] && <span className="text-[12.5px] text-muted"> · sub-question {gap.sub}</span>}
+                <span className="mt-0.5 block"><code className="rounded bg-surface px-1.5 py-0.5 text-[12px] text-muted">{gap.query}</code></span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2">{Number(data.screened ?? 0).toLocaleString('en-US')} new papers screened, {Number(data.added ?? 0).toLocaleString('en-US')} added to the report.</p>
+          {data.papers?.length ? (
+            <ul className="mt-1.5 space-y-0.5 text-[13px]">
+              {(data.papers as { n: number; title: string; year: number | null }[]).map((paper) => (
+                <li key={paper.n} className="flex gap-2"><span className="grid h-5 min-w-5 place-items-center rounded bg-accent-50 px-1 text-[11px] font-bold text-accent-600">{paper.n}</span><span className="min-w-0 truncate text-ink">{paper.title}{paper.year ? ` (${paper.year})` : ''}</span></li>
+              ))}
+            </ul>
+          ) : null}
+        </>
+      );
+    }
     case 'write':
-      return <p>{Number(data.words ?? 0).toLocaleString('en-US')} words, written only from the numbered sources.</p>;
+      return (
+        <>
+          <p>{Number(data.words ?? 0).toLocaleString('en-US')} words, written only from the numbered sources{data.sections?.length ? ', each thematic section from its own sources' : ''}.</p>
+          {data.sections?.length ? <p className="mt-1.5"><span className="font-semibold text-ink">Sections:</span> {(data.sections as string[]).join(' · ')}</p> : null}
+          {data.figures?.length ? <p className="mt-1"><span className="font-semibold text-ink">Figures:</span> {(data.figures as string[]).join(' · ')}</p> : null}
+        </>
+      );
     case 'verify':
       return <VerifyDetails data={data} />;
     default:

@@ -3,7 +3,7 @@
  *   GET  /sources/groups            the source picker and which groups work on this server
  *   POST /sources/search            Find Papers: search the chosen groups with filters (no credits)
  *   POST /research/plan             the sub-questions a Detailed report will research, to review first (no credits)
- *   POST /research                  Deep Research (Server-Sent Events: task, step, sources, delta, done | error)
+ *   POST /research                  Deep Research (Server-Sent Events: task, step, sources, figures, delta, markdown, done | error)
  *   POST /research/:id/follow-up    a follow-up answered from the same sources (1 credit)
  *   POST /research/:id/headings     headings on or off for a finished answer (off is free; adding them is 1 credit)
  *   POST /files/text                text from an attached PDF, Word, Markdown or text file
@@ -17,13 +17,13 @@ import { requireUser, type AppVariables } from '../auth.js';
 import type { Slots } from '../slots/types.js';
 import { LlmError, llmModelName, llmUnavailable } from '../slots/llm.js';
 import { currentUser, meterTokens, parseBody } from '../lib/assist-llm.js';
-import { CREDIT_COSTS, creditCost, refundCredits, requireFeature, spendCredits, type CreditCharge } from '../lib/plans.js';
+import { CREDIT_COSTS, checkQuota, checkRunning, countUse, creditCost, refundCredits, requireFeature, spendCredits, type CreditCharge } from '../lib/plans.js';
 import { researchProfile } from '../lib/users.js';
 import { DEPTHS, DEPTH_SETTINGS, ResearchEmptyError, applyHeadings, followUpPrompt, hasHeadings, headingsPrompt, stripHeadings, usage0, type Depth, type ResearchSource } from '../lib/research.js';
 import { cleanPlan, planResearch, runResearch } from '../lib/researchPipeline.js';
 import { SOURCE_GROUPS, STUDY_TYPES, JOURNAL_TIER_ORDER, searchSources, sourceGroups } from '../lib/sources/index.js';
 import { extractText } from '../lib/fileText.js';
-import { createTask, deleteTask, failTask, finishTask, getTaskFor, listTasks, updateTask, updateTaskResult, TASK_KINDS } from '../lib/history.js';
+import { createTask, deleteTask, failTask, finishTask, getTaskFor, listTasks, runningResearch, updateTask, updateTaskResult, TASK_KINDS } from '../lib/history.js';
 import { addMember, createProject, deleteProject, getProjectFor, listProjects, publicProject, removeMember, updateProject } from '../lib/projects.js';
 import { rateLimit } from '../lib/rateLimit.js';
 
@@ -136,6 +136,11 @@ export function researchRoutes(slots: Slots) {
     if (unavailable) throw new HTTPException(503, { message: unavailable });
     if (body.depth === 'detailed') await requireFeature(user.account_id, 'detailed_mode');
     if (body.high_quality) await requireFeature(user.account_id, 'high_quality');
+    // Reports (not Summary answers) have a daily count and a cap on how many run at once.
+    if (body.depth !== 'summary') {
+      await checkQuota(user.account_id, 'research_runs');
+      await checkRunning(user.account_id, await runningResearch(user.account_id));
+    }
     const credits = researchCredits(body.depth, body.high_quality);
     const charge = await spendCredits(user.account_id, credits, `A ${body.depth === 'summary' ? 'Summary answer' : body.depth === 'deep' ? 'Deep report' : 'Detailed report'}`);
     let taskId: string;
@@ -170,13 +175,17 @@ export function researchRoutes(slots: Slots) {
             step: (step) => send('step', step),
             sources: (sources, web, searched) => send('sources', { sources, web, ...searched }),
             delta: (text) => send('delta', { text }),
+            figures: (figures) => send('figures', { figures }),
+            markdown: (text) => send('markdown', { text }),
           });
           await meterTokens(user, result.usage, { feature: `research:${body.depth}`, provider: slots.llm.provider, model: llmModelName(slots.llm, body.high_quality || body.depth !== 'summary' ? 'review' : 'fast') });
           const saved = {
             markdown: result.markdown, summary: result.summary, sources: result.sources, all_sources: result.all_sources, consensus: result.consensus, queries: result.queries,
-            searched: result.searched, plan: result.plan, steps: result.steps, verification: result.verification, follow_ups: [],
+            searched: result.searched, plan: result.plan, steps: result.steps, verification: result.verification, figures: result.figures, follow_ups: [],
+            ...(result.markdown_headed ? { markdown_headed: result.markdown_headed, markdown_plain: result.markdown_plain } : {}),
           };
           await finishTask(taskId, saved);
+          if (body.depth !== 'summary') await countUse(user.account_id, 'research_runs').catch((error) => console.error('report not counted', error));
           send('done', { task_id: taskId, credits, ...saved });
         } catch (error) {
           await refundCredits(charge);

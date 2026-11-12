@@ -18,6 +18,7 @@ import { Check, MultiSelect, NumberField, Select } from './controls';
 import { api, ApiError } from '@/lib/session';
 import { openPricing, refreshCredits, useCredits } from '@/lib/billing';
 import { fileText } from './stream';
+import { FigureView, type ResearchFigure } from './figures';
 
 // ------------------------------------------------------------------ types shared with the API
 
@@ -60,8 +61,8 @@ export const ROLE_OPTIONS: [string, string][] = [
 ];
 export const DEPTHS: { value: Depth; label: string; detail: string; credits: number; paid?: boolean; icon: React.ReactNode }[] = [
   { value: 'summary', label: 'Summary', detail: 'A short cited answer from about 8 papers', credits: 1, icon: <LuZap /> },
-  { value: 'deep', label: 'Deep', detail: 'A structured report from 20–40 papers, every citation checked', credits: 7, icon: <LuLayers /> },
-  { value: 'detailed', label: 'Detailed', detail: 'A long report with tables from 50+ papers; you review the plan first', credits: 25, paid: true, icon: <LuBookOpenText /> },
+  { value: 'deep', label: 'Deep', detail: 'A 2,500–4,000-word report with figures from 45+ papers, gaps searched again, every citation checked', credits: 15, icon: <LuLayers /> },
+  { value: 'detailed', label: 'Detailed', detail: 'A 5,000–8,000-word report with figures and a study table from 90+ papers; you review the plan first', credits: 45, paid: true, icon: <LuBookOpenText /> },
 ];
 
 // ------------------------------------------------------------------ errors and credits
@@ -157,7 +158,7 @@ export function DepthSwitch({ value, onChange, detailedAllowed }: { value: Depth
         const on = value === depth.value;
         return (
           <button key={depth.value} type="button" role="radio" aria-checked={on} title={`${depth.detail} · ${depth.credits} credit${depth.credits === 1 ? '' : 's'}${locked ? ' · paid plans' : ''}`}
-            onClick={() => (locked ? openPricing('Detailed reports read 50+ papers and are part of the paid plans.') : onChange(depth.value))}
+            onClick={() => (locked ? openPricing('Detailed reports read 90+ papers and are part of the paid plans.') : onChange(depth.value))}
             className={`flex h-7 shrink-0 items-center gap-1 whitespace-nowrap rounded-lg px-2.5 text-[13px] transition-[background-color,color,box-shadow] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${on ? 'bg-surface font-bold text-brand shadow-[0_0_0_1.5px_var(--color-brand),0_3px_8px_-3px_rgb(var(--brand-rgb)/0.45)]' : 'font-semibold text-muted hover:bg-surface/60 hover:text-ink-2'}`}>
             <span aria-hidden="true" className={`grid place-items-center transition-transform duration-150 [&>svg]:h-3.5 [&>svg]:w-3.5 ${on ? 'scale-110 text-brand' : 'opacity-80'}`}>{depth.icon}</span>
             {depth.label}
@@ -422,15 +423,33 @@ export function LibraryPicker({ selected, onClose, onDone }: { selected: Library
 
 // ------------------------------------------------------------------ answers and sources
 
-/** Markdown with [S1]-style markers shown as numbered citation chips that jump to the source. */
-export function CitedMarkdown({ markdown, sources, onCite, className = '' }: { markdown: string; sources?: { n: number; title: string }[]; onCite?: (n: number) => void; className?: string }) {
+/** The figure id in a ```figure block, read from the rendered <pre><code class="language-figure">. */
+function figureIdOf(node: unknown): string | null {
+  const code = (node as { children?: { tagName?: string; properties?: { className?: unknown }; children?: { value?: string }[] }[] } | undefined)?.children?.[0];
+  const classes = code?.properties?.className;
+  if (code?.tagName !== 'code' || !Array.isArray(classes) || !classes.includes('language-figure')) return null;
+  return (code.children ?? []).map((child) => child.value ?? '').join('').trim() || null;
+}
+
+/**
+ * Markdown with [S1]-style markers shown as numbered citation chips that jump to the source.
+ * A report's ```figure blocks are drawn from `figures` (Deep Research).
+ */
+export function CitedMarkdown({ markdown, sources, onCite, figures, className = '' }: {
+  markdown: string; sources?: { n: number; title: string }[]; onCite?: (n: number) => void; figures?: ResearchFigure[] | null; className?: string;
+}) {
   const titles = useMemo(() => new Map((sources ?? []).map((source) => [source.n, source.title])), [sources]);
+  const figureById = useMemo(() => new Map((figures ?? []).map((figure) => [figure.id, figure])), [figures]);
   const linked = useMemo(() => markdown.replace(/\[(S\d+(?:\s*[,;]\s*S?\d+)*)\]/g, (_, group: string) =>
     [...group.matchAll(/S?(\d+)/g)].map((match) => `[${match[1]}](#cite-${match[1]})`).join('')), [markdown]);
   return (
     <div className={`wo-prose text-[16px] leading-[1.7] text-ink [&_h2]:mt-7 [&_h2]:text-[20px] [&_h2]:font-bold [&_h3]:mt-5 [&_h3]:text-[17px] [&_h3]:font-semibold [&_li]:my-1 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-3 [&_table]:my-4 [&_table]:w-full [&_table]:text-[14px] [&_td]:border-t [&_td]:border-line-2 [&_td]:px-2 [&_td]:py-1.5 [&_td]:align-top [&_th]:px-2 [&_th]:py-1.5 [&_th]:text-left [&_th]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 ${className}`}>
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
         table: ({ children }) => <div className="overflow-x-auto"><table>{children}</table></div>,
+        pre: ({ node, children }) => {
+          const id = figureIdOf(node);
+          return id ? <FigureView figure={figureById.get(id)} onCite={onCite} /> : <pre className="overflow-x-auto rounded-lg bg-soft p-3 text-[13px]">{children}</pre>;
+        },
         a: ({ href, children }) => {
           const n = Number(href?.match(/^#cite-(\d+)$/)?.[1]);
           if (n) {

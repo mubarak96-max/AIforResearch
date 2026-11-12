@@ -57,12 +57,20 @@ const llm = {
     if (system.includes('You correct sentences')) return json({ items: [{ i: 0, text: 'One small study found naps may help memory [S2].' }] });
     if (system.includes('You add section headings')) return { text: '{"headings":[{"before":0,"level":2,"text":"Summary [S1]"},{"before":7,"level":2,"text":"Out of range"}]}', usage: { inputTokens: 10, outputTokens: 5 } };
     if (system.includes('You plan literature searches')) return { text: '{"queries":["sleep recall","nap memory"]}', usage: { inputTokens: 10, outputTokens: 5 } };
+    if (system.includes('You review the evidence gathered')) return json({ gaps: [{ sub: 2, gap: 'Naps in older adults', query: 'nap memory older adults' }] });
+    if (system.includes('You outline the body')) return json({ sections: [{ heading: 'Sleep and recall', focus: 'The main effect', sources: [1, 2] }, { heading: 'Who benefits', focus: 'Ages', sources: [1, 99] }], labels: { summary: 'Summary' } });
+    if (system.includes('Write the Summary')) return { text: 'Sleep helps recall [S1].', usage: { inputTokens: 10, outputTokens: 5 } };
     return { text: 'A follow-up answer [S1].', usage: { inputTokens: 10, outputTokens: 5 } };
   }),
-  stream: vi.fn(async (_input: unknown, onDelta: (text: string) => void) => {
-    onDelta(answer.slice(0, 30));
-    onDelta(answer.slice(30));
-    return { text: answer, usage: { inputTokens: 100, outputTokens: 40 } };
+  // Summary answers and a report's first section stream `answer`; the second section and the closing sections their own text.
+  stream: vi.fn(async (input: { messages: { content: string }[] }, onDelta: (text: string) => void) => {
+    const system = input.messages[0].content;
+    const user = input.messages[1]?.content ?? '';
+    const text = system.includes('closing sections') ? '## Where studies disagree\n\nNo study disagrees.'
+      : user.includes('This section: Who benefits') ? 'Older adults benefit as well [S1].' : answer;
+    onDelta(text.slice(0, 30));
+    onDelta(text.slice(30));
+    return { text, usage: { inputTokens: 100, outputTokens: 40 } };
   }),
 };
 const slots = { llm, papers: { provider: 'fake' } } as unknown as Slots;
@@ -104,13 +112,19 @@ describe('Deep Research', () => {
     expect((await call('/api/research', { method: 'POST', body: { question: 'Does sleep help memory?' } })).status).toBe(401);
   });
 
-  it('runs the seven steps, drops invented citations, narrows an overstated claim, flags a retraction, saves the task and charges 7 credits', async () => {
+  it('runs the eight steps, writes the report in sections with a figure, drops invented citations, narrows an overstated claim, flags a retraction, saves the task and charges 15 credits', async () => {
     const response = await call('/api/research', { method: 'POST', body: { question: 'Does sleep after learning improve memory?', depth: 'deep' } });
     const list = await events(response);
-    expect(list.map((item) => (item.event === 'step' ? `${item.data.id}:${item.data.state}` : item.event))).toEqual([
+    // Steps and sources in order; progress lines ("Writing 2 sections") repeat a step's state, so repeats are folded.
+    const flow = list.filter((item) => !['delta', 'figures', 'markdown'].includes(item.event)).map((item) => (item.event === 'step' ? `${item.data.id}:${item.data.state}` : item.event));
+    expect(flow.filter((item, index) => item !== flow[index - 1])).toEqual([
       'task', 'plan:active', 'plan:done', 'search:active', 'search:done', 'screen:active', 'screen:done', 'rank:active', 'rank:done', 'sources',
-      'read:active', 'read:done', 'sources', 'write:active', 'delta', 'delta', 'write:done', 'verify:active', 'verify:done', 'done',
+      'read:active', 'read:done', 'sources', 'gaps:active', 'gaps:done', 'write:active', 'write:done', 'verify:active', 'verify:done', 'done',
     ]);
+    // The figures arrive before the text that places them; the Summary, written last, replaces the streamed text.
+    const kinds = list.map((item) => item.event);
+    expect(kinds.indexOf('figures')).toBeLessThan(kinds.indexOf('delta'));
+    expect(kinds.indexOf('markdown')).toBeGreaterThan(kinds.lastIndexOf('delta'));
     const step = (id: string) => list.find((item) => item.event === 'step' && item.data.id === id && item.data.state === 'done')!.data;
     expect(step('plan').data.sub_questions).toHaveLength(3);
     // 4 searches (the question and one per sub-question) each return the same 2 papers.
@@ -118,20 +132,29 @@ describe('Deep Research', () => {
     expect(step('screen').data).toMatchObject({ screened: 2, kept: 2, excluded: 0 });
     expect(step('read').data).toMatchObject({ read: 2, stances: { supports: 2 } });
 
+    expect(step('gaps').data).toMatchObject({ gaps: [{ sub: 2, query: 'nap memory older adults' }], screened: 0, added: 0 });
+    expect(step('write').data).toMatchObject({ sections: ['Sleep and recall', 'Who benefits'], figures: ['Figure 1. How the sources were found and chosen'] });
     const done = list.at(-1)!.data;
-    expect(done.markdown).toBe('Sleep after learning improves recall [S1]. One small study found naps may help memory [S2]. An invented one.');
+    expect(done.markdown.startsWith('## Summary\n\nSleep helps recall [S1].\n\n## How this review was done\n\nWe searched OpenAlex and Semantic Scholar')).toBe(true);
+    expect(done.markdown).toContain('```figure\nfig-1\n```');
+    expect(done.markdown).toContain('## Sleep and recall\n\nSleep after learning improves recall [S1]. One small study found naps may help memory [S2]. An invented one.');
+    // The outline named a source that does not exist (99); the section was written from source 1 alone.
+    expect(done.markdown).toContain('## Who benefits\n\nOlder adults benefit as well [S1].');
+    expect(done.markdown.endsWith('## Where studies disagree\n\nNo study disagrees.')).toBe(true);
+    expect(done.figures).toMatchObject([{ id: 'fig-1', kind: 'prisma', data: { identified: 8, duplicates: 6, screened: 2, included: 2 } }]);
     expect(done.sources.map((source: { marker: string; stance: string; check: { status: string } }) => [source.marker, source.stance, source.check.status])).toEqual([['S1', 'supports', 'confirmed'], ['S2', 'supports', 'retracted']]);
     expect(done.sources[0]).toMatchObject({ sample: '40 students', limits: 'Small sample', relevance: 3 });
     expect(done.verification).toMatchObject({
-      claims: { checked: 2, supported: 1, partly: 1, revised: 1 }, references: { checked: 2, confirmed: 1, retracted: 1 }, dropped_markers: 1,
+      claims: { checked: 4, supported: 3, partly: 1, revised: 1 }, references: { checked: 2, confirmed: 1, retracted: 1 }, dropped_markers: 1,
       flags: [{ kind: 'revised', text: 'Naps help too [S2].', revised: 'One small study found naps may help memory [S2].' }, { kind: 'retracted', n: 2 }],
     });
-    expect(done.steps.map((item: { state: string }) => item.state)).toEqual(Array(7).fill('done'));
+    expect(done.steps.map((item: { state: string }) => item.state)).toEqual(Array(8).fill('done'));
     expect(done.consensus).toMatchObject({ applicable: true, line: '2 of 2 studies that test the question support it.' });
-    expect((await creditSummary('acc-1')).used).toBe(7);
+    expect((await creditSummary('acc-1')).used).toBe(15);
     const task = await (await call(`/api/history/${done.task_id}`)).json();
-    expect(task).toMatchObject({ kind: 'research', module: 'deep', status: 'done', credits: 7, title: 'Does sleep after learning improve memory?' });
-    expect(task.result.steps).toHaveLength(7);
+    expect(task).toMatchObject({ kind: 'research', module: 'deep', status: 'done', credits: 15, title: 'Does sleep after learning improve memory?' });
+    expect(task.result.steps).toHaveLength(8);
+    expect(task.result.figures).toHaveLength(1);
     expect(task.result.verification.claims.revised).toBe(1);
   });
 
@@ -151,7 +174,40 @@ describe('Deep Research', () => {
     // An edited sub-question without searches gets keywords from its wording.
     expect(planStep.data.sub_questions[1].queries[0]).toMatch(/sleep/);
     expect(list.at(-1)!.event).toBe('done');
-    expect((await creditSummary('acc-1')).used).toBe(25);
+    // Detailed adds a figure of papers per sub-question.
+    expect(list.at(-1)!.data.figures.map((figure: { kind: string; title: string }) => figure.title)).toEqual(['Figure 1. How the sources were found and chosen', 'Figure 2. Included papers for each sub-question']);
+    expect((await creditSummary('acc-1')).used).toBe(45);
+  });
+
+  it('keeps a report asked for without headings as plain text, with the headed copy saved for free', async () => {
+    const done = (await events(await call('/api/research', { method: 'POST', body: { question: 'Does sleep help memory?', depth: 'deep', headings: false } }))).at(-1)!.data;
+    expect(done.markdown).not.toMatch(/^#/m);
+    expect(done.markdown).toContain('```figure\nfig-1\n```');
+    expect(done.markdown_headed.startsWith('## Summary')).toBe(true);
+    const on = await (await call(`/api/research/${done.task_id}/headings`, { method: 'POST', body: { headings: true } })).json();
+    expect(on).toMatchObject({ markdown: done.markdown_headed, credits: 0 });
+  });
+
+  it('skips Fill gaps on a Summary answer', async () => {
+    const done = (await events(await call('/api/research', { method: 'POST', body: { question: 'Does sleep help memory?', depth: 'summary' } }))).at(-1)!.data;
+    expect(done.steps.find((item: { id: string }) => item.id === 'gaps')).toMatchObject({ state: 'skipped' });
+    expect(done.figures).toEqual([]);
+  });
+
+  it('runs one report at a time on Free and stops at 2 reports a day, before any credits are taken', async () => {
+    fake.put('tasks/running-1', { user_id: 'user-1', account_id: 'acc-1', kind: 'research', module: 'deep', status: 'running', created_at: new Date(), updated_at: new Date() });
+    const busy = await call('/api/research', { method: 'POST', body: { question: 'Does sleep help memory?', depth: 'deep' } });
+    expect(busy.status).toBe(402);
+    expect(await busy.json()).toMatchObject({ limit: 'research_parallel' });
+    // A Summary answer is not a report: it still runs.
+    expect((await call('/api/research', { method: 'POST', body: { question: 'Does sleep help memory?', depth: 'summary' } })).status).toBe(200);
+    // A run left "running" for over half an hour died with its server and no longer counts.
+    fake.put('tasks/running-1', { user_id: 'user-1', account_id: 'acc-1', kind: 'research', module: 'deep', status: 'running', created_at: new Date(Date.now() - 31 * 60_000), updated_at: new Date() });
+    fake.put(`accounts/acc-1/plan_usage/research_runs__${new Date().toISOString().slice(0, 10)}`, { key: 'research_runs', amount: 2 });
+    const daily = await call('/api/research', { method: 'POST', body: { question: 'Does sleep help memory?', depth: 'deep' } });
+    expect(daily.status).toBe(402);
+    expect(await daily.json()).toMatchObject({ limit: 'research_runs' });
+    expect((await creditSummary('acc-1')).used).toBe(1);
   });
 
   it('refunds the credits and marks the task failed when nothing is found', async () => {
@@ -173,11 +229,11 @@ describe('Deep Research', () => {
     const ok = await call('/api/research', { method: 'POST', body: { question: 'Does sleep help memory?', depth: 'detailed' } });
     expect(ok.status).toBe(200);
     await events(ok);
-    expect((await creditSummary('acc-1')).used).toBe(25);
+    expect((await creditSummary('acc-1')).used).toBe(45);
   });
 
   it('refuses a job when the credits are not enough, before any work', async () => {
-    fake.put('accounts/acc-1/plan_usage/credits__' + new Date().toISOString().slice(0, 7), { key: 'credits', amount: 28 });
+    fake.put('accounts/acc-1/plan_usage/credits__' + new Date().toISOString().slice(0, 7), { key: 'credits', amount: 40 });
     const response = await call('/api/research', { method: 'POST', body: { question: 'Does sleep help memory?', depth: 'deep' } });
     expect(response.status).toBe(402);
     expect(llm.stream).not.toHaveBeenCalled();

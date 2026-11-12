@@ -22,7 +22,7 @@ export type AskRequest = {
   plan?: { sub_questions: { question: string; queries: string[] }[] } | null;
 };
 
-export const DEPTH_CREDITS: Record<Depth, number> = { summary: 1, deep: 7, detailed: 25 };
+export const DEPTH_CREDITS: Record<Depth, number> = { summary: 1, deep: 15, detailed: 45 };
 export const askCredits = (depth: Depth, highQuality: boolean) => DEPTH_CREDITS[depth] * (highQuality ? 3 : 1);
 
 /** What the person's plan allows (Detailed, High quality), from the public plan list. */

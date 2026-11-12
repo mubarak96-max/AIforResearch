@@ -24,7 +24,7 @@ const db = {
 
 import { Hono } from 'hono';
 import {
-  PlanLimitError, addTopupCredits, checkLibraryRoom, checkQuota, checkTotal, countUse, creditSummary, effectivePlan, forgetPlans, loadPlans,
+  PlanLimitError, addTopupCredits, checkLibraryRoom, checkQuota, checkRunning, checkTotal, countUse, creditSummary, effectivePlan, forgetPlans, loadPlans,
   planQuota, publicPlan, refundCredits, requireFeature, spendCredits,
 } from '../../lib/server/lib/plans.js';
 
@@ -41,7 +41,7 @@ describe('plans in code', () => {
   it('come from plans.ts in order, with their features, and paid ones can be bought before any Dodo product exists', async () => {
     const { plans, features } = await loadPlans();
     expect(plans.map((plan) => plan.id)).toEqual(['free', 'plus', 'pro', 'team']);
-    expect(features.get('free')?.[0]).toEqual({ label: '30 credits a month for AI research, reviews and drafts', included: true });
+    expect(features.get('free')?.[0]).toEqual({ label: '45 credits a month for AI research, reviews and drafts', included: true });
     const plus = plans.find((plan) => plan.id === 'plus')!;
     expect(plus.dodo_monthly_product_id).toBeNull();
     expect(publicPlan(plus, [])).toMatchObject({ purchasable: true, has_monthly: true, has_yearly: true });
@@ -87,14 +87,29 @@ describe('counted limits', () => {
     expect(error.message).toBe("You have used today's 10 AI autocompletes on the Free plan. Upgrade for more.");
   });
 
+  it('lets a Free account run 2 reports a day and one at a time; Pro runs 3 at once', async () => {
+    for (let index = 0; index < 2; index += 1) {
+      await checkQuota(ACCOUNT, 'research_runs');
+      await countUse(ACCOUNT, 'research_runs');
+    }
+    await expect(checkQuota(ACCOUNT, 'research_runs')).rejects.toThrow("You have used today's 2 Deep and Detailed reports on the Free plan");
+    await expect(checkRunning(ACCOUNT, 0)).resolves.toBeUndefined();
+    await expect(checkRunning(ACCOUNT, 1)).rejects.toThrow('A report is already running. Your Free plan runs one at a time');
+    db.state.account = { ...db.state.account, plan_id: 'pro', plan_source: 'dodo', plan_status: 'active' };
+    await expect(checkRunning(ACCOUNT, 2)).resolves.toBeUndefined();
+    const error = await checkRunning(ACCOUNT, 3).catch((caught) => caught);
+    expect(error).toMatchObject({ status: 402, key: 'research_parallel' });
+    expect(await checkQuota(ACCOUNT, 'research_runs')).toBe(38);
+  });
+
 });
 
 describe('credits', () => {
-  it('gives Free 30 credits a month, refuses a job that needs more than is left, and refunds a failed job', async () => {
-    expect(await creditSummary(ACCOUNT)).toMatchObject({ allowance: 30, used: 0, topup: 0, left: 30 });
+  it('gives Free 45 credits a month, refuses a job that needs more than is left, and refunds a failed job', async () => {
+    expect(await creditSummary(ACCOUNT)).toMatchObject({ allowance: 45, used: 0, topup: 0, left: 45 });
     const deep = await spendCredits(ACCOUNT, 5);
     expect(deep).toMatchObject({ fromPlan: 5, fromTopup: 0 });
-    await spendCredits(ACCOUNT, 20);
+    await spendCredits(ACCOUNT, 35);
     const error = await spendCredits(ACCOUNT, 10, 'A document review').catch((caught) => caught);
     expect(error).toBeInstanceOf(PlanLimitError);
     expect(error.status).toBe(402);
@@ -104,7 +119,7 @@ describe('credits', () => {
   });
 
   it('uses top-up credits after the month runs out and gives them back on refund', async () => {
-    await spendCredits(ACCOUNT, 28);
+    await spendCredits(ACCOUNT, 43);
     await addTopupCredits(ACCOUNT, 500);
     const charge = await spendCredits(ACCOUNT, 10);
     expect(charge).toMatchObject({ fromPlan: 2, fromTopup: 8 });
@@ -113,13 +128,13 @@ describe('credits', () => {
     expect(await creditSummary(ACCOUNT)).toMatchObject({ left: 502, topup: 500 });
   });
 
-  it('gives Plus 500 and Pro 1,500 credits, and a Defence Pass runs as Pro until its end date', async () => {
+  it('gives Plus 750 and Pro 1,500 credits, and a Defence Pass runs as Pro until its end date', async () => {
     db.state.account = { ...db.state.account, plan_id: 'plus', plan_source: 'dodo', plan_status: 'active' };
-    expect((await creditSummary(ACCOUNT)).allowance).toBe(500);
+    expect((await creditSummary(ACCOUNT)).allowance).toBe(750);
     db.state.account = { ...db.state.account, plan_id: 'pro', plan_source: 'pass', plan_status: 'active', plan_period_end: new Date(Date.now() + 86_400_000) };
     expect((await creditSummary(ACCOUNT)).allowance).toBe(1500);
     db.state.account = { ...db.state.account, plan_period_end: new Date(Date.now() - 1000) };
-    expect((await creditSummary(ACCOUNT)).allowance).toBe(30);
+    expect((await creditSummary(ACCOUNT)).allowance).toBe(45);
   });
 });
 

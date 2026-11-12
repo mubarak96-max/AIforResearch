@@ -160,7 +160,7 @@ describe('POST /api/studio/run/:module', () => {
 
   it('refuses High quality on Free and a run that needs more credits than are left', async () => {
     expect((await run(fakeLlm('x'), 'outline', { inputs: { topic: 'nurse burnout' }, high_quality: true })).status).toBe(402);
-    fake.put(`accounts/${ACCOUNT}/plan_usage/credits__${new Date().toISOString().slice(0, 7)}`, { key: 'credits', amount: 25 });
+    fake.put(`accounts/${ACCOUNT}/plan_usage/credits__${new Date().toISOString().slice(0, 7)}`, { key: 'credits', amount: 40 });
     const refused = await run(fakeLlm('x'), 'paper', { inputs: { topic: 'a study' } });
     expect(refused.status).toBe(402);
     expect(refused.json).toMatchObject({ code: 'plan_limit', limit: 'credits' });

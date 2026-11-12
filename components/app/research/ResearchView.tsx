@@ -15,6 +15,8 @@ import { Check } from './controls';
 import { followOnLinks, openResultInEditor } from './handoff';
 import { AskComposer, type AskRequest } from './AskComposer';
 import { ResearchSteps, VerifyFlags, type StepView } from './ResearchSteps';
+import type { ResearchFigure } from './figures';
+import { figuresAsText } from '@/lib/server/lib/researchFigures';
 
 export type ResearchState = {
   taskId: string | null;
@@ -24,6 +26,8 @@ export type ResearchState = {
   /** The seven steps (Plan … Verify), live or as saved; empty on answers saved before the steps. */
   steps: StepView[];
   markdown: string;
+  /** A report's figures (Deep and Detailed), drawn where the text has a figure block. */
+  figures?: ResearchFigure[];
   sources: Source[];
   allSources: Source[];
   web: Source[];
@@ -74,6 +78,8 @@ export function ResearchView({ state, onRetry }: { state: ResearchState; onRetry
   // Under the answer: what the reader must know (changed sentences, unsupported claims, retracted or corrected papers).
   const attention = (state.verification?.flags ?? []).filter((flag) => flag.kind !== 'unconfirmed');
   const searchedTotal = Object.values(state.searched?.counts ?? {}).reduce((sum, value) => sum + value, 0);
+  /** The report as text, each figure as a table: for the editor and the clipboard. */
+  const asText = () => figuresAsText(markdown, state.figures);
 
   const ask = async () => {
     if (!state.taskId || followUp.trim().length < 2) return;
@@ -135,7 +141,7 @@ export function ResearchView({ state, onRetry }: { state: ResearchState; onRetry
           </section>
         )}
         {state.consensus && <div className="mt-4"><ConsensusBar consensus={state.consensus} /></div>}
-        {markdown && <CitedMarkdown className={`mt-2 transition-opacity ${formatting ? 'opacity-50' : ''}`} markdown={markdown} sources={everySource} onCite={cite} />}
+        {markdown && <CitedMarkdown className={`mt-2 transition-opacity ${formatting ? 'opacity-50' : ''}`} markdown={markdown} sources={everySource} onCite={cite} figures={state.figures} />}
         {!state.running && attention.length > 0 && (
           <section aria-labelledby="checks-title" className="mt-5 rounded-xl bg-soft px-4 py-3">
             <h2 id="checks-title" className="text-[14px] font-bold text-ink">Notes from the citation check</h2>
@@ -146,8 +152,8 @@ export function ResearchView({ state, onRetry }: { state: ResearchState; onRetry
         {!state.running && markdown && state.taskId && (
           <>
             <div className="mt-6 flex flex-wrap items-center gap-2">
-              <Button variant="primary" size="sm" onClick={() => openResultInEditor(state.question, markdown, everySource)}><LuFilePen className="h-4 w-4" />Open in editor</Button>
-              <Button size="sm" onClick={() => navigator.clipboard.writeText(markdown).then(() => toast.success('Copied'))}><LuCopy className="h-4 w-4" />Copy</Button>
+              <Button variant="primary" size="sm" onClick={() => openResultInEditor(state.question, asText(), everySource)}><LuFilePen className="h-4 w-4" />Open in editor</Button>
+              <Button size="sm" onClick={() => navigator.clipboard.writeText(asText()).then(() => toast.success('Copied'))}><LuCopy className="h-4 w-4" />Copy</Button>
               <Button size="sm" onClick={() => saveAll().catch(showError)}><LuLibrary className="h-4 w-4" />Save cited papers</Button>
               <Check size="sm" className="ml-1" checked={withHeadings} onChange={toggleHeadings}
                 title={withHeadings ? 'Show the answer as flowing paragraphs' : addCost ? 'Add section headings; the text and citations stay the same (1 credit)' : 'Show the version with section headings'}>

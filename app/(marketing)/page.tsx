@@ -42,7 +42,7 @@ const FAQ = [
   },
   {
     q: 'What do I get for free?',
-    a: 'Unlimited paper search, filters, citations and the Library (25 PDFs), the full editor with 10 AI autocompletes a day, and 30 credits a month for AI work: for example three Deep reports, a preview review, an outline and a few quick answers. No credit card.',
+    a: 'Unlimited paper search, filters, citations and the Library (25 PDFs), the full editor with 10 AI autocompletes a day, and 45 credits a month for AI work: for example two Deep reports with figures, an outline and a few quick answers. No credit card.',
   },
   {
     q: 'What is a credit?',

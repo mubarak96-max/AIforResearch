@@ -9,6 +9,7 @@ import { api } from '@/lib/session';
 import { openInEditor } from '@/components/tools/editorHandoff';
 import { EDITOR_STYLE, editorHtml, type ResultSource } from '@/components/tools/toolOutput';
 import type { Source } from './parts';
+import { figuresAsText } from '@/lib/server/lib/researchFigures';
 
 export function toResultSource(source: Source): ResultSource {
   return {
@@ -37,7 +38,8 @@ export async function loadFromTask(id: string | null | undefined): Promise<{ top
   const task = await api<TaskRecord>(`/api/history/${encodeURIComponent(id)}`).catch(() => null);
   if (!task) return null;
   const sources = ((task.result?.sources ?? task.result?.all_sources ?? []) as Source[]);
-  return { topic: String(task.inputs?.question ?? task.inputs?.topic ?? task.title), sources, markdown: String(task.result?.markdown ?? ''), task };
+  // A report's figures arrive as tables: the workspaces that build on it read text.
+  return { topic: String(task.inputs?.question ?? task.inputs?.topic ?? task.title), sources, markdown: figuresAsText(String(task.result?.markdown ?? ''), task.result?.figures), task };
 }
 
 /** Text with its [S1] markers removed, for forms that take plain text (abstract, paraphrase, improve…). */

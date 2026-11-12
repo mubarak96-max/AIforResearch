@@ -23,6 +23,7 @@ import { mergeResults, searchSources, sortPapers, semanticScholarSimilar, SOURCE
 import { searchSemanticScholar } from '../lib/sources/providers.js';
 import { createTask, failTask, finishTask, getTaskFor } from '../lib/history.js';
 import { Filters, toFilters } from './research.js';
+import { figuresAsText, type ResearchFigure } from '../lib/researchFigures.js';
 import { STUDIO_KIND, studioCredits, studioModule, type StudioField, type StudioModule } from '../lib/studioCatalog.js';
 import { batches, buildStudioPrompt, cleanDeck, hasStudioPrompt, improvePrompt, paragraphsOf, type StudioLength } from '../lib/studioModules.js';
 
@@ -217,7 +218,7 @@ async function gatherStudioSources(slots: Slots, user: AuthUser, module: StudioM
     send('status', { stage: 'reading', detail: `Using the ${found.length} sources of “${task.title.slice(0, 60)}”` });
     const sources = renumber([...files, ...found]);
     const map = new Map(found.map((source, index) => [source.marker, sources[files.length + index].marker]));
-    const markdown = typeof task.result?.markdown === 'string' ? remapMarkers(task.result.markdown, map).trim() : '';
+    const markdown = typeof task.result?.markdown === 'string' ? remapMarkers(figuresAsText(task.result.markdown, task.result.figures as ResearchFigure[] | undefined), map).trim() : '';
     return { sources, prior: markdown ? { title: task.title, markdown } : null };
   } else if (module.grounded && !(module.id === 'slides' && inputs.text)) {
     const groups: SourceGroup[] = body.library_document_ids.length && !body.groups.includes('library') ? [...body.groups, 'library'] : body.groups;

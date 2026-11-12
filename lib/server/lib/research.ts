@@ -1,22 +1,27 @@
 /**
  * Deep Research: a question in, an answer built from real papers out, every claim cited.
  *
- * Every job runs seven steps the person watches (researchPipeline.ts): Plan, Search, Screen,
- * Rank, Read, Write and Verify. Three depths:
- * - Summary: one search, about 8 papers, a short cited answer (1 credit).
- * - Deep: 3 sub-questions, about 25 papers, a few full texts, a structured report (7 credits).
- * - Detailed: 5 sub-questions the person can edit first, citation chasing, about 50 papers, a long
- *   report with tables (25 credits, paid plans).
- * High quality (Pro) uses the stronger model and longer answers, for 3× the credits.
+ * Every job runs eight steps the person watches (researchPipeline.ts): Plan, Search, Screen,
+ * Rank, Read, Fill gaps, Write and Verify. Three depths:
+ * - Summary: one search, about 8 papers, a short cited answer (1 credit). No gap round.
+ * - Deep: 5 sub-questions, about 250 papers screened, 45 kept (plus up to 12 from the gap round),
+ *   12 full texts, a 2,500 to 4,000-word report written section by section, with figures
+ *   (15 credits).
+ * - Detailed: 7 sub-questions the person can edit first, citation chasing, about 450 screened,
+ *   90 kept (plus up to 20 from the gap round), 25 full texts, a 5,000 to 8,000-word report with a
+ *   comparison table and figures (45 credits, paid plans).
+ * High quality (Pro) uses the stronger model and longer sections, for 3× the credits.
  *
  * Sources are the groups the person picks (All papers, Medical, Preprints, Web, My Library) plus
  * any files they attach. The model may cite only the numbered sources it was given; invented
- * markers are dropped before anything is saved. A consensus line ("14 of 18 studies…") is
- * computed from the cited sources' stances, never typed by the model.
+ * markers are dropped before anything is saved. A consensus line ("14 of 18 studies…"), the
+ * Methods paragraph, the comparison table and every figure are computed, never typed by the model
+ * (researchReport.ts, researchFigures.ts).
  */
 import type { LlmSlot, ChatMessage, LlmUsage } from '../slots/types.js';
 import { STUDY_TYPE_LABELS, type FoundPaper, type SearchFilters, type SourceGroup, type WebResult } from './sources/index.js';
 import type { ResearchProfile } from './users.js';
+import type { Effect, ResearchFigure } from './researchFigures.js';
 
 export const DEPTHS = ['summary', 'deep', 'detailed'] as const;
 export type Depth = (typeof DEPTHS)[number];
@@ -28,17 +33,33 @@ export type DepthSettings = {
   queries: number; perQuery: number;
   /** Candidates screened, papers kept after ranking, open full texts read. */
   candidates: number; papers: number; fullTexts: number;
-  /** Follow the references and citations of the best papers (citation chasing). */
-  snowball: boolean;
-  /** Most claims and references checked in Verify. */
-  claims: number; references: number;
-  abstractChars: number; words: string; maxTokens: number;
+  /** Seed papers whose references and citations are followed (citation chasing); 0 is off. */
+  snowball: number;
+  /** Fill gaps: follow-up searches after Read, the most papers they may add, and full texts among them. */
+  gapQueries: number; gapPapers: number; gapFullTexts: number;
+  /** Most claims checked in Verify, references checked at Crossref, and claims rewritten. */
+  claims: number; references: number; revise: number;
+  /** Abstract characters each source shows the writer. */
+  abstractChars: number;
+  /** Whole-report length, and the thematic sections the outline may make (Deep and Detailed). */
+  words: string; themes: [number, number];
+  /** Output tokens: the whole answer (Summary) or each thematic section (Deep, Detailed). */
+  maxTokens: number;
 };
 
 export const DEPTH_SETTINGS: Record<Depth, DepthSettings> = {
-  summary: { subQuestions: 1, queriesPer: 1, queries: 1, perQuery: 14, candidates: 30, papers: 8, fullTexts: 0, snowball: false, claims: 12, references: 8, abstractChars: 900, words: '150 to 250', maxTokens: 900 },
-  deep: { subQuestions: 3, queriesPer: 1, queries: 4, perQuery: 18, candidates: 90, papers: 25, fullTexts: 4, snowball: false, claims: 40, references: 25, abstractChars: 800, words: '900 to 1,300', maxTokens: 3200 },
-  detailed: { subQuestions: 5, queriesPer: 2, queries: 7, perQuery: 20, candidates: 180, papers: 50, fullTexts: 8, snowball: true, claims: 80, references: 40, abstractChars: 600, words: '2,000 to 3,000', maxTokens: 7000 },
+  summary: {
+    subQuestions: 1, queriesPer: 1, queries: 1, perQuery: 14, candidates: 30, papers: 8, fullTexts: 0, snowball: 0,
+    gapQueries: 0, gapPapers: 0, gapFullTexts: 0, claims: 12, references: 8, revise: 12, abstractChars: 900, words: '150 to 250', themes: [0, 0], maxTokens: 900,
+  },
+  deep: {
+    subQuestions: 5, queriesPer: 2, queries: 11, perQuery: 25, candidates: 250, papers: 45, fullTexts: 12, snowball: 3,
+    gapQueries: 4, gapPapers: 12, gapFullTexts: 3, claims: 90, references: 60, revise: 24, abstractChars: 1400, words: '2,500 to 4,000', themes: [3, 5], maxTokens: 1500,
+  },
+  detailed: {
+    subQuestions: 7, queriesPer: 3, queries: 22, perQuery: 25, candidates: 450, papers: 90, fullTexts: 25, snowball: 6,
+    gapQueries: 6, gapPapers: 20, gapFullTexts: 6, claims: 160, references: 110, revise: 40, abstractChars: 1600, words: '5,000 to 8,000', themes: [5, 8], maxTokens: 2000,
+  },
 };
 
 /** The research plan: sub-questions that together answer the question, each with its searches. */
@@ -104,6 +125,10 @@ export type ResearchSource = {
   passage?: string | null;
   /** Verify's reference check: the DOI at Crossref, and any retraction or correction notice. */
   check?: ReferenceCheck | null;
+  /** An effect size with its 95% interval, kept only when its numbers are written in the paper (Read). */
+  effect?: Effect | null;
+  /** Found by the Fill gaps round. */
+  gap?: boolean;
 };
 
 export type ReferenceCheck = { status: 'confirmed' | 'retracted' | 'corrected' | 'concern' | 'unconfirmed' | 'no_doi'; note: string | null };
@@ -111,19 +136,27 @@ export type ReferenceCheck = { status: 'confirmed' | 'retracted' | 'corrected' |
 export type Stance = 'supports' | 'mixed' | 'against' | 'unclear';
 export type Consensus = { applicable: boolean; line: string | null; counts: Record<Stance, number>; total: number };
 
-export const STEP_IDS = ['plan', 'search', 'screen', 'rank', 'read', 'write', 'verify'] as const;
+export const STEP_IDS = ['plan', 'search', 'screen', 'rank', 'read', 'gaps', 'write', 'verify'] as const;
 export type StepId = (typeof STEP_IDS)[number];
 /** One step as the browser shows it: its state, a one-line result and the details behind it. */
-export type ResearchStep = { id: StepId; state: 'pending' | 'active' | 'done' | 'failed'; detail: string; data: Record<string, unknown> | null; ms: number | null };
+export type ResearchStep = { id: StepId; state: 'pending' | 'active' | 'done' | 'skipped' | 'failed'; detail: string; data: Record<string, unknown> | null; ms: number | null };
 
 export type ResearchEvents = {
   step: (step: ResearchStep) => void;
   sources: (sources: ResearchSource[], web: ResearchSource[], searched: { counts: Record<string, number>; errors: { provider: string; message: string }[]; queries: string[] }) => void;
   delta: (text: string) => void;
+  /** The report's figures, sent before its text so the placeholders can be drawn as they stream. */
+  figures: (figures: ResearchFigure[]) => void;
+  /** The whole text so far, replacing what was streamed (a report's Summary is written last but goes first). */
+  markdown: (text: string) => void;
 };
 
 export type ResearchResult = {
   markdown: string;
+  /** Both versions when the person asked for no headings, so turning them on later is free. */
+  markdown_headed?: string;
+  markdown_plain?: string;
+  figures: ResearchFigure[];
   sources: ResearchSource[];
   all_sources: ResearchSource[];
   consensus: Consensus | null;
@@ -236,23 +269,22 @@ export function sourcesBlock(sources: ResearchSource[], abstractChars: number): 
       source.finding ? `Key finding: ${source.finding}` : null,
       source.sample ? `Studied: ${source.sample}` : null,
       source.limits ? `Main limitation: ${source.limits}` : null,
+      source.effect ? `Effect size: ${source.effect.measure} ${source.effect.value} (95% CI ${source.effect.low} to ${source.effect.high})${source.effect.outcome ? ` for ${source.effect.outcome}` : ''}` : null,
       source.passage ? `Full-text excerpt: ${source.passage.replace(/\s+/g, ' ').slice(0, 2400)}` : null,
     ].filter(Boolean).join('\n');
     return `[${source.marker}] ${authors || source.venue || 'Unknown'} (${source.year ?? 'n.d.'}). ${source.title}. ${source.venue || ''}${labels ? ` [${labels}]` : ''}\n${source.kind === 'file' ? 'Excerpt' : source.kind === 'web' ? 'Page summary' : 'Abstract'}: ${body}${read ? `\n${read}` : ''}`;
   }).join('\n\n');
 }
 
+/** The prompt for a Summary answer, written in one call. */
 export function researchPrompt(input: ResearchInput, sources: ResearchSource[]): ChatMessage[] {
   const settings = DEPTH_SETTINGS[input.depth];
   const reader = ROLE_TEXT[input.role || input.profile.role || ''] || 'a researcher';
   const field = input.profile.field ? ` in ${input.profile.field}` : '';
+  // Summary answers only: Deep and Detailed reports are written section by section (researchReport.ts).
   const structure = !input.headings
     ? 'Write flowing paragraphs without headings. Keep the most direct answer in the first paragraph.'
-    : input.depth === 'summary'
-      ? 'Start with a one-paragraph direct answer, then 2–4 short bullet points of the key findings. Use no headings.'
-      : input.depth === 'deep'
-        ? 'Use these Markdown sections: ## Summary (3–4 sentences that answer the question), ## What the evidence shows (grouped by theme with ### subheadings), ## Where studies disagree, ## Limits of the evidence, ## Open questions.'
-        : 'Use these Markdown sections: ## Summary, ## Background, ## What the evidence shows (grouped by theme with ### subheadings), ## Comparison of studies (a Markdown table: Source | Design | Population or setting | Main finding), ## Where studies disagree and why, ## Quality and limits of the evidence, ## Implications, ## Open questions and future research.';
+    : 'Start with a one-paragraph direct answer, then 2–4 short bullet points of the key findings. Use no headings.';
   const system = [
     'You are AI for Research, a research assistant that answers only from the numbered sources given.',
     `Write for ${reader}${field}, in clear, plain, formal language; prefer short common words and direct sentences.`,

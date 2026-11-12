@@ -79,6 +79,21 @@ export async function createTask(user: AuthUser, task: { kind: TaskKind; module?
   return id;
 }
 
+/** A report still running after this long has died with its server; it no longer holds a slot. */
+const STALE_RUN_MS = 30 * 60 * 1000;
+
+/** Deep and Detailed reports the account has running now (Summary answers are not counted). */
+export async function runningResearch(accountId: string): Promise<number> {
+  const snapshot = await col(C.tasks).where('account_id', '==', accountId).where('status', '==', 'running').get();
+  const since = Date.now() - STALE_RUN_MS;
+  return snapshot.docs.filter((doc) => {
+    const data = doc.data();
+    const created = data.created_at;
+    const at = created && typeof created.toDate === 'function' ? created.toDate().getTime() : new Date(created).getTime();
+    return data.kind === 'research' && data.module !== 'summary' && at > since;
+  }).length;
+}
+
 export async function finishTask(id: string, result: Record<string, unknown>, extra: { title?: string; credits?: number } = {}) {
   await col(C.tasks).doc(id).update({
     status: 'done', result: trimResult(result), updated_at: new Date(),

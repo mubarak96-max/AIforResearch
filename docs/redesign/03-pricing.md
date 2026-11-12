@@ -100,8 +100,8 @@ Estimated worst case for a free account that spends everything, every month: abo
 | Job | Tokens read / written | Estimated cost | Credits | Cost per credit |
 | --- | --- | --- | --- | --- |
 | Summary answer | 19k / 2k | $0.008 | 1 | $0.008 |
-| Deep report | 110k / 9k | $0.044 | 7 | $0.0063 |
-| Detailed report | 395k / 23k | $0.146 | 25 | $0.0058 |
+| Deep report (deeper, 12 Nov 2026) | about 175k / 30k | $0.089 | 15 | $0.0059 |
+| Detailed report (deeper, 12 Nov 2026) | about 520k / 60k | $0.228 | 45 | $0.0051 |
 | Standard review, 10,000 words | 70k / 8k | $0.03 | 10 | $0.003 |
 | High-quality review (premium model writes the final pass) | 70k economy + 30k / 8k premium | $0.23 | 30 | $0.008 |
 | Slide deck | 40k / 6k | $0.02 | 10 | $0.002 |
@@ -110,10 +110,14 @@ Target: **no more than $0.006 of cost per credit on average.**
 
 **Research steps (12 November 2026).** Deep Research now runs seven steps the person watches: Plan, Search, Screen, Rank, Read, Write, Verify. Screen (titles and abstracts), Read (one finding per paper, plus open full texts: 4 on Deep, 8 on Detailed) and Verify (each cited sentence checked against its sources, overstated ones rewritten, each DOI checked at Crossref) add economy-model calls; Rank, citation chasing and the Crossref checks cost nothing. The old stance-labelling call is gone (Read does it). Deep went from 5 to 7 credits and Detailed from 20 to 25 to stay near the target. Summary stays at 1 credit as the free entry point, about $0.008 a credit; a user who spent a whole Plus allowance on Summary answers would cost about $4 instead of $3, and the plan stays positive. Allowances are unchanged: every job is now priced at its cost, so a month's credits buy a little fewer reports than before but each one does more. Measure the real tokens per step (meterTokens records `research:<depth>` and `research:plan`) and revisit after a month.
 
+**Deeper reports (12 November 2026).** Deep and Detailed now read and write like a literature review: Deep plans 5 sub-questions with 2 searches each, screens about 250 papers, keeps 45, reads 12 in full text and chases the citations of the 3 best; Detailed plans 7 with 3 searches each, screens about 450, keeps 90 and reads 25 in full text. A new **Fill gaps** step asks where the evidence is thin and searches again (up to 12 papers on Deep, 20 on Detailed). The report is written section by section from an outline (3–5 thematic sections on Deep, 5–8 on Detailed, 2,500–4,000 and 5,000–8,000 words), with a computed Methods paragraph, figures (flow of sources, papers by year and design, stance by design, papers per sub-question, and a forest plot when three or more studies report the same measure with numbers found word for word in the paper), and on Detailed a study comparison table. Estimated cost rose about 2× (Deep) and 1.6× (Detailed); Deep went from 7 to **15** credits and Detailed from 25 to **45**, still under the $0.006 target. To keep reports affordable, Free went from 30 to **45** credits (two Deep reports, about $0.27 at full use) and Plus from 500 to **750**. Pro stays at 1,500 and Team at 2,000 a seat: at 2,000 the Defence Pass would keep about 4% at full use and a yearly Team seat about 12%.
+
+**Daily reports and reports at once (12 November 2026).** Borrowed from a competitor that sells research runs by the day: besides credits, each plan has a number of Deep and Detailed reports a day and a number that may run at once (Free 2 a day, 1 at once; Plus 15, 1; Pro 40, 3; Team 100, 10). A report runs for minutes and reads hundreds of papers, so this caps a burst from one account (and the load on the paper APIs) without touching what a normal month costs. Summary answers are not counted. A report still marked running after 30 minutes no longer holds a slot. Not copied yet: queue priority by plan (there is no queue; reports run in the request), and per-plan limits on pages per PDF and files per upload.
+
 | Plan | Revenue a month | Fees | Credits at full use | Autocomplete, hosting | Left at full use | Left at typical use (40% of credits) |
 | --- | --- | --- | --- | --- | --- | --- |
-| Plus, monthly | $12.00 | $1.12 | $3.00 | $1.50 | $6.38 (53%) | $8.18 (68%) |
-| Plus, yearly | $8.00 | $0.51 | $3.00 | $1.50 | $2.99 (37%) | $4.79 (60%) |
+| Plus, monthly (750 credits) | $12.00 | $1.12 | $4.50 | $1.50 | $4.88 (41%) | $7.58 (63%) |
+| Plus, yearly (750 credits) | $8.00 | $0.51 | $4.50 | $1.50 | $1.49 (19%) | $4.19 (52%) |
 | Pro, monthly | $29.00 | $2.14 | $9.00 | $2.50 | $15.36 (53%) | $20.76 (72%) |
 | Pro, yearly | $19.00 | $1.17 | $9.00 | $2.50 | $6.33 (33%) | $11.73 (62%) |
 | Team seat, yearly | $25.00 | $1.53 | $12.00 | $2.50 | $8.97 (36%) | $16.17 (65%) |

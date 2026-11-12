@@ -16,7 +16,7 @@ import { creditsChanged, showError } from '@/components/app/research/parts';
 import { PENDING_KEY, type TaskRecord } from '@/components/app/research/handoff';
 
 const blank = (request: Partial<AskRequest> = {}): ResearchState => ({
-  taskId: null, question: request.question ?? '', depth: request.depth ?? 'deep', groups: request.groups ?? ['papers'], steps: [], markdown: '',
+  taskId: null, question: request.question ?? '', depth: request.depth ?? 'deep', groups: request.groups ?? ['papers'], steps: [], markdown: '', figures: [],
   sources: [], allSources: [], web: [], consensus: null, searched: null, followUps: [], running: false, error: null, request,
 });
 
@@ -26,7 +26,7 @@ function fromTask(task: TaskRecord): ResearchState {
   return {
     taskId: task.id, question: String(task.inputs?.question ?? task.title), depth: String(task.inputs?.depth ?? task.module ?? 'deep'), groups: task.inputs?.groups ?? ['papers'],
     steps: (result.steps ?? []) as StepView[], verification: result.verification ?? null,
-    markdown: String(result.markdown ?? ''), sources: result.sources ?? [], allSources: all.filter((source) => source.kind !== 'web'),
+    markdown: String(result.markdown ?? ''), figures: result.figures ?? [], sources: result.sources ?? [], allSources: all.filter((source) => source.kind !== 'web'),
     web: all.filter((source) => source.kind === 'web'), consensus: result.consensus ?? null, searched: result.searched ?? null,
     followUps: result.follow_ups ?? [], headedCopy: typeof result.markdown_headed === 'string', running: task.status === 'running', error: task.status === 'failed' ? task.error || 'This research did not finish.' : null,
     request: task.inputs ? {
@@ -82,9 +82,11 @@ function DeepResearch() {
             case 'task': return { ...current, taskId: data.id };
             case 'step': return { ...current, steps: applyStep(current.steps, data) };
             case 'sources': return { ...current, allSources: data.sources, web: data.web, searched: { counts: data.counts, errors: data.errors, queries: data.queries } };
+            case 'figures': return { ...current, figures: data.figures };
             case 'delta': return { ...current, markdown: current.markdown + data.text };
+            case 'markdown': return { ...current, markdown: data.text };
             case 'done': return {
-              ...current, running: false, markdown: data.markdown, sources: data.sources, consensus: data.consensus, followUps: [],
+              ...current, running: false, markdown: data.markdown, figures: data.figures ?? current.figures, headedCopy: typeof data.markdown_headed === 'string', sources: data.sources, consensus: data.consensus, followUps: [],
               steps: data.steps ?? current.steps, verification: data.verification ?? null,
               allSources: (data.all_sources ?? []).filter((source: { kind: string }) => source.kind !== 'web'),
             };
