@@ -406,7 +406,7 @@ export type ChartResult = TestResult & { chart?: SurvivalChart };
 export function guessEvent(levels: string[], requested?: string | null): string | null {
   if (requested && levels.includes(requested)) return requested;
   const lower = levels.map((level) => level.toLowerCase());
-  for (const word of ['1', 'yes', 'event', 'dead', 'died', 'death', 'deceased', 'true', 'relapse', 'recurrence', 'failure', 'failed', 'progressed']) {
+  for (const word of ['1', 'yes', 'event', 'dead', 'died', 'death', 'deceased', 'true', 'relapse', 'relapsed', 'recurrence', 'failure', 'failed', 'progressed', 'positive', 'pos', '+', 'case', 'disease', 'diseased', 'present', 'abnormal', 'sick', 'ill', 'malignant', 'detected', 'reactive']) {
     const at = lower.indexOf(word);
     if (at >= 0 && levels.length <= 2) return levels[at];
   }

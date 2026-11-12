@@ -1,7 +1,5 @@
 /** Analytics never accepts arbitrary editor properties, paths or identifiers. */
 export const PRIVACY_STORAGE_KEY = 'research-privacy-v1';
-export const PRIVACY_SETTINGS_EVENT = 'research-privacy-settings';
-export const PRIVACY_CHANGED_EVENT = 'research-privacy-changed';
 export type PrivacyChoice = { analytics: boolean; recordings: boolean; savedAt: number };
 export const EMPTY_PRIVACY_CHOICE: PrivacyChoice = { analytics: false, recordings: false, savedAt: 0 };
 const MAX_CHOICE_AGE = 180 * 24 * 60 * 60_000;
@@ -12,6 +10,12 @@ export function parsePrivacyChoice(raw: string | null, now = Date.now()): Privac
     if (!value || typeof value.savedAt !== 'number' || !Number.isFinite(value.savedAt) || value.savedAt > now || now - value.savedAt > MAX_CHOICE_AGE) return { ...EMPTY_PRIVACY_CHOICE };
     return { analytics: value.analytics === true, recordings: value.recordings === true, savedAt: value.savedAt };
   } catch { return { ...EMPTY_PRIVACY_CHOICE }; }
+}
+
+/** The choice in effect: a saved choice wins; with none saved, analytics and recordings are on. */
+export function effectivePrivacyChoice(raw: string | null, now = Date.now()): PrivacyChoice {
+  const saved = parsePrivacyChoice(raw, now);
+  return saved.savedAt ? saved : { analytics: true, recordings: true, savedAt: 0 };
 }
 
 /** Explicit public pages only. Tools, search, help, auth and all workspaces are excluded. */

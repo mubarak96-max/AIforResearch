@@ -18,6 +18,8 @@ To remake the Word, PDF and survey files after editing the Markdown, run `node s
 | The papers in the systematic-review exports | Their abstracts, which are short summaries rather than the publishers' text |
 | | The funding call (a fictional fund), "Kamau & Otieno (2021)" and "Wanjiru & Ochieng (2022)" (they do not exist) |
 
+For the features added on 13 November 2026 (Data Lab clinical statistics, the reporting-guideline check, the survey builder and the new Writing Studio templates), see the files in `data-lab/clinical/`, `surveys/`, `reviewer/manuscript-cross-sectional-strobe.md`, `writing/case-notes-kikuchi.txt` and `writing/programme-wash-schools.txt`, and their expected results in [docs/testing/test-plan.md](../docs/testing/test-plan.md).
+
 ## Feature by feature
 
 ### Deep Research (`/deep-research`)
@@ -196,4 +198,4 @@ Upload `reviewer/thesis-chapter-2-sleep-memory.pdf` and `reviewer/research-propo
 
 ### Credits
 
-On a fresh Free account, a Deep report (5) plus a free Reviewer preview (3) should leave 22 of 30 credits. A failed job, such as a question with no results, should give its credits back.
+On a fresh Free account, a Deep report (15) plus a free Reviewer preview (3) should leave 27 of 45 credits. A failed job, such as a question with no results, should give its credits back.

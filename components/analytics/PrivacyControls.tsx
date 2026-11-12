@@ -3,8 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import {
-  EMPTY_PRIVACY_CHOICE, parsePrivacyChoice, PRIVACY_CHANGED_EVENT, PRIVACY_SETTINGS_EVENT,
-  PRIVACY_STORAGE_KEY, publicAnalyticsPath, type PrivacyChoice,
+  EMPTY_PRIVACY_CHOICE, effectivePrivacyChoice, PRIVACY_STORAGE_KEY, publicAnalyticsPath, type PrivacyChoice,
 } from '@/lib/analyticsPrivacy';
 
 // Preserve the existing projects. Neither script is loaded in private workspaces.
@@ -38,30 +37,21 @@ function addScript(id: string, src: string) {
   document.head.appendChild(script);
 }
 
-export function PrivacySettingsButton({ className = '' }: { className?: string }) {
-  return <button type="button" onClick={() => window.dispatchEvent(new Event(PRIVACY_SETTINGS_EVENT))} className={`text-brand underline underline-offset-4 ${className}`}>Privacy and cookie choices</button>;
-}
-
-/** Consent for every visitor, independent of location. Optional scripts stay on public pages. */
+/** Loads analytics on public pages only. A previously saved opt-out is still respected. */
 export function PrivacyControls({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? '';
   const [choice, setChoice] = useState<PrivacyChoice | null>(null);
-  const [draft, setDraft] = useState({ analytics: false, recordings: false });
-  const [open, setOpen] = useState(false);
   const [scriptsLoaded, setScriptsLoaded] = useState(false);
-  const [storageError, setStorageError] = useState('');
   const loaded = useRef(false);
 
   useEffect(() => {
     const read = () => {
       let next = { ...EMPTY_PRIVACY_CHOICE };
-      try { next = parsePrivacyChoice(localStorage.getItem(PRIVACY_STORAGE_KEY)); } catch { /* Defaults remain off. */ }
-      setChoice(next); setDraft(next);
-      if (!next.savedAt && publicLocation()) setOpen(true);
+      try { next = effectivePrivacyChoice(localStorage.getItem(PRIVACY_STORAGE_KEY)); } catch { /* Storage unavailable: stay off. */ }
+      setChoice(next);
       return next;
     };
     read();
-    const show = () => { const next = read(); setDraft(next); setOpen(true); };
     const storage = (event: StorageEvent) => {
       if (event.key !== PRIVACY_STORAGE_KEY) return;
       const next = read();
@@ -69,9 +59,8 @@ export function PrivacyControls({ children }: { children: React.ReactNode }) {
         stopTracking(); window.location.reload();
       }
     };
-    window.addEventListener(PRIVACY_SETTINGS_EVENT, show);
     window.addEventListener('storage', storage);
-    return () => { window.removeEventListener(PRIVACY_SETTINGS_EVENT, show); window.removeEventListener('storage', storage); };
+    return () => window.removeEventListener('storage', storage);
   }, []);
 
   useEffect(() => {
@@ -131,32 +120,10 @@ export function PrivacyControls({ children }: { children: React.ReactNode }) {
     }
   }, [choice, pathname]);
 
-  const save = (values: { analytics: boolean; recordings: boolean }) => {
-    const next = { ...values, savedAt: Date.now() };
-    try { localStorage.setItem(PRIVACY_STORAGE_KEY, JSON.stringify(next)); } catch {
-      stopTracking();
-      setChoice({ ...EMPTY_PRIVACY_CHOICE });
-      setStorageError('This browser could not save your choice. Optional tracking is stopped on this page. Use your browser’s storage settings to keep it off on later visits.');
-      return;
-    }
-    const revoke = loaded.current && ((choice?.analytics && !next.analytics) || (choice?.recordings && !next.recordings));
-    setChoice(next); setStorageError(''); setOpen(false); window.dispatchEvent(new Event(PRIVACY_CHANGED_EVENT));
-    if (revoke) { stopTracking(); window.location.reload(); }
-  };
-
   // A programmatic route change can render before the history callback. Keep private DOM
   // out of the old document until the fresh, tracker-free navigation completes.
   const blockPrivateRender = scriptsLoaded && !publicAnalyticsPath(pathname);
   return <>
     {blockPrivateRender ? null : children}
-    {open && <section aria-label="Privacy choices" data-clarity-mask="true" className="fixed bottom-4 left-4 right-4 z-[100] max-w-xl rounded-xl border border-line bg-surface p-5 text-ink shadow-xl sm:left-auto sm:w-[440px]">
-      <h2 className="text-base font-semibold">Your privacy choices</h2>
-      <p className="mt-2 text-sm text-muted">Essential storage keeps the app working. Optional analytics is off until you choose. Your choice applies in this browser for 180 days.</p>
-      {storageError && <p role="alert" className="mt-2 text-sm text-red-700">{storageError}</p>}
-      <label className="mt-4 flex items-start gap-2.5 text-sm"><input type="checkbox" className="mt-0.5" checked={draft.analytics} onChange={(event) => setDraft({ ...draft, analytics: event.target.checked })} /><span>Usage analytics: public-page visits and content-free feature counts. No document text, questions, source names or document IDs.</span></label>
-      <label className="mt-3 flex items-start gap-2.5 text-sm"><input type="checkbox" className="mt-0.5" checked={draft.recordings} onChange={(event) => setDraft({ ...draft, recordings: event.target.checked })} /><span>I am 18 or older and allow Microsoft Clarity session recordings on public information pages. Private workspaces and tools are excluded.</span></label>
-      <div className="mt-4 flex flex-wrap gap-2"><button type="button" onClick={() => save({ analytics: false, recordings: false })} className="rounded-lg border border-line px-3 py-2 text-sm font-medium">Essential only</button><button type="button" onClick={() => save(draft)} className="rounded-lg bg-brand px-3 py-2 text-sm font-medium text-white">Save choices</button></div>
-      <a href="/cookies#analytics" className="mt-3 inline-block text-xs text-muted underline underline-offset-4">Details and privacy policy</a>
-    </section>}
   </>;
 }

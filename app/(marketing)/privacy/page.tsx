@@ -1,6 +1,5 @@
 import { COMPANY, ContactLine, LegalPage, type LegalSection } from '@/components/marketing/LegalPage';
 import { pageMetadata } from '@/components/marketing/seo';
-import { PrivacySettingsButton } from '@/components/analytics/PrivacyControls';
 
 export const metadata = pageMetadata({
   title: 'Privacy policy',
@@ -84,7 +83,7 @@ const SECTIONS: LegalSection[] = [
   {
     id: 'cookies',
     title: 'Cookies and local storage',
-    body: <><p>Essential storage supports sign-in, security and your preferences. Optional analytics and public-page session recordings are off until you choose them. Content-free editor events, if allowed, are stored as daily totals without document, account or user identifiers; these counters do not include your writing, research questions or source names. Advertising consent stays denied.</p><p><PrivacySettingsButton />. Choices apply to this browser for 180 days and can be withdrawn at any time. Withdrawal stops future collection, not data already collected. See <a href="/cookies" className="underline underline-offset-4">cookies and browser storage</a> for details.</p></>,
+    body: <><p>Essential storage supports sign-in, security and your preferences. Optional analytics and public-page session recordings are off until you choose them. Content-free editor events, if allowed, are stored as daily totals without document, account or user identifiers; these counters do not include your writing, research questions or source names. Advertising consent stays denied.</p><p>See <a href="/cookies" className="underline underline-offset-4">cookies and browser storage</a> for details.</p></>,
   },
   {
     id: 'children',

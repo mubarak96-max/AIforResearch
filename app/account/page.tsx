@@ -10,7 +10,6 @@ import { SignInMethodsCard } from '@/components/auth/SignInMethodsCard';
 import { EmailCard } from '@/components/auth/EmailCard';
 import { ThemeChooser } from '@/components/theme/theme';
 import { api, clearSession, useSession } from '@/lib/session';
-import { PrivacySettingsButton } from '@/components/analytics/PrivacyControls';
 
 export default function AccountPage() {
   const router = useRouter();
@@ -63,10 +62,6 @@ export default function AccountPage() {
         {user && <SignInMethodsCard />}
 
         {user && <EmailCard />}
-
-        <Card>
-          <CardHeader title="Privacy choices" description="Optional usage analytics and public-page recordings. Private workspaces are never recorded." actions={<PrivacySettingsButton className="text-sm" />} />
-        </Card>
 
         {user && (
           <Card>

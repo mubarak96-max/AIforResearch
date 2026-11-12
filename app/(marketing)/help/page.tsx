@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { pageMetadata } from '@/components/marketing/seo';
 import { container, focusRing } from '@/components/marketing/styles';
 import { HelpSearch } from '@/components/marketing/HelpSearch';
-import { PrivacySettingsButton } from '@/components/analytics/PrivacyControls';
 
 export const metadata = pageMetadata({
   title: 'Help center: writing, citations and export',
@@ -15,13 +14,6 @@ type Topic = { id: string; title: string; items: [string, React.ReactNode][] };
 const kbd = (keys: string) => <kbd className="rounded-md border border-b-2 border-line bg-surface px-1.5 py-px font-sans text-[12.5px] text-ink-2">{keys}</kbd>;
 
 const TOPICS: Topic[] = [
-  {
-    id: 'privacy-choices',
-    title: 'Privacy choices',
-    items: [
-      ['Optional analytics', <>Choose whether to share public-page visits and content-free feature counts. Session recordings are a separate choice for public information pages; private workspaces and tools are excluded. <PrivacySettingsButton />. Choices are saved in this browser for 180 days.</>],
-    ],
-  },
   {
     id: 'start',
     title: 'Getting started',
