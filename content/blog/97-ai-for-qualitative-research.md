@@ -1,0 +1,203 @@
+---
+title: "AI for Qualitative Research: Coding, Themes and Judgment"
+slug: "ai-for-qualitative-research"
+description: "AI for qualitative research, step by step: where AI can suggest codes, why you decide the themes, how to protect participant data and how to report it."
+primary_keyword: "ai for qualitative research"
+secondary_keywords: ["ai thematic analysis", "qualitative coding with ai", "chatgpt qualitative analysis", "can ai do thematic analysis", "is it ethical to use ai for qualitative analysis", "trustworthiness in qualitative research", "reflexive thematic analysis"]
+cluster: "P. Research by field"
+pillar: "/blog/ai-for-qualitative-research"
+author: "Mubarak"
+compares_tools: false
+published: "2026-11-12"
+updated: "2026-11-12"
+faq:
+  - q: "Can AI do thematic analysis?"
+    a: "AI can do parts of it. It can suggest first-pass codes, summarize transcripts and find quotes that fit a code. It cannot do the analysis itself, because themes in reflexive thematic analysis come from your interpretation of the data against your question and theory. A study that re-ran two analyses with ChatGPT found it reproduced concrete, descriptive themes but missed subtle, interpretive ones. Treat AI output as suggestions you accept or reject."
+  - q: "Is it ethical to use AI for qualitative analysis?"
+    a: "It can be, if three conditions hold. Your ethics approval and consent forms must cover the tool, or you need an amendment. The data must be de-identified before upload, and the tool's terms must rule out training on it. And you must disclose how you used AI in your methods. Using a consumer chatbot on raw interview transcripts without approval is usually a breach of your protocol."
+  - q: "Can I use ChatGPT for qualitative analysis?"
+    a: "You can use it for limited tasks such as suggesting candidate codes or finding quotes, but check your institution's rules first. Many universities only allow confidential data in tools they have approved, and consumer chat services may use conversations to improve models unless you opt out. De-identify transcripts, keep a log of prompts and outputs, and verify every quote against the original transcript."
+  - q: "Does AI-assisted coding need inter-rater reliability?"
+    a: "It depends on your approach. Codebook and coding-reliability approaches often report agreement between coders, and AI can act as a second coder whose labels you compare with Cohen's kappa. Reflexive thematic analysis does not use inter-rater reliability, because coding is treated as interpretive, not as finding one correct answer. In that case, document your decisions in an audit trail instead."
+  - q: "How do I report AI use in a qualitative methods section?"
+    a: "Name the tool and version, the dates you used it, the tasks it did (for example, suggesting initial codes on de-identified transcripts) and the tasks it did not do (generating or naming themes). Say how you checked its output, how data were protected, and that the ethics committee approved the use. Keep prompts and outputs in your audit trail so a reviewer can see them."
+---
+
+# AI for qualitative research: what it can code, and what stays human
+
+*Last updated: 12 November 2026*
+
+AI for qualitative research works best as a fast junior assistant: it can suggest first-pass codes, summarize transcripts and find quotes that match a code. It must not decide your themes or your interpretation, because those come from your reading of the data. Use it only on de-identified data your ethics approval covers, check every output against the transcript, and report how you used it.
+
+This guide is for master's and PhD students, health and social science researchers, and supervisors who want a defensible way to use AI in interview, focus group or open-text survey analysis. It is the main guide in our series on research by field, which also covers [AI for humanities research](/blog/ai-for-humanities-research), [patent and prior art search](/blog/patent-search-for-researchers) and [AI tools for research labs](/blog/ai-tools-for-research-labs).
+
+## Can AI do thematic analysis?
+
+AI can do some of the mechanical work in thematic analysis, but it cannot do the analysis. **Thematic analysis is a method for identifying, analyzing and reporting patterns of meaning (themes) across a qualitative dataset.** Braun and Clarke, who set out the method in 2006, describe it in six phases, and most of the work in those phases is interpretation [1].
+
+Two definitions make the line clear:
+
+- **A code is a short label attached to a segment of data that captures one feature relevant to your question.** "Hides tiredness from charge nurse" is a code.
+- **A theme is a pattern of shared meaning across the data, organized around a central idea that answers your research question.** "Fatigue as a private failure" is a theme. A theme is not a topic summary such as "experiences of fatigue."
+
+In reflexive thematic analysis, Braun and Clarke stress, themes are generated by the researcher, not found waiting in the data, and your perspective is a resource, not a bias to remove [2][3]. A language model does not hold your theoretical position or know what your participants left unsaid.
+
+Morgan re-analyzed two datasets with ChatGPT and compared its output with themes from earlier manual analyses. It did reasonably well on concrete, descriptive themes and was less successful at subtle, interpretive ones [4].
+
+## Where does AI help, and where must it not decide?
+
+Use AI for search, sorting and summary, and keep every decision about meaning for yourself.
+
+| Task | AI can | You must | How to check |
+| --- | --- | --- | --- |
+| Transcription | Draft a transcript from audio, if your ethics approval covers the service | Correct it against the recording | Listen to 10% of the audio against the text |
+| Familiarization | Summarize each transcript in 150 words | Read every transcript in full yourself | Compare your notes with the summary |
+| Initial coding | Suggest candidate codes with the quote each one rests on | Accept, merge, rename or reject each code | Open the quoted lines in the transcript |
+| Finding data for a code | List every passage that may fit a code you defined | Decide which passages really fit | Read the passage in context, not alone |
+| Generating themes | Nothing beyond listing code clusters | Build, name and define themes | Your supervisor or team reviews the map |
+| Interpretation | Nothing | Relate themes to your question and theory | Peer debriefing, audit trail |
+| Writing up | Tidy your prose, check consistency of theme names | Choose the quotes and write the argument | Every quote matches the transcript word for word |
+
+The pattern: AI output is always a suggestion with a pointer back to the data. If a suggestion has no quote and line reference, discard it.
+
+## How to use AI for qualitative research, phase by phase
+
+This procedure follows Braun and Clarke's six phases [1] and adds AI for qualitative research only where it saves time without taking a decision away from you.
+
+1. **Familiarize yourself with the data.** Read every transcript in full and write notes. AI summaries never replace this first reading.
+2. **Generate initial codes.** Code two or three transcripts by hand first. Then ask the AI to suggest codes for the same transcripts and compare. Keep the codes that add something you missed; reject the rest. Write a one-line definition for every code you keep.
+3. **Search for themes.** Group codes into candidate themes on paper or a whiteboard. You can ask the AI to list codes that often appear together, but you decide what they mean.
+4. **Review themes.** Check each theme against the coded extracts, then against the whole dataset. Ask the AI to find passages that contradict a theme. Disconfirming cases are where it is most useful at this stage.
+5. **Define and name themes.** Write two or three sentences for each theme: its central idea, its boundaries, how it relates to the others. This is entirely your work.
+6. **Produce the report.** Choose the extracts, write the analytic narrative and connect it to the literature. Check every quote against the transcript before you submit.
+
+### A worked example (invented)
+
+Example study: 18 interviews with early-career nurses about night-shift fatigue, about 9,000 words each (about 162,000 words).
+
+- The researcher coded transcripts 1 to 3 by hand and produced 41 codes.
+- The AI, given the same three de-identified transcripts and the research question, suggested 64 codes, each with a quote.
+- The researcher kept 29 of the AI's codes as new or better-worded codes, merged 12 into existing codes, and rejected 23 as too vague or unsupported by the quote (29 + 12 + 23 = 64).
+- Asked for themes, the AI proposed "Fatigue," "Workload" and "Support," which are topics, not themes. The researcher's themes included "Fatigue as a private failure" and "Borrowing alertness from colleagues."
+
+The time saved came from steps 2 and 4. The interpretation took as long as it would have without AI.
+
+## Prompts for qualitative coding with AI
+
+Good prompts force the model to point at the data. Save every prompt and output in your audit trail.
+
+```
+Initial codes
+You are helping with reflexive thematic analysis. Research question: [question].
+For the transcript below, suggest candidate codes. For each code give:
+(1) a label of 3 to 7 words, (2) a one-sentence definition,
+(3) the exact quote it rests on, with the line numbers.
+Do not suggest themes. Do not paraphrase quotes. If a passage is ambiguous, say so.
+
+Disconfirming cases
+Candidate theme: [name and definition].
+Find passages across these transcripts that do not fit this theme or argue against it.
+Quote them exactly with transcript ID and line numbers.
+```
+
+Number transcript lines before you paste them, and never accept a quote you have not found in the original file: language models sometimes produce a plausible quote no participant said.
+
+## Is it ethical to use AI for qualitative analysis?
+
+Using AI for qualitative research can be ethical, but only if your consent, ethics approval and data handling cover it. Participants agreed to a specific use of their words; sending them to a third-party AI service is new processing.
+
+Oxford's policy says personal data should only be uploaded to a generative AI tool when confidentiality can be guaranteed [5]. Roehampton requires extra data protection approval for AI transcription and asks for the tool to be named in the consent form [6]. Deakin treats uploading transcripts to an open generative AI tool as a confidentiality breach [7]. In the UK, the Information Commissioner's Office explains how data protection law applies when AI processes personal data [8].
+
+Use this checklist before any transcript goes near an AI tool:
+
+1. **Check your ethics approval and consent form.** If neither mentions AI processing, ask your ethics committee whether you need an amendment.
+2. **Use an approved tool.** Ask your university which AI tools are approved for confidential research data.
+3. **Read the tool's data terms.** Find out whether your inputs can be used to train models and whether you can turn that off. Consumer chat services may use conversations to improve models unless you opt out [9].
+4. **De-identify first.** Remove names, places, employers, dates and rare details that could identify someone. Replace them with consistent labels such as [Ward A].
+5. **Upload the minimum.** Send only the transcripts or passages the task needs.
+6. **Keep a log.** Record the tool, version, date, prompt and output for every AI step.
+7. **Disclose it.** Report the AI use in your methods section and in any data management plan.
+
+## How do you keep AI-assisted analysis trustworthy?
+
+Use the same criteria you would without AI, and show your AI steps as part of the evidence. **Trustworthiness is the qualitative counterpart of validity and reliability: the degree to which readers can have confidence in your findings.** Lincoln and Guba proposed four criteria in *Naturalistic Inquiry* [10], and Nowell and colleagues showed how to meet them in thematic analysis with an auditable decision trail [11].
+
+| Criterion | What it asks | What to do when AI is involved |
+| --- | --- | --- |
+| Credibility | Do the findings fit what participants said? | Check every AI-suggested code and quote against the transcript |
+| Transferability | Can readers judge whether findings apply elsewhere? | Thick description of setting and participants, written by you |
+| Dependability | Is the process logical, traceable and documented? | Keep prompts, outputs and your accept or reject decisions in the audit trail |
+| Confirmability | Are findings grounded in the data, not in the analyst (or the model)? | Link each theme to coded extracts; record where you overruled the AI |
+
+### Should you measure agreement between AI and human coders?
+
+Only if your approach calls for it. Codebook approaches often compare two coders with Cohen's kappa, and AI can be one coder. O'Connor and Joffe set out the debate and practical guidelines for intercoder reliability [12]. Reflexive thematic analysis rejects it, because there is no single correct coding to agree on [3]. If you do compare, see [Cohen's kappa and inter-rater reliability](/blog/cohens-kappa-inter-rater-reliability).
+
+## How to report AI use in your methods section
+
+Name the tool, what it did and did not do, and how you checked it. An example:
+
+> Initial codes for three of the 18 transcripts were suggested by [tool, version] between [dates], using de-identified transcripts and the prompts in Appendix C. The first author accepted, merged or rejected each suggested code and checked every quoted passage against the transcript. Themes were generated, reviewed and named by the research team without AI. Use of the tool was approved by [committee, reference] and participants consented to AI-assisted processing of de-identified transcripts.
+
+For publisher and funder rules on disclosure, see [AI tools for research labs](/blog/ai-tools-for-research-labs).
+
+## Doing the work around your analysis in AI for Research
+
+AI for Research does not have a qualitative coding feature: there is no codebook, transcript coder or theme map. Code in NVivo, ATLAS.ti, MAXQDA, Taguette or a spreadsheet; use AI for Research for the literature, planning and writing around it. <!-- LINK: /fields/social-sciences when L39 ships -->
+
+- **Find the methods literature.** [Find Papers](/features/paper-search) searches 250M+ scholarly works with filters for year, study type and open access, at 0 credits. Save papers to your Library.
+- **Ask questions of methods papers.** Upload PDFs to [My Library](/features/research-library) and ask a question such as "How do the authors define a theme?" Answers cite the page. Storage is free; a question costs 1 credit. Only upload participant data if your ethics approval allows it, and only de-identified. Our privacy policy says documents are never used to train AI and that the text needed for a request is sent to our AI provider [13].
+- **Plan the study.** Thesis Suite drafts a research question with the SPIDER framework (built for qualitative questions) and a methodology section, 3 credits each. Proposal Studio drafts an ethics application (IRB, UK REC, HREC) and a data management plan, 3 credits a section or 15 for a whole document.
+- **Share with your supervisor.** Put the work in a Project and share it by email as "can comment," so your supervisor sees drafts without editing them.
+- **Write the chapter.** The [Writing Studio](/features/ai-writing-editor) drafts a thematic literature review or a section with citations, 3 credits a section and 15 a whole draft. You write the findings chapter yourself.
+
+<!-- SCREENSHOT: My Library answer to "How do Braun and Clarke define a theme?" on a methods paper PDF, with the page citation visible -->
+
+<!-- SCREENSHOT: Thesis Suite Research question module with the SPIDER framework selected -->
+
+Search, the Library and exports cost nothing. See [pricing](/pricing) for each plan's monthly credits.
+
+## FAQ
+
+### Can AI do thematic analysis?
+
+AI can do parts of it. It can suggest first-pass codes, summarize transcripts and find quotes that fit a code. It cannot do the analysis itself, because themes in reflexive thematic analysis come from your interpretation of the data against your question and theory. A study that re-ran two analyses with ChatGPT found it reproduced concrete, descriptive themes but missed subtle, interpretive ones. Treat AI output as suggestions you accept or reject.
+
+### Is it ethical to use AI for qualitative analysis?
+
+It can be, if three conditions hold. Your ethics approval and consent forms must cover the tool, or you need an amendment. The data must be de-identified before upload, and the tool's terms must rule out training on it. And you must disclose how you used AI in your methods. Using a consumer chatbot on raw interview transcripts without approval is usually a breach of your protocol.
+
+### Can I use ChatGPT for qualitative analysis?
+
+You can use it for limited tasks such as suggesting candidate codes or finding quotes, but check your institution's rules first. Many universities only allow confidential data in tools they have approved, and consumer chat services may use conversations to improve models unless you opt out. De-identify transcripts, keep a log of prompts and outputs, and verify every quote against the original transcript.
+
+### Does AI-assisted coding need inter-rater reliability?
+
+It depends on your approach. Codebook and coding-reliability approaches often report agreement between coders, and AI can act as a second coder whose labels you compare with Cohen's kappa. Reflexive thematic analysis does not use inter-rater reliability, because coding is treated as interpretive, not as finding one correct answer. In that case, document your decisions in an audit trail instead.
+
+### How do I report AI use in a qualitative methods section?
+
+Name the tool and version, the dates you used it, the tasks it did (for example, suggesting initial codes on de-identified transcripts) and the tasks it did not do (generating or naming themes). Say how you checked its output, how data were protected, and that the ethics committee approved the use. Keep prompts and outputs in your audit trail so a reviewer can see them.
+
+## Next steps
+
+- Working with books and archives instead of interviews? Read [AI for humanities research](/blog/ai-for-humanities-research).
+- Running a team? Set shared rules with [AI tools for research labs](/blog/ai-tools-for-research-labs).
+- Need to check an invention against earlier work? See [patent search for researchers](/blog/patent-search-for-researchers).
+- Synthesizing published qualitative studies? Start with [what a systematic review is](/blog/what-is-a-systematic-review).
+
+## Sources
+
+1. Braun, V., & Clarke, V. (2006). Using thematic analysis in psychology. *Qualitative Research in Psychology, 3*(2), 77–101. https://doi.org/10.1191/1478088706qp063oa
+2. Braun, V., & Clarke, V. (2019). Reflecting on reflexive thematic analysis. *Qualitative Research in Sport, Exercise and Health, 11*(4), 589–597. https://doi.org/10.1080/2159676X.2019.1628806
+3. Braun, V., & Clarke, V. (2021). One size fits all? What counts as quality practice in (reflexive) thematic analysis? *Qualitative Research in Psychology, 18*(3), 328–352. https://doi.org/10.1080/14780887.2020.1769238
+4. Morgan, D. L. (2023). Exploring the use of artificial intelligence for qualitative data analysis: The case of ChatGPT. *International Journal of Qualitative Methods, 22*. https://doi.org/10.1177/16094069231211248
+5. University of Oxford. Policy for using generative AI in research. https://www.ox.ac.uk/research/support-researchers/research-practice/policy-generative-ai-research
+6. University of Roehampton. Guidance on AI transcription tools for research projects. https://www.roehampton.ac.uk/globalassets/documents/research/ethics/guidance-on-ai-transcription-tools-for-research-projects.docx
+7. Deakin University Library. Generative AI in research: analyse data. https://deakin.libguides.com/generative-ai-research/analyse-data
+8. Information Commissioner's Office. Guidance on AI and data protection. https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/guidance-on-ai-and-data-protection/
+9. OpenAI Help Center. How your data is used to improve model performance. https://help.openai.com/en/articles/5722486-how-your-data-is-used-to-improve-model-performance
+10. Lincoln, Y. S., & Guba, E. G. (1985). *Naturalistic Inquiry*. Sage.
+11. Nowell, L. S., Norris, J. M., White, D. E., & Moules, N. J. (2017). Thematic analysis: Striving to meet the trustworthiness criteria. *International Journal of Qualitative Methods, 16*(1). https://doi.org/10.1177/1609406917733847
+12. O'Connor, C., & Joffe, H. (2020). Intercoder reliability in qualitative research: Debates and practical guidelines. *International Journal of Qualitative Methods, 19*. https://doi.org/10.1177/1609406919899220
+13. AI for Research. Privacy policy. https://aiforresearch.app/privacy
