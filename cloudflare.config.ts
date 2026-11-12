@@ -45,6 +45,12 @@ export default defineConfig({
       MENDELEY_CLIENT_ID: bindings.text(env("MENDELEY_CLIENT_ID")),
       ZOTERO_CALLBACK_URL: bindings.text(env("ZOTERO_CALLBACK_URL")),
       ZOTERO_CLIENT_KEY: bindings.text(env("ZOTERO_CLIENT_KEY")),
+      // Paper and web sources (lib/server/env.ts).
+      PAPERS_PROVIDER: bindings.text(env("PAPERS_PROVIDER")),
+      WEB_SEARCH_PROVIDER: bindings.text(env("WEB_SEARCH_PROVIDER")),
+      OPENALEX_EMAIL: bindings.text(env("OPENALEX_EMAIL")),
+      // Optional: the support address shown on sign-in help; hidden when unset.
+      ...(process.env.SUPPORT_EMAIL ? { SUPPORT_EMAIL: bindings.text(process.env.SUPPORT_EMAIL) } : {}),
       // Set as encrypted secrets on the Worker (dashboard "Secret" type or `wrangler secret put`),
       // never as plain-text vars — plain vars are printed in deploy diffs.
       DODO_PAYMENTS_API_KEY: bindings.secret(),
@@ -52,6 +58,14 @@ export default defineConfig({
       RESEND_API_KEY: bindings.secret(),
       MENDELEY_CLIENT_SECRET: bindings.secret(),
       ZOTERO_CLIENT_SECRET: bindings.secret(),
+      LLM_API_KEY: bindings.secret(),
+      // Shared secret the converter and Cloud Functions send to internal endpoints.
+      INTERNAL_SECRET: bindings.secret(),
+      WEB_SEARCH_API_KEY: bindings.secret(),
+      OPENALEX_API_KEY: bindings.secret(),
+      SEMANTIC_SCHOLAR_API_KEY: bindings.secret(),
+      NCBI_API_KEY: bindings.secret(),
+      SCHOLAR_API_KEY: bindings.secret(),
       // Encrypts the Zotero/Mendeley tokens people connect (lib/server/lib/settings.ts). Keep it
       // stable: changing it disconnects them.
       SETTINGS_KEY: bindings.secret(),

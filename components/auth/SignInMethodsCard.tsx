@@ -6,7 +6,7 @@ import { Button, Card, CardHeader, StatusPill } from '@/components/app/ui';
 import { disconnectProvider, getMyMethods, PROVIDER_NAMES, PROVIDERS, startProvider, type MyMethods } from '@/lib/signin';
 import { ProviderLogo } from './ProviderLogo';
 
-/** Account › Sign-in methods: password and connected Google/Microsoft/Apple (from Firebase Auth). */
+/** Account › Sign-in methods: password and connected Google (from Firebase Auth). */
 export function SignInMethodsCard() {
   const [mine, setMine] = useState<MyMethods | null>(null);
   const [busy, setBusy] = useState<string | null>(null);

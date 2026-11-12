@@ -29,7 +29,7 @@ You pay Google Cloud for what your Firebase project uses (the free tier covers s
 ## Run it on Firebase
 
 ```
-  Browser ──────────────► Firebase Authentication   (password, Google, Microsoft, Apple; App Check)
+  Browser ──────────────► Firebase Authentication   (password, Google; App Check)
      │  ID token
      ├─ https ─────────►  App Hosting: Next.js app    Next.js pages + the API (/api) in route handlers
      │                       │  Admin SDK
@@ -45,7 +45,7 @@ More in [docs/architecture.md](docs/architecture.md) and [docs/data-model.md](do
 You need a Firebase project on the **Blaze** plan (App Hosting, Functions and Cloud Run need billing; small groups stay inside the free tier), the [Firebase CLI](https://firebase.google.com/docs/cli) and `gcloud`.
 
 1. **Create the project** and, in the Firebase console, turn on:
-   - **Authentication** › Sign-in method: Email/Password, and Google, Microsoft, Apple as you like (each provider's redirect URL is `https://<project>.firebaseapp.com/__/auth/handler`). Under **Templates**, set the action URL to `https://<your site>/auth/action` so reset and confirmation links open AI for Research's own pages. Add your domain under **Authorized domains**.
+   - **Authentication** › Sign-in method: Email/Password and Google (Google's redirect URL is `https://<project>.firebaseapp.com/__/auth/handler`). Under **Templates**, set the action URL to `https://<your site>/auth/action` so reset and confirmation links open AI for Research's own pages. Add your domain under **Authorized domains**.
    - **Firestore** (Native mode) and **Storage**.
    - Optional: **App Check** with reCAPTCHA Enterprise, enforced for Authentication.
 2. **Rules, indexes and functions:**
@@ -72,7 +72,7 @@ You need a Firebase project on the **Blaze** plan (App Hosting, Functions and Cl
 ### What changed from the Postgres version
 
 - **No Docker install.** The app runs on your Firebase project instead of one server. There is no `docker compose` any more.
-- **Sign-in is Firebase Authentication.** Passwords, Google, Microsoft and Apple work as before. **Passkeys are gone** (Firebase has none), and **Cloudflare Turnstile is replaced by App Check**. Firebase sends the reset and confirmation emails.
+- **Sign-in is Firebase Authentication.** Email and password, and Google. Microsoft and Apple are not offered. **Passkeys are gone** (Firebase has none), and **Cloudflare Turnstile is replaced by App Check**. Firebase sends the reset and confirmation emails.
 - **Search is word-based.** Firestore has no full-text index. Documents and Library passages match on their words; turn on `EMBEDDINGS_PROVIDER` for Library vector search, or add Typesense or Algolia for ranked full-text search.
 - **Background work runs in Cloud Functions** (PDF text, imports, newsletter), so nothing is lost when a request ends.
 - **Live editing is its own service** (`services/collab`) and runs on one Cloud Run instance for now.
@@ -89,7 +89,7 @@ Each service is a slot with its own provider. Set them in `apphosting.yaml` (sec
 | **Email** | SMTP or Resend (invitations; Firebase sends sign-in emails itself) | `MAIL_PROVIDER`, `MAIL_FROM`, `SMTP_*`, `RESEND_API_KEY` |
 | **Newsletter** | MailCheap (keeps a list in step with confirmed accounts) | `NEWSLETTER_PROVIDER`, `MAILCHEAP_API_KEY` |
 | **Payments** | Dodo Payments, if you sell plans yourself | `DODO_PAYMENTS_API_KEY`, `DODO_PAYMENTS_WEBHOOK_KEY`, `BILLING_LIVE=1` for live mode |
-| **Sign-in** | Email and password, Google, Microsoft, Apple (Firebase Authentication), App Check | Firebase console › Authentication; on/off with `SIGNIN_PASSWORD`, `SIGNIN_GOOGLE`, `SIGNIN_MICROSOFT`, `SIGNIN_APPLE` |
+| **Sign-in** | Email and password, and Google (Firebase Authentication), App Check | Firebase console › Authentication; the methods are fixed in `lib/server/lib/signin.ts` |
 
 [`.env.example`](.env.example) lists every setting with a short note. Files live in the project's Cloud Storage bucket.
 

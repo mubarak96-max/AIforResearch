@@ -7,7 +7,7 @@ import { queueNewsletterSync } from './newsletter.js';
 
 /**
  * People and what the browser is told about them. Firebase Authentication owns sign-in
- * (passwords, Google, Microsoft, Apple, email links, confirmation and reset emails); this
+ * (passwords, Google, email links, confirmation and reset emails); this
  * module owns the `users/{uid}` and `accounts/{id}` documents that go with each person.
  */
 

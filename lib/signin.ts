@@ -1,23 +1,23 @@
 'use client';
 
 import {
-  GoogleAuthProvider, linkWithPopup, OAuthProvider, sendPasswordResetEmail, signInWithPopup, signInWithRedirect,
+  GoogleAuthProvider, linkWithPopup, sendPasswordResetEmail, signInWithPopup, signInWithRedirect,
   type AuthProvider,
 } from 'firebase/auth';
 import { firebaseAuth, firebaseCode } from '@/lib/firebase';
 import { api, friendly, refreshSession, setSession, type SessionUser } from '@/lib/session';
 
 /**
- * Sign-in methods in the browser: which this site offers (Admin › Sign-in), and Google,
- * Microsoft and Apple through Firebase Authentication. Firebase keeps one account per email:
+ * Sign-in methods in the browser: email and password, and Google, through Firebase
+ * Authentication. Firebase keeps one account per email:
  * a provider whose email already has an account must be connected from the account page.
  */
 
-export type Provider = 'google' | 'microsoft' | 'apple';
+export type Provider = 'google';
 /** `password_reset`: Firebase sends reset links, so it is always true now. */
 export type Methods = { password: boolean; password_reset?: boolean; support_email?: string | null } & Record<Provider, boolean>;
-export const PROVIDERS: Provider[] = ['google', 'microsoft', 'apple'];
-export const PROVIDER_NAMES: Record<Provider, string> = { google: 'Google', microsoft: 'Microsoft', apple: 'Apple' };
+export const PROVIDERS: Provider[] = ['google'];
+export const PROVIDER_NAMES: Record<Provider, string> = { google: 'Google' };
 
 let methodsRequest: Promise<Methods> | null = null;
 export function getMethods(): Promise<Methods> {
@@ -28,17 +28,10 @@ export function getMethods(): Promise<Methods> {
   return methodsRequest;
 }
 
-function providerFor(provider: Provider): AuthProvider {
-  if (provider === 'google') {
-    const google = new GoogleAuthProvider();
-    google.setCustomParameters({ prompt: 'select_account' });
-    return google;
-  }
-  const oauth = new OAuthProvider(provider === 'microsoft' ? 'microsoft.com' : 'apple.com');
-  oauth.addScope('email');
-  if (provider === 'microsoft') oauth.setCustomParameters({ prompt: 'select_account' });
-  else oauth.addScope('name');
-  return oauth;
+function providerFor(_provider: Provider): AuthProvider {
+  const google = new GoogleAuthProvider();
+  google.setCustomParameters({ prompt: 'select_account' });
+  return google;
 }
 
 async function finish(user: { getIdToken: (force?: boolean) => Promise<string>; uid: string }): Promise<SessionUser> {

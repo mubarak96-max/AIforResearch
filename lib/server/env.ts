@@ -52,16 +52,10 @@ export const env = {
   settingsKey: read('SETTINGS_KEY'),
 
   /**
-   * Sign-in methods shown on the sign-in page ('on'/'off', Admin › Sign-in). The providers
-   * themselves are set up in Firebase console › Authentication; client ids live there.
-   */
-  signinPassword: read('SIGNIN_PASSWORD', 'on'),
-  /**
    * App Check (reCAPTCHA Enterprise) on public endpoints such as /api/auth/legacy-login:
    * 'on' refuses requests without a valid token; anything else lets them through.
    */
   appCheckEnforce: read('APP_CHECK_ENFORCE') === 'on',
-  googleRedirectUri: read('GOOGLE_REDIRECT_URI'),
   /** Zotero sign-in (optional OAuth app from zotero.org/oauth/apps; API keys work without it). */
   zoteroClientKey: read('ZOTERO_CLIENT_KEY'),
   zoteroClientSecret: read('ZOTERO_CLIENT_SECRET'),
@@ -69,17 +63,6 @@ export const env = {
   /** Mendeley import (OAuth app from dev.mendeley.com). */
   mendeleyClientId: read('MENDELEY_CLIENT_ID'),
   mendeleyClientSecret: read('MENDELEY_CLIENT_SECRET'),
-  signinGoogle: read('SIGNIN_GOOGLE', 'on'),
-  googleClientId: read('GOOGLE_CLIENT_ID'),
-  googleClientSecret: read('GOOGLE_CLIENT_SECRET'),
-  signinMicrosoft: read('SIGNIN_MICROSOFT', 'off'),
-  microsoftClientId: read('MICROSOFT_CLIENT_ID'),
-  microsoftClientSecret: read('MICROSOFT_CLIENT_SECRET'),
-  signinApple: read('SIGNIN_APPLE', 'off'),
-  appleServicesId: read('APPLE_SERVICES_ID'),
-  appleTeamId: read('APPLE_TEAM_ID'),
-  appleKeyId: read('APPLE_KEY_ID'),
-  applePrivateKey: read('APPLE_PRIVATE_KEY'),
 
   /** Account emails (password reset, email confirmation): 'smtp' or 'resend'; empty sends none. */
   mailProvider: read('MAIL_PROVIDER'),

@@ -31,7 +31,7 @@ server used, so the editor needed no change for HTTP. Server components that nee
 data (pricing) call the app in-process (`getApp().request(...)`).
 
 **Authentication.** Firebase Authentication handles every sign-in method (email and password,
-Google, Microsoft, Apple) and sends the reset and confirmation emails. The browser keeps the
+and Google) and sends the reset and confirmation emails. The browser keeps the
 latest ID token (`lib/session.ts`) and sends it as `Authorization: Bearer`. The API
 verifies it with the Admin SDK (`lib/server/auth.ts`). On a person's first request it
 creates their `users/{uid}` and `accounts/{id}` documents (`lib/users.ts`). There are no admin

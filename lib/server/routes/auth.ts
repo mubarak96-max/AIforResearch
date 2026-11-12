@@ -6,7 +6,7 @@ import { bearer, decodeToken, forgetUser, requireUser, type AppVariables } from 
 import { adminAuth, C, col, getRow } from '../firebase.js';
 import { rateLimit } from '../lib/rateLimit.js';
 import { requireAppCheck } from '../lib/appCheck.js';
-import { methodsFor, PROVIDER_IDS, PROVIDERS, type Provider } from '../lib/signin.js';
+import { METHODS, PROVIDER_IDS, PROVIDERS, type Provider } from '../lib/signin.js';
 import { RESEARCH_ROLES, publicUser, signedIn, userByEmail, type UserDoc } from '../lib/users.js';
 import { forgetLegacyPassword, legacyPassword, verifyLegacyPassword } from '../lib/legacyPasswords.js';
 import { deleteUserData } from '../lib/accountDeletion.js';
@@ -28,13 +28,13 @@ const profileBody = z.object({
     language: z.string().trim().max(40).nullable().optional(),
   }).optional(),
 });
-const providerParam = z.enum(['google', 'microsoft', 'apple']);
+const providerParam = z.enum(['google']);
 
 export function authRoutes() {
   const app = new Hono<{ Variables: AppVariables }>();
 
   /** password_reset: Firebase sends reset links itself, so "Forgot password?" always works. */
-  app.get('/methods', (c) => c.json({ ...methodsFor(), password_reset: true, support_email: env.supportEmail || null }));
+  app.get('/methods', (c) => c.json({ ...METHODS, password_reset: true, support_email: env.supportEmail || null }));
 
   /** The signed-in person; also where a fresh sign-in is recorded (last seen, admin, invitations). */
   app.get('/me', requireUser, async (c) => {
@@ -108,7 +108,7 @@ export function authRoutes() {
       password: record.providerData.some((info) => info.providerId === 'password'),
       providers: Object.fromEntries(PROVIDERS.map((provider) => [provider, { connected: Boolean(linked(provider)), email: linked(provider)?.email ?? null }])),
       email_verified: record.emailVerified,
-      available: methodsFor(),
+      available: METHODS,
     });
   });
 

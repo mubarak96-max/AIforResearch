@@ -57,7 +57,7 @@ function OptionButton({ icon, verb, name, busy, disabled, compact, onClick }: {
 }
 
 /**
- * The one sign-in form, for signing in and signing up alike: the switched-on providers first,
+ * The one sign-in form, for signing in and signing up alike: Google first,
  * then an email and its password, or a new account (name, then password). Firebase
  * Authentication does the signing in; it never says whether an email has an account, so the
  * form asks for the password and offers "Create an account" beside it.
@@ -85,7 +85,7 @@ export function AuthEntry() {
 
   useEffect(() => {
     if (hasSession()) { router.replace(target); return; }
-    getMethods().then(setMethods).catch(() => setMethods({ password: true, google: false, microsoft: false, apple: false }));
+    getMethods().then(setMethods).catch(() => setMethods({ password: true, google: true }));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
