@@ -49,6 +49,9 @@ export default defineConfig({
       RESEND_API_KEY: bindings.secret(),
       MENDELEY_CLIENT_SECRET: bindings.secret(),
       ZOTERO_CLIENT_SECRET: bindings.secret(),
+      // Encrypts the Zotero/Mendeley tokens people connect (lib/server/lib/settings.ts). Keep it
+      // stable: changing it disconnects them.
+      SETTINGS_KEY: bindings.secret(),
       // Google credentials on the Worker (the service-account key file's JSON); lib/server/google
       // uses it for Firestore, Auth and Storage over their REST APIs.
       GOOGLE_SERVICE_ACCOUNT_JSON: bindings.secret(),
