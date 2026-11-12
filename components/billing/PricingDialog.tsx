@@ -6,6 +6,7 @@ import { LuX, LuZap } from 'react-icons/lu';
 import { closePricing, usePlans, usePricingDialog, yearlySaving, type Interval } from '@/lib/billing';
 import { IntervalToggle, PlanCards } from './PlanCards';
 import { usePlanChoice } from './usePlanChoice';
+import { PricingExtras } from './PricingExtras';
 
 /** The pricing pop-up: every Upgrade button and plan limit opens it. */
 export function PricingDialog() {
@@ -51,7 +52,7 @@ function PricingDialogBody({ reason }: { reason: string | null }) {
           {changed ? (
             <div className="flex flex-col items-center py-14 text-center">
               <p className="text-[20px] font-bold text-ink">You&apos;re on {changed} now</p>
-              <p className="mt-1 text-[14.5px] text-muted">The new limits apply straight away.</p>
+              <p className="mt-1 text-[14.5px] text-muted">Your new credits and features apply straight away.</p>
               <button type="button" onClick={closePricing} className="mt-5 h-11 rounded-[11px] bg-brand px-6 text-[15px] font-semibold text-on-brand shadow-brand hover:bg-brand-600">Done</button>
             </div>
           ) : (
@@ -68,6 +69,7 @@ function PricingDialogBody({ reason }: { reason: string | null }) {
                   {[0, 1, 2, 3].map((index) => <div key={index} className="h-[420px] animate-pulse rounded-[20px] bg-surface" />)}
                 </div>
               )}
+              <PricingExtras compact />
               <p className="mt-5 text-center text-[13px] text-subtle">Secure checkout by Dodo Payments · Cancel any time</p>
             </>
           )}

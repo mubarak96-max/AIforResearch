@@ -1,5 +1,6 @@
 /** Literature review matrices (mounted at /api/matrices). See lib/matrix.ts. */
 import { Hono } from 'hono';
+import { planQuota } from '../lib/plans.js';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 import { requireUser, type AppVariables } from '../auth.js';
@@ -135,8 +136,8 @@ export function matrixRoutes(slots: Slots) {
     return c.json({ removed: true });
   });
 
-  /** Fills one paper's row with AI answers (the browser calls this for each paper in turn). */
-  app.post('/:id/fill', async (c) => {
+  /** Fills one paper's row with AI answers (the browser calls this for each paper in turn): 1 credit a row, back if it fails. */
+  app.post('/:id/fill', planQuota('ai_edit'), async (c) => {
     const user = currentUser(c);
     const matrix = await ownMatrix(user.id, c.req.param('id'));
     const body = await parseBody(c, FillBody);

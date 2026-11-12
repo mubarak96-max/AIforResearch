@@ -279,6 +279,7 @@ export function assistRoutes(slots: Slots) {
   app.use('/peer-review', planQuota('review', { credits: CREDIT_COSTS.review_standard }));
   app.use('/source-quality', planQuota('review'));
   app.use('/chat', planQuota('chat'));
+  app.use('/comment-reply', planQuota('chat'));
 
   // ---------------------------------------------------------------- paper search
 

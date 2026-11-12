@@ -35,6 +35,8 @@ export const env = {
   scholarUrl: read('SCHOLAR_URL', 'https://scholar.citedevidence.com').replace(/\/+$/, ''),
   scholarApiKey: read('SCHOLAR_API_KEY'),
   openalexEmail: read('OPENALEX_EMAIL'),
+  /** OpenAlex asks for a free API key (openalex.org/settings/api): about $1 of use a day free, then pay as you go. */
+  openalexApiKey: read('OPENALEX_API_KEY'),
   /**
    * More scholarly sources (lib/server/lib/sources). All work without a key at lower limits;
    * a key raises them. PubMed: NCBI_API_KEY (ncbi.nlm.nih.gov/account). Semantic Scholar:

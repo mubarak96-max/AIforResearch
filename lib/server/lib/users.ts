@@ -48,7 +48,8 @@ export async function publicUser(user: AuthUser): Promise<PublicUser> {
 
 /** The person's research profile (for prompts: level and field). */
 export async function researchProfile(userId: string): Promise<ResearchProfile> {
-  const doc = await getRow<UserDoc>(C.users, userId);
+  const snapshot = await col(C.users).doc(userId).get();
+  const doc = snapshot.exists ? (snapshot.data() as UserDoc) : null;
   return { ...EMPTY_PROFILE, ...(doc?.profile ?? {}) };
 }
 

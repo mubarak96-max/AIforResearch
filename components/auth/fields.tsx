@@ -92,7 +92,7 @@ export function useQueryParams(): URLSearchParams | null {
 
 /** Only same-site paths are allowed as the post-sign-in destination (no open redirects). */
 export function safeNext(raw: string | null | undefined): string {
-  if (!raw || !raw.startsWith('/') || raw.startsWith('//') || raw.startsWith('/\\')) return '/editor';
+  if (!raw || !raw.startsWith('/') || raw.startsWith('//') || raw.startsWith('/\\')) return '/home';
   return raw;
 }
 

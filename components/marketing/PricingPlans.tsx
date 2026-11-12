@@ -5,7 +5,7 @@ import { IntervalToggle, PlanCards } from '@/components/billing/PlanCards';
 import { usePlanChoice } from '@/components/billing/usePlanChoice';
 import { usePlans, yearlySaving, type Interval, type PublicPlan } from '@/lib/billing';
 
-/** The Monthly / Yearly toggle and the plan cards (plans come from Admin › Plans). */
+/** The Monthly / Yearly toggle and the plan cards (plans come from lib/server/lib/plans.ts). */
 export function PricingPlans({ initialPlans }: { initialPlans: PublicPlan[] | null }) {
   const [interval, setInterval] = useState<Interval>('year');
   const { plans } = usePlans(initialPlans ?? undefined);

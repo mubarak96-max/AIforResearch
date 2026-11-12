@@ -5,6 +5,7 @@ import { C, col } from '../firebase.js';
 import { requireUser, type AppVariables } from '../auth.js';
 import { dodoClient } from '../lib/dodoBilling.js';
 import { creditSummary, loadPlans, publicPlan, usageSummary } from '../lib/plans.js';
+import { TOPUP_PACKS, completePurchase, listPurchases, publicPacks, startPackPurchase, sweepExpiredTopups } from '../lib/creditPurchases.js';
 import {
   billingPortal, completeCheckout, ensureCustomer, listCards, listInvoices, removeCard, renewPlan, setCancelAtPeriodEnd,
   setDefaultCard, startAddCard, startPlanPurchase,
@@ -44,10 +45,39 @@ export function billingRoutes() {
   const accountOf = (c: { get: (key: 'user') => AppVariables['user'] }) => c.get('user')!.account_id;
 
   /** Credits left this month, for the app's credit meter and every job's start button. */
-  app.get('/credits', async (c) => c.json(await creditSummary(accountOf(c))));
+  app.get('/credits', async (c) => {
+    await sweepExpiredTopups(accountOf(c)).catch((error) => console.warn('top-up expiry sweep failed', (error as Error).message));
+    return c.json(await creditSummary(accountOf(c)));
+  });
+
+  /** Top-ups and passes bought, with what is left of each top-up and when it expires. */
+  app.get('/purchases', async (c) => c.json({ purchases: await listPurchases(accountOf(c)), packs: publicPacks() }));
+
+  /** Dodo's checkout for extra credits (paid plans only). */
+  app.post('/credits/checkout', async (c) => {
+    const body = z.object({ pack: z.enum(TOPUP_PACKS) }).safeParse(await c.req.json().catch(() => ({})));
+    if (!body.success) throw new HTTPException(422, { message: 'Choose 500 or 2,000 credits.' });
+    const dodo = dodoOr503();
+    return c.json(await friendly(() => startPackPurchase(dodo, accountOf(c), body.data.pack)));
+  });
+
+  /** Dodo's checkout for the Defence Pass: 90 days of Pro, paid once. */
+  app.post('/pass/checkout', async (c) => {
+    const dodo = dodoOr503();
+    return c.json(await friendly(() => startPackPurchase(dodo, accountOf(c), 'pass_defence')));
+  });
+
+  /** Back from a credits or pass checkout: applies the payment straight away. */
+  app.post('/purchases/complete', async (c) => {
+    const body = z.object({ payment: z.string().min(5).max(300) }).safeParse(await c.req.json().catch(() => ({})));
+    if (!body.success) throw new HTTPException(422, { message: 'Missing payment.' });
+    const dodo = dodoOr503();
+    return c.json(await friendly(() => completePurchase(dodo, accountOf(c), body.data.payment)));
+  });
 
   app.get('/', async (c) => {
     const accountId = accountOf(c);
+    await sweepExpiredTopups(accountId).catch((error) => console.warn('top-up expiry sweep failed', (error as Error).message));
     const summary = await usageSummary(accountId);
     const [library, accountSnapshot] = await Promise.all([
       col(C.libraryDocuments).where('user_id', '==', c.get('user')!.id).count().get().then((snapshot) => ({ count: snapshot.data().count })),
@@ -80,6 +110,8 @@ export function billingRoutes() {
       limits,
       usage: counts,
       credits,
+      purchases: await listPurchases(accountId).catch(() => []),
+      packs: publicPacks(),
       library: { used: library.count, limit: limits.library_pdfs },
       cards,
       invoices,

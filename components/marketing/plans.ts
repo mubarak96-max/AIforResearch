@@ -1,7 +1,7 @@
 import type { CountLimit, PublicPlan } from '@/lib/billing';
 
 /**
- * /pricing reads the plans from the API (Admin › Plans is the one place to change them).
+ * /pricing reads the plans from the API (lib/server/lib/plans.ts is the one place to change them).
  * This file turns them into the comparison table and the page description.
  */
 
@@ -48,8 +48,8 @@ const usd = (cents: number) => `$${(cents / 100).toLocaleString('en-US', { maxim
 /** One-line summary used in the /pricing meta description. */
 export function pricingSummary(plans: PublicPlan[] | null) {
   const paid = (plans ?? []).filter((plan) => plan.monthly_cents > 0);
-  if (!paid.length) return 'Start free with the full editor and citation generator. Upgrade for more AI writing, claim checks and LaTeX export.';
+  if (!paid.length) return 'Start free with 30 credits a month for AI research, unlimited paper search and citations. Upgrade for more credits, Detailed reports and High-quality mode.';
   const cheapest = paid.reduce((low, plan) => (plan.monthly_cents < low.monthly_cents ? plan : low));
   const perMonthYearly = cheapest.yearly_cents ? usd(Math.round(cheapest.yearly_cents / 12)) : null;
-  return `Start free with the full editor and citation generator. ${cheapest.name} is ${usd(cheapest.monthly_cents)}/month${perMonthYearly ? ` or ${perMonthYearly}/month billed yearly` : ''}, for more AI, claim checks and LaTeX export.`;
+  return `Start free with 30 credits a month and unlimited paper search. ${cheapest.name} is ${usd(cheapest.monthly_cents)}/month${perMonthYearly ? ` or ${perMonthYearly}/month billed yearly` : ''}, with 500 credits and Detailed reports. Defence Pass: 90 days of Pro for $49.`;
 }

@@ -113,7 +113,7 @@ export const TOOLS: Tool[] = [
       'Your list stays in this browser. Sign in to keep references with your documents.',
     ],
     faq: [
-      { q: 'Is it free?', a: 'Yes, with no account needed. The free plan inside the editor also includes unlimited citations.' },
+      { q: 'Is it free?', a: 'Yes, with no account needed. Citations never use credits, on any plan.' },
       { q: 'Can I cite a website?', a: 'Yes. Choose Website and fill in the author, title, site name, date and URL.' },
       { q: 'Which styles are there?', a: 'The common styles are listed first. Search the style box for over 10,000 more, including journal and university versions.' },
     ],

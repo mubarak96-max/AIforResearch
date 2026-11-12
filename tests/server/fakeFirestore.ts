@@ -39,6 +39,7 @@ function matches(data: Data, filter: Filter) {
     case '==': return filter.value === null ? value === null : value !== undefined && compare(value, filter.value) === 0;
     case '!=': return value !== undefined && value !== null && compare(value, filter.value) !== 0;
     case 'in': return (filter.value as any[]).some((item) => compare(value, item) === 0);
+    case 'array-contains': return Array.isArray(value) && value.some((item) => compare(item, filter.value) === 0);
     case '>=': return value != null && compare(value, filter.value) >= 0;
     case '<=': return value != null && compare(value, filter.value) <= 0;
     case '>': return value != null && compare(value, filter.value) > 0;

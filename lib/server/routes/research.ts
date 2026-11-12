@@ -13,10 +13,9 @@ import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 import { requireUser, type AppVariables } from '../auth.js';
 import type { Slots } from '../slots/types.js';
-import { LlmError, llmModelName } from '../slots/llm.js';
+import { LlmError, llmModelName, llmUnavailable } from '../slots/llm.js';
 import { currentUser, meterTokens, parseBody } from '../lib/assist-llm.js';
-import { llmUnavailable } from '../lib/prompts.js';
-import { CREDIT_COSTS, PlanLimitError, creditCost, refundCredits, requireFeature, spendCredits, type CreditCharge } from '../lib/plans.js';
+import { CREDIT_COSTS, creditCost, refundCredits, requireFeature, spendCredits, type CreditCharge } from '../lib/plans.js';
 import { researchProfile } from '../lib/users.js';
 import { DEPTHS, ResearchEmptyError, followUpPrompt, runResearch, type ResearchSource } from '../lib/research.js';
 import { SOURCE_GROUPS, STUDY_TYPES, JOURNAL_TIER_ORDER, searchSources, sourceGroups } from '../lib/sources/index.js';
@@ -76,8 +75,8 @@ export const researchCredits = (depth: (typeof DEPTHS)[number], highQuality: boo
 
 export function researchRoutes(slots: Slots) {
   const app = new Hono<{ Variables: AppVariables }>();
-  // Paper search without an account is the directory; here it is the signed-in Find Papers.
-  app.use('*', requireUser);
+  // Signed in only. Mounted at /api, so each prefix is guarded by name (a '*' here would guard every /api route).
+  for (const prefix of ['/sources/*', '/files/*', '/research', '/research/*', '/history', '/history/*', '/projects', '/projects/*']) app.use(prefix, requireUser);
   const searches = rateLimit({ key: 'sources-search', limit: 240, windowSeconds: 3600 });
 
   app.get('/sources/groups', (c) => c.json({ groups: sourceGroups(), study_types: STUDY_TYPES, journal_tiers: JOURNAL_TIER_ORDER }));
@@ -245,4 +244,3 @@ export function researchRoutes(slots: Slots) {
   return app;
 }
 
-export { PlanLimitError };

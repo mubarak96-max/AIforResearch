@@ -116,7 +116,7 @@ export function ResetPasswordForm() {
     try {
       await confirmPasswordReset(firebaseAuth(), code, password);
       await signIn(email, password);
-      router.replace('/editor');
+      router.replace('/home');
     } catch (caught) {
       const message = errorMessage(friendly(caught));
       if (/expired|already used/i.test(message)) setExpired(true); else setError(message);
@@ -186,7 +186,7 @@ export function ConfirmEmail() {
         <span className="grid h-12 w-12 place-items-center rounded-2xl bg-green-50 text-green-600"><LuCircleCheck size={22} aria-hidden="true" /></span>
         <p className="mt-4 text-[15px] leading-[1.6] text-ink-2">Your email address is confirmed.</p>
       </div>
-      <Link href="/editor" className={`${btnPrimary} mt-6 h-12 w-full text-base`}>Open AI for Research</Link>
+      <Link href="/home" className={`${btnPrimary} mt-6 h-12 w-full text-base`}>Open AI for Research</Link>
     </AuthCard>
   );
 }

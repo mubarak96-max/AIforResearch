@@ -12,8 +12,14 @@ const nextConfig = {
   poweredByHeader: false,
   // lib/server imports its files with .js extensions (it also runs under Node in functions/ and
   // services/collab); let webpack find the .ts source.
-  webpack(config) {
+  webpack(config, { isServer, webpack }) {
     config.resolve.extensionAlias = { ...config.resolve.extensionAlias, '.js': ['.ts', '.tsx', '.js'] };
+    if (!isServer) {
+      // pptxgenjs (Slides' PowerPoint download, in the browser) imports node:fs and node:https for its
+      // Node build; its package maps them to nothing in browsers once the "node:" prefix is gone.
+      config.plugins.push(new webpack.NormalModuleReplacementPlugin(/^node:(fs|https)$/, (resource) => { resource.request = resource.request.replace(/^node:/, ''); }));
+      config.resolve.fallback = { ...config.resolve.fallback, fs: false, https: false };
+    }
     return config;
   },
 };

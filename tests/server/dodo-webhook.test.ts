@@ -61,4 +61,17 @@ describe('Dodo Payments webhook', () => {
     expect(await again.json()).toEqual({ received: true, duplicate: true });
     expect(keys('billing_events/')).toHaveLength(1);
   });
+
+  it('adds a paid top-up once and takes back what is left when it is refunded', async () => {
+    fake.put('accounts/acc-1', { plan: 'plus', plan_source: 'dodo', plan_status: 'active', dodo_customer_id: 'cus_1', credit_topup: 0 });
+    const paid = event('payment.succeeded', {
+      payment_id: 'pay_top', status: 'succeeded', subscription_id: null, customer: { customer_id: 'cus_1' },
+      metadata: { writeorbit_kind: 'topup', writeorbit_pack: 'topup_500', writeorbit_account_id: 'acc-1' }, product_cart: [],
+    });
+    expect((await send(paid)).status).toBe(200);
+    expect((await send(paid)).status).toBe(200); // a second delivery under a new id still counts once
+    expect(fake.read('accounts/acc-1')?.credit_topup).toBe(500);
+    await send(event('refund.succeeded', { refund_id: 'ref_top', payment_id: 'pay_top', status: 'succeeded', is_partial: false, amount: 700, customer: { customer_id: 'cus_1' }, metadata: {} }));
+    expect(fake.read('accounts/acc-1')?.credit_topup).toBe(0);
+  });
 });

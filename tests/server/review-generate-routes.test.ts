@@ -14,7 +14,7 @@ vi.mock('../../lib/server/usage.js', () => ({
 // Plan allowances have their own tests (plans.test.ts); here every request is allowed.
 vi.mock('../../lib/server/lib/plans.js', async () => {
   const { createMiddleware } = await import('hono/factory');
-  return { planQuota: () => createMiddleware(async (_c, next) => next()) };
+  return { CREDIT_COSTS: { review_standard: 10 }, planQuota: () => createMiddleware(async (_c, next) => next()) };
 });
 vi.mock('../../lib/server/lib/access.js', async () => {
   const { HTTPException } = await import('hono/http-exception');

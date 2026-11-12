@@ -93,7 +93,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     faq: [
       { q: 'Where do the sources come from?', a: 'From a scholarly index of over 250 million works (the OpenAlex catalogue), from PDFs you upload to your Library, and from the document you are writing. You choose which.' },
       { q: 'Can it make up a citation?', a: 'Citations come from search results, not from the model’s memory, so each one is a real record you can open. The text around a citation is still AI-written, so check that the source says what the answer claims.' },
-      { q: 'Is it free?', a: 'Yes, the free plan includes AI Chat with a daily limit. Paid plans raise or remove the limit.' },
+      { q: 'Is it free?', a: 'Yes. The free plan includes 30 credits a month; a chat answer costs 1 credit. Paid plans include 500 or 1,500 credits a month.' },
     ],
   },
   {
@@ -163,7 +163,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     ],
     inputs: ['PDF files', 'BibTeX (.bib) and RIS (.ris) files', 'DOIs and PubMed ids', 'Zotero and Mendeley accounts'],
     outputs: ['A searchable library with citation details', 'Collections you can cite from and chat with'],
-    planNote: 'The Free plan holds 10 PDFs of up to 10 MB each. Paid plans hold unlimited PDFs.',
+    planNote: 'The Free plan holds 25 PDFs of up to 10 MB each. Paid plans hold unlimited PDFs.',
     limitations: [
       'Scanned PDFs without a text layer cannot be searched or asked about.',
       'Each plan has its own Library size and file size limits; see Pricing.',
@@ -177,7 +177,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     tools: ['pdf-tools', 'citation-generator'],
     faq: [
       { q: 'Are my PDFs private?', a: 'Yes. Your Library is visible only to you. Sharing a document does not share your Library.' },
-      { q: 'How large can a PDF be?', a: 'Up to 10 MB on the Free plan and 50 MB on Plus. See Pricing for every plan.' },
+      { q: 'How large can a PDF be?', a: 'Up to 10 MB on the Free plan, 50 MB on Plus and 100 MB on Pro. See Pricing for every plan.' },
       { q: 'Can I delete papers?', a: 'Yes. You can delete any paper or collection from your Library at any time.' },
     ],
   },
@@ -535,7 +535,7 @@ export const FEATURE_PAGES: FeaturePage[] = [
     ],
     inputs: ['.docx, .doc, .odt and .rtf files'],
     outputs: ['Word (.docx)', 'PDF', 'LaTeX project (.tex with a .bib file)'],
-    planNote: 'Word and PDF export are on every plan, including Free. LaTeX export is on paid plans (Plus and up).',
+    planNote: 'Word and PDF export are on every plan, including Free. LaTeX and PowerPoint export are on paid plans (Plus and up).',
     limitations: [
       'Unusual Word features (some fields, macros, embedded objects) may not survive the round trip.',
       'LaTeX export uses standard packages; journal classes need adding by hand.',

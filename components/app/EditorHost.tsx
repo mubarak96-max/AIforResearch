@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { WriteOrbitEditorProvider, type WriteOrbitEditorConfig } from '@/components/editor';
 import { getToken, useSession } from '@/lib/session';
 import { openPricing } from '@/lib/billing';
+import { AppNav } from '@/components/app/AppNav';
 
 /** Connects the editor package to this app: session, sign-in, upgrades and analytics. */
 export function EditorHost({ children }: { children: React.ReactNode }) {
@@ -25,6 +26,8 @@ export function EditorHost({ children }: { children: React.ReactNode }) {
       router.push(`/login?next=${encodeURIComponent(here)}`);
     },
     onUpgrade: (info) => openPricing(info?.message ?? null),
+    // One navigation everywhere: the editor shows the app's own.
+    renderNavigation: () => <AppNav className="flex h-full" />,
     onEvent: () => {},
   }), [user, loading, pathname, searchParams, router]);
 

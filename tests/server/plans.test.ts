@@ -173,3 +173,22 @@ describe('planQuota on a route', () => {
     expect((await creditSummary(ACCOUNT)).used).toBe(1);
   });
 });
+
+describe('the pricing page’s credit table', () => {
+  it('shows the same costs the server charges', async () => {
+    const { CREDIT_TABLE } = await import('../../components/billing/creditTable.js');
+    const { CREDIT_COSTS, HIGH_QUALITY_FACTOR } = await import('../../lib/server/lib/plans.js');
+    const cost = (prefix: string) => CREDIT_TABLE.find((row) => row.job.startsWith(prefix))!.credits;
+    expect(cost('Summary answer')).toBe(String(CREDIT_COSTS.summary));
+    expect(cost('Editor check')).toBe(String(CREDIT_COSTS.review));
+    expect(cost('Section')).toBe(String(CREDIT_COSTS.section));
+    expect(cost('Deep Research')).toBe(String(CREDIT_COSTS.deep));
+    expect(cost('Document review')).toBe(String(CREDIT_COSTS.review_standard));
+    expect(cost('Slide deck')).toBe(String(CREDIT_COSTS.slides));
+    expect(cost('Full draft')).toBe(`${CREDIT_COSTS.write}–${CREDIT_COSTS.draft}`);
+    expect(cost('Detailed report')).toBe(String(CREDIT_COSTS.detailed));
+    expect(cost('Data Lab')).toBe(String(CREDIT_COSTS.data_ai));
+    expect(cost('Systematic review')).toBe(String(CREDIT_COSTS.screening));
+    expect(cost('High-quality')).toBe(`× ${HIGH_QUALITY_FACTOR}`);
+  });
+});

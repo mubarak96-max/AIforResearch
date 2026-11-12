@@ -3,6 +3,7 @@
  * what the sentence citing it says, and is any sentence copied from a source? See lib/evidence.ts.
  */
 import { Hono } from 'hono';
+import { planQuota } from '../lib/plans.js';
 import { z } from 'zod';
 import { requireUser, type AppVariables } from '../auth.js';
 import type { Slots } from '../slots/types.js';
@@ -32,7 +33,8 @@ const EvidenceRequest = z.object({
 
 export function evidenceRoutes(slots: Slots) {
   const app = new Hono<{ Variables: AppVariables }>();
-  app.post('/evidence', requireUser, async (c) => {
+  // Claim check in the editor: CREDIT_COSTS.review, back when it fails.
+  app.post('/evidence', requireUser, planQuota('review'), async (c) => {
     const user = currentUser(c);
     const body = await parseBody(c, EvidenceRequest);
     return withHttpErrors(async () => c.json(await checkEvidence(slots, user, body.blocks, { language: body.language, library: body.library })));
