@@ -2,7 +2,6 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ContactLine, LegalPage, type LegalSection } from '@/components/marketing/LegalPage';
 import { pageMetadata } from '@/components/marketing/seo';
-import { PrivacySettingsButton } from '@/components/analytics/PrivacyControls';
 
 export const metadata = pageMetadata({
   title: 'Cookies and browser storage',
@@ -73,7 +72,7 @@ const SECTIONS: LegalSection[] = [
       <>
         <p>Optional analytics is off until you choose it. With your permission, Google Tag Manager loads analytics on public information pages; Google Analytics may use cookies such as <code>_ga</code> to measure visits. The app also counts approved feature events, such as document creation and review completion, in daily totals. Those event payloads exclude document text, questions, source names and document, account and user identifiers.</p>
         <p>Microsoft Clarity session recordings and heatmaps are a separate, optional choice for adults on public information pages. Clarity can use cookies such as <code>_clck</code> and <code>_clsk</code>. Third-party analytics and recording scripts are not loaded in private workspaces, sign-in pages, interactive tools or research search pages. Advertising consent stays denied.</p>
-        <p><PrivacySettingsButton />. You can decline or withdraw either choice and keep using the app. Withdrawal stops collection going forward and reloads a tracked page to remove loaded analytics code; it does not remove data already collected. Your browser can also clear cookies and block third-party requests.</p>
+        <p>Your browser can clear cookies and block third-party requests.</p>
       </>
     ),
   },

@@ -1,0 +1,12 @@
+Case notes for a case report (test sample; the case is invented for testing).
+
+Patient: Mary Wanjiku, 34-year-old woman, primary school teacher, seen at St Luke's Hospital, Nakuru, on 12 March 2026.
+Presenting complaint: fever up to 39.2 C for 3 weeks, night sweats, tender swellings in the right side of the neck, fatigue. No weight loss. No cough.
+History: previously well. No travel outside the county in the last year. No TB contacts. Not on regular medication. No family history of lymphoma or autoimmune disease.
+Examination (day 1): temperature 38.6 C, three tender, mobile right posterior cervical lymph nodes (largest 2.5 cm). No hepatosplenomegaly. No rash. Joints normal.
+Investigations: Hb 11.8 g/dL; WBC 3.1 x10^9/L (leukopenia); platelets 210; ESR 62 mm/h; CRP 38 mg/L; LDH 410 U/L. Blood cultures negative x3. HIV negative. Malaria RDT negative. Sputum GeneXpert negative. ANA weakly positive (1:80), anti-dsDNA negative. Chest X-ray normal. Neck ultrasound: enlarged nodes with preserved hilum.
+Day 10: excisional biopsy of the largest node. Histology: paracortical necrosis with karyorrhectic debris, histiocytes and plasmacytoid dendritic cells, no neutrophils, no granulomas; CD68 and MPO positive histiocytes. Consistent with histiocytic necrotising lymphadenitis (Kikuchi-Fujimoto disease). AFB stain and TB culture negative.
+Diagnoses considered: tuberculous lymphadenitis, lymphoma, systemic lupus erythematosus, reactive lymphadenopathy.
+Treatment: ibuprofen 400 mg three times daily for 2 weeks, paracetamol as needed. Advised rest.
+Follow-up: fever settled by day 18. Nodes smaller by day 30 and not palpable at 3 months. WBC 5.4 at 3 months. Repeat ANA negative at 6 months. No features of lupus at 6 months.
+Not yet recorded: the patient's own account of her illness; written consent for publication.
