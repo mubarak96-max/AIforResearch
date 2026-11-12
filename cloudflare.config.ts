@@ -38,6 +38,9 @@ export default defineConfig({
       NEXT_PUBLIC_REALTIME_URL: bindings.text(env("NEXT_PUBLIC_REALTIME_URL")),
       COLLAB_URL: bindings.text(env("COLLAB_URL")),
       CONVERT_URL: bindings.text(env("CONVERT_URL")),
+      // The embed service on Cloud Run (lib/server/lib/embeddings.ts). Optional: without it the
+      // converter answers /embed itself.
+      ...(process.env.EMBED_URL ? { EMBED_URL: bindings.text(process.env.EMBED_URL) } : {}),
       MAIL_PROVIDER: bindings.text(env("MAIL_PROVIDER")),
       MENDELEY_CLIENT_ID: bindings.text(env("MENDELEY_CLIENT_ID")),
       ZOTERO_CALLBACK_URL: bindings.text(env("ZOTERO_CALLBACK_URL")),

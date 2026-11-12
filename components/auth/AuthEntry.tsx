@@ -57,7 +57,7 @@ function OptionButton({ icon, verb, name, busy, disabled, compact, onClick }: {
 }
 
 /**
- * The one sign-in form, for signing in and signing up alike: Google / Microsoft / Apple first,
+ * The one sign-in form, for signing in and signing up alike: the switched-on providers first,
  * then an email and its password, or a new account (name, then password). Firebase
  * Authentication does the signing in; it never says whether an email has an account, so the
  * form asks for the password and offers "Create an account" beside it.
@@ -186,7 +186,7 @@ export function AuthEntry() {
   const title = step === 'signup' ? 'Create your account'
     : step === 'setpassword' ? 'Set your password'
     : step === 'password' ? 'Welcome back'
-    : 'Welcome to AI for Research';
+    : 'Sign in or sign up';
   // The provider buttons stay on top while creating an account too.
   const topOptions = step === 'email' || step === 'signup' ? options() : null;
   const planName = plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : '';
@@ -196,15 +196,15 @@ export function AuthEntry() {
     <div className="w-full">
       {plan && (
         <p className="mb-6 rounded-xl border border-brand-100 bg-brand-50 px-3.5 py-2.5 text-center text-sm text-brand-600">
-          <strong className="font-semibold">{planName} plan selected.</strong> Sign in or create your account, then pay securely with Dodo Payments.
+          <strong className="font-semibold">{planName} plan selected.</strong> Sign in or create your account, then finish paying securely.
         </p>
       )}
-      <h1 className="text-center text-[28px] font-bold leading-[1.15] tracking-[-0.025em] sm:text-[30px]">{title}</h1>
-      {step === 'email' && <p className="mt-2 text-center text-[15px] text-muted">Sign in or create an account.</p>}
+      <h1 className="text-balance text-center text-[26px] font-bold leading-[1.15] tracking-[-0.025em] sm:text-[30px]">{title}</h1>
+      {step === 'email' && <p className="mx-auto mt-2 max-w-[340px] text-balance text-center text-[15px] leading-[1.55] text-muted">Ask research questions, find papers and write with real citations. Free to start.</p>}
 
-      <div className="mt-7">
+      <div className="mt-6 sm:mt-7">
         {topOptions}
-        {topOptions && <Divider label="Or continue with email" />}
+        {topOptions && <Divider label="or use your email" />}
 
         {error && <p role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm font-medium text-red-700">{error}</p>}
 
