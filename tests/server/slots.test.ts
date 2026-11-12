@@ -8,14 +8,12 @@ import { createLlmSlot, LlmError, NOT_CONFIGURED_MESSAGE, resolveLlmConfig, type
 import { cleanQuery, createPapersSlot, reconstructAbstract, resolvePapersEndpoint, workToPaper, type PapersSettings } from '../../lib/server/slots/papers.js';
 
 const llmSettings = (overrides: Partial<LlmSettings> = {}): LlmSettings => ({
-  llmProvider: '',
   llmApiKey: '',
-  llmBaseUrl: '',
-  llmModel: '',
-  llmReviewModel: '',
   publicUrl: 'http://localhost:3000',
   ...overrides,
 });
+/** A provider with its own default models and endpoint. */
+const ai = (provider: string, extra: Partial<NonNullable<LlmSettings['ai']>> = {}) => ({ provider, model: '', reviewModel: '', baseUrl: '', ...extra });
 
 const papersSettings = (overrides: Partial<PapersSettings> = {}): PapersSettings => ({
   papersProvider: '',
@@ -33,30 +31,30 @@ describe('LLM provider selection', () => {
   it('defaults to DeepSeek through OpenRouter, and reports a missing key without throwing', () => {
     const config = resolveLlmConfig(llmSettings());
     expect(config).toMatchObject({ provider: 'openrouter', baseURL: 'https://openrouter.ai/api/v1', models: { fast: 'deepseek/deepseek-chat', review: 'deepseek/deepseek-chat' }, unavailable: NOT_CONFIGURED_MESSAGE });
-    expect(resolveLlmConfig(llmSettings({ llmProvider: 'deepseek', llmApiKey: 'k' }))).toMatchObject({ baseURL: 'https://api.deepseek.com', models: { fast: 'deepseek-chat' } });
+    expect(resolveLlmConfig(llmSettings({ ai: ai('deepseek'), llmApiKey: 'k' }))).toMatchObject({ baseURL: 'https://api.deepseek.com', models: { fast: 'deepseek-chat' } });
     expect(resolveLlmConfig(llmSettings({ llmApiKey: 'sk-test' })).unavailable).toBeNull();
   });
 
-  it('LLM_PROVIDER picks the provider', () => {
-    const config = resolveLlmConfig(llmSettings({ llmProvider: 'openai', llmApiKey: 'sk-openai' }));
+  it('the AI config picks the provider', () => {
+    const config = resolveLlmConfig(llmSettings({ ai: ai('openai'), llmApiKey: 'sk-openai' }));
     expect(config).toMatchObject({ provider: 'openai', baseURL: 'https://api.openai.com/v1', apiKey: 'sk-openai', tokenParam: 'max_completion_tokens' });
   });
 
   it('knows each provider endpoint', () => {
-    expect(resolveLlmConfig(llmSettings({ llmProvider: 'anthropic', llmApiKey: 'k' })).baseURL).toBe('https://api.anthropic.com/v1');
-    expect(resolveLlmConfig(llmSettings({ llmProvider: 'openrouter', llmApiKey: 'k' }))).toMatchObject({ baseURL: 'https://openrouter.ai/api/v1', headers: { 'X-Title': 'AI for Research' } });
-    const ollama = resolveLlmConfig(llmSettings({ llmProvider: 'ollama' }));
+    expect(resolveLlmConfig(llmSettings({ ai: ai('anthropic'), llmApiKey: 'k' })).baseURL).toBe('https://api.anthropic.com/v1');
+    expect(resolveLlmConfig(llmSettings({ ai: ai('openrouter'), llmApiKey: 'k' }))).toMatchObject({ baseURL: 'https://openrouter.ai/api/v1', headers: { 'X-Title': 'AI for Research' } });
+    const ollama = resolveLlmConfig(llmSettings({ ai: ai('ollama') }));
     expect(ollama).toMatchObject({ baseURL: 'http://localhost:11434/v1', unavailable: null });
-    expect(resolveLlmConfig(llmSettings({ llmProvider: 'ollama', llmBaseUrl: 'http://gpu:11434/v1/' })).baseURL).toBe('http://gpu:11434/v1');
+    expect(resolveLlmConfig(llmSettings({ ai: ai('ollama', { baseUrl: 'http://gpu:11434/v1/' }) })).baseURL).toBe('http://gpu:11434/v1');
   });
 
-  it('LLM_MODEL and LLM_REVIEW_MODEL override the models', () => {
-    expect(resolveLlmConfig(llmSettings({ llmApiKey: 'k', llmModel: 'fast-x' })).models).toEqual({ fast: 'fast-x', review: 'fast-x' });
-    expect(resolveLlmConfig(llmSettings({ llmApiKey: 'k', llmModel: 'fast-x', llmReviewModel: 'review-y' })).models).toEqual({ fast: 'fast-x', review: 'review-y' });
+  it('the AI config models override the provider defaults', () => {
+    expect(resolveLlmConfig(llmSettings({ llmApiKey: 'k', ai: ai('openrouter', { model: 'fast-x' }) })).models).toEqual({ fast: 'fast-x', review: 'fast-x' });
+    expect(resolveLlmConfig(llmSettings({ llmApiKey: 'k', ai: ai('openrouter', { model: 'fast-x', reviewModel: 'review-y' }) })).models).toEqual({ fast: 'fast-x', review: 'review-y' });
   });
 
   it('rejects an unknown provider clearly', () => {
-    expect(resolveLlmConfig(llmSettings({ llmProvider: 'gemini' })).unavailable).toMatch(/unknown LLM_PROVIDER "gemini"/);
+    expect(resolveLlmConfig(llmSettings({ ai: ai('gemini') })).unavailable).toMatch(/unknown AI provider "gemini"/);
   });
 });
 
@@ -104,7 +102,7 @@ describe('LLM slot', () => {
       requests.push(JSON.parse(init.body));
       return new Response(body, { status: 200, headers: { 'content-type': 'text/event-stream' } });
     });
-    const slot = createLlmSlot({ settings: llmSettings({ llmProvider: 'openrouter', llmApiKey: 'sk-or-test' }), fetch: fetchMock as any });
+    const slot = createLlmSlot({ settings: llmSettings({ ai: ai('openrouter'), llmApiKey: 'sk-or-test' }), fetch: fetchMock as any });
     const deltas: string[] = [];
     const result = await slot.stream({ messages: [{ role: 'user', content: 'hi' }] }, (delta) => deltas.push(delta));
     expect(deltas).toEqual(['Hello', ' world']);

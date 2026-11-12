@@ -98,7 +98,7 @@ describe('POST /api/ai-editor/review', () => {
   });
 
   it('503 without an AI key', async () => {
-    const response = await post(makeApp({ llm: createLlmSlot({ settings: { llmProvider: '', llmApiKey: '', llmBaseUrl: '', llmModel: '', llmReviewModel: '', publicUrl: 'x' } }), papers: fakePapers() }), '/api/ai-editor/review', { text });
+    const response = await post(makeApp({ llm: createLlmSlot({ settings: { llmApiKey: '', publicUrl: 'x' } }), papers: fakePapers() }), '/api/ai-editor/review', { text });
     expect(response.status).toBe(503);
   });
 });

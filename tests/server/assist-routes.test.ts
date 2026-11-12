@@ -75,7 +75,7 @@ import { createLlmSlot, LlmError } from '../../lib/server/slots/llm.js';
 import { PapersError, createPapersSlot } from '../../lib/server/slots/papers.js';
 import { USER, fakeLlm, fakePapers, makeApp, paper, parseSse, post } from './assist-helpers.js';
 
-const NO_KEYS = { llmProvider: '', llmApiKey: '', llmBaseUrl: '', llmModel: '', llmReviewModel: '', publicUrl: 'http://localhost:3000' };
+const NO_KEYS = { llmApiKey: '', publicUrl: 'http://localhost:3000' };
 
 beforeEach(() => {
   state.threads.clear();

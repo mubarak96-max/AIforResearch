@@ -8,6 +8,8 @@ COPY package.json pnpm-lock.yaml ./
 COPY patches patches
 RUN pnpm install --frozen-lockfile --ignore-scripts
 COPY lib/server lib/server
+# lib/server and the collab entry import these two from lib/.
+COPY lib/site.ts lib/tools.ts lib/
 COPY services/collab services/collab
 RUN pnpm build:collab
 

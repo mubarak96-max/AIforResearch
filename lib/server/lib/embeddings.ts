@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { env } from '../env.js';
+import { AI } from '../../site.js';
 import { settings } from './settings.js';
 import { serviceAuthHeaders } from './serviceAuth.js';
 
@@ -33,7 +34,7 @@ function config(): Config | null {
   }
   if (provider !== 'openai') return null;
   // An OpenAI AI slot's key works too, so one key can do both.
-  const apiKey = s.embeddingsApiKey || env.embeddingsApiKey || (s.llmProvider === 'openai' ? s.llmApiKey : '');
+  const apiKey = s.embeddingsApiKey || env.embeddingsApiKey || (AI.provider === 'openai' ? s.llmApiKey : '');
   if (!apiKey) return null;
   return { provider: 'openai', apiKey, model: s.embeddingsModel || env.embeddingsModel || 'text-embedding-3-small' };
 }

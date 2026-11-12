@@ -5,6 +5,7 @@
  */
 import OpenAI from 'openai';
 import { env, APP_NAME } from '../env.js';
+import { AI } from '../../site.js';
 import type { ChatMessage, LlmSlot, LlmUsage } from './types.js';
 
 export type LlmProvider = 'deepseek' | 'openai' | 'anthropic' | 'openrouter' | 'ollama';
@@ -26,10 +27,10 @@ export class LlmError extends Error {
   }
 }
 
-export type LlmSettings = Pick<
-  typeof env,
-  'llmProvider' | 'llmApiKey' | 'llmBaseUrl' | 'llmModel' | 'llmReviewModel' | 'publicUrl'
->;
+export type LlmSettings = Pick<typeof env, 'llmApiKey' | 'publicUrl'> & {
+  /** Provider and models; defaults to AI in lib/site.ts (tests pass their own). */
+  ai?: typeof AI;
+};
 
 export type LlmConfig = {
   provider: string;
@@ -55,16 +56,16 @@ const DEFAULTS: Record<LlmProvider, { baseURL: string; fast: string; review: str
 
 /** Which provider, endpoint, key and models the settings select. Pure, for tests. */
 export function resolveLlmConfig(settings: LlmSettings = env): LlmConfig {
-  const requested = settings.llmProvider.toLowerCase();
+  const ai = settings.ai ?? AI;
   // Default: DeepSeek's model, reached through OpenRouter (one key, several upstream hosts).
-  const provider = requested || 'openrouter';
+  const provider = ai.provider.trim().toLowerCase() || 'openrouter';
   if (!(LLM_PROVIDERS as readonly string[]).includes(provider)) {
     return {
       provider,
       baseURL: '',
       apiKey: '',
       models: { fast: '', review: '' },
-      unavailable: `AI is not configured: unknown LLM_PROVIDER "${provider}" (use ${LLM_PROVIDERS.join(', ')})`,
+      unavailable: `AI is not configured: unknown AI provider "${provider}" in lib/site.ts (use ${LLM_PROVIDERS.join(', ')})`,
       tokenParam: 'max_tokens',
       jsonMode: false,
     };
@@ -72,9 +73,9 @@ export function resolveLlmConfig(settings: LlmSettings = env): LlmConfig {
   const name = provider as LlmProvider;
   const defaults = DEFAULTS[name];
   const apiKey = name === 'ollama' ? settings.llmApiKey || 'ollama' : settings.llmApiKey;
-  const baseURL = (settings.llmBaseUrl || defaults.baseURL).replace(/\/+$/, '');
-  const fast = settings.llmModel || defaults.fast;
-  const review = settings.llmReviewModel || settings.llmModel || defaults.review;
+  const baseURL = (ai.baseUrl.trim() || defaults.baseURL).replace(/\/+$/, '');
+  const fast = ai.model.trim() || defaults.fast;
+  const review = ai.reviewModel.trim() || ai.model.trim() || defaults.review;
   const headers = name === 'openrouter' ? { 'HTTP-Referer': settings.publicUrl, 'X-Title': APP_NAME } : undefined;
   return {
     provider: name,
@@ -130,7 +131,7 @@ export function classifyLlmError(error: unknown, provider: string): unknown {
     if (status === 401 || status === 403) {
       return new LlmError('not_configured', `AI is not configured: ${provider} rejected the API key (check LLM_API_KEY)`);
     }
-    if (status === 404) return new LlmError('not_configured', `AI is not configured: ${provider} does not know the model (check LLM_MODEL)`);
+    if (status === 404) return new LlmError('not_configured', `AI is not configured: ${provider} does not know the model (check AI in lib/site.ts)`);
     if (status === 429) return new LlmError('busy', 'The AI is busy right now. Try again in a moment.');
     return new LlmError('upstream', 'The AI service failed. Try again.');
   }

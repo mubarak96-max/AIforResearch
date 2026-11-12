@@ -24,12 +24,8 @@ export const env = {
   embeddingsApiKey: read('EMBEDDINGS_API_KEY'),
   embeddingsModel: read('EMBEDDINGS_MODEL', 'text-embedding-3-small'),
 
-
-  llmProvider: read('LLM_PROVIDER'),          // deepseek | openai | anthropic | openrouter | ollama
+  /** The AI provider's key. The provider and models are set in code (AI in lib/site.ts). */
   llmApiKey: read('LLM_API_KEY'),
-  llmBaseUrl: read('LLM_BASE_URL'),
-  llmModel: read('LLM_MODEL'),                // fast model: autocomplete, edits, chat
-  llmReviewModel: read('LLM_REVIEW_MODEL'),   // stronger model: reviews
 
   papersProvider: read('PAPERS_PROVIDER'),    // scholar (default) | openalex
   scholarUrl: read('SCHOLAR_URL', 'https://scholar.citedevidence.com').replace(/\/+$/, ''),
