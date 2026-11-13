@@ -71,7 +71,7 @@ A review found that the first pass built every expansion branch at once, against
 | Scheduled monitoring | Deploy `checkSavedResearch` in the existing Functions project. It calls the same adapters and needs their existing configuration. | Manual checks are available; code does not claim a scheduler is deployed |
 | OCR | None: the converter image installs Tesseract (English) and OCR settings are fixed in code; add language packs in the Dockerfile. See [converter instructions](../services/convert/README.md). | On after the next converter build; without Tesseract, scanned pages are reported as unread |
 | Institutional identity | Configure an actual Firebase SAML/OIDC provider, then expose its public ID through `FIREBASE_SSO_PROVIDERS`. | Existing sign-in choices remain |
-| ReliefWeb | Approved `RELIEFWEB_APPNAME` | Connector visibly unavailable |
+| ReliefWeb | None: the approved appname `mutesasira-aiforresearch-nQO9kmOfXv` is set in code | Available whenever the expansion connectors are on |
 | SEC | None: the User-Agent `AIforResearch support@aiforresearch.app` is set in code | Available whenever the expansion flag is on |
 | Zotero groups | User explicitly supplies a key with the needed group read permissions | Existing personal-library read scopes unchanged |
 

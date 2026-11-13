@@ -12,6 +12,7 @@ import {
   LuShieldCheck, LuTrash2,
 } from 'react-icons/lu';
 import { Button } from '@/components/app/ui';
+import { SHOW_PROVIDERS } from '@/lib/devInfo';
 import { CreditCost } from './parts';
 
 export type StepId = 'plan' | 'search' | 'screen' | 'rank' | 'read' | 'gaps' | 'write' | 'verify';
@@ -31,7 +32,7 @@ const STEPS: Record<StepId, { label: string; what: string; icon: React.ReactNode
   verify: { label: 'Verify', what: 'Check cited narrative within the depth limit; show unverified claims and reference notices', icon: <LuShieldCheck /> },
 };
 
-const PROVIDERS: Record<string, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', pubmed: 'PubMed', europepmc: 'Europe PMC', arxiv: 'arXiv', web: 'Web', library: 'My Library' };
+const PROVIDERS: Record<string, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', core: 'CORE', pubmed: 'PubMed', europepmc: 'Europe PMC', arxiv: 'arXiv', clinicaltrials: 'ClinicalTrials.gov', datacite: 'DataCite', web: 'Web', library: 'My Library' };
 const RELEVANCE = [
   { label: 'On the question', className: 'bg-green-600' },
   { label: 'On a sub-question', className: 'bg-green-400' },
@@ -171,16 +172,18 @@ function StepDetails({ step, plan }: { step: StepView; plan: SubQuestion[] }) {
     case 'search':
       return (
         <>
-          <p className="flex flex-wrap gap-1.5">
-            {Object.entries((data.counts ?? {}) as Record<string, number>).map(([provider, count]) => (
-              <span key={provider} className="rounded-md bg-surface px-2 py-0.5 text-[12.5px]"><span className="font-semibold text-ink">{PROVIDERS[provider] || provider}</span> {count}</span>
-            ))}
-          </p>
+          {SHOW_PROVIDERS && (
+            <p className="flex flex-wrap gap-1.5">
+              {Object.entries((data.counts ?? {}) as Record<string, number>).map(([provider, count]) => (
+                <span key={provider} className="rounded-md bg-surface px-2 py-0.5 text-[12.5px]"><span className="font-semibold text-ink">{PROVIDERS[provider] || provider}</span> {count}</span>
+              ))}
+            </p>
+          )}
           <p className="mt-2">
             {Number(data.found ?? 0).toLocaleString('en-US')} results from {(data.queries ?? []).length} {(data.queries ?? []).length === 1 ? 'search' : 'searches'}, {Number(data.unique ?? 0).toLocaleString('en-US')} distinct papers
             {data.chased ? `, ${data.chased} of them found by following the references and citations of the best papers (citation chasing)` : ''}.
           </p>
-          {data.errors?.length ? <p className="mt-1 text-[12.5px] text-amber-800">{(data.errors as { provider: string }[]).map((error) => PROVIDERS[error.provider] || error.provider).join(', ')} did not answer.</p> : null}
+          {data.errors?.length ? <p className="mt-1 text-[12.5px] text-amber-800">{SHOW_PROVIDERS ? `${(data.errors as { provider: string }[]).map((error) => PROVIDERS[error.provider] || error.provider).join(', ')} did not answer.` : 'Some sources did not answer.'}</p> : null}
         </>
       );
     case 'screen': {

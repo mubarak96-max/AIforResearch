@@ -7,9 +7,9 @@ COPY package.json pnpm-lock.yaml ./
 # package.json's pnpm.patchedDependencies points here; install fails without it.
 COPY patches patches
 RUN pnpm install --frozen-lockfile --ignore-scripts
-COPY lib/server lib/server
-# lib/server and the collab entry import these two from lib/.
-COPY lib/site.ts lib/tools.ts lib/
+# lib/server imports shared modules from lib/ (site, tools, workflows, researchMethods, ...), so
+# copy the whole folder; esbuild bundles only what collab actually reaches.
+COPY lib lib
 COPY services/collab services/collab
 RUN pnpm build:collab
 

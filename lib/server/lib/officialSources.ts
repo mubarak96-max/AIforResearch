@@ -11,7 +11,9 @@ import type { OfficialLocator, OfficialRecord, OfficialSearch } from '../../offi
 
 /** SEC EDGAR asks every client to identify itself with a name and contact email (sec.gov/os/accessing-edgar-data). */
 export const SEC_USER_AGENT = 'AIforResearch support@aiforresearch.app';
-export const officialSettings = () => ({ reliefwebAppname: (process.env.RELIEFWEB_APPNAME ?? '').trim(), secUserAgent: SEC_USER_AGENT });
+/** ReliefWeb's pre-approved application name, sent as ?appname= on every request (apidoc.reliefweb.int). No API key is used. */
+export const RELIEFWEB_APPNAME = 'mutesasira-aiforresearch-nQO9kmOfXv';
+export const officialSettings = () => ({ reliefwebAppname: RELIEFWEB_APPNAME, secUserAgent: SEC_USER_AGENT });
 const text = (value: unknown) => typeof value === 'string' ? value : '';
 const date = (label: string, value: unknown) => text(value) ? [{ label, value: text(value) }] : [];
 const number = (value: unknown): number | null => typeof value === 'number' && Number.isFinite(value) ? value : null;
@@ -91,7 +93,7 @@ export async function indicatorData(locator: OfficialLocator): Promise<OfficialR
     warnings: [...base.warnings, `Page ${page} of ${Number(data.meta.pages) || 1}; ${data.items.length} observations. Missing values are retained, never replaced with zero. Areas may include aggregates; the API area filter is not a user access restriction.`] });
 }
 
-const reliefAppname = () => { const value = officialSettings().reliefwebAppname; if (!value) throw new HTTPException(503, { message: 'ReliefWeb is not connected. The service operator must configure an approved appname.' }); return value; };
+const reliefAppname = () => RELIEFWEB_APPNAME;
 export function reliefRecord(item: any): OfficialRecord {
   const f = item?.fields ?? {}; const id = String(item?.id ?? '');
   if (!/^\d+$/.test(id)) throw new SourceError('ReliefWeb', 'The report has no valid identifier.');

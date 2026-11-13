@@ -7,6 +7,10 @@
  * - PubMed E-utilities: eutils.ncbi.nlm.nih.gov, free; a key raises 3 to 10 requests a second.
  * - Europe PMC REST: ebi.ac.uk/europepmc, free (biomedical papers and bioRxiv/medRxiv preprints).
  * - arXiv API: export.arxiv.org, free (asks for at most one request every 3 seconds).
+ * - CORE: api.core.ac.uk, free with a key (open-access papers from repositories); skipped without one.
+ * - ClinicalTrials.gov API v2: free, no key (registered trials).
+ * - DataCite REST: api.datacite.org, free, no key (datasets with DOIs).
+ * - OpenCitations Index: api.opencitations.net, free (citation links; a token is optional).
  * - Web: Tavily, Brave Search or Exa, paid per search, chosen with WEB_SEARCH_PROVIDER.
  *
  * Google Scholar (no API) and Scopus (licence only) are deliberately absent.
@@ -410,6 +414,191 @@ export async function searchArxiv(input: ProviderSearch): Promise<FoundPaper[]> 
   url.searchParams.set('sortBy', input.sort === 'newest' ? 'submittedDate' : 'relevance');
   const xml = await fetchSource<string>(url, { source: 'arXiv', as: 'text' });
   return parseArxivAtom(xml || '');
+}
+
+// ------------------------------------------------------------------ CORE
+
+const CORE_BASE = 'https://api.core.ac.uk/v3';
+/** CORE's free keys allow a few requests every 10 seconds; Deep answers start several searches at once. */
+const CORE_PACE = { key: 'core', ms: 1500 };
+
+/** Is CORE set up? It refuses requests without a key, so it is skipped until there is one. */
+export const coreAvailable = () => Boolean(env.coreApiKey);
+
+/** CORE's query: the words, with the year range in its own syntax. Pure, for tests. */
+export function coreQuery(query: string, filters: SearchFilters): string {
+  const q = cleanQuery(query);
+  if (!q) return '';
+  const years = [filters.fromYear ? `yearPublished>=${filters.fromYear}` : null, filters.toYear ? `yearPublished<=${filters.toYear}` : null].filter(Boolean);
+  return years.length ? [`(${q})`, ...years].join(' AND ') : q;
+}
+
+export function coreToFound(item: any): FoundPaper {
+  const doi = doiKey(item?.doi);
+  const authors: string[] = (Array.isArray(item?.authors) ? item.authors : []).map((author: any) => String(author?.name || '')).filter(Boolean);
+  const links: any[] = Array.isArray(item?.links) ? item.links : [];
+  const display = links.find((link) => link?.type === 'display')?.url ?? null;
+  const pdf = item?.downloadUrl || links.find((link) => link?.type === 'download')?.url || null;
+  const journal = Array.isArray(item?.journals) ? item.journals.find((entry: any) => entry?.title)?.title ?? null : null;
+  const venue = journal || item?.publisher || null;
+  const title = String(item?.title || 'Untitled');
+  const type = String(item?.documentType || '').toLowerCase();
+  return {
+    ...emptyPaper(`CORE:${item?.id}`, 'core'),
+    title, authors: authors.slice(0, 5).map((name) => ({ name })), extra_author_count: Math.max(0, authors.length - 5),
+    year: Number.isInteger(item?.yearPublished) ? item.yearPublished : yearOf(item?.publishedDate),
+    publication_date: item?.publishedDate ? String(item.publishedDate).slice(0, 10) : null,
+    venue, doi, abstract: item?.abstract ? stripTags(String(item.abstract)) : null,
+    cited_by_count: Number.isFinite(item?.citationCount) ? item.citationCount : null,
+    is_oa: Boolean(pdf), pdf_url: pdf, oa_url: display ?? pdf,
+    url: doiUrl(doi) ?? display ?? (item?.id ? `https://core.ac.uk/works/${item.id}` : null),
+    study_type: classifyStudy({ title }),
+    is_preprint: /preprint/.test(type),
+    journal: journal ? { name: journal, h_index: null, tier: null } : null,
+    type: type || 'article',
+  };
+}
+
+export async function searchCore(input: ProviderSearch): Promise<FoundPaper[]> {
+  if (!coreAvailable()) return [];
+  const q = coreQuery(input.query, input.filters);
+  if (!q) return [];
+  const url = new URL(`${CORE_BASE}/search/works`);
+  url.searchParams.set('q', q);
+  url.searchParams.set('limit', String(Math.min(25, input.limit)));
+  if (input.sort === 'newest') url.searchParams.set('sort', 'publishedDate:desc');
+  const data = await fetchSource(url, { source: 'CORE', headers: { Authorization: `Bearer ${env.coreApiKey}` }, pace: CORE_PACE, timeoutMs: 15_000 });
+  return (Array.isArray(data?.results) ? data.results : []).filter((item: any) => item?.id && item?.title).map(coreToFound);
+}
+
+// ------------------------------------------------------------------ ClinicalTrials.gov
+
+const CT_BASE = 'https://clinicaltrials.gov/api/v2/studies';
+const CT_FIELDS = 'IdentificationModule,StatusModule,DescriptionModule,DesignModule,SponsorCollaboratorsModule,ConditionsModule,HasResults';
+const sentenceCase = (value: unknown) => {
+  const text = String(value ?? '').replace(/_/g, ' ').toLowerCase().trim();
+  return text ? text[0].toUpperCase() + text.slice(1) : '';
+};
+
+/** A registered trial as a FoundPaper (its record is public, so it counts as open). Pure, for tests. */
+export function trialToFound(study: any): FoundPaper {
+  const p = study?.protocolSection || {};
+  const id = String(p.identificationModule?.nctId || '');
+  const title = String(p.identificationModule?.officialTitle || p.identificationModule?.briefTitle || 'Untitled');
+  const status = p.statusModule || {};
+  const design = p.designModule || {};
+  const start = status.startDateStruct?.date ? String(status.startDateStruct.date) : null;
+  const interventional = design.studyType === 'INTERVENTIONAL';
+  const model = String(design.designInfo?.observationalModel || '');
+  const studyType: StudyType = interventional
+    ? design.designInfo?.allocation === 'RANDOMIZED' ? 'rct' : 'clinical-trial'
+    : model === 'COHORT' ? 'cohort' : model === 'CASE_CONTROL' ? 'case-control' : model === 'CROSS_SECTIONAL' ? 'cross-sectional' : 'other';
+  const phases = (Array.isArray(design.phases) ? design.phases : []).filter((phase: string) => phase !== 'NA').map((phase: string) => sentenceCase(phase).replace(/^Phase(\d)/, 'Phase $1').replace(/^Early phase(\d)/, 'Early phase $1'));
+  const facts = [
+    status.overallStatus ? `Status: ${sentenceCase(status.overallStatus)}` : null,
+    phases.length ? phases.join('/') : null,
+    design.enrollmentInfo?.count ? `${design.enrollmentInfo.count} participants` : null,
+    study?.hasResults ? 'Results posted' : null,
+  ].filter(Boolean).join('. ');
+  const summary = p.descriptionModule?.briefSummary ? String(p.descriptionModule.briefSummary).replace(/\s+/g, ' ').trim() : '';
+  const lead = p.sponsorCollaboratorsModule?.responsibleParty?.investigatorFullName || p.sponsorCollaboratorsModule?.leadSponsor?.name || null;
+  const url = id ? `https://clinicaltrials.gov/study/${id}` : null;
+  return {
+    ...emptyPaper(`NCT:${id}`, 'clinicaltrials'),
+    title, authors: lead ? [{ name: String(lead) }] : [],
+    year: yearOf(start), publication_date: start && /^\d{4}-\d{2}-\d{2}$/.test(start) ? start : null,
+    venue: 'ClinicalTrials.gov', abstract: [facts ? `${facts}.` : '', summary].filter(Boolean).join(' ') || null,
+    is_oa: true, oa_url: url, url,
+    study_type: studyType, type: 'clinical-trial',
+  };
+}
+
+export async function searchClinicalTrials(input: ProviderSearch): Promise<FoundPaper[]> {
+  const term = cleanQuery(input.query);
+  if (!term) return [];
+  const url = new URL(CT_BASE);
+  url.searchParams.set('query.term', term);
+  url.searchParams.set('pageSize', String(Math.min(50, input.limit)));
+  url.searchParams.set('format', 'json');
+  url.searchParams.set('fields', CT_FIELDS);
+  const { fromYear, toYear } = input.filters;
+  if (fromYear || toYear) url.searchParams.set('filter.advanced', `AREA[StartDate]RANGE[${fromYear ? `${fromYear}-01-01` : 'MIN'},${toYear ? `${toYear}-12-31` : 'MAX'}]`);
+  if (input.sort === 'newest') url.searchParams.set('sort', 'StartDate:desc');
+  const data = await fetchSource(url, { source: 'ClinicalTrials.gov', timeoutMs: 15_000 });
+  return (Array.isArray(data?.studies) ? data.studies : []).map(trialToFound).filter((paper: FoundPaper) => paper.id !== 'NCT:');
+}
+
+// ------------------------------------------------------------------ DataCite
+
+const DATACITE_BASE = 'https://api.datacite.org/dois';
+
+/** "Family, Given" (or the given and family parts) as "Given Family". */
+const creatorName = (creator: any) => {
+  if (creator?.givenName && creator?.familyName) return `${creator.givenName} ${creator.familyName}`;
+  const name = String(creator?.name || '').trim();
+  return creator?.nameType === 'Personal' && /^[^,]+,\s*[^,]+$/.test(name) ? name.split(/,\s*/).reverse().join(' ') : name;
+};
+
+/** A DataCite dataset record as a FoundPaper. Pure, for tests. */
+export function dataciteToFound(record: any): FoundPaper {
+  const a = record?.attributes || {};
+  const doi = doiKey(a.doi || record?.id);
+  const title = String((Array.isArray(a.titles) ? a.titles.find((entry: any) => !entry?.titleType)?.title ?? a.titles[0]?.title : null) || 'Untitled');
+  const authors: string[] = (Array.isArray(a.creators) ? a.creators : []).map(creatorName).filter(Boolean);
+  const descriptions: any[] = Array.isArray(a.descriptions) ? a.descriptions : [];
+  const description = (descriptions.find((entry) => entry?.descriptionType === 'Abstract') ?? descriptions[0])?.description;
+  const publisher = typeof a.publisher === 'string' ? a.publisher : a.publisher?.name ?? null;
+  const rights: any[] = Array.isArray(a.rightsList) ? a.rightsList : [];
+  const open = rights.some((entry) => /creativecommons|open|cc0|cc-by|public domain/i.test(`${entry?.rightsUri ?? ''} ${entry?.rightsIdentifier ?? ''} ${entry?.rights ?? ''}`));
+  return {
+    ...emptyPaper(`DC:${doi ?? record?.id}`, 'datacite'),
+    title: stripTags(title), authors: authors.slice(0, 5).map((name) => ({ name })), extra_author_count: Math.max(0, authors.length - 5),
+    year: Number.isInteger(a.publicationYear) ? a.publicationYear : yearOf(a.publicationYear),
+    publication_date: a.published ? String(a.published).slice(0, 10) : null,
+    venue: publisher, doi, abstract: description ? stripTags(String(description)).slice(0, 4000) : null,
+    cited_by_count: Number.isFinite(a.citationCount) ? a.citationCount : null,
+    is_oa: open, oa_url: a.url ?? null, url: doiUrl(doi) ?? a.url ?? null,
+    type: 'dataset',
+  };
+}
+
+export async function searchDatacite(input: ProviderSearch): Promise<FoundPaper[]> {
+  let query = cleanQuery(input.query);
+  if (!query) return [];
+  const { fromYear, toYear } = input.filters;
+  if (fromYear || toYear) query = `(${query}) AND publicationYear:[${fromYear ?? '*'} TO ${toYear ?? '*'}]`;
+  const url = new URL(DATACITE_BASE);
+  url.searchParams.set('query', query);
+  url.searchParams.set('resource-type-id', 'dataset');
+  url.searchParams.set('page[size]', String(Math.min(50, input.limit)));
+  if (input.sort === 'newest') url.searchParams.set('sort', '-published');
+  if (input.sort === 'cited') url.searchParams.set('sort', '-citation-count');
+  const data = await fetchSource(url, { source: 'DataCite', timeoutMs: 15_000 });
+  return (Array.isArray(data?.data) ? data.data : []).map(dataciteToFound);
+}
+
+// ------------------------------------------------------------------ OpenCitations (links, not search)
+
+const OPENCITATIONS = 'https://api.opencitations.net/index/v2';
+
+/** The ids in one side of an OpenCitations row ("omid:br/1 doi:10.1/x openalex:W1"). Pure, for tests. */
+export function openCitationsIds(field: unknown): { doi: string | null; openalex: string | null } {
+  const text = String(field ?? '');
+  return { doi: doiKey(text.match(/\bdoi:(\S+)/)?.[1]), openalex: text.match(/\bopenalex:(W\d+)/)?.[1] ?? null };
+}
+
+/**
+ * What a DOI cites (references) or what cites it (citations), from OpenCitations' open index:
+ * the other papers' OpenAlex ids and DOIs, for the caller to look up.
+ */
+export async function openCitationsLinks(doi: string, direction: 'references' | 'citations', limit = 200): Promise<{ doi: string | null; openalex: string | null }[]> {
+  const clean = doiKey(doi);
+  if (!clean) return [];
+  const data = await fetchSource<any[]>(`${OPENCITATIONS}/${direction}/doi:${encodeURIComponent(clean)}`, {
+    source: 'OpenCitations', headers: env.openCitationsToken ? { authorization: env.openCitationsToken } : {}, timeoutMs: 20_000,
+  });
+  const side = direction === 'references' ? 'cited' : 'citing';
+  return (Array.isArray(data) ? data : []).map((row) => openCitationsIds(row?.[side])).filter((ids) => ids.doi || ids.openalex).slice(0, limit);
 }
 
 // ------------------------------------------------------------------ Web

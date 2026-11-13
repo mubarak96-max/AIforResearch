@@ -43,8 +43,8 @@
   --color-amber-50: #fffbeb;
   --color-positive: #3f7d58;
   /* Surfaces */
-  --color-page: #fffdf9;
-  --color-surface: #fffdf9;
+  --color-page: #ffffff;
+  --color-surface: #ffffff;
   --color-panel: #f6f2ec;
 
   /* The editor uses "primary-*" utilities; they follow the brand. */

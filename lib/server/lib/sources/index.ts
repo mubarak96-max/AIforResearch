@@ -7,7 +7,8 @@
 import { libraryHits } from '../assist-papers.js';
 import { doiKey, titleKey } from './classify.js';
 import {
-  searchArxiv, searchEuropePmc, searchOpenAlex, searchPubmed, searchSemanticScholar, searchWeb, webSearchAvailable, type ProviderSearch,
+  coreAvailable, searchArxiv, searchClinicalTrials, searchCore, searchDatacite, searchEuropePmc, searchOpenAlex, searchPubmed, searchSemanticScholar,
+  searchWeb, webSearchAvailable, type ProviderSearch,
 } from './providers.js';
 import {
   JOURNAL_TIER_ORDER, emptyPaper, type FoundPaper, type ProviderId, type SearchFilters, type SearchInput, type SearchOutput, type SourceGroup,
@@ -16,15 +17,17 @@ import {
 export * from './types.js';
 export { classifyStudy, doiKey, titleKey } from './classify.js';
 export {
-  crossrefUpdates, crossrefWork, pubmedCount, pubmedRecords, pubmedTerm, searchWeb, semanticScholarLinks, semanticScholarPaper,
+  crossrefUpdates, crossrefWork, openCitationsLinks, pubmedCount, pubmedRecords, pubmedTerm, searchWeb, semanticScholarLinks, semanticScholarPaper,
   semanticScholarSimilar, unpaywall, webSearchAvailable,
 } from './providers.js';
 
-/** Which services answer for each group. */
+/** Which services answer for each group (CORE joins All papers only when its key is set). */
 export const GROUP_PROVIDERS: Record<SourceGroup, ProviderId[]> = {
-  papers: ['openalex', 'semantic_scholar'],
+  papers: ['openalex', 'semantic_scholar', 'core'],
   medical: ['pubmed', 'europepmc'],
   preprints: ['arxiv', 'europepmc'],
+  trials: ['clinicaltrials'],
+  datasets: ['datacite'],
   web: ['web'],
   library: ['library'],
 };
@@ -35,6 +38,8 @@ export function sourceGroups() {
     { id: 'papers', label: 'All papers', detail: 'OpenAlex and Semantic Scholar: 250M+ works in every field', available: true },
     { id: 'medical', label: 'Medical', detail: 'PubMed and Europe PMC', available: true },
     { id: 'preprints', label: 'Preprints', detail: 'arXiv, bioRxiv and medRxiv', available: true },
+    { id: 'trials', label: 'Clinical trials', detail: 'Registered trials, including ones not yet published', available: true },
+    { id: 'datasets', label: 'Datasets', detail: 'Research datasets with DOIs', available: true },
     { id: 'web', label: 'Web', detail: 'Web pages, reports and news', available: webSearchAvailable() },
     { id: 'library', label: 'My Library', detail: 'Your PDFs and saved papers', available: true },
   ] as const;
@@ -153,6 +158,7 @@ export async function searchSources(input: SearchInput, context: SearchContext =
   if (groups.has('papers')) {
     tasks.push({ provider: 'openalex', run: () => searchOpenAlex(ask) });
     tasks.push({ provider: 'semantic_scholar', run: () => searchSemanticScholar({ ...ask, limit: Math.min(ask.limit, 40) }) });
+    if (coreAvailable()) tasks.push({ provider: 'core', run: () => searchCore(ask) });
   }
   if (groups.has('medical')) {
     tasks.push({ provider: 'pubmed', run: () => searchPubmed(ask) });
@@ -162,6 +168,8 @@ export async function searchSources(input: SearchInput, context: SearchContext =
     tasks.push({ provider: 'arxiv', run: () => searchArxiv({ ...ask, limit: Math.min(ask.limit, 30) }) });
     tasks.push({ provider: 'europepmc', run: () => searchEuropePmc({ ...ask, filters: { ...filters, excludePreprints: false } }, 'preprints') });
   }
+  if (groups.has('trials')) tasks.push({ provider: 'clinicaltrials', run: () => searchClinicalTrials(ask) });
+  if (groups.has('datasets')) tasks.push({ provider: 'datacite', run: () => searchDatacite(ask) });
   if (groups.has('library') && context.userId) {
     tasks.push({ provider: 'library', run: () => libraryPapers(context.userId!, input.query, input.libraryDocumentIds ?? [], Math.min(limit, 12)) });
   }

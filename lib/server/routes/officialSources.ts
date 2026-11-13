@@ -51,7 +51,7 @@ export function officialSourceRoutes() {
   app.get('/availability', (c) => {
     const settings = officialSettings();
     if (!expansionWorkbooksEnabled()) return c.json({ clinical_trials: true });
-    return c.json({ clinical_trials: true, world_bank: true, reliefweb: Boolean(settings.reliefwebAppname), sec: true });
+    return c.json({ clinical_trials: true, world_bank: true, reliefweb: true, sec: true });
   });
   app.post('/search', async (c) => {
     const input = await parseBody(c, z.object({ provider: Provider, query: z.string().trim().min(1).max(500), page: Page, page_token: z.string().max(3000).optional(), source_id: z.string().regex(/^\d{1,5}$/).default('2') }).strict());

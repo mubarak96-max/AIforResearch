@@ -6,11 +6,11 @@
 import type { RichPaper } from '../../slots/papers.js';
 
 /** The source groups people pick from. "papers" is the general index (OpenAlex and Semantic Scholar). */
-export const SOURCE_GROUPS = ['papers', 'medical', 'preprints', 'web', 'library'] as const;
+export const SOURCE_GROUPS = ['papers', 'medical', 'preprints', 'trials', 'datasets', 'web', 'library'] as const;
 export type SourceGroup = (typeof SOURCE_GROUPS)[number];
 
 /** The services behind the groups. */
-export type ProviderId = 'openalex' | 'semantic_scholar' | 'pubmed' | 'europepmc' | 'arxiv' | 'web' | 'library';
+export type ProviderId = 'openalex' | 'semantic_scholar' | 'core' | 'pubmed' | 'europepmc' | 'arxiv' | 'clinicaltrials' | 'datacite' | 'web' | 'library';
 
 export const STUDY_TYPES = [
   'meta-analysis', 'systematic-review', 'rct', 'clinical-trial', 'cohort', 'case-control', 'cross-sectional',

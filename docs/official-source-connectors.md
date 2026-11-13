@@ -6,14 +6,14 @@ The signed-in `/official-sources` workspace uses the existing Library and task w
 | --- | --- | --- | --- |
 | ClinicalTrials.gov | Search registrations, load outcome descriptions and linked publication references, save record snapshots | First registration/result-posting dates, registry update, estimated/actual enrollment, registered versus posted outcome descriptions, reference type and PMID | Registry records; numerical result tables, group denominators, statistical analyses and publication full text are not imported |
 | World Bank | Search one indicator catalogue, read metadata and paged observations, export CSV/JSON | Dataset source, definition, period, area, unit, missing versus zero, footnote and update date | Source 2 defaults to World Development Indicators; other source IDs are selectable; partial catalogue/data pages are identified |
-| ReliefWeb | Search published reports and save report body/metadata | Original publication, ReliefWeb ingestion/update, original publisher | Requires an approved appname; attached files are not downloaded |
+| ReliefWeb | Search published reports and save report body/metadata | Original publication, ReliefWeb ingestion/update, original publisher | Sends the approved appname set in code; attached files are not downloaded |
 | SEC EDGAR | Read recent submission records by CIK and XBRL concept facts | Filing date, reporting interval, taxonomy, unit, accession, original/amended filing | SEC filer coverage; older submission archives and custom XBRL concepts are not searched; filing index records are not filing full text |
 
 Geographic filters, when supplied, select source data. They do not restrict who can use the product. No exchange-rate conversion, averaging of different periods, imputation of missing observations, or automatic claim of global coverage is made.
 
 ## Optional deployment configuration
 
-- `RELIEFWEB_APPNAME`: the application name approved by ReliefWeb. Without it, the source is shown as not connected and no request is sent.
+- ReliefWeb needs no configuration: requests send the approved application name `mutesasira-aiforresearch-nQO9kmOfXv` (`RELIEFWEB_APPNAME` in `lib/server/lib/officialSources.ts`). No API key is used.
 - SEC EDGAR needs no configuration: requests identify the app with the fixed User-Agent `AIforResearch support@aiforresearch.app` (`SEC_USER_AGENT` in `lib/server/lib/officialSources.ts`). A Firestore admission counter allows at most five SEC network attempts per second across app instances. SEC requests do not retry automatically.
 
 ClinicalTrials.gov and World Bank do not use additional application credentials in these adapters. Existing Library plan limits still apply to saved snapshots. Saved provenance includes the provider, record type, canonical URL, retrieval time, SHA-256 digest, labeled dates, source metadata, and stated limits. New source content creates a new snapshot instead of overwriting an earlier one.

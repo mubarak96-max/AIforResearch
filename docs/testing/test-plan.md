@@ -162,7 +162,7 @@ From `lib/server/lib/plans.ts`:
 | 4.3.5 | Landscape | *sleep memory consolidation*, from 2000; compare *urban green space mental health* with *blue space mental health* | Works per year, topics, journals, authors, institutions and open-access share; two series when comparing |
 | 4.3.6 | Trial registries | `/official-sources`: *intermittent fasting type 2 diabetes* | ClinicalTrials.gov registrations, with registered and posted outcomes kept separate; save to Library with the retrieval date |
 | 4.3.7 | Saved search | `/monitoring`: save *green space mental health adults*, run now | The first run records a baseline; a later run shows only what is new, plus DOI corrections and retractions; a run with no changes needs no review |
-| 4.3.8 | Expansion sources | With `NEXT_PUBLIC_EXPANSION_WORKBOOKS=1` only: World Bank indicator `SH.STA.SMSS.ZS`, ReliefWeb (needs `RELIEFWEB_APPNAME`), SEC company `Apple` | Data with units, period and source date; with the flag off, these are hidden |
+| 4.3.8 | Expansion sources | With `WORKBOOK_FEATURES.expansionWorkbooks = true` (lib/workflows.ts) only: World Bank indicator `SH.STA.SMSS.ZS`, ReliefWeb, SEC company `Apple` | Data with units, period and source date; with the flag off, these are hidden |
 
 ## 5. Library and reference import
 

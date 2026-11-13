@@ -25,7 +25,7 @@ vi.mock('../../lib/server/lib/directory.js', () => {
   };
   return { papersSlots: () => [{ provider: 'openalex', get }] };
 });
-vi.mock('../../lib/server/lib/sources/index.js', () => ({ semanticScholarLinks: async () => [] }));
+vi.mock('../../lib/server/lib/sources/index.js', () => ({ semanticScholarLinks: async () => [], openCitationsLinks: async () => [] }));
 vi.mock('../../lib/server/auth.js', async () => {
   const { createMiddleware } = await import('hono/factory');
   return { requireUser: createMiddleware(async (c, next) => { c.set('user', { id: 'u1', email: 'a@b.c', full_name: null, account_id: 'acc', is_admin: false }); await next(); }) };

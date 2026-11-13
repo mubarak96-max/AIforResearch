@@ -11,7 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import toast from 'react-hot-toast';
 import {
-  LuBookmarkPlus, LuBookOpenText, LuCheck, LuChevronDown, LuDatabase, LuExternalLink, LuFileCode, LuFileSpreadsheet, LuFileText, LuFileType, LuFilter,
+  LuBookmarkPlus, LuBookOpenText, LuCheck, LuChevronDown, LuClipboardList, LuDatabase, LuTable, LuExternalLink, LuFileCode, LuFileSpreadsheet, LuFileText, LuFileType, LuFilter,
   LuFlaskConical, LuGlobe, LuGraduationCap, LuLayers, LuLibrary, LuLock, LuPaperclip, LuSigma, LuStethoscope, LuX, LuZap,
 } from 'react-icons/lu';
 import { Check, MultiSelect, NumberField, Select } from './controls';
@@ -22,7 +22,7 @@ import { FigureView, type ResearchFigure } from './figures';
 
 // ------------------------------------------------------------------ types shared with the API
 
-export type SourceGroup = 'papers' | 'medical' | 'preprints' | 'web' | 'library';
+export type SourceGroup = 'papers' | 'medical' | 'preprints' | 'trials' | 'datasets' | 'web' | 'library';
 export type Depth = 'summary' | 'deep' | 'detailed';
 export type Filters = {
   from_year?: number | null; to_year?: number | null; study_types?: string[] | null; open_access?: boolean | null;
@@ -129,11 +129,13 @@ export const SOURCE_GROUPS: GroupInfo[] = [
   { id: 'papers', label: 'All papers', detail: 'Peer-reviewed papers across every field', available: true },
   { id: 'medical', label: 'Medical', detail: 'PubMed and clinical literature', available: true },
   { id: 'preprints', label: 'Preprints', detail: 'arXiv, bioRxiv, medRxiv and more', available: true },
+  { id: 'trials', label: 'Clinical trials', detail: 'Registered trials, including ones not yet published', available: true },
+  { id: 'datasets', label: 'Datasets', detail: 'Research datasets with DOIs', available: true },
   { id: 'web', label: 'Web', detail: 'Reports, guidelines and pages from the open web', available: true },
   { id: 'library', label: 'My Library', detail: 'Papers you have saved or uploaded', available: true },
 ];
 const SOURCE_ICONS: Record<SourceGroup, React.ReactNode> = {
-  papers: <LuFileText />, medical: <LuStethoscope />, preprints: <LuFlaskConical />, web: <LuGlobe />, library: <LuLibrary />,
+  papers: <LuFileText />, medical: <LuStethoscope />, preprints: <LuFlaskConical />, trials: <LuClipboardList />, datasets: <LuTable />, web: <LuGlobe />, library: <LuLibrary />,
 };
 
 /** The sources as a dropdown of checkable options, with no server lookup (Home's signed-out box uses it). */

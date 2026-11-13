@@ -68,6 +68,8 @@ export default defineConfig({
       OPENALEX_API_KEY: bindings.secret(),
       SEMANTIC_SCHOLAR_API_KEY: bindings.secret(),
       NCBI_API_KEY: bindings.secret(),
+      CORE_API_KEY: bindings.secret(),
+      OPENCITATIONS_ACCESS_TOKEN: bindings.secret(),
       SCHOLAR_API_KEY: bindings.secret(),
       // Encrypts the Zotero/Mendeley tokens people connect (lib/server/lib/settings.ts). Keep it
       // stable: changing it disconnects them.

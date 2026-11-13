@@ -51,7 +51,7 @@ export function toFilters(filters: z.infer<typeof Filters>) {
   };
 }
 
-const Groups = z.array(z.enum(SOURCE_GROUPS)).min(1).max(5);
+const Groups = z.array(z.enum(SOURCE_GROUPS)).min(1).max(SOURCE_GROUPS.length);
 
 const SearchRequest = z.object({
   query: z.string().trim().min(2).max(300),

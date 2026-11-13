@@ -47,6 +47,10 @@ export const env = {
    */
   ncbiApiKey: read('NCBI_API_KEY'),
   semanticScholarApiKey: read('SEMANTIC_SCHOLAR_API_KEY'),
+  /** CORE (core.ac.uk/services/api): open-access papers from repositories. Needs a free key; without one CORE is skipped. */
+  coreApiKey: read('CORE_API_KEY'),
+  /** OpenCitations (opencitations.net/accesstoken): optional free token, citation links for Citation Map. */
+  openCitationsToken: read('OPENCITATIONS_ACCESS_TOKEN'),
   contactEmail: read('CONTACT_EMAIL') || read('OPENALEX_EMAIL') || read('SUPPORT_EMAIL'),
   /** The Web source: 'tavily', 'brave' or 'exa' with WEB_SEARCH_API_KEY; empty turns the Web source off. */
   webSearchProvider: read('WEB_SEARCH_PROVIDER').toLowerCase(),

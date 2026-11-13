@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { LuArrowUpDown, LuSearch, LuShare2 } from 'react-icons/lu';
 import { Select } from '@/components/app/research/controls';
 import { AppFrame } from '@/components/app/AppFrame';
+import { SHOW_PROVIDERS } from '@/lib/devInfo';
 import { SourcesNav } from '@/components/app/SourcesNav';
 import { Button, Card } from '@/components/app/ui';
 import { useSignedIn } from '@/components/app/useSignedIn';
@@ -17,7 +18,7 @@ import {
 
 type SearchResult = { papers: FoundPaper[]; web: { id: string; title: string; url: string; site: string; snippet: string; published: string | null }[]; counts: Record<string, number>; errors: { provider: string; message: string }[] };
 
-const PROVIDERS: Record<string, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', pubmed: 'PubMed', europepmc: 'Europe PMC', arxiv: 'arXiv', web: 'Web', library: 'Library' };
+const PROVIDERS: Record<string, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', core: 'CORE', pubmed: 'PubMed', europepmc: 'Europe PMC', arxiv: 'arXiv', clinicaltrials: 'ClinicalTrials.gov', datacite: 'DataCite', web: 'Web', library: 'Library' };
 
 /** A search result in the shape the source rows draw. */
 function asSource(paper: FoundPaper, n: number): Source {
@@ -92,8 +93,8 @@ function FindPapers() {
           {result && (
             <div className="mb-2 flex flex-wrap items-center gap-3">
               <p className="min-w-0 flex-1 text-[14px] text-muted">
-                {result.papers.length ? `${result.papers.length} papers` : 'No papers'}{searched.length ? ` from ${searched.join(', ')}` : ''}
-                {result.errors.length ? ` · ${result.errors.map((error) => PROVIDERS[error.provider] || error.provider).join(', ')} did not answer` : ''}
+                {result.papers.length ? `${result.papers.length} papers` : 'No papers'}{SHOW_PROVIDERS && searched.length ? ` from ${searched.join(', ')}` : ''}
+                {result.errors.length ? (SHOW_PROVIDERS ? ` · ${result.errors.map((error) => PROVIDERS[error.provider] || error.provider).join(', ')} did not answer` : ' · Some sources did not answer') : ''}
               </p>
               <Select label="Sort" prefix="Sort" icon={<LuArrowUpDown />} align="right" value={sort} onChange={(next) => setSort(next as typeof sort)}
                 options={[{ value: 'relevance', label: 'Most relevant' }, { value: 'cited', label: 'Most cited' }, { value: 'newest', label: 'Newest' }]} />
@@ -107,7 +108,7 @@ function FindPapers() {
           {!result && !busy && (
             <Card className="px-5 py-8 text-center">
               <p className="text-[15px] font-semibold">Search 250M+ papers and more</p>
-              <p className="mx-auto mt-1 max-w-md text-[14px] text-muted">Pick sources above: All papers (OpenAlex and Semantic Scholar), Medical (PubMed and Europe PMC), Preprints (arXiv, bioRxiv, medRxiv), the Web, or your Library. Searching costs no credits.</p>
+              <p className="mx-auto mt-1 max-w-md text-[14px] text-muted">Pick sources above: All papers (OpenAlex and Semantic Scholar), Medical (PubMed and Europe PMC), Preprints (arXiv, bioRxiv, medRxiv), Clinical trials, Datasets, the Web, or your Library. Searching costs no credits.</p>
             </Card>
           )}
           {result && (
@@ -115,7 +116,7 @@ function FindPapers() {
               {sources.map((source) => (
                 <SourceRow key={source.id} source={source} extra={<>
                   {source.doi && <Link href={`/citation-map?doi=${encodeURIComponent(source.doi)}`} className="text-brand hover:underline">Citation map</Link>}
-                  <span className="font-normal text-muted">{source.providers.map((provider) => PROVIDERS[provider] || provider).join(' + ')}</span>
+                  {SHOW_PROVIDERS && <span className="font-normal text-muted">{source.providers.map((provider) => PROVIDERS[provider] || provider).join(' + ')}</span>}
                 </>} />
               ))}
               {result.web.map((page) => (

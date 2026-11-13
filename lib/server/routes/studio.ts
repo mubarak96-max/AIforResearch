@@ -29,7 +29,7 @@ import { batches, buildStudioPrompt, cleanDeck, hasStudioPrompt, improvePrompt, 
 
 const RunRequest = z.object({
   inputs: z.record(z.string(), z.string()).default({}),
-  groups: z.array(z.enum(SOURCE_GROUPS)).min(1).max(5).default(['papers']),
+  groups: z.array(z.enum(SOURCE_GROUPS)).min(1).max(SOURCE_GROUPS.length).default(['papers']),
   filters: Filters,
   role: z.string().trim().max(40).nullish(),
   headings: z.boolean().default(true),

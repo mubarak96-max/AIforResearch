@@ -29,7 +29,7 @@ const make = (authenticated = true) => {
 };
 const post = (path: string, body: unknown, app = make()) => app.request(`/api/official-sources${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
 
-beforeEach(() => { fake.clear(); vi.clearAllMocks(); vi.stubEnv('RELIEFWEB_APPNAME', ''); remote.room.mockResolvedValue(undefined); });
+beforeEach(() => { fake.clear(); vi.clearAllMocks(); remote.room.mockResolvedValue(undefined); });
 afterEach(() => vi.unstubAllEnvs());
 
 describe('official source records', () => {
@@ -94,11 +94,9 @@ describe('official source records', () => {
     expect(response.warnings.join(' ')).toContain('not an exhaustive');
   });
 
-  it('does not contact optional providers without operator configuration', async () => {
-    await expect(searchRelief('flood')).rejects.toThrow('approved appname');
-    expect(remote.fetch).not.toHaveBeenCalled(); expect(remote.sec).not.toHaveBeenCalled();
+  it('reports every connector as available when the expansion connectors are on', async () => {
     const response = await make().request('/api/official-sources/availability');
-    expect(await response.json()).toEqual({ clinical_trials: true, world_bank: true, reliefweb: false, sec: true });
+    expect(await response.json()).toEqual({ clinical_trials: true, world_bank: true, reliefweb: true, sec: true });
   });
 
   it('offers only trial registries while the expansion connectors are switched off', async () => {
@@ -116,10 +114,9 @@ describe('official source records', () => {
   });
 
   it('uses the approved ReliefWeb appname and preserves original publication versus ingestion dates', async () => {
-    process.env.RELIEFWEB_APPNAME = 'approved-test-name';
     remote.fetch.mockResolvedValue({ totalCount: 22, data: [{ id: '1234', fields: { title: 'Needs assessment', url: 'https://reliefweb.int/report/example', body: 'Survey findings.', source: [{ name: 'Publishing NGO' }], date: { original: '2026-10-01', created: '2026-10-03', changed: '2026-10-04' } } }] });
     const found = await searchRelief('needs assessment');
-    expect((remote.fetch.mock.calls[0][0] as URL).searchParams.get('appname')).toBe('approved-test-name');
+    expect((remote.fetch.mock.calls[0][0] as URL).searchParams.get('appname')).toBe('mutesasira-aiforresearch-nQO9kmOfXv');
     expect(found.records[0]).toMatchObject({ publication_date: '2026-10-01', updated_at: '2026-10-04', publisher: 'Publishing NGO' });
     expect(found.records[0].dates).toContainEqual({ label: 'Added to ReliefWeb', value: '2026-10-03' });
     expect(found.next_page).toBe(2);

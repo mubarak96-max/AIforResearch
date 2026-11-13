@@ -1,16 +1,17 @@
 /**
  * Citation Map, snowballing, review citation search and Landscape, all from OpenAlex (the
- * configured Scholar index first, public OpenAlex as fallback) with Semantic Scholar when
- * OpenAlex has no links for a paper. No credits: these are searches, not AI jobs.
+ * configured Scholar index first, public OpenAlex as fallback) with OpenCitations, then Semantic
+ * Scholar, when OpenAlex has no links for a paper. No credits: these are searches, not AI jobs.
  *
  * OpenAlex: https://api.openalex.org (works/{id}, works?filter=cites:…, works?filter=openalex_id:…,
- * works?group_by=…). Semantic Scholar: https://api.semanticscholar.org/graph/v1/paper/{id}/references|citations.
+ * works?group_by=…). OpenCitations: https://api.opencitations.net/index/v2/references|citations/doi:….
+ * Semantic Scholar: https://api.semanticscholar.org/graph/v1/paper/{id}/references|citations.
  */
 import { cleanQuery } from '../slots/papers.js';
 import { papersSlots } from './directory.js';
 import { classifyStudy, doiKey } from './sources/classify.js';
 import { openAlexToFound } from './sources/providers.js';
-import { semanticScholarLinks } from './sources/index.js';
+import { openCitationsLinks, semanticScholarLinks } from './sources/index.js';
 import type { FoundPaper } from './sources/types.js';
 
 /** A paper as the map draws and lists it. */
@@ -94,6 +95,7 @@ export async function worksByIds(ids: string[]): Promise<MapNode[]> {
 export async function referencesOf(work: any, limit = 60): Promise<MapNode[]> {
   const ids = (Array.isArray(work?.referenced_works) ? work.referenced_works : []).map(shortId).filter(isWorkId);
   let nodes = ids.length ? await worksByIds(ids.slice(0, 200)) : [];
+  if (!nodes.length) nodes = await openCitationsNodes(work, 'references');
   if (!nodes.length) nodes = await s2Links(work, 'references', limit);
   return nodes.sort((a, b) => b.cited_by_count - a.cited_by_count).slice(0, limit);
 }
@@ -106,8 +108,28 @@ export async function citationsOf(work: any, limit = 60): Promise<MapNode[]> {
     const data = await openAlex('works', { filter: `cites:${id}`, per_page: String(Math.min(100, limit)), sort: 'cited_by_count:desc', select: SELECT });
     nodes = works(data).map((item) => toNode(openAlexToFound(item)));
   }
+  if (!nodes.length) nodes = (await openCitationsNodes(work, 'citations')).sort((a, b) => b.cited_by_count - a.cited_by_count);
   if (!nodes.length) nodes = await s2Links(work, 'citations', limit);
   return nodes.slice(0, limit);
+}
+
+/**
+ * OpenCitations' links for a paper OpenAlex has none for (by DOI), looked up in OpenAlex by the
+ * OpenAlex ids OpenCitations gives, else by DOI.
+ */
+async function openCitationsNodes(work: any, direction: 'references' | 'citations'): Promise<MapNode[]> {
+  const doi = doiKey(work?.doi);
+  if (!doi) return [];
+  const links = await openCitationsLinks(doi, direction, 200).catch(() => []);
+  if (!links.length) return [];
+  const nodes = await worksByIds(links.map((link) => link.openalex).filter(isWorkId)).catch(() => [] as MapNode[]);
+  const known = new Set(nodes.map((node) => doiKey(node.doi)).filter(Boolean));
+  const dois = [...new Set(links.filter((link) => !link.openalex && link.doi && !known.has(link.doi)).map((link) => link.doi!))].slice(0, 50);
+  if (dois.length) {
+    const data = await openAlex('works', { filter: `doi:${dois.join('|')}`, per_page: '50', select: SELECT }).catch(() => null);
+    nodes.push(...works(data).map((item) => toNode(openAlexToFound(item))));
+  }
+  return nodes;
 }
 
 /** Semantic Scholar's links for a paper OpenAlex has none for (by DOI). */

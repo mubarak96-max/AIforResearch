@@ -105,7 +105,7 @@ export default function OfficialSourcesPage() {
           <Button className="self-end" disabled={busy || !availability.sec || !concept || !query} onClick={() => loadData({ provider: 'sec', id: query.trim(), taxonomy, concept, page: 1 })}>Load reported facts</Button>
           <p className="text-xs text-muted sm:col-span-3">SEC submissions cover SEC filers. Search retrieves recent filing metadata; concept facts retain every reported unit, period and filing date.</p>
         </div>}
-        {availability[provider] === false && <p role="status" className="text-sm text-muted">This source is not connected on this deployment.{provider === 'reliefweb' ? ' ReliefWeb requires an approved application name.' : ''} Other sources remain available.</p>}
+        {availability[provider] === false && <p role="status" className="text-sm text-muted">This source is not connected on this deployment. Other sources remain available.</p>}
       </form>
     </Card>
     <div className="my-5 flex flex-wrap items-end gap-3"><label className="min-w-64 flex-1 text-sm font-semibold">Save destination<select className={`${inputClass} mt-1`} value={destination} onChange={(event) => setDestination(event.target.value)} disabled={busy}><option value="">My Library</option>{destinations.map((item) => <option key={item.id} value={item.id}>Library + {item.title}{item.project_id ? ' (shared)' : ''}</option>)}</select></label><Button disabled={busy} onClick={() => reloadDestinations().catch((e) => setError((e as Error).message))}>Refresh workbooks</Button><Link href="/workbooks?new=1" className="pb-3 text-sm font-semibold text-brand">Create a workbook</Link></div>

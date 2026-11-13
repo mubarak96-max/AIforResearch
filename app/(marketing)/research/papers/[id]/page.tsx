@@ -58,9 +58,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? clip(paper.abstract, 155)
     : clip(`${paper.title}${by ? ` by ${by}` : ''}${paper.year ? ` (${paper.year})` : ''}. Cite it in APA, MLA, Chicago or Harvard, and see who cites it.`, 155);
   const base = pageMetadata({ title: clip(paper.title, 70), description, path: `/research/papers/${paper.id}` });
-  // A record with no abstract is too thin to rank on its own: keep it out of the index, but let crawlers follow its links.
-  const thin = !paper.abstract;
-  return { ...base, robots: thin ? { index: false, follow: true } : undefined, openGraph: { ...base.openGraph, type: 'article' } };
+  // Paper pages stay out of the index: only the /research search page is meant to rank.
+  // Crawlers may still follow their links to authors and related papers.
+  return { ...base, robots: { index: false, follow: true }, openGraph: { ...base.openGraph, type: 'article' } };
 }
 
 function scholarlySchema(record: PaperRecord) {

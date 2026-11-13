@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 import { LuArrowRight, LuCopy, LuFilePen, LuLibrary, LuLoaderCircle, LuRotateCcw, LuSend } from 'react-icons/lu';
 import { api } from '@/lib/session';
 import { Button } from '@/components/app/ui';
+import { SHOW_PROVIDERS } from '@/lib/devInfo';
 import { CitedMarkdown, ConsensusBar, CreditCost, SourceRow, creditsChanged, saveToLibrary, showError, type Source } from './parts';
 import { Check } from './controls';
 import { followOnLinks, openResultInEditor } from './handoff';
@@ -43,10 +44,10 @@ export type ResearchState = {
   request?: Partial<AskRequest>;
 };
 
-const GROUP_LABELS: Record<string, string> = { papers: 'All papers', medical: 'Medical', preprints: 'Preprints', web: 'Web', library: 'My Library' };
+const GROUP_LABELS: Record<string, string> = { papers: 'All papers', medical: 'Medical', preprints: 'Preprints', trials: 'Clinical trials', datasets: 'Datasets', web: 'Web', library: 'My Library' };
 const hasHeadings = (markdown: string) => /^#{1,6}[ \t]+\S/m.test(markdown);
 
-const PROVIDER_LABELS: Record<string, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', pubmed: 'PubMed', europepmc: 'Europe PMC', arxiv: 'arXiv', web: 'Web', library: 'Library' };
+const PROVIDER_LABELS: Record<string, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', core: 'CORE', pubmed: 'PubMed', europepmc: 'Europe PMC', arxiv: 'arXiv', clinicaltrials: 'ClinicalTrials.gov', datacite: 'DataCite', web: 'Web', library: 'Library' };
 
 export function ResearchView({ state, onRetry }: { state: ResearchState; onRetry?: (request: AskRequest) => void }) {
   const [tab, setTab] = useState<'cited' | 'all' | 'web'>('cited');
@@ -124,7 +125,7 @@ export function ResearchView({ state, onRetry }: { state: ResearchState; onRetry
         </p>
         {state.searched?.errors?.length ? (
           <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-[13px] text-amber-800">
-            {state.searched.errors.map((error) => PROVIDER_LABELS[error.provider] || error.provider).join(', ')} did not answer this time; the answer uses the other sources.
+            {SHOW_PROVIDERS ? state.searched.errors.map((error) => PROVIDER_LABELS[error.provider] || error.provider).join(', ') : 'Some sources'} did not answer this time; the answer uses the other sources.
           </p>
         ) : null}
         {state.steps.length > 0 && <ResearchSteps key={state.taskId ?? 'live'} steps={state.steps} running={state.running} />}
