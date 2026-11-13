@@ -249,10 +249,12 @@ type NumberFieldProps = {
   /** The value the steppers start from when the field is empty. */
   start?: number;
   suffix?: string;
+  /** The − / + buttons; arrow keys still step without them. */
+  steppers?: boolean;
   className?: string;
 };
 
-export function NumberField({ value, onChange, label, placeholder, min, max, step = 1, start, suffix, className = '' }: NumberFieldProps) {
+export function NumberField({ value, onChange, label, placeholder, min, max, step = 1, start, suffix, steppers = true, className = '' }: NumberFieldProps) {
   const clamp = (next: number) => Math.min(max ?? Infinity, Math.max(min ?? -Infinity, next));
   const bump = (by: number) => onChange(clamp(value === null || value === undefined ? (start ?? min ?? 0) : value + by));
   const stepper = 'grid h-full w-8 shrink-0 place-items-center text-muted transition-colors hover:bg-soft hover:text-ink disabled:pointer-events-none disabled:opacity-40';
@@ -270,10 +272,10 @@ export function NumberField({ value, onChange, label, placeholder, min, max, ste
         }}
         className="h-full min-w-0 flex-1 bg-transparent pl-3 text-[14px] tabular-nums text-ink placeholder:text-subtle focus:outline-none" />
       {suffix && value !== null && value !== undefined && <span className="pr-1 text-[13px] text-muted">{suffix}</span>}
-      <div className="flex h-full items-stretch border-l border-line-2">
+      {steppers && <div className="flex h-full items-stretch border-l border-line-2">
         <button type="button" tabIndex={-1} aria-label={`Decrease ${label}`} disabled={value === null || value === undefined || (min !== undefined && value <= min)} onClick={() => bump(-step)} className={stepper}><LuMinus className="h-3.5 w-3.5" /></button>
         <button type="button" tabIndex={-1} aria-label={`Increase ${label}`} disabled={max !== undefined && value !== null && value !== undefined && value >= max} onClick={() => bump(step)} className={`${stepper} border-l border-line-2`}><LuPlus className="h-3.5 w-3.5" /></button>
-      </div>
+      </div>}
     </div>
   );
 }

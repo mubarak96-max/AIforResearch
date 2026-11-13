@@ -76,17 +76,19 @@ function FindPapers() {
       </form>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <SourcePicker value={groups} onChange={setGroups} />
-        <button type="button" onClick={() => setShowFilters(!showFilters)} className="h-8 rounded-full px-2 text-[13.5px] font-semibold text-brand lg:hidden">{showFilters ? 'Hide filters' : `Filters${filterCount(filters) ? ` (${filterCount(filters)})` : ''}`}</button>
+        <button type="button" aria-expanded={showFilters} onClick={() => setShowFilters(!showFilters)} className="h-8 rounded-full px-2 text-[13.5px] font-semibold text-brand xl:hidden">{showFilters ? 'Hide filters' : `Filters${filterCount(filters) ? ` (${filterCount(filters)})` : ''}`}</button>
+        {filterCount(filters) > 0 && <button type="button" onClick={() => setFilters({})} className="h-8 px-1 text-[13px] font-semibold text-muted hover:text-ink xl:hidden">Clear filters</button>}
       </div>
+      {showFilters && <div className="mt-3 rounded-2xl border border-line bg-soft p-4 xl:hidden"><FiltersPanel value={filters} onChange={setFilters} /></div>}
 
-      <div className="mt-5 grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-        <aside aria-label="Filters" className={`${showFilters ? 'block' : 'hidden'} lg:block`}>
-          <div className="rounded-2xl border border-line bg-surface p-4 lg:sticky lg:top-6">
+      <div className="mt-5 grid gap-6 xl:grid-cols-[272px_minmax(0,1fr)]">
+        <aside aria-label="Filters" className="hidden min-w-0 self-start xl:block">
+          <div className="rounded-2xl border border-line bg-surface p-4">
             <div className="mb-3 flex items-baseline justify-between">
               <h2 className="text-[15px] font-bold">Filters</h2>
               {filterCount(filters) > 0 && <button type="button" onClick={() => setFilters({})} className="text-[13px] font-semibold text-brand hover:underline">Clear</button>}
             </div>
-            <div className="[&_.grid]:grid-cols-1"><FiltersPanel value={filters} onChange={setFilters} /></div>
+            <FiltersPanel stacked value={filters} onChange={setFilters} />
           </div>
         </aside>
         <section aria-label="Results" className="min-w-0">

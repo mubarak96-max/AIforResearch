@@ -196,16 +196,18 @@ export function filterCount(filters: Filters) {
   return [filters.from_year, filters.to_year, filters.study_types?.length, filters.open_access, filters.min_citations, filters.journal_tier, filters.exclude_preprints, filters.exclude_retracted === false].filter(Boolean).length;
 }
 
-export function FiltersPanel({ value, onChange }: { value: Filters; onChange: (value: Filters) => void }) {
+/** `stacked` lays the filters out in one column for a narrow sidebar. */
+export function FiltersPanel({ value, onChange, stacked = false }: { value: Filters; onChange: (value: Filters) => void; stacked?: boolean }) {
   const set = (patch: Filters) => onChange({ ...value, ...patch });
+  const wide = stacked ? '' : 'sm:col-span-2';
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      <fieldset>
+    <div className={`grid gap-4 ${stacked ? 'grid-cols-1' : 'sm:grid-cols-2'}`}>
+      <fieldset className="min-w-0">
         <legend className="mb-1.5 text-[13px] font-semibold text-ink-2">Published</legend>
         <div className="flex items-center gap-2">
-          <NumberField label="From year" placeholder="From" min={1800} max={YEAR} start={YEAR - 10} value={value.from_year} onChange={(year) => set({ from_year: year })} />
-          <span className="text-[13px] text-muted">to</span>
-          <NumberField label="To year" placeholder="To" min={1800} max={YEAR} start={YEAR} value={value.to_year} onChange={(year) => set({ to_year: year })} />
+          <NumberField label="From year" placeholder="From" min={1800} max={YEAR} start={YEAR - 10} steppers={!stacked} value={value.from_year} onChange={(year) => set({ from_year: year })} />
+          <span className="shrink-0 text-[13px] text-muted">to</span>
+          <NumberField label="To year" placeholder="To" min={1800} max={YEAR} start={YEAR} steppers={!stacked} value={value.to_year} onChange={(year) => set({ to_year: year })} />
         </div>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {[5, 10].map((years) => {
@@ -217,19 +219,19 @@ export function FiltersPanel({ value, onChange }: { value: Filters; onChange: (v
           })}
         </div>
       </fieldset>
-      <fieldset>
+      <fieldset className="min-w-0">
         <legend className="mb-1.5 text-[13px] font-semibold text-ink-2">Journal and citations</legend>
         <Select variant="field" label="Journal quality" value={value.journal_tier ?? ''} onChange={(tier) => set({ journal_tier: tier || null })} options={TIER_OPTIONS} />
         <NumberField label="Minimum citations" placeholder="At least … citations" min={0} step={10} start={10} suffix="+ citations" className="mt-2" value={value.min_citations} onChange={(count) => set({ min_citations: count || null })} />
       </fieldset>
-      <fieldset className="sm:col-span-2">
+      <fieldset className={`min-w-0 ${wide}`}>
         <legend className="mb-1.5 text-[13px] font-semibold text-ink-2">Study type and method</legend>
         <Chips label="Study type" value={(value.study_types ?? []) as string[]}
           onChange={(types) => set({ study_types: types })}
           options={Object.entries(STUDY_TYPE_LABELS).filter(([id]) => id !== 'other').map(([id, label]) => ({ value: id, label }))} />
         {(value.study_types?.length ?? 0) > 0 && <button type="button" onClick={() => set({ study_types: null })} className="mt-2 text-[13px] font-semibold text-brand hover:underline">Any study type</button>}
       </fieldset>
-      <div className="flex flex-wrap gap-x-5 gap-y-2 sm:col-span-2">
+      <div className={`flex flex-wrap gap-x-5 gap-y-2 ${stacked ? 'flex-col' : ''} ${wide}`}>
         {([
           ['open_access', 'Open access only', Boolean(value.open_access)],
           ['exclude_preprints', 'Peer-reviewed only (no preprints)', Boolean(value.exclude_preprints)],
