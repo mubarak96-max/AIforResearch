@@ -58,6 +58,22 @@ function headingsRule(context: StudioContext, sections: string) {
   return context.headings ? `Use these sections as "##" headings: ${sections}.` : 'Write flowing paragraphs without headings, in this order of content: ' + sections + '.';
 }
 
+/** The sections of each kind of white paper (WHITE_PAPER_TYPES in studioCatalog.ts). */
+const WHITE_PAPER_SECTIONS: Record<string, string> = {
+  'problem-solution': 'Executive summary, Introduction, The problem (what it costs and who it affects, cited), Why current approaches fall short, A better approach (the principles first, then the approach itself), Evidence and results, Implementation (steps, timeline, what it takes), Risks and limitations, Conclusion and next step',
+  scientific: 'Executive summary, Introduction and scope, The state of the science (one "###" subsection per theme, each saying how strong the evidence is), Where the evidence agrees and where it is uncertain, Implications (for practice, industry or policy), Recommendations (research priorities and actions), How this paper was prepared (the evidence base: the kinds of studies cited and its limits), Glossary (key terms in plain words), Conclusion',
+  technical: 'Executive summary, Introduction, The technical problem and its context, Requirements and design goals, Architecture: how it works (components and data flow, with a simple text diagram such as A → B → C), Performance and evaluation (only from the sources or the writer\'s benchmarks), Security, reliability and limitations, Comparison with alternatives (a table: approach | strengths | weaknesses | when to use it), Implementation and integration, Glossary, Conclusion',
+  policy: 'Summary, Introduction (the purpose of the paper and who it is for), The case for change (cited), Objectives, Proposals (numbered; each with its rationale, expected effect, cost as a [placeholder] unless given, and who must act), Options considered (a table: option | benefits | costs and risks | strength of evidence | why chosen or not), Implementation and timeline, Impact (benefits, costs, equity, risks), Consultation questions (numbered questions for readers to respond to), Next steps',
+  industry: 'Executive summary, Introduction and scope, The field today, Key trends (one "###" subsection per trend, each with its evidence), Challenges and risks, Outlook (only projections the sources make, labelled as projections, with their source), What this means for the reader, Methodology note (what the evidence base is and its limits), Conclusion',
+  backgrounder: 'Executive summary, Introduction, The problem it addresses, How it works, Key features (a table: feature | what it does | what the reader gains), Evidence (cited studies and the writer\'s own results, kept apart), Use cases, Getting started, Conclusion',
+  numbered: 'Introduction (the problem and why these points matter), 7–10 numbered points, each a "###" heading that states the point in one line followed by the explanation and its evidence, Conclusion and next step',
+};
+const WHITE_PAPER_LABEL: Record<string, string> = {
+  'problem-solution': 'problem–solution white paper', scientific: 'scientific white paper that sets out the state of the research for decision makers',
+  technical: 'technical white paper', policy: 'policy white paper that sets out proposals for change', industry: 'industry white paper on trends and outlook',
+  backgrounder: 'backgrounder white paper', numbered: 'numbered-list white paper',
+};
+
 type Builder = (context: StudioContext) => { user: string; maxTokens: number; grounded?: boolean; json?: boolean; task?: 'fast' | 'review'; system?: string };
 
 const BUILDERS: Record<string, Builder> = {
@@ -111,6 +127,39 @@ const BUILDERS: Record<string, Builder> = {
   }),
 
   // ---------------------------------------------------------------- Writing Studio: deliverables
+  'white-paper': (c) => {
+    const type = WHITE_PAPER_SECTIONS[c.inputs.type] ? c.inputs.type : 'problem-solution';
+    const part = c.inputs.part || 'whole';
+    const audience: Record<string, string> = {
+      executives: 'decision makers and executives who read the executive summary first and may stop there', technical: 'engineers and technical buyers who want to know how it works and what the trade-offs are',
+      policy: 'policy makers and officials who need options, evidence and what implementing them takes', scientists: 'scientists and specialists in the field who expect precise claims and the strength of evidence',
+      funders: 'investors, funders and partners deciding whether to back the work', public: 'an informed general reader with no specialist background',
+    };
+    const position = c.inputs.stance === 'position';
+    const material = c.inputs.material?.trim();
+    const parts: Record<string, string> = {
+      summary: 'the executive summary (150–250 words: the problem, why it matters now, the approach and the main recommendation), followed by "## Key takeaways" with 3–5 bullets',
+      problem: 'the section on the problem: what is wrong or changing, who it affects, what it costs, and why current approaches fall short',
+      evidence: 'the section on what the evidence says, organised by theme, with how strong each finding is and where the evidence disagrees',
+      approach: 'the section on the approach or solution: the principles first, then how it works, then what it takes to implement',
+      recommendations: 'the recommendations (numbered, each with who should act and the first step) and a conclusion with one clear next step',
+    };
+    return {
+      user: (part === 'whole'
+        ? `Write a ${WHITE_PAPER_LABEL[type]} of about ${words(3000, c)} words on "${c.inputs.topic}". Start with a "**Title:**" line and a "**Subtitle:**" line. ${headingsRule(c, WHITE_PAPER_SECTIONS[type])} ` +
+          'End with "## Suggested figures": 2–4 charts, diagrams or tables a designer could make, each with the data that backs it (only numbers from the sources or the writer\'s material, with their markers) or a [placeholder] for the data still needed.'
+        : `Write ${parts[part] ?? parts.summary} of a ${WHITE_PAPER_LABEL[type]} on "${c.inputs.topic}", about ${words(800, c)} words. Use "###" subheadings where they help.`) +
+        ` Written for ${audience[c.inputs.audience] ?? audience.executives}. ` +
+        'A white paper persuades through evidence, so write with authority but not as an advertisement: no superlatives ("best", "revolutionary", "game-changing", "seamless"), no hype, and say where the evidence is weak, mixed or from a different setting. ' +
+        'Every statistic must come from the sources (with its marker) or from the writer\'s material, exactly as given; never invent figures, percentages, savings, customers, quotations or case studies. Where a number would help and none is available, write a [placeholder] naming the data needed. ' +
+        (position
+          ? 'The paper makes the case for the writer\'s approach: lead with the problem and the evidence, present the approach only after the principles that justify it, and attribute the writer\'s own claims and results to them (e.g. "[Organisation] reports…") unless a source independently supports them. Include its limits and when it is not the right choice. '
+          : 'Keep the paper educational and vendor-neutral: explain the problem and the options fairly, recommend actions rather than products, and do not promote any organisation. ') +
+        (material ? `\n\nThe writer's approach, product or data (use it as given; do not add to it):\n${material.slice(0, 30000)}` : '\n\nThe writer gave no material of their own: where the paper needs it (their organisation, product, results, pricing, contacts), write a clear [placeholder].') +
+        notesLine(c.inputs.notes),
+      maxTokens: part === 'whole' ? 8000 : 2600, grounded: true, task: part === 'whole' ? 'review' : undefined,
+    };
+  },
   'case-report': (c) => {
     const format = c.inputs.journal || 'standard';
     const size = format === 'poster' ? 'a conference abstract of about 300 words with the labels Introduction, Case presentation, Discussion and Conclusion'

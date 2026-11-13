@@ -73,6 +73,17 @@ const DEGREE = select('degree', 'Degree', [['masters', 'Master’s'], ['phd', 'P
 
 const fixed = (action: CreditAction) => () => ({ action, units: 1 });
 
+/** The kinds of white paper the White paper module writes; the prompt gives each its own structure. */
+export const WHITE_PAPER_TYPES: { id: string; label: string }[] = [
+  { id: 'problem-solution', label: 'Problem–solution (business or B2B)' },
+  { id: 'scientific', label: 'Scientific or research white paper' },
+  { id: 'technical', label: 'Technical white paper (how it works)' },
+  { id: 'policy', label: 'Policy or government white paper' },
+  { id: 'industry', label: 'Industry or market report (trends and outlook)' },
+  { id: 'backgrounder', label: 'Backgrounder (a product, technology or programme)' },
+  { id: 'numbered', label: 'Numbered list (key questions or points)' },
+];
+
 /** Starting documents for the editor: headings and short prompts, no AI (and the sections the "template" module writes). */
 export const TEMPLATES: { id: string; label: string; short: string; sections: [string, string][]; /** A blank starting document only; a dedicated module writes it. */ blankOnly?: boolean }[] = [
   { id: 'imrad', label: 'Research paper (IMRaD)', short: 'Title, abstract, introduction, methods, results, discussion.', sections: [['Abstract', 'Background, aim, methods, results and conclusion in 150–250 words.'], ['Introduction', 'The problem, what is known, the gap, and your aim.'], ['Methods', 'Design, participants or data, measures, procedure and analysis.'], ['Results', 'What you found, in the order of your aims. Tables and figures here.'], ['Discussion', 'What the results mean, how they fit the literature, limits, and implications.'], ['Conclusion', 'The answer to your question in a few sentences.'], ['References', '']] },
@@ -86,6 +97,7 @@ export const TEMPLATES: { id: string; label: string; short: string; sections: [s
   { id: 'clinical-audit', blankOnly: true, label: 'Clinical audit', short: 'Standard, criteria, method, results against target, action plan and re-audit.', sections: [['Title', ''], ['Background', 'Why this audit, and the standard it measures against.'], ['Aim and objectives', ''], ['Standard, criteria and targets', 'A table: criterion, target, exceptions, source.'], ['Method', 'Sample, period, data source, who collected the data, the data collection form.'], ['Results', 'Each criterion against its target.'], ['Discussion', 'Why practice differed from the standard.'], ['Action plan', 'A table: action, owner, deadline.'], ['Re-audit', 'When and how the cycle will be closed.'], ['References', '']] },
   { id: 'evaluation-report', blankOnly: true, label: 'Evaluation report', short: 'Executive summary, methodology, findings by criterion, recommendations.', sections: [['Executive summary', ''], ['Background and programme description', ''], ['Evaluation purpose, scope and questions', ''], ['Methodology', 'Design, data sources, sampling, analysis, limitations, ethics.'], ['Findings', 'By criterion or evaluation question.'], ['Conclusions', ''], ['Recommendations', 'A table: recommendation, addressed to, priority, timeframe.'], ['Lessons learned', ''], ['Annexes', 'Terms of reference, evaluation matrix, tools, people consulted.']] },
   { id: 'policy-brief', blankOnly: true, label: 'Policy brief', short: 'Key messages, the problem, evidence, options and recommendations.', sections: [['Key messages', '3–5 bullet points a busy reader can act on.'], ['The problem', ''], ['What the evidence says', ''], ['Policy options', 'A table: option, benefits, costs and risks, strength of evidence.'], ['Recommendations', ''], ['Implementation considerations', 'Feasibility, cost, equity and who must act.'], ['References', '']] },
+  { id: 'white-paper', blankOnly: true, label: 'White paper', short: 'Executive summary, the problem, the evidence, the approach and recommendations.', sections: [['Title and subtitle', 'A title that names the problem or the outcome, and a subtitle that names the approach.'], ['Executive summary', 'The problem, why it matters now, the approach and the main recommendation, in 150–250 words.'], ['Introduction', 'Who this paper is for, what it covers and what the reader will be able to decide.'], ['The problem', 'What is wrong or changing, who it affects and what it costs, with cited numbers.'], ['What the evidence says', 'The research and data, with how strong each finding is.'], ['The approach', 'The principles or method that address the problem; your product or programme only after the principles.'], ['Implementation', 'Steps, timeline, costs, risks and what the reader needs to start.'], ['Recommendations', 'Numbered, specific actions for the reader.'], ['Conclusion and next step', 'The case in three sentences and one clear next step.'], ['About the author or organisation', ''], ['References', '']] },
   { id: 'annotated-bibliography', blankOnly: true, label: 'Annotated bibliography', short: 'An introduction, then each source with its annotation.', sections: [['Introduction', 'The topic, the scope and how the sources were chosen.'], ['Source 1', 'Full reference, then summary, evaluation and relevance.'], ['Source 2', ''], ['Source 3', '']] },
 ];
 export const template = (id: string) => TEMPLATES.find((item) => item.id === id) ?? null;
@@ -134,6 +146,19 @@ export const STUDIO_MODULES: StudioModule[] = [
   },
 
   // ---------------------------------------------------------------- Writing Studio: deliverables
+  {
+    id: 'white-paper', workspace: 'write', group: 'Deliverables', label: 'White paper', short: 'A scientific, technical, policy or business white paper built on real research, with your own data and approach.',
+    fields: [
+      topic('Topic or working title', 'e.g. Why mid-size hospitals should adopt remote patient monitoring'),
+      select('type', 'Kind of white paper', WHITE_PAPER_TYPES.map(({ id, label }): [string, string] => [id, label])),
+      select('audience', 'Written for', [['executives', 'Decision makers and executives'], ['technical', 'Engineers and technical buyers'], ['policy', 'Policy makers and officials'], ['scientists', 'Scientists and specialists'], ['funders', 'Investors, funders and partners'], ['public', 'An informed general reader']]),
+      select('stance', 'Voice', [['educate', 'Educational and neutral: teach the reader, recommend no product'], ['position', 'Make the case for our approach, backed by evidence']]),
+      select('part', 'Write', [['whole', 'The whole white paper'], ['summary', 'Executive summary'], ['problem', 'The problem and why it matters'], ['evidence', 'What the evidence says'], ['approach', 'The approach or solution'], ['recommendations', 'Recommendations and next steps']]),
+      { name: 'material', label: 'Your approach, product or data (optional)', kind: 'textarea', placeholder: 'What you propose or offer, how it works, and your own results: pilot figures, case studies, survey numbers, benchmarks. Used exactly as given; anything missing becomes a [placeholder].', max: 30_000, upload: true },
+      notes('Anything to include (optional)', 'Organisation name, the call to action, house style, word limit, sections you must have…'),
+    ],
+    grounded: 'multi', output: 'markdown', topicField: 'topic', cost: (inputs) => ({ action: (inputs.part || 'whole') === 'whole' ? 'draft' : 'section', units: 1 }), lengthOption: true,
+  },
   {
     id: 'case-report', workspace: 'write', group: 'Deliverables', label: 'Case report (CARE)', short: 'A clinical case report in the CARE structure, from your case notes, with the literature in the discussion.',
     fields: [

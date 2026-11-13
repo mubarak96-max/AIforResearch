@@ -149,6 +149,27 @@ const BUILDERS: Record<string, Builder> = {
     maxTokens: 3200,
     task: 'review',
   }),
+  'white-paper-generator': (inputs, sources) => {
+    const kinds: Record<string, string> = {
+      'problem-solution': 'a problem–solution white paper. Sections: ## Executive summary, ## The problem (cited), ## Why current approaches fall short, ## A better approach (principles first), ## Evidence, ## Implementation, ## Conclusion and next step',
+      scientific: 'a scientific white paper setting out the state of the research for decision makers. Sections: ## Executive summary, ## Introduction and scope, ## The state of the science (### per theme, each saying how strong the evidence is), ## Where the evidence is uncertain, ## Implications, ## Recommendations',
+      technical: 'a technical white paper. Sections: ## Executive summary, ## The technical problem, ## Requirements, ## How it works (with a simple text diagram such as A → B → C), ## Performance and limitations, ## Comparison with alternatives (a table), ## Conclusion',
+      policy: 'a policy white paper. Sections: ## Summary, ## The case for change (cited), ## Objectives, ## Proposals (numbered, each with its rationale and who must act), ## Options considered (a table), ## Implementation, ## Consultation questions',
+      industry: 'an industry white paper on trends. Sections: ## Executive summary, ## The field today, ## Key trends (### per trend, with evidence), ## Challenges, ## Outlook (only projections the sources make), ## What this means for the reader',
+    };
+    const readers: Record<string, string> = { executives: 'decision makers', technical: 'technical readers', policy: 'policy makers', scientists: 'scientists and specialists', public: 'an informed general reader' };
+    return {
+      system: `${BASE} ${CITE} A white paper persuades through evidence: write with authority, not as an advertisement; no superlatives or hype. ` +
+        'Every statistic must come from the sources (with its marker) or from the writer\'s notes exactly; never invent figures, customers, quotations or case studies. Where a number is needed and not available, write a [placeholder].',
+      user: grounded(
+        `Draft ${kinds[inputs.type] ?? kinds['problem-solution']}, on "${inputs.topic}", for ${readers[inputs.audience] ?? readers.executives}. ` +
+        'Start with a "**Title:**" line. About 1,500 words. Attribute the writer\'s own claims about their approach to them unless a source supports them.',
+        inputs, sources,
+      ),
+      maxTokens: 3800,
+      task: 'review',
+    };
+  },
   'abstract-generator': (inputs) => ({
     system: `${BASE} Use only facts, numbers and claims that appear in the writer's text. Do not add citations.`,
     user:

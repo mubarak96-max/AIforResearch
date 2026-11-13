@@ -128,6 +128,11 @@ export const CATALOG: CatalogItem[] = [
     href: '/write?module=evaluation-report', credits: '15 credits', phase1: false, marketing: null, landing: '/features/evaluation-report', keywords: ['m&e', 'oecd dac', 'ngo', 'donor report', 'logframe'],
   },
   {
+    id: 'white-paper', name: 'White paper', hub: 'write',
+    description: 'A scientific, technical, policy or business white paper built on real research, with your own data and approach.',
+    href: '/write?module=white-paper', credits: 'Whole 15 credits · section 3', phase1: false, marketing: '/tools/white-paper-generator', landing: '/features/white-paper-writer', keywords: ['white paper', 'whitepaper', 'technical', 'scientific', 'b2b', 'report'],
+  },
+  {
     id: 'policy-brief', name: 'Policy brief', hub: 'write',
     description: 'Key messages, the evidence, policy options compared and recommendations, cited to real research.',
     href: '/write?module=policy-brief', credits: '15 credits', phase1: false, marketing: null, landing: '/features/policy-brief', keywords: ['policy', 'government', 'options', 'brief'],

@@ -8,7 +8,7 @@ cluster: "F. Research and citations"
 pillar: "/blog/ai-citation-generator"
 author: "Mubarak"
 published: "2026-11-06"
-updated: "2026-11-06"
+updated: "2026-11-13"
 faq:
   - q: "What is white paper writing?"
     a: "White paper writing is the work of producing a persuasive, research-based report that explains a problem and argues for an approach to solving it. In business it is a marketing and sales asset aimed at people evaluating a purchase or policy. Its persuasive power comes from evidence: data, cited research and specific examples rather than product claims."
@@ -24,11 +24,11 @@ faq:
 
 # How to write a white paper (with AI, without making things up)
 
-*Last updated: 6 November 2026*
+*Last updated: 13 November 2026*
 
 A white paper is a persuasive, research-based report that explains a problem and argues for an approach to solving it. The three common types are the backgrounder, the problem and solution paper, and the numbered list. Its power comes from evidence, so cite real data, check every claim, and never let AI supply the statistics.
 
-This white paper writing guide is for B2B marketers, consultants and policy teams. It covers structure, a fill-in template, research, persuasion without overclaiming, AI drafting, design and cost. It is part of our series on [citations that point to real sources](/blog/ai-citation-generator).
+This white paper writing guide is for B2B marketers, consultants and policy teams. It covers structure, a fill-in template, research, persuasion without overclaiming, AI drafting, design and cost. It is part of our series on [citations that point to real sources](/blog/ai-citation-generator). If you are new to the form, start with [what is a white paper](/blog/what-is-a-white-paper); for scientific, technical and government papers, see the guides linked under "Other kinds of white paper" below.
 
 ## What white paper writing is
 
@@ -48,6 +48,16 @@ Gordon Graham, author of *White Papers For Dummies*, describes three main types.
 
 Graham's guidance is that a numbered list can be combined with either of the other two, but a backgrounder and a problem and solution paper don't mix well. [2] Pick one main type before you outline.
 
+### Other kinds of white paper
+
+Outside B2B marketing, the same name covers documents with different readers and rules:
+
+- **Scientific white papers** set out the state of the research for funders, agencies or boards, with the strength of the evidence stated. See [how to write a scientific white paper](/blog/how-to-write-a-scientific-white-paper).
+- **Technical white papers** explain how a system works, its design decisions and its measured performance. See [how to write a technical white paper](/blog/how-to-write-a-technical-white-paper).
+- **Government and policy white papers** set out policy proposals, with options and implementation. See [government white paper](/blog/government-white-paper).
+
+For finished papers of each kind, see [white paper examples](/blog/white-paper-examples), and for layout, the [white paper format guide](/blog/white-paper-format).
+
 ## White paper structure and template
 
 A problem and solution white paper usually follows this order. Graham puts the main body of most white papers at 6 to 8 pages, with 10 to 12 pages total once you add front and back matter. [2]
@@ -65,6 +75,8 @@ A problem and solution white paper usually follows this order. Graham puts the m
 | References | Every source cited | As needed |
 
 ### Fill-in white paper writing template
+
+A longer version, with prompts for every section, is on the [white paper template](/templates/white-paper) page.
 
 ```markdown
 # [Title: name the problem the reader has]
@@ -167,7 +179,17 @@ AI for Research is a web editor where the sources, the draft and the review live
 - **Team review.** Marketing, product and legal co-edit in real time and leave suggestions as tracked changes, with version history.
 - **Word and PDF export** in any of 10,000+ citation styles, or open your company's `.docx` template and keep its styles.
 
-AI for Research doesn't have a built-in white paper template; paste the Markdown template above into a new document.
+### The White paper module
+
+The Writing Studio also has a dedicated White paper module ([how it works](/features/white-paper-writer)). You give it a topic and choose the kind: problem and solution, scientific, technical, policy, industry trends, backgrounder or numbered list. Then you choose the reader, a neutral, educational voice or one that makes the case for your approach, and whether to write the whole paper or one section.
+
+- **It searches first** across scholarly sources and the web, plans several searches from your topic, and cites only what it found. Markers that point to no real source are removed before you see the text.
+- **Your material is used exactly as given.** Upload or paste your approach, pilot results or benchmarks. Statistics come only from the sources or from you; a missing figure becomes a [placeholder], never an estimate.
+- **No brochure copy.** It is told to avoid superlatives, to state limits, and, when it argues for your approach, to attribute your claims to you unless a source supports them.
+- **It ends with suggested figures:** charts and tables a designer could make, each with the data that backs it.
+- **Cost:** 15 credits for a whole paper and 3 for one section. The free plan has 45 credits a month.
+
+It does not interview experts, design the layout, or know anything about your product beyond what you give it, and you still need to check every cited source. For a short draft without an account, try the free [white paper generator](/tools/white-paper-generator). To start from a blank structure instead, open the White paper template in the editor or paste the Markdown template above into a new document.
 
 <!-- SCREENSHOT: a white paper draft with an AI review comment on a statistic ("claim not found in cited source") and a tracked-change suggestion from a second editor -->
 
@@ -225,7 +247,7 @@ The best tool is one that ties every claim to a source you can open. Look for ci
 
 ## Next steps
 
-If your document is meant to inform an internal decision rather than persuade outside readers, use the structure in [how to write a research report](/blog/how-to-write-a-research-report). Before you publish, run every claim through the method in [AI fact checker](/blog/ai-fact-checker). For finding and formatting real sources, read the pillar guide: [AI citation generator: get citations that point to real sources](/blog/ai-citation-generator).
+To draft one now, open the [White paper module](/features/white-paper-writer) or the free [white paper generator](/tools/white-paper-generator). If your document is meant to inform an internal decision rather than persuade outside readers, use the structure in [how to write a research report](/blog/how-to-write-a-research-report). Before you publish, run every claim through the method in [AI fact checker](/blog/ai-fact-checker). For finding and formatting real sources, read the pillar guide: [AI citation generator: get citations that point to real sources](/blog/ai-citation-generator).
 
 ## Sources
 

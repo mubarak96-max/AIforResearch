@@ -51,6 +51,7 @@ export function followOnLinks(taskId: string) {
   return [
     { label: 'Write a literature review', href: `/write?module=literature-review&${from}` },
     { label: 'Write a paper', href: `/write?module=paper&${from}` },
+    { label: 'Write a white paper', href: `/write?module=white-paper&${from}` },
     { label: 'Fill a template', href: `/write?module=template&${from}` },
     { label: 'Find gaps', href: `/thesis?module=gaps&${from}` },
     { label: 'Thesis outline', href: `/thesis?module=outline&${from}` },

@@ -69,9 +69,32 @@ describe('deliverable templates', () => {
     expect(prompt('reading-prep', { text: 'Reading one argues that markets clear. '.repeat(10), depth: 'deep' }).user).toMatch(/Counter-arguments/);
   });
 
+  it('a white paper is a deliverable with its own structure per kind, priced like a proposal', () => {
+    const module = studioModule('white-paper')!;
+    expect(module).toMatchObject({ workspace: 'write', group: 'Deliverables', grounded: 'multi' });
+    expect(hasStudioPrompt('white-paper')).toBe(true);
+    expect(studioCredits(module, {}, CREDIT_COSTS)).toBe(CREDIT_COSTS.draft);
+    expect(studioCredits(module, { part: 'summary' }, CREDIT_COSTS)).toBe(CREDIT_COSTS.section);
+    expect(prompt('white-paper', { topic: 'Remote patient monitoring', type: 'scientific' }, 4).user).toMatch(/state of the science[\s\S]*Suggested figures/);
+    expect(prompt('white-paper', { topic: 'Event streaming', type: 'technical', audience: 'technical' }, 4).user).toMatch(/Architecture[\s\S]*engineers/);
+    expect(prompt('white-paper', { topic: 'Bus lanes', type: 'policy' }, 4).user).toMatch(/Consultation questions/);
+    expect(prompt('white-paper', { topic: 'Bus lanes', type: 'not-a-type' }, 4).user).toMatch(/problem–solution white paper/);
+  });
+
+  it('a white paper never invents figures, uses the writer’s data as given and keeps vendor claims attributed', () => {
+    const neutral = prompt('white-paper', { topic: 'Cold-chain sensors' }, 3).user;
+    expect(neutral).toMatch(/never invent figures/);
+    expect(neutral).toMatch(/vendor-neutral/);
+    expect(neutral).toMatch(/gave no material/);
+    const position = prompt('white-paper', { topic: 'Cold-chain sensors', stance: 'position', material: 'Pilot: spoilage fell from 8% to 3% across 12 depots.' }, 3).user;
+    expect(position).toMatch(/Organisation\] reports/);
+    expect(position).toContain('spoilage fell from 8% to 3%');
+    expect(prompt('white-paper', { topic: 'Cold-chain sensors', part: 'recommendations' }, 3).user).toMatch(/recommendations \(numbered/);
+  });
+
   it('adds blank editor templates without offering them to “Fill a template”', () => {
     const blank = TEMPLATES.filter((item) => item.blankOnly).map((item) => item.id);
-    expect(blank).toEqual(['case-report', 'clinical-audit', 'evaluation-report', 'policy-brief', 'annotated-bibliography']);
+    expect(blank).toEqual(['case-report', 'clinical-audit', 'evaluation-report', 'policy-brief', 'white-paper', 'annotated-bibliography']);
     const fill = studioModule('template')!.fields[0].options!.map(([id]) => id);
     expect(fill.some((id) => blank.includes(id))).toBe(false);
   });
