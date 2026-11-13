@@ -90,7 +90,7 @@ export function AskComposer({ onSubmit, busy = false, initialQuestion = '', init
       <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
         <DepthSwitch value={depth} onChange={setDepth} detailedAllowed={limits.detailed} />
         <AttachMenu files={files} onFiles={setFiles} library={library} onLibrary={setLibrary} />
-        <SourcePicker value={effectiveGroups} onChange={setGroups} />
+        <SourcePicker value={effectiveGroups} onChange={setGroups} records />
         <FiltersToggle value={filters} onChange={setFilters} defaultOpen={Boolean(initialRequest && filterCount(initialRequest.filters ?? {}))} />
         <div className="ml-auto flex items-center gap-2.5">
           <CreditCost credits={credits} className="hidden sm:inline" />

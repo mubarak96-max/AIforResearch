@@ -34,6 +34,7 @@ const COLUMNS = [
       { label: 'Blog', href: '/blog' },
       { label: 'Help center', href: '/help' },
       { label: 'Research papers', href: '/research' },
+      { label: 'Research fields', href: '/fields' },
       { label: 'Citation styles', href: '/citation-styles' },
     ],
   },

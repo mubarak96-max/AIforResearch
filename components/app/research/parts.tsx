@@ -11,7 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import toast from 'react-hot-toast';
 import {
-  LuBookmarkPlus, LuBookOpenText, LuCheck, LuChevronDown, LuClipboardList, LuDatabase, LuTable, LuExternalLink, LuFileCode, LuFileSpreadsheet, LuFileText, LuFileType, LuFilter,
+  LuAtom, LuBookmarkPlus, LuBookOpenText, LuCheck, LuChevronDown, LuClipboardList, LuCpu, LuDatabase, LuDna, LuTable, LuExternalLink, LuFileCode, LuFileSpreadsheet, LuFileText, LuFileType, LuFilter,
   LuFlaskConical, LuGlobe, LuGraduationCap, LuLayers, LuLibrary, LuLock, LuPaperclip, LuSigma, LuStethoscope, LuX, LuZap,
 } from 'react-icons/lu';
 import { Check, MultiSelect, NumberField, Select } from './controls';
@@ -22,7 +22,7 @@ import { FigureView, type ResearchFigure } from './figures';
 
 // ------------------------------------------------------------------ types shared with the API
 
-export type SourceGroup = 'papers' | 'medical' | 'preprints' | 'trials' | 'datasets' | 'web' | 'library';
+export type SourceGroup = 'papers' | 'medical' | 'preprints' | 'trials' | 'datasets' | 'dblp' | 'web' | 'library' | 'life-sciences' | 'chemistry';
 export type Depth = 'summary' | 'deep' | 'detailed';
 export type Filters = {
   from_year?: number | null; to_year?: number | null; study_types?: string[] | null; open_access?: boolean | null;
@@ -39,6 +39,8 @@ export type Source = {
   stance?: 'supports' | 'mixed' | 'against' | 'unclear' | null; finding?: string | null;
   sample?: string | null; limits?: string | null; relevance?: number | null; rank_score?: number | null; sub_questions?: number[]; full_text?: boolean;
   passage?: string | null; evidence_basis?: string;
+  /** A database record (life-sciences and chemistry sources): the database's name. Listed with the web results. */
+  database?: string | null;
   check?: { status: 'confirmed' | 'retracted' | 'corrected' | 'concern' | 'unconfirmed' | 'unverified' | 'no_doi'; note: string | null; attempted?: boolean; notices_checked?: boolean } | null;
 };
 
@@ -114,7 +116,8 @@ export function Chips<T extends string>({ options, value, onChange, label }: { o
   );
 }
 
-type GroupInfo = { id: SourceGroup; label: string; detail: string; available: boolean };
+/** `kind: 'records'` marks the database groups that only Deep Research uses. */
+type GroupInfo = { id: SourceGroup; label: string; detail: string; available: boolean; kind?: 'records' };
 let groupsRequest: Promise<GroupInfo[]> | null = null;
 export function useSourceGroups() {
   const [groups, setGroups] = useState<GroupInfo[] | null>(null);
@@ -131,25 +134,31 @@ export const SOURCE_GROUPS: GroupInfo[] = [
   { id: 'preprints', label: 'Preprints', detail: 'arXiv, bioRxiv, medRxiv and more', available: true },
   { id: 'trials', label: 'Clinical trials', detail: 'Registered trials, including ones not yet published', available: true },
   { id: 'datasets', label: 'Datasets', detail: 'Research datasets with DOIs', available: true },
+  { id: 'dblp', label: 'Computer science', detail: 'DBLP: journals, conferences and CoRR preprints', available: true },
   { id: 'web', label: 'Web', detail: 'Reports, guidelines and pages from the open web', available: true },
   { id: 'library', label: 'My Library', detail: 'Papers you have saved or uploaded', available: true },
+  { id: 'life-sciences', label: 'Life sciences databases', detail: 'Genes, proteins, structures, pathways and variants', available: true, kind: 'records' },
+  { id: 'chemistry', label: 'Chemistry databases', detail: 'Compounds and drug-like molecules', available: true, kind: 'records' },
 ];
 const SOURCE_ICONS: Record<SourceGroup, React.ReactNode> = {
-  papers: <LuFileText />, medical: <LuStethoscope />, preprints: <LuFlaskConical />, trials: <LuClipboardList />, datasets: <LuTable />, web: <LuGlobe />, library: <LuLibrary />,
+  papers: <LuFileText />, medical: <LuStethoscope />, preprints: <LuFlaskConical />, trials: <LuClipboardList />, datasets: <LuTable />, dblp: <LuCpu />, web: <LuGlobe />, library: <LuLibrary />, 'life-sciences': <LuDna />, chemistry: <LuAtom />,
 };
 
-/** The sources as a dropdown of checkable options, with no server lookup (Home's signed-out box uses it). */
-export function SourceDropdown({ value, onChange, groups = SOURCE_GROUPS }: { value: SourceGroup[]; onChange: (value: SourceGroup[]) => void; groups?: GroupInfo[] }) {
-  const options = groups.map((group) => ({
+/**
+ * The sources as a dropdown of checkable options, with no server lookup (Home's signed-out box uses it).
+ * `records` adds the database groups (life sciences, chemistry), which only Deep Research cites.
+ */
+export function SourceDropdown({ value, onChange, groups = SOURCE_GROUPS, records = false }: { value: SourceGroup[]; onChange: (value: SourceGroup[]) => void; groups?: GroupInfo[]; records?: boolean }) {
+  const options = groups.filter((group) => records || group.kind !== 'records').map((group) => ({
     value: group.id, label: group.label, icon: SOURCE_ICONS[group.id], detail: group.available ? group.detail || undefined : 'Not set up on this server yet',
     disabled: !group.available,
   }));
   return <MultiSelect label="Sources" icon={<LuDatabase />} options={options} value={value} onChange={onChange} />;
 }
 
-export function SourcePicker({ value, onChange }: { value: SourceGroup[]; onChange: (value: SourceGroup[]) => void }) {
+export function SourcePicker({ value, onChange, records = false }: { value: SourceGroup[]; onChange: (value: SourceGroup[]) => void; records?: boolean }) {
   const groups = useSourceGroups();
-  return <SourceDropdown value={value} onChange={onChange} groups={groups ?? SOURCE_GROUPS} />;
+  return <SourceDropdown value={value} onChange={onChange} groups={groups ?? SOURCE_GROUPS} records={records} />;
 }
 
 /** Summary / Deep / Detailed, each with its credits; Detailed shows a lock on plans without it. */

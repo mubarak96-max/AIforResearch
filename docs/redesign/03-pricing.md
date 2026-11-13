@@ -22,6 +22,7 @@ Two problems with the new features:
 | --- | --- | --- |
 | Summary answer | 1 | |
 | Chat with PDF question, AI edit, short rewrite | 1 | |
+| Short piece: research email, ethics statement, diagram, progress summary (added 13 Nov) | 1 | `short` |
 | Deep Research report | 7 | 20–40 papers; screened, ranked, every citation checked |
 | Detailed report | 25 | 50+ papers, tables, plan reviewed first, citation chasing. Paid plans. |
 | Section draft, abstract, outline, gap analysis | 3 | |

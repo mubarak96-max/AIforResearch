@@ -11,8 +11,8 @@ cta:
   label: "Search medical papers"
   href: "/deep-research"
 plan_note: "Free plan: 45 credits a month. A Summary answer from medical sources costs 1 credit; a Deep report 15. Searching and filters are free."
-related: ["/features/deep-research", "/features/paper-search", "/features/systematic-review", "/blog/levels-of-evidence-and-study-types", "/blog/how-to-search-pubmed"]
-updated: "2026-11-12"
+related: ["/features/deep-research", "/features/paper-search", "/features/systematic-review", "/blog/levels-of-evidence-and-study-types", "/blog/how-to-search-pubmed", "/fields/medicine-and-health", "/features/clinical-research-checklists", "/features/reporting-guideline-checker"]
+updated: "2026-11-13"
 faq:
   - q: "Can I use AI for Research to make clinical decisions?"
     a: "No. It is a research tool for reading and summarizing the literature, not a clinical decision support system, and it gives no diagnosis or treatment advice. Answers can overstate or miss evidence. Any result you use for practice, guidelines, teaching or publication needs review by a qualified professional who reads the cited studies, and local guidelines take precedence."
@@ -94,7 +94,7 @@ The free plan (45 credits) covers occasional questions. A clinical researcher re
 ## What it does not do
 
 - It gives no diagnosis, treatment or dosing advice and is not a medical device.
-- It does not search Embase, CINAHL, the Cochrane Library or trial registries; import their exports for a review.
+- It does not search Embase, CINAHL or the Cochrane Library; import their exports for a review. ClinicalTrials.gov and openFDA are in Official Sources, but registries other than ClinicalTrials.gov are not searched.
 - No meta-analysis or forest plot yet.
 - Study type labels and the consensus line can be wrong. They count studies, not sample size or risk of bias.
 
@@ -102,7 +102,7 @@ The free plan (45 credits) covers occasional questions. A clinical researcher re
 
 Supervising students? See [AI for professors](/for/academics). Writing a doctorate? See [AI tools for PhD students](/for/phd).
 
-<!-- LINK: /fields/medicine-and-health (L34) when it ships -->
+For the sources and checklists clinical research uses, see [AI for clinical research](/fields/medicine-and-health): ClinicalTrials.gov and openFDA records, [clinical research checklists](/features/clinical-research-checklists) such as the site initiation visit, and the [reporting guideline checker](/features/reporting-guideline-checker) for CONSORT, STROBE, SAGER and SAMPL.
 
 ## Learn more
 

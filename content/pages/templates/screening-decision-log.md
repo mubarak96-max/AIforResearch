@@ -10,9 +10,9 @@ hero: "cta"
 cta:
   label: "Log decisions in a review"
   href: "/systematic-review"
-plan_note: "Copying the log is free. In the Systematic Review workspace, screening, conflicts, agreement statistics and the CSV export of decisions cost 0 credits; the free plan holds one review of up to 50 records."
+plan_note: "Copying the log is free. In the Systematic Review workspace, screening, conflicts, agreement statistics, the CSV of decisions and the decision log as Word or PDF cost 0 credits; the free plan holds one review of up to 50 records."
 related: ["/features/systematic-review", "/templates/screening-forms", "/templates/reporting-checklists", "/blog/how-to-make-a-prisma-flow-diagram", "/blog/cohens-kappa-inter-rater-reliability", "/alternatives/covidence"]
-updated: "2026-11-12"
+updated: "2026-11-13"
 faq:
   - q: "What is a screening decision log?"
     a: "A screening decision log is a table with one row per record and stage, holding each reviewer's decision and reason, whether they agreed, the final decision, who settled any disagreement, and when. It is the audit trail behind your PRISMA flow diagram, your agreement statistics and your table of excluded studies, and it lets an examiner or peer reviewer check any single decision."
@@ -103,6 +103,9 @@ The Systematic Review workspace records decisions as you screen and keeps the lo
 3. Open the **Conflicts** view. Each record where you disagree shows both decisions; choose **Include** or **Exclude** to set the final decision.
 4. Read the **Agreement** panel: Cohen's kappa with its label, percent agreement and the number of records compared, for each stage.
 5. On the **Report** tab, download **All records and decisions (CSV)**: one row per record with the title and abstract decision, the full-text decision, the final decision and its reason, plus extraction columns.
+6. For the appendix, or for a team that screens in another tool, download the **decision log** as **Word** or **PDF** from the same tab, with the screening form and the exclusion-reason list. No credits.
+
+<!-- VERIFY: the columns of the Word/PDF decision log export (per-reviewer votes or final decisions only) once the Report step export ships -->
 
 | Log column | Where it is in the workspace |
 | --- | --- |

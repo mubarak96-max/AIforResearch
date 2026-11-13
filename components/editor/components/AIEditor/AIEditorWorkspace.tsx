@@ -20,7 +20,7 @@ import { MantineProvider } from '@mantine/core';
 import { useHostTheme } from '../../lib/aiEditor/hostTheme';
 import { SuggestionMenuController, getDefaultReactSlashMenuItems, useCreateBlockNote } from '@blocknote/react';
 import { SuggestionMenu as SuggestionMenuExtension, filterSuggestionItems, insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
-import { LuFlag, LuQuote, LuSigma, LuSparkles, LuTableOfContents, LuThumbsDown, LuThumbsUp } from 'react-icons/lu';
+import { LuFlag, LuQuote, LuSigma, LuSparkles, LuTableOfContents, LuThumbsDown, LuThumbsUp, LuWorkflow } from 'react-icons/lu';
 import { BlockNoteView } from '@blocknote/mantine';
 import { preprocessRichDocumentHtml } from '../../utils/googleDocsHtmlForBlockNote';
 import NavigationSidebar from '../NavigationSidebar';
@@ -93,6 +93,7 @@ import { decorateInText } from '../../lib/aiEditor/citationText';
 import { editorPrompt } from '../../lib/aiEditor/editorDialogs';
 import { AUTOCOMPLETE_CSS } from '../../lib/aiEditor/autocomplete';
 import { EQUATION_CSS, EquationEditor, equationBlockSpec } from '../../lib/aiEditor/equationBlock';
+import { DIAGRAM_CSS, diagramBlockSpec } from '../../lib/aiEditor/diagramBlock';
 import {
   AI_AUTHOR,
   isAIAuthor,
@@ -2404,6 +2405,7 @@ export default function AIEditorWorkspace() {
             checkListItem: withWordProps(defaultBlockSpecs.checkListItem),
             tableOfContents: tableOfContentsBlockSpec(),
             equation: equationBlockSpec(),
+            mermaid: diagramBlockSpec(),
           },
           inlineContentSpecs: { ...aiEditorInlineContentSpecs, footnote: footnoteInlineContentSpec },
           styleSpecs: {
@@ -5209,6 +5211,14 @@ export default function AIEditorWorkspace() {
             icon: <LuTableOfContents size={18} />,
             onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, { type: 'tableOfContents' } as any),
           },
+          {
+            title: 'Diagram',
+            subtext: 'Flowchart, framework, study flow or timeline (Mermaid), or draw it with AI',
+            aliases: ['mermaid', 'flowchart', 'chart', 'framework', 'prisma', 'consort', 'timeline'],
+            group: 'Academic',
+            icon: <LuWorkflow size={18} />,
+            onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, { type: 'mermaid', props: { source: '' } } as any),
+          },
         ],
         query,
       ),
@@ -7317,6 +7327,7 @@ export default function AIEditorWorkspace() {
         ${SUGGESTION_CSS}
         ${AUTOCOMPLETE_CSS}
         ${EQUATION_CSS}
+        ${DIAGRAM_CSS}
         .ai-editor-blocknote .bn-side-menu .ce-side-ai svg { color: var(--theme-primary); }
         .ce-chat-markdown p { margin: 0 0 8px; }
         .ce-chat-markdown p:last-child { margin-bottom: 0; }

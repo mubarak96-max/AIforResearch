@@ -24,7 +24,7 @@ This work received no specific funding.`;
 describe('reporting guideline data', () => {
   it('numbers every checklist as published, with unique item ids', () => {
     const counts = Object.fromEntries(GUIDELINES.map((item) => [item.id, item.items.length]));
-    expect(counts).toEqual({ consort: 37, strobe: 34, prisma: 42, care: 30, stard: 34, coreq: 32, srqr: 21, squire: 22 });
+    expect(counts).toEqual({ consort: 37, strobe: 34, prisma: 42, care: 30, stard: 34, coreq: 32, srqr: 21, squire: 22, sager: 12, sampl: 22 });
     for (const g of GUIDELINES) expect(new Set(g.items.map((item) => item.id)).size).toBe(g.items.length);
     expect(guideline('prisma')!.items.map((item) => item.id).slice(-4)).toEqual(['24c', '25', '26', '27']);
   });

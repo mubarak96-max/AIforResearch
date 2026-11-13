@@ -9,7 +9,7 @@ import { AppFrame } from '@/components/app/AppFrame';
 import { Card } from '@/components/app/ui';
 import { useSignedIn } from '@/components/app/useSignedIn';
 import { api } from '@/lib/session';
-import { KIND_LABELS, taskHref, type TaskRecord } from '@/components/app/research/handoff';
+import { KIND_LABELS, taskLabel, taskHref, type TaskRecord } from '@/components/app/research/handoff';
 import { showError } from '@/components/app/research/parts';
 
 type Project = { id: string; name: string; role: string };
@@ -95,7 +95,7 @@ function History() {
               <Link href={taskHref(task)} className="min-w-0 flex-1 basis-60">
                 <span className="block truncate text-[15px] font-medium text-ink hover:underline">{task.title}</span>
                 <span className="block truncate text-[13px] text-muted">
-                  {[KIND_LABELS[task.kind] || task.kind, task.status === 'failed' ? 'did not finish' : task.status === 'running' ? 'running' : null, task.credits ? `${task.credits} credits` : null,
+                  {[taskLabel(task), task.status === 'failed' ? 'did not finish' : task.status === 'running' ? 'running' : null, task.credits ? `${task.credits} credits` : null,
                     new Date(task.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })].filter(Boolean).join(' · ')}
                 </span>
                 {task.summary && <span className="mt-0.5 line-clamp-1 text-[13.5px] text-ink-2">{task.summary}</span>}

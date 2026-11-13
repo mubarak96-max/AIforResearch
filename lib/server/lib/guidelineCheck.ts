@@ -1,6 +1,7 @@
 /**
  * Reporting-guideline check: a manuscript read against every item of a checklist (CONSORT,
- * STROBE, PRISMA, CARE, STARD, COREQ, SRQR, SQUIRE; lib/reportingGuidelines.ts).
+ * STROBE, PRISMA, CARE, STARD, COREQ, SRQR, SQUIRE, and the complementary SAGER and SAMPL;
+ * lib/reportingGuidelines.ts).
  *
  * The items go to the model in batches with the whole text. For each item it says whether it is
  * reported, partly reported, missing or not applicable, quotes the passage and names the section.
@@ -33,6 +34,7 @@ export function batchPrompt(g: Guideline, items: GuidelineItem[], text: string, 
     {
       role: 'system' as const,
       content: `You check a manuscript against the ${g.name} ${g.version} reporting guideline (${g.for}), item by item, as a journal editor would. ` +
+        (g.complements ? 'This checklist is used alongside a study-design checklist and applies to any study design; judge each item for this manuscript whatever its design. ' : '') +
         'Judge only what the text says; never assume something is reported because it is usual. For each item answer: ' +
         '"reported" (clearly and fully reported), "partial" (mentioned but incomplete), "missing" (not reported) or "not_applicable" (the item cannot apply to this study; say why). ' +
         'For reported and partial items, copy a short passage exactly from the text (at most 30 words) that shows it, and name the section heading it is in. ' +

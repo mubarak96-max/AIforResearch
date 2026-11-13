@@ -5,12 +5,42 @@
  */
 import type { RichPaper } from '../../slots/papers.js';
 
-/** The source groups people pick from. "papers" is the general index (OpenAlex and Semantic Scholar). */
-export const SOURCE_GROUPS = ['papers', 'medical', 'preprints', 'trials', 'datasets', 'web', 'library'] as const;
+/**
+ * The source groups people pick from. "papers" is the general index (OpenAlex and Semantic Scholar);
+ * "dblp" is computer science. "life-sciences" and "chemistry" are not paper indexes: Deep Research
+ * cites their database records (genes, proteins, compounds…) next to the papers (sources/records.ts).
+ */
+export const SOURCE_GROUPS = ['papers', 'medical', 'preprints', 'trials', 'datasets', 'dblp', 'web', 'library', 'life-sciences', 'chemistry'] as const;
 export type SourceGroup = (typeof SOURCE_GROUPS)[number];
 
+/** The groups that return database records instead of papers (Deep Research only). */
+export const RECORD_GROUPS = ['life-sciences', 'chemistry'] as const;
+export type RecordGroup = (typeof RECORD_GROUPS)[number];
+export const isRecordGroup = (group: string): group is RecordGroup => (RECORD_GROUPS as readonly string[]).includes(group);
+
 /** The services behind the groups. */
-export type ProviderId = 'openalex' | 'semantic_scholar' | 'core' | 'pubmed' | 'europepmc' | 'arxiv' | 'clinicaltrials' | 'datacite' | 'web' | 'library';
+export type ProviderId = 'openalex' | 'semantic_scholar' | 'core' | 'pubmed' | 'europepmc' | 'arxiv' | 'clinicaltrials' | 'datacite' | 'dblp' | 'web' | 'library';
+
+/** The databases behind the record groups. */
+export type RecordDatabase = 'ncbi_gene' | 'uniprot' | 'ensembl' | 'reactome' | 'pdb' | 'alphafold' | 'gwas' | 'clinvar' | 'pubchem' | 'chembl';
+
+/**
+ * One database record (a gene, protein, structure, pathway, variant or compound) that a research
+ * answer can number and cite like a paper. `summary` is short structured text the model reads.
+ */
+export type RecordSource = {
+  /** `record:<database>:<identifier>`, unique across databases. */
+  id: string;
+  database: RecordDatabase;
+  /** As shown to people and the model ("UniProt", "NCBI Gene"). */
+  database_name: string;
+  group: RecordGroup;
+  /** The database's own identifier (P38398, CID 2244, VCV000055361). */
+  identifier: string;
+  title: string;
+  url: string;
+  summary: string;
+};
 
 export const STUDY_TYPES = [
   'meta-analysis', 'systematic-review', 'rct', 'clinical-trial', 'cohort', 'case-control', 'cross-sectional',

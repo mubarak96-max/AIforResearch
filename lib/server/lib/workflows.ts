@@ -5,7 +5,7 @@ import { getProjectFor, listProjects, type Project } from './projects.js';
 import { ownLibraryDocument, libraryDoc } from './libraryFiles.js';
 import { reviewState } from './systematicReview.js';
 import {
-  availableWorkbookKinds, redactText, scheduleRecall, sectionFor, validateEntry,
+  availableWorkbookKinds, redactText, scheduleRecall, sectionFor, splitCodes, validateEntry,
   type RecallState, type Workbook, type WorkbookEntry, type WorkbookEvent, type WorkbookLink, type WorkbookLinkKind, type WorkflowKind,
 } from '../../workflows.js';
 
@@ -227,6 +227,37 @@ export async function putWorkbookEntry(user: AuthUser, id: string, revision: num
     const entry: WorkbookEntry = { id: existing?.id || newId(), section: input.section, values, created_at: existing?.created_at || now, updated_at: now, updated_by: user.id };
     workbook.entries = existing ? workbook.entries.map((item) => item.id === existing.id ? entry : item) : [...workbook.entries, entry];
     return { note: input.section, entry_id: entry.id };
+  });
+}
+
+/**
+ * Qualitative coding: one coded excerpt, and any codes it uses that are not in the codebook yet,
+ * saved in one revision (a new code needs its definition). Codes already in the codebook, ignoring
+ * letter case, are reused with the codebook's wording.
+ */
+export async function codeExcerpt(user: AuthUser, id: string, revision: number, input: { values: Record<string, string>; new_codes: { label: string; definition: string }[] }) {
+  return mutate(user, id, revision, 'coded_excerpt', (workbook) => {
+    if (workbook.kind !== 'qualitative') throw new Error('Coding is available in qualitative workbooks.');
+    const codebook = workbook.entries.filter((entry) => entry.section === 'codes');
+    const known = new Map(codebook.map((entry) => [entry.values.label.trim().toLowerCase(), entry.values.label]));
+    const now = new Date().toISOString();
+    const added: WorkbookEntry[] = [];
+    for (const code of input.new_codes) {
+      const key = code.label.trim().toLowerCase();
+      if (!key || known.has(key)) continue;
+      const values = validateEntry(workbook.kind, 'codes', { label: code.label.replace(/,/g, ' '), definition: code.definition, include: '', exclude: '' }, workbook.entries);
+      known.set(key, values.label);
+      added.push({ id: newId(), section: 'codes', values, created_at: now, updated_at: now, updated_by: user.id });
+    }
+    const codes = splitCodes(input.values.codes).map((code) => known.get(code.toLowerCase()) ?? code);
+    const missing = codes.filter((code) => !known.has(code.toLowerCase()));
+    if (missing.length) throw new Error(`Define the code${missing.length > 1 ? 's' : ''} ${missing.map((code) => `“${code}”`).join(', ')} first.`);
+    if (!codes.length) throw new Error('Choose a code for this excerpt.');
+    if (workbook.entries.length + added.length + 1 > MAX_ENTRIES) throw new Error('This workbook holds up to 500 entries. Start another workbook for additional material.');
+    const values = validateEntry(workbook.kind, 'excerpts', { ...input.values, codes: codes.join(', ') }, workbook.entries);
+    const excerpt: WorkbookEntry = { id: newId(), section: 'excerpts', values, created_at: now, updated_at: now, updated_by: user.id };
+    workbook.entries = [...workbook.entries, ...added, excerpt];
+    return { note: `excerpts${added.length ? ` (${added.length} new code${added.length > 1 ? 's' : ''})` : ''}`, entry_id: excerpt.id };
   });
 }
 

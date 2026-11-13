@@ -97,7 +97,7 @@ export function researchRoutes(slots: Slots) {
   const searches = rateLimit({ key: 'sources-search', limit: 240, windowSeconds: 3600 });
   const plans = rateLimit({ key: 'research-plan', limit: 60, windowSeconds: 3600 });
 
-  app.get('/sources/groups', (c) => c.json({ groups: sourceGroups(), study_types: STUDY_TYPES, journal_tiers: JOURNAL_TIER_ORDER, background_research: env.researchJobsEnabled }));
+  app.get('/sources/groups', (c) => c.json({ groups: sourceGroups({ records: true }), study_types: STUDY_TYPES, journal_tiers: JOURNAL_TIER_ORDER, background_research: env.researchJobsEnabled }));
 
   app.post('/sources/search', searches, async (c) => {
     const user = currentUser(c);

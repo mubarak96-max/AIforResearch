@@ -11,6 +11,7 @@ import { downloadFile } from './client';
 import { PrismaDiagram, downloadPrisma } from './Prisma';
 import type { ReviewState, SrRecord } from './types';
 import { FullTextPanel } from './FullTextPanel';
+import { exportWordDocument } from '@/components/editor/lib/aiEditor/wordApi';
 
 const ROB_VALUES = ['low', 'some concerns', 'high', 'unclear', 'not applicable'];
 
@@ -151,6 +152,20 @@ export function ReportTab({ state, reload }: { state: ReviewState; reload: () =>
       toast.success('Saved');
     } catch (error) { showError(error); }
   };
+  const [docBusy, setDocBusy] = useState<'docx' | 'pdf' | 'md' | null>(null);
+  const screeningDocs = async (format: 'docx' | 'pdf' | 'md') => {
+    setDocBusy(format);
+    try {
+      const docs = await api<{ title: string; blocks: any[]; markdown: string }>(`/api/systematic-reviews/${review.id}/screening-documents`);
+      const blob = format === 'md' ? new Blob([docs.markdown], { type: 'text/markdown;charset=utf-8' }) : await exportWordDocument({ title: docs.title, blocks: docs.blocks, format });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${name}-screening.${format}`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) { showError(error); } finally { setDocBusy(null); }
+  };
   const exportAs = (format: 'csv' | 'ris', records: 'all' | 'included') => downloadFile(`/api/systematic-reviews/${review.id}/export?format=${format}&records=${records}`, `${name}.${format}`).catch(showError);
 
   return (
@@ -187,6 +202,14 @@ export function ReportTab({ state, reload }: { state: ReviewState; reload: () =>
             </table>
           </div>
         )}
+      </Card>
+
+      <Card className="p-5">
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="flex-1 text-[16px] font-bold">Screening documents</h2>
+          {(['docx', 'pdf', 'md'] as const).map((format) => <Button key={format} size="sm" disabled={docBusy !== null} onClick={() => screeningDocs(format)}>{docBusy === format ? <LuLoaderCircle className="h-4 w-4 animate-spin" /> : <LuDownload className="h-4 w-4" />}{format === 'docx' ? 'Word' : format === 'pdf' ? 'PDF' : 'Markdown'}</Button>)}
+        </div>
+        <p className="mt-1 text-[13.5px] text-muted">The title and abstract and full-text screening forms, built from your {review.framework} elements and eligibility criteria; the exclusion reasons in use with their counts; and the decision log. Free. Decisions still blinded to you are left out.</p>
       </Card>
 
       <Card className="p-5">

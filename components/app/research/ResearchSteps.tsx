@@ -32,7 +32,8 @@ const STEPS: Record<StepId, { label: string; what: string; icon: React.ReactNode
   verify: { label: 'Verify', what: 'Check cited narrative within the depth limit; show unverified claims and reference notices', icon: <LuShieldCheck /> },
 };
 
-const PROVIDERS: Record<string, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', core: 'CORE', pubmed: 'PubMed', europepmc: 'Europe PMC', arxiv: 'arXiv', clinicaltrials: 'ClinicalTrials.gov', datacite: 'DataCite', web: 'Web', library: 'My Library' };
+const PROVIDERS: Record<string, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', core: 'CORE', pubmed: 'PubMed', europepmc: 'Europe PMC', arxiv: 'arXiv', clinicaltrials: 'ClinicalTrials.gov', datacite: 'DataCite', dblp: 'DBLP', web: 'Web', library: 'My Library',
+  ncbi_gene: 'NCBI Gene', uniprot: 'UniProt', ensembl: 'Ensembl', reactome: 'Reactome', pdb: 'RCSB PDB', alphafold: 'AlphaFold DB', gwas: 'GWAS Catalog', clinvar: 'ClinVar', pubchem: 'PubChem', chembl: 'ChEMBL' };
 const RELEVANCE = [
   { label: 'On the question', className: 'bg-green-600' },
   { label: 'On a sub-question', className: 'bg-green-400' },

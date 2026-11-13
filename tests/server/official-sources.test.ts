@@ -95,15 +95,21 @@ describe('official source records', () => {
   });
 
   it('reports every connector as available when the expansion connectors are on', async () => {
+    vi.stubEnv('FRED_API_KEY', ''); vi.stubEnv('PATENTSVIEW_API_KEY', '');
     const response = await make().request('/api/official-sources/availability');
-    expect(await response.json()).toEqual({ clinical_trials: true, world_bank: true, reliefweb: true, sec: true });
+    // Keyed connectors (FRED, USPTO) report false until their keys are set.
+    expect(await response.json()).toEqual({ clinical_trials: true, world_bank: true, reliefweb: true, sec: true, openfda_label: true, openfda_event: true, openfda_device: true, fred: false, treasury: true, oecd: true, uspto_patents: false });
   });
 
-  it('offers only trial registries while the expansion connectors are switched off', async () => {
+  it('hides the World Bank, ReliefWeb and SEC connectors while the expansion flag is off, and keeps the research data sources', async () => {
     WORKBOOK_FEATURES.expansionWorkbooks = false;
     try {
       const app = make();
-      expect(await (await app.request('/api/official-sources/availability')).json()).toEqual({ clinical_trials: true });
+      const availability = await (await app.request('/api/official-sources/availability')).json() as Record<string, boolean>;
+      expect(availability).toMatchObject({ clinical_trials: true, openfda_label: true, openfda_event: true, openfda_device: true, treasury: true, oecd: true });
+      expect(availability).not.toHaveProperty('world_bank');
+      expect(availability).not.toHaveProperty('reliefweb');
+      expect(availability).not.toHaveProperty('sec');
       const post = (path: string, body: unknown) => app.request(`/api/official-sources${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
       expect((await post('/search', { provider: 'world_bank', query: 'poverty' })).status).toBe(404);
       expect((await post('/save', { locator: { provider: 'sec', id: '320193', concept: 'Revenues' } })).status).toBe(404);

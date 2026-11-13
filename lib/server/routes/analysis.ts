@@ -22,7 +22,7 @@ import { getLibraryDocuments } from '../lib/assist-store.js';
 import { researchProfile } from '../lib/users.js';
 import { rateLimit } from '../lib/rateLimit.js';
 import { citationMap, dataReportPrompt, landscape, reviewsCiting, snowball } from '../lib/analysis.js';
-import { ANALYSES, analysisDef, variableRange } from '../../dataLabAnalyses.js';
+import { ANALYSES, OPTION_KEYS, analysisDef, variableRange } from '../../dataLabAnalyses.js';
 
 const Seed = z.object({
   work_id: z.string().max(40).nullish(), doi: z.string().max(300).nullish(), title: z.string().max(500).nullish(), library_document_id: z.string().max(64).nullish(),
@@ -35,7 +35,7 @@ const Reproducibility = z.object({
   schema: z.literal(1), software: z.string().max(80), created_at: z.string().datetime(), dataset_sha256: Fingerprint,
   rows: z.number().int().min(0).max(50_000), columns: z.array(z.string().max(200)).max(200), truncated: z.boolean(), column_kinds: Kinds,
   transformations: z.array(z.object({ at: z.string().datetime(), action: z.enum(['load', 'edit_data', 'column_type', 'derive']), detail: z.string().max(500) })).max(300),
-  analyses: z.array(z.object({ test: z.enum(ANALYSES.map((item) => item.id) as [string, ...string[]]), variables: z.array(z.string().max(200)).min(1).max(41), options: z.object({ positive: z.string().max(200), reference_positive: z.string().max(200), event: z.string().max(200) }).partial().strict().optional(), kinds: Kinds, at: z.string().datetime(), dataset_sha256: Fingerprint, missing: z.literal('complete_observations'), rows_used: z.number().int().min(0), rows_omitted: z.number().int().min(0) }).refine((spec) => { const [min, max] = variableRange(analysisDef(spec.test)!); return spec.variables.length >= min && spec.variables.length <= max; }, 'An analysis has the wrong number of columns.')).max(30),
+  analyses: z.array(z.object({ test: z.enum(ANALYSES.map((item) => item.id) as [string, ...string[]]), variables: z.array(z.string().max(200)).min(1).max(41), options: z.object(Object.fromEntries(OPTION_KEYS.map((key) => [key, z.string().max(200)])) as Record<(typeof OPTION_KEYS)[number], z.ZodString>).partial().strict().optional(), kinds: Kinds, at: z.string().datetime(), dataset_sha256: Fingerprint, missing: z.literal('complete_observations'), rows_used: z.number().int().min(0), rows_omitted: z.number().int().min(0) }).refine((spec) => { const [min, max] = variableRange(analysisDef(spec.test)!); return spec.variables.length >= min && spec.variables.length <= max; }, 'An analysis has the wrong number of columns.')).max(30),
   notes: z.string().max(10_000),
 });
 

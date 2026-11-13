@@ -17,6 +17,7 @@
  *   POST   /:id/extract/ai           AI extraction for included records (CREDIT_COSTS.section per 10)
  *   POST   /:id/methods/draft        a Methods section from the log and counts (AI, CREDIT_COSTS.section)
  *   GET    /:id/export?format=csv|ris
+ *   GET    /:id/screening-documents  screening forms, exclusion reasons and decision log as editor blocks (exported as Word or PDF)
  * Searching, importing, removing duplicates, screening by hand, agreement, PRISMA and exports cost no credits.
  */
 import { Hono } from 'hono';
@@ -36,6 +37,7 @@ import {
   methodsPrompt, protocolPrompt, resolve, reviewFor, reviewState, reviewerSetup, runSearch, saveExtraction, storeExtraction,
   storeSuggestions, suggestDecisions, updateReview, vote, attachFullText, fullTextPages, withFullTexts, reviewAudit, type RecordRow,
 } from '../lib/systematicReview.js';
+import { screeningDocuments } from '../lib/systematicReviewDocuments.js';
 
 const Decision = z.enum(['include', 'exclude', 'maybe']);
 const Stage = z.enum(['title', 'full']);
@@ -288,6 +290,15 @@ export function systematicReviewRoutes(slots: Slots) {
     });
     await updateReview(user, state.review.id, { methods });
     return c.json({ methods, credits: CREDIT_COSTS.section });
+  });
+
+  /** The screening documents as the viewer may see them (blinded decisions stay hidden). Free. */
+  app.get('/:id/screening-documents', async (c) => {
+    const user = currentUser(c);
+    const state = await reviewState(user, c.req.param('id'));
+    const audit = await reviewAudit(user, state.review.id);
+    c.header('cache-control', 'private, no-store');
+    return c.json(screeningDocuments({ review: state.review, records: state.records, reviewers: state.reviewers, audit, generated: new Date().toISOString() }));
   });
 
   app.get('/:id/export', async (c) => {

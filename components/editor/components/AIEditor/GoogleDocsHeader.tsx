@@ -502,7 +502,8 @@ const topMenuItems: Record<string, MenuItem[]> = {
     { label: 'Table of contents' },
     { label: 'Special characters' },
     { label: 'Inline equation' },
-    { label: 'Equation', dividerAfter: true },
+    { label: 'Equation' },
+    { label: 'Diagram', description: 'Mermaid, or draw it with AI', dividerAfter: true },
     { label: 'Comment', shortcut: 'Ctrl+Alt+M' },
   ],
   Format: [
@@ -4019,6 +4020,9 @@ export default function GoogleDocsHeader({
       }
       if (item.label === 'Equation' || item.label === 'Equation toolbar') {
         insertBlockAfterSelection({ type: 'equation', props: { latex: '' } });
+      }
+      if (item.label === 'Diagram') {
+        insertBlockAfterSelection({ type: 'mermaid', props: { source: '' } });
       }
       if (item.label === 'Add/edit citation') {
         handleOpenCitationDialog();

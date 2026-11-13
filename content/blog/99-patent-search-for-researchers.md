@@ -9,7 +9,7 @@ pillar: "/blog/ai-for-qualitative-research"
 author: "Mubarak"
 compares_tools: false
 published: "2026-11-12"
-updated: "2026-11-12"
+updated: "2026-11-13"
 faq:
   - q: "How do I search for prior art for free?"
     a: "Start with keywords in Google Patents to find a few close documents, then note their CPC classification codes. Search those codes with your keywords in Espacenet, the USPTO's Patent Public Search and WIPO Patentscope. Follow the citations and family members of the closest hits. Then search the scholarly literature, theses and conference papers, because non-patent literature counts as prior art too. Record every query and result."
@@ -25,7 +25,7 @@ faq:
 
 # Prior art search for researchers: a free, step-by-step patent search
 
-*Last updated: 12 November 2026*
+*Last updated: 13 November 2026*
 
 A prior art search checks whether anything made public before your filing date already describes your invention. Researchers can run a solid first search for free: keywords in Google Patents, classification codes in Espacenet, the USPTO's Patent Public Search and WIPO Patentscope, then papers and theses. The result tells you what exists. Whether your invention is patentable is a question for a patent attorney.
 
@@ -141,7 +141,7 @@ Do not treat an AI chatbot's view on any of these as an answer. Language models 
 
 ## Using AI for Research for the non-patent literature
 
-AI for Research has no patent search. Use the free patent databases above for patents, and use AI for Research for the scholarly side and for keeping the work in order. <!-- LINK: /fields/law-and-patents when L42 ships -->
+AI for Research searches US patents through USPTO PatentsView in Official Sources, at no credit cost. It does not cover other offices, so use the free databases above (Google Patents, Espacenet and WIPO Patentscope) for patents filed elsewhere, and use AI for Research for the scholarly side and for keeping the work in order. Nothing it returns is a patentability, validity or freedom-to-operate opinion. More on the [patent search tool](/fields/law-and-patents) page.
 
 - **Search papers as prior art.** [Find Papers](/features/paper-search) searches 250M+ scholarly works, including preprints, with a year filter so you can see what was public before a date. 0 credits.
 - **Trace a key paper's citations.** Citation Map shows the references and citing papers of a seed paper, 0 credits.

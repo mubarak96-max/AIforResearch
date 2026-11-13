@@ -11,8 +11,8 @@ cta:
   label: "Ask a question"
   href: "/deep-research"
 plan_note: "Free plan: 45 credits a month. A Summary answer costs 1 credit; searching papers, citations and the editor cost nothing."
-related: ["/features/paper-search", "/tools/citation-generator", "/features/authorship-report", "/blog/how-to-find-sources-for-a-research-paper", "/blog/how-to-write-a-literature-review"]
-updated: "2026-11-12"
+related: ["/features/paper-search", "/tools/citation-generator", "/features/authorship-report", "/blog/how-to-find-sources-for-a-research-paper", "/blog/how-to-write-a-literature-review", "/features/reference-list-formatter", "/features/research-poster-maker"]
+updated: "2026-11-13"
 faq:
   - q: "Is AI for Research free for college students?"
     a: "Yes. The free plan gives you 45 credits a month with no card. Searching papers, filters, citations, the editor, Word and PDF export and the authorship report cost nothing. A Summary answer costs 1 credit and a Deep report 15. Most essay months fit inside the free allowance; Plus is $12 a month for 750 credits if you need more."
@@ -109,6 +109,8 @@ The authorship report helps with the second and third. It shows time spent, text
 ## Who else it is for
 
 Doing a master's? See [AI for a master's thesis](/for/masters). Going on to a doctorate? See [AI tools for PhD students](/for/phd).
+
+Handing in a paper or a poster? The [reference list formatter](/features/reference-list-formatter) cleans and restyles a reference list, the [research poster maker](/features/research-poster-maker) builds a poster for a research day, and the [PDF to Markdown converter](/features/document-converter) turns lecture slides and PDFs into editable notes.
 
 ## Learn more
 

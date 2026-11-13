@@ -71,3 +71,38 @@ Written 12 November 2026 from [docs/redesign/04-content-plan.md](../../docs/rede
 | 87–92 | N. Systematic reviews | 87 what-is-a-systematic-review |
 | 93–96 | O. Statistics for research | 93 which-statistical-test-to-use |
 | 97–100 | P. Research by field | 97 ai-for-qualitative-research |
+
+Posts 101–124 are reserved for the plan in [docs/redesign/06-content-new-features.md](../../docs/redesign/06-content-new-features.md). Posts 125–131 (cluster Q. White papers, pillar 125 what-is-a-white-paper) are described in [08-white-papers.md](../../docs/redesign/08-white-papers.md).
+
+## Articles 132 to 149: the catalogue features
+
+Written 13 November 2026 for the features in the build spec of [docs/redesign/09-features-from-catalogue.md](../../docs/redesign/09-features-from-catalogue.md). Keywords, the matching landing pages and the checklist before publishing are in [docs/redesign/10-content-catalogue-features.md](../../docs/redesign/10-content-catalogue-features.md). Most of these posts teach a method, so by claim rule 1 they may publish before the features ship only if their product section is removed or the linked feature is live.
+
+| Posts | Cluster | Pillar |
+| --- | --- | --- |
+| 132–136 | R. Writing and publishing papers | 132 how-to-write-a-conference-paper |
+| 137–140 | S. Clinical studies and reporting | 137 site-initiation-visit-checklist |
+| 141, 142, 146–149 | P. Research by field (existing) | 97 ai-for-qualitative-research |
+| 143 | J. Planning a study and thesis (existing) | 70 how-to-write-a-research-question |
+| 144, 145 | O. Statistics for research (existing) | 93 which-statistical-test-to-use |
+
+| # | Article | Feature page it supports |
+| --- | --- | --- |
+| 132 | [How to write a conference paper](132-how-to-write-a-conference-paper.md) | /features/conference-paper-writer |
+| 133 | [How to format a paper for a journal](133-how-to-format-a-paper-for-a-journal.md) | /features/journal-formatter |
+| 134 | [How to format a reference list](134-how-to-format-a-reference-list.md) | /features/reference-list-formatter |
+| 135 | [How to make a research poster](135-how-to-make-a-research-poster.md) | /features/research-poster-maker |
+| 136 | [Conceptual framework diagram](136-how-to-draw-a-conceptual-framework-diagram.md) | /features/scientific-diagrams |
+| 137 | [Site initiation visit checklist](137-site-initiation-visit-checklist.md) | /features/clinical-research-checklists |
+| 138 | [ClinicalTrials.gov results reporting](138-clinicaltrials-gov-results-reporting.md) | /features/clinical-research-checklists |
+| 139 | [SAGER guidelines](139-sager-guidelines.md) | /features/reporting-guideline-checker |
+| 140 | [SAMPL guidelines](140-sampl-guidelines.md) | /features/reporting-guideline-checker |
+| 141 | [How to code qualitative data](141-how-to-code-qualitative-data.md) | /features/qualitative-coding |
+| 142 | [Inductive vs deductive coding](142-inductive-vs-deductive-coding.md) | /features/qualitative-coding |
+| 143 | [Operational definition of variables](143-operational-definition-of-variables.md) | /features/variable-operationalization |
+| 144 | [Bayes factor explained](144-bayes-factor-explained.md) | /features/bayesian-statistics |
+| 145 | [Bayesian t-test](145-bayesian-t-test.md) | /features/bayesian-statistics |
+| 146 | [DBLP search](146-dblp-computer-science-literature-search.md) | /fields/engineering-and-computing |
+| 147 | [Gene and protein databases](147-gene-and-protein-databases-for-literature-review.md) | /fields/life-sciences |
+| 148 | [FRED economic data](148-fred-economic-data-for-research.md) | /fields/business-and-economics |
+| 149 | [openFDA for researchers](149-openfda-for-researchers.md) | /fields/medicine-and-health |

@@ -44,13 +44,14 @@ export type ResearchState = {
   request?: Partial<AskRequest>;
 };
 
-const GROUP_LABELS: Record<string, string> = { papers: 'All papers', medical: 'Medical', preprints: 'Preprints', trials: 'Clinical trials', datasets: 'Datasets', web: 'Web', library: 'My Library' };
+const GROUP_LABELS: Record<string, string> = { papers: 'All papers', medical: 'Medical', preprints: 'Preprints', trials: 'Clinical trials', datasets: 'Datasets', dblp: 'Computer science', web: 'Web', library: 'My Library', 'life-sciences': 'Life sciences databases', chemistry: 'Chemistry databases' };
 const hasHeadings = (markdown: string) => /^#{1,6}[ \t]+\S/m.test(markdown);
 
-const PROVIDER_LABELS: Record<string, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', core: 'CORE', pubmed: 'PubMed', europepmc: 'Europe PMC', arxiv: 'arXiv', clinicaltrials: 'ClinicalTrials.gov', datacite: 'DataCite', web: 'Web', library: 'Library' };
+const PROVIDER_LABELS: Record<string, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', core: 'CORE', pubmed: 'PubMed', europepmc: 'Europe PMC', arxiv: 'arXiv', clinicaltrials: 'ClinicalTrials.gov', datacite: 'DataCite', dblp: 'DBLP', web: 'Web', library: 'Library',
+  ncbi_gene: 'NCBI Gene', uniprot: 'UniProt', ensembl: 'Ensembl', reactome: 'Reactome', pdb: 'RCSB PDB', alphafold: 'AlphaFold DB', gwas: 'GWAS Catalog', clinvar: 'ClinVar', pubchem: 'PubChem', chembl: 'ChEMBL' };
 
 export function ResearchView({ state, onRetry }: { state: ResearchState; onRetry?: (request: AskRequest) => void }) {
-  const [tab, setTab] = useState<'cited' | 'all' | 'web'>('cited');
+  const [tab, setTab] = useState<'cited' | 'all' | 'web' | 'records'>('cited');
   const [highlight, setHighlight] = useState<number | null>(null);
   const [followUps, setFollowUps] = useState(state.followUps);
   const [asking, setAsking] = useState(false);
@@ -68,12 +69,16 @@ export function ResearchView({ state, onRetry }: { state: ResearchState; onRetry
 
   const cite = (n: number) => {
     const inCited = state.sources.some((source) => source.n === n);
-    setTab(inCited ? 'cited' : state.web.some((source) => source.n === n) ? 'web' : 'all');
+    const extra = state.web.find((source) => source.n === n);
+    setTab(inCited ? 'cited' : extra ? (extra.database ? 'records' : 'web') : 'all');
     setHighlight(n);
     requestAnimationFrame(() => document.getElementById(`source-${n}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
     window.setTimeout(() => setHighlight(null), 2200);
   };
-  const shown = tab === 'cited' ? (state.running && !state.sources.length ? state.allSources : state.sources) : tab === 'all' ? state.allSources : state.web;
+  // Database records (life sciences, chemistry) travel with the web results and get their own tab.
+  const webPages = state.web.filter((source) => !source.database);
+  const records = state.web.filter((source) => source.database);
+  const shown = tab === 'cited' ? (state.running && !state.sources.length ? state.allSources : state.sources) : tab === 'all' ? state.allSources : tab === 'records' ? records : webPages;
   const everySource = [...state.allSources, ...state.web];
   const cited = state.sources.length;
   // Under the answer: what the reader must know (changed sentences, unsupported claims, retracted or corrected papers).
@@ -195,7 +200,7 @@ export function ResearchView({ state, onRetry }: { state: ResearchState; onRetry
       <aside ref={sourcesRef} aria-label="Sources" className="min-w-0 lg:sticky lg:top-6 lg:max-h-[calc(100dvh-48px)] lg:overflow-y-auto">
         <div className="rounded-2xl border border-line bg-surface">
           <div role="tablist" aria-label="Sources" className="flex gap-1 border-b border-line-2 px-3 pt-3">
-            {([['cited', `Cited (${cited || (state.running ? '…' : 0)})`], ['all', `All read (${state.allSources.length})`], ...(state.web.length ? [['web', `Web (${state.web.length})`]] : [])] as [typeof tab, string][]).map(([id, label]) => (
+            {([['cited', `Cited (${cited || (state.running ? '…' : 0)})`], ['all', `All read (${state.allSources.length})`], ...(webPages.length ? [['web', `Web (${webPages.length})`]] : []), ...(records.length ? [['records', `Databases (${records.length})`]] : [])] as [typeof tab, string][]).map(([id, label]) => (
               <button key={id} role="tab" type="button" aria-selected={tab === id} onClick={() => setTab(id)}
                 className={`-mb-px border-b-2 px-2.5 pb-2.5 text-[14px] font-semibold ${tab === id ? 'border-brand text-ink' : 'border-transparent text-muted hover:text-ink-2'}`}>{label}</button>
             ))}

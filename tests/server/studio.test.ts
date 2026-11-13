@@ -75,7 +75,7 @@ describe('the studio catalogue', () => {
       if (module.output === 'papers' || module.output === 'compare') continue;
       expect(hasStudioPrompt(module.id), module.id).toBe(true);
     }
-    expect(workspaceModules('thesis').map((module) => module.id)).toEqual(['similar', 'question', 'hypothesis', 'outline', 'methodology', 'framework', 'gaps', 'timeline', 'defence', 'auto-proposal']);
+    expect(workspaceModules('thesis').map((module) => module.id)).toEqual(['similar', 'question', 'hypothesis', 'outline', 'methodology', 'framework', 'operationalisation', 'gaps', 'timeline', 'defence', 'auto-proposal']);
   });
 
   it('prices runs from the credit list: drafts, sections, rewrites per 2,000 words, high quality ×3, similar papers free', () => {

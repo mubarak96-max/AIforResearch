@@ -51,6 +51,7 @@ export function followOnLinks(taskId: string) {
   return [
     { label: 'Write a literature review', href: `/write?module=literature-review&${from}` },
     { label: 'Write a paper', href: `/write?module=paper&${from}` },
+    { label: 'Write a conference paper', href: `/write?module=conference-paper&${from}` },
     { label: 'Write a white paper', href: `/write?module=white-paper&${from}` },
     { label: 'Fill a template', href: `/write?module=template&${from}` },
     { label: 'Find gaps', href: `/thesis?module=gaps&${from}` },
@@ -63,8 +64,10 @@ export function followOnLinks(taskId: string) {
 }
 
 /** Where each kind of task reopens. */
-export function taskHref(task: Pick<TaskRecord, 'id' | 'kind' | 'module'>): string {
+export function taskHref(task: Pick<TaskRecord, 'id' | 'kind' | 'module'> & { project_id?: string | null }): string {
   const id = encodeURIComponent(task.id);
+  const projectId = task.project_id || '';
+  if (task.kind === 'tool' && task.module === 'progress-summary' && projectId) return `/projects/${encodeURIComponent(projectId)}?tab=progress`;
   switch (task.kind) {
     case 'research': return `/deep-research?task=${id}`;
     case 'review': case 'claim_check': case 'citation_check': case 'guideline_check': return `/reviewer?task=${id}`;
@@ -85,4 +88,10 @@ export const KIND_LABELS: Record<string, string> = {
   proposal: 'Proposal Studio', writing: 'Writing Studio', systematic_review: 'Systematic Review', data: 'Data Lab', citation_map: 'Citation Map',
   landscape: 'Landscape', slides: 'Slides', tool: 'Tool', chat_pdf: 'Chat with PDF',
 };
+
+/** The label for a task, where a module has its own name (the Reviewer's reference formatter, a project's progress summary). */
+export const taskLabel = (task: { kind: string; module?: string | null }) =>
+  task.kind === 'citation_check' && task.module === 'references' ? 'Reference formatter'
+    : task.kind === 'tool' && task.module === 'progress-summary' ? 'Progress summary'
+    : KIND_LABELS[task.kind] ?? task.kind;
 

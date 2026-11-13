@@ -13,7 +13,7 @@ import { api, refreshSession } from '@/lib/session';
 import { useCredits } from '@/lib/billing';
 import { AskComposer, type AskRequest } from '@/components/app/research/AskComposer';
 import { ROLE_OPTIONS } from '@/components/app/research/parts';
-import { KIND_LABELS, PENDING_KEY, taskHref, type TaskRecord } from '@/components/app/research/handoff';
+import { taskLabel, PENDING_KEY, taskHref, type TaskRecord } from '@/components/app/research/handoff';
 import { HomeWorkbooks } from '@/components/app/workflows/HomeWorkbooks';
 
 /** The quick tasks under the Ask box (the follow-on tools of every result, as starting points). */
@@ -121,7 +121,7 @@ function Home() {
                   <Link href={taskHref(task)} className="flex items-center gap-3 px-4 py-3 hover:bg-soft">
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[15px] font-medium text-ink">{task.title}</span>
-                      <span className="text-[13px] text-muted">{KIND_LABELS[task.kind] || task.kind}{task.status === 'failed' ? ' · did not finish' : task.status === 'running' ? ' · running' : ''}</span>
+                      <span className="text-[13px] text-muted">{taskLabel(task)}{task.status === 'failed' ? ' · did not finish' : task.status === 'running' ? ' · running' : ''}</span>
                     </span>
                     <span className="shrink-0 text-[13px] text-muted">{new Date(task.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                     <LuArrowRight className="h-4 w-4 shrink-0 text-subtle" aria-hidden="true" />

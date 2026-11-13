@@ -10,6 +10,8 @@
  * - CORE: api.core.ac.uk, free with a key (open-access papers from repositories); skipped without one.
  * - ClinicalTrials.gov API v2: free, no key (registered trials).
  * - DataCite REST: api.datacite.org, free, no key (datasets with DOIs).
+ * - DBLP search API: dblp.org/search/publ/api, free, no key, CC0 metadata (computer science); asks
+ *   clients to keep request rates low and answers 429 with Retry-After, so it is paced here.
  * - OpenCitations Index: api.opencitations.net, free (citation links; a token is optional).
  * - Web: Tavily, Brave Search or Exa, paid per search, chosen with WEB_SEARCH_PROVIDER.
  *
@@ -575,6 +577,54 @@ export async function searchDatacite(input: ProviderSearch): Promise<FoundPaper[
   if (input.sort === 'cited') url.searchParams.set('sort', '-citation-count');
   const data = await fetchSource(url, { source: 'DataCite', timeoutMs: 15_000 });
   return (Array.isArray(data?.data) ? data.data : []).map(dataciteToFound);
+}
+
+// ------------------------------------------------------------------ DBLP
+
+const DBLP_BASE = 'https://dblp.org/search/publ/api';
+/** DBLP asks for modest, sequential use (dblp.org/faq/1474706.html); one request a second per process. */
+const DBLP_PACE = { key: 'dblp', ms: 1000, maxWaitMs: 10_000 };
+const asList = <T>(value: T | T[] | null | undefined): T[] => (Array.isArray(value) ? value : value === null || value === undefined ? [] : [value]);
+
+/** A DBLP hit as a FoundPaper. Author disambiguation numbers ("Wei Wang 0001") are dropped. Pure, for tests. */
+export function dblpToFound(hit: any): FoundPaper {
+  const info = hit?.info || {};
+  const key = String(info.key || hit?.['@id'] || '');
+  const authors = asList<any>(info.authors?.author).map((author) => String(typeof author === 'string' ? author : author?.text ?? '').replace(/\s+\d{4}$/, '').trim()).filter(Boolean);
+  const title = stripTags(String(info.title || 'Untitled')).replace(/\.$/, '') || 'Untitled';
+  const doi = doiKey(info.doi) ?? asList<string>(info.ee).map((link) => doiKey(String(link))).find(Boolean) ?? null;
+  const ee = asList<string>(info.ee).map(String).find((link) => /^https?:\/\//.test(link)) ?? null;
+  const venue = asList<string>(info.venue).map(String).join(', ') || null;
+  const type = String(info.type || '');
+  // CoRR is DBLP's arXiv mirror: "journals/corr/abs-2101-00001" is arXiv 2101.00001.
+  const corr = key.match(/^journals\/corr\/abs-(\d{4})-(\d{4,5})/);
+  const arxivId = corr ? `${corr[1]}.${corr[2]}` : null;
+  const informal = /informal/i.test(type) || Boolean(corr);
+  return {
+    ...emptyPaper(`DBLP:${key}`, 'dblp'),
+    title, authors: authors.slice(0, 5).map((name) => ({ name })), extra_author_count: Math.max(0, authors.length - 5),
+    year: yearOf(info.year), venue: corr ? 'CoRR (arXiv)' : venue, doi, arxiv_id: arxivId,
+    url: doiUrl(doi) ?? ee ?? (info.url ? String(info.url) : null),
+    oa_url: arxivId ? `https://arxiv.org/abs/${arxivId}` : null, is_oa: Boolean(arxivId),
+    study_type: classifyStudy({ title }), is_preprint: informal,
+    journal: venue && !informal ? { name: venue, h_index: null, tier: null } : null,
+    type: /journal/i.test(type) ? 'article' : /conference/i.test(type) ? 'proceedings-article' : informal ? 'preprint' : type.toLowerCase() || 'article',
+  };
+}
+
+export async function searchDblp(input: ProviderSearch): Promise<FoundPaper[]> {
+  const query = cleanQuery(input.query).replace(/["()]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!query) return [];
+  const url = new URL(DBLP_BASE);
+  url.searchParams.set('q', query);
+  url.searchParams.set('format', 'json');
+  url.searchParams.set('h', String(Math.min(50, input.limit)));
+  // Read as text: DBLP's bot check answers with an HTML page, which must fail clearly, not as a JSON error.
+  const body = await fetchSource<string>(url, { source: 'DBLP', as: 'text', pace: DBLP_PACE, timeoutMs: 12_000 });
+  if (!body) return [];
+  let data: any;
+  try { data = JSON.parse(body); } catch { throw new SourceError('DBLP', 'DBLP did not answer with search results (it may be asking for a browser check).'); }
+  return asList<any>(data?.result?.hits?.hit).filter((hit) => hit?.info?.title).map(dblpToFound);
 }
 
 // ------------------------------------------------------------------ OpenCitations (links, not search)

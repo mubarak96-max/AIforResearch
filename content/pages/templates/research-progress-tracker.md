@@ -8,11 +8,11 @@ primary_keyword: "research progress tracker"
 secondary_keywords: ["thesis timeline template", "research timeline", "phd progress tracker", "research journal template", "weekly research log", "dissertation timeline"]
 hero: "cta"
 cta:
-  label: "Plan your timeline"
-  href: "/thesis?module=timeline"
-plan_note: "The tracker is free to copy and keep in the editor. A research timeline from the Thesis Suite costs 3 credits; the free plan has 45 credits a month."
-related: ["/features/projects", "/blog/how-to-write-a-thesis-outline", "/blog/how-to-organize-research-papers", "/for/masters", "/for/phd", "/templates/research-emails"]
-updated: "2026-11-12"
+  label: "Open your project's Progress tab"
+  href: "/projects"
+plan_note: "The tracker is free to copy. The Progress tab in Projects is free; an AI summary for a supervisor meeting costs 1 credit and a Thesis Suite timeline 3. The free plan has 45 credits a month."
+related: ["/features/projects", "/features/thesis-defense-prep", "/blog/how-to-write-a-thesis-outline", "/blog/how-to-organize-research-papers", "/for/masters", "/for/phd", "/templates/research-emails"]
+updated: "2026-11-13"
 faq:
   - q: "How do I track progress on my thesis?"
     a: "Use three layers. A weekly log of 15 minutes records what you did, what blocked you and the next three actions. A monthly review compares that with your timeline and goes to your supervisor. A timeline with dated milestones, such as ethics approval or chapter drafts, shows whether you are on track. Keep all three in one document so nothing is lost."
@@ -23,7 +23,7 @@ faq:
   - q: "What is a good thesis timeline template?"
     a: "A table with phases, months, main tasks and one milestone per phase, plus a buffer of 10 to 20% of the total time and the fixed dates you cannot move, such as ethics committee meetings and the submission deadline. The 12-month and 36-month timelines on this page follow that shape. Adjust the months to your program's rules."
   - q: "Can AI make a research timeline for me?"
-    a: "It can draft one. The Thesis Suite's Research timeline takes your project, the months available, an optional start date and fixed dates, and returns a table of phases and milestones, dependencies, risks with buffers and supervisor checkpoints, for 3 credits. It does not know your program's rules or your supervisor's availability, so treat it as a first plan."
+    a: "It can draft one, and it can summarize your progress, but you keep the log. In AI for Research, the Progress tab on a project holds your weekly or monthly entries and your supervisor's comments, and an AI summary for a meeting costs 1 credit. The Thesis Suite's Research timeline takes your project, the months available, an optional start date and fixed dates, and returns a table of phases and milestones, dependencies, risks with buffers and supervisor checkpoints, for 3 credits. It does not know your program's rules or your supervisor's availability, so treat it as a first plan."
 ---
 This research progress tracker is for master's and PhD students, and anyone running a long research project, who want to see each week whether the work is moving. It has three parts to copy: a weekly log, a monthly review for you and your supervisor, and a thesis timeline with milestones. Keep all three in one document.
 
@@ -121,27 +121,32 @@ Both tables overlap phases on purpose: reading continues while you collect data.
 
 ## How to keep a research progress tracker in AI for Research
 
-1. Open the **Thesis Suite** and choose **Research timeline**.
-2. Describe the project, pick the time available (6, 12, 18, 24, 36 or 48 months), add a start month and any fixed dates such as an ethics deadline or fieldwork window.
-3. You get a phases table (phase, months, main tasks, milestone), the dependencies between phases, a risks and buffers table, and checkpoints with your supervisor.
-4. Open it in the editor, paste the weekly log and monthly review templates under it, and keep the whole tracker as one document.
-5. Put the document in a **Project** with your papers and drafts, and share it with your supervisor as can comment. Every AI task you run is saved in **History**, which doubles as a record of what you did.
+The weekly log on this page now has a home in the product: the **Progress** tab on every project.
+
+1. Open your thesis in **Projects** and choose the **Progress** tab.
+2. Add an entry each week or each month, in the same three parts as the log above: what you did, what blocked you, and what comes next.
+3. Share the project with your supervisor. People you share it with can read the log and comment on an entry, so feedback sits next to the week it is about.
+4. Before a supervisor meeting, ask for an **AI summary** of the entries since the last meeting: progress, open blockers and decisions to discuss. 1 credit. Read it before you send it; it summarizes only what you wrote.
+5. For the milestones, open the **Thesis Suite** and choose **Research timeline**. Describe the project, pick the time available (6, 12, 18, 24, 36 or 48 months), add a start month and fixed dates such as an ethics deadline or fieldwork window. You get a phases table, the dependencies between phases, risks with buffers, and supervisor checkpoints. 3 credits.
+6. Keep the timeline as a document in the same project. Every AI task you run is also saved in **History**, a second record of what you did.
 
 | Task | Where | Credits |
 | --- | --- | --- |
 | Copy the log, review and timelines | This page | 0 |
-| Keep the tracker as a document | Editor | 0 |
+| Weekly or monthly progress log, shared with a supervisor | Projects, Progress tab | 0 |
+| AI summary for a supervisor meeting | Projects, Progress tab | 1 |
 | Research timeline with risks and checkpoints | Thesis Suite | 3 |
 | Thesis outline with a word budget per chapter | Thesis Suite | 3 |
-| Share with a supervisor | Projects | 0 |
 
-<!-- SCREENSHOT: Thesis Suite Research timeline output, phases table and risks table, for a 36-month PhD -->
+<!-- SCREENSHOT: the Progress tab of a thesis project, three weekly entries, a supervisor comment and the AI summary panel -->
 
 See [pricing](/pricing) for plans, and [Projects](/features/projects) for sharing and access levels.
 
 ## What this research progress tracker and the tool do not do
 
-- There are no reminders, notifications or Gantt charts. The tracker is a document you update by hand.
+- There are no Gantt charts, and the Progress tab does not fill itself in: you write each entry.
+<!-- VERIFY: whether the Progress tab sends reminders or notifications when an entry or comment is added; the build spec does not say -->
+- The AI summary uses only your entries and your supervisor's comments. It does not read your drafts or judge whether you are on track.
 - The Research timeline does not know your program's rules, funding end date or your supervisor's leave. Add them as fixed dates, then check the plan with your supervisor.
 - No tracker writes the thesis. It shows you, early, when the plan and the work have drifted apart.
 

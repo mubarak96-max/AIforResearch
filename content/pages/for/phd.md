@@ -11,8 +11,8 @@ cta:
   label: "Start a Deep report"
   href: "/deep-research"
 plan_note: "Free plan: 45 credits and up to 2 Deep reports a day. A Deep report costs 15 credits; Detailed reports (45) need a paid plan."
-related: ["/features/deep-research", "/features/citation-map", "/features/systematic-review", "/features/thesis-defense-prep", "/blog/thesis-to-journal-article"]
-updated: "2026-11-12"
+related: ["/features/deep-research", "/features/citation-map", "/features/systematic-review", "/features/thesis-defense-prep", "/blog/thesis-to-journal-article", "/features/conference-paper-writer", "/features/qualitative-coding"]
+updated: "2026-11-13"
 faq:
   - q: "What is the difference between a Deep and a Detailed report?"
     a: "A Deep report (15 credits) is 2,500 to 4,000 words with figures, built from about 250 papers screened, 45+ kept and 12 read in full. A Detailed report (45 credits, paid plans) is 5,000 to 8,000 words with figures and a study table, from 90+ papers and 25 full texts, and you review its plan before it runs. Both check every citation against its paper."
@@ -111,6 +111,8 @@ Two sets of rules apply: your university's for the thesis, and each journal's fo
 ## Who else it is for
 
 On a master's? See [AI for a master's thesis](/for/masters). After the PhD, see [AI for professors](/for/academics).
+
+Publishing during the doctorate? See the [conference paper writer](/features/conference-paper-writer), the [manuscript formatting tool](/features/journal-formatter) and the [research poster maker](/features/research-poster-maker). For analysis, see [qualitative coding](/features/qualitative-coding) and the [Bayesian t-test calculator](/features/bayesian-statistics). The sources for your discipline are on the field pages, for example [life sciences](/fields/life-sciences) and [engineering and computing](/fields/engineering-and-computing).
 
 ## Learn more
 

@@ -24,6 +24,11 @@ export function spssName(name: string, taken = new Set<string>()): string {
   return candidate;
 }
 
+/** The prior scale as BayesFactor writes it ("0.707" is its "medium", √2/2). */
+const rScale = (raw?: string) => (!raw || raw === '0.707' ? '"medium"' : raw);
+const pyScale = (raw?: string) => (!raw ? '0.707' : raw);
+const beta = (o: AnalysisSpec['options'] = {}) => ({ a: o.prior_a || '1', b: o.prior_b || '1', threshold: o.threshold || '0.5' });
+
 function rAnalysis(spec: AnalysisSpec): string[] {
   const [a, b, c] = spec.variables;
   const o = spec.options ?? {};
@@ -69,6 +74,31 @@ function rAnalysis(spec: AnalysisSpec): string[] {
       'auc(r); ci.auc(r, method = "delong")', 'coords(r, "best", best.method = "youden")', 'plot(r)',
     ];
     case 'alpha': return ['library(psych)', `alpha(d[, c(${spec.variables.map(rStr).join(', ')})])`];
+    case 'bayes_one': return [
+      'library(BayesFactor)',
+      `bf <- ttestBF(x = na.omit(${rCol(a)}), mu = ${Number(o.mu || 0)}, rscale = ${rScale(o.prior_scale)})`,
+      'bf; 1 / bf  # BF10 and BF01', 'summary(posterior(bf, iterations = 10000))  # delta: posterior of the effect size',
+    ];
+    case 'bayes_paired': return [
+      'library(BayesFactor)',
+      `x <- na.omit(d[, c(${rStr(a)}, ${rStr(b)})])`,
+      `bf <- ttestBF(x = x[[1]], y = x[[2]], paired = TRUE, rscale = ${rScale(o.prior_scale)})`,
+      'bf; 1 / bf  # BF10 and BF01', 'summary(posterior(bf, iterations = 10000))  # delta: posterior of the effect size',
+    ];
+    case 'bayes_two': return [
+      'library(BayesFactor)',
+      `x <- d[!is.na(${rCol(a)}) & !is.na(${rCol(b)}), ]`, `x$group <- factor(x[[${rStr(b)}]])`,
+      `bf <- ttestBF(formula = ${rName(a)} ~ group, data = x, rscale = ${rScale(o.prior_scale)})`,
+      'bf; 1 / bf  # BF10 and BF01', 'summary(posterior(bf, iterations = 10000))  # delta (its sign follows the factor level order)',
+    ];
+    case 'bayes_prop': {
+      const p = beta(o);
+      return [
+        `x <- na.omit(${rCol(a)}); k <- sum(x == ${rStr(o.positive ?? '')}); n <- length(x)${o.positive ? '' : '  # set the success value'}`,
+        `a <- ${p.a} + k; b <- ${p.b} + n - k  # Beta(${p.a}, ${p.b}) prior`,
+        `c(mean = a / (a + b), median = qbeta(0.5, a, b), lower = qbeta(0.025, a, b), upper = qbeta(0.975, a, b), p_above = 1 - pbeta(${p.threshold}, a, b))`,
+      ];
+    }
     default: return [`# ${spec.test}: not available as R code`];
   }
 }
@@ -119,6 +149,20 @@ function pyAnalysis(spec: AnalysisSpec): string[] {
       `print("AUC", roc_auc_score(y, x[${pyStr(a)}]))`, `fpr, tpr, thr = roc_curve(y, x[${pyStr(a)}])`, 'print("Youden cut-off", thr[(tpr - fpr).argmax()])',
     ];
     case 'alpha': return ['import pingouin as pg', `print(pg.cronbach_alpha(data=${cc(spec.variables)}))`];
+    case 'bayes_one': return ['import pingouin as pg', `print(pg.ttest(${pyCol(a)}.dropna(), ${Number(o.mu || 0)}, r=${pyScale(o.prior_scale)})[["T", "dof", "BF10"]])  # BF01 = 1 / BF10`];
+    case 'bayes_paired': return ['import pingouin as pg', `x = ${cc([a, b])}`, `print(pg.ttest(x[${pyStr(a)}], x[${pyStr(b)}], paired=True, r=${pyScale(o.prior_scale)})[["T", "dof", "BF10"]])  # BF01 = 1 / BF10`];
+    case 'bayes_two': return [
+      'import pingouin as pg', `x = ${cc([a, b])}`, `g1, g2 = x[${pyStr(b)}].value_counts().index[:2]  # Data Lab orders groups by size`,
+      `print(pg.ttest(x.loc[x[${pyStr(b)}] == g1, ${pyStr(a)}], x.loc[x[${pyStr(b)}] == g2, ${pyStr(a)}], correction=False, r=${pyScale(o.prior_scale)})[["T", "dof", "BF10"]])  # Student's t, as the JZS model`,
+    ];
+    case 'bayes_prop': {
+      const p = beta(o);
+      return [
+        `x = ${pyCol(a)}.dropna().astype(str); k = int((x == ${pyStr(o.positive ?? '')}).sum()); n = len(x)`,
+        `post = stats.beta(${p.a} + k, ${p.b} + n - k)  # Beta(${p.a}, ${p.b}) prior`,
+        `print("mean", post.mean(), "median", post.median(), "95% CrI", post.ppf([0.025, 0.975]), "P(p > ${p.threshold})", post.sf(${p.threshold}))`,
+      ];
+    }
     default: return [`# ${spec.test}: not available as Python code`];
   }
 }
@@ -159,6 +203,8 @@ function spssAnalysis(spec: AnalysisSpec, v: (name: string) => string): string[]
       `ROC ${a} BY ref_pos (1) /PLOT=CURVE /PRINT=SE COORDINATES /CRITERIA=CUTOFF(INCLUDE) TESTPOS(LARGE) DISTRIBUTION(FREE) CI(95).`,
     ];
     case 'alpha': return [`RELIABILITY /VARIABLES=${spec.variables.map(v).join(' ')} /SCALE('Scale') ALL /MODEL=ALPHA /SUMMARY=TOTAL.`];
+    case 'bayes_one': case 'bayes_paired': case 'bayes_two': case 'bayes_prop':
+      return ['* SPSS Bayesian procedures use different default priors from Data Lab (JZS, Cauchy prior on the effect size; beta-binomial).', '* Rerun this analysis from the R (BayesFactor) or Python (pingouin) script, or in JASP.'];
     default: return [`* ${spec.test}: not available as SPSS syntax.`];
   }
 }

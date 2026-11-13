@@ -8,11 +8,11 @@ primary_keyword: "prisma checklist"
 secondary_keywords: ["prisma 2020 checklist", "prisma checklist for systematic review", "sampl guidelines", "qualitative research reporting checklist", "srqr checklist", "coreq checklist"]
 hero: "cta"
 cta:
-  label: "Report from your review"
-  href: "/systematic-review"
-plan_note: "Copying the checklists is free. In the Systematic Review workspace the PRISMA 2020 diagram costs 0 credits and an AI methods draft 3; the free plan has 45 credits a month and one review."
-related: ["/features/systematic-review", "/blog/how-to-make-a-prisma-flow-diagram", "/templates/systematic-review-protocol", "/templates/screening-decision-log", "/blog/which-statistical-test-to-use", "/blog/ai-for-qualitative-research"]
-updated: "2026-11-12"
+  label: "Check your manuscript against a guideline"
+  href: "/reviewer?module=guidelines"
+plan_note: "Copying the checklists is free. The Reviewer's guideline check (PRISMA, SAMPL, SAGER, CONSORT and more) costs 5 credits per 10,000 words; the free plan has 45 credits a month."
+related: ["/features/reporting-guideline-checker", "/blog/sampl-guidelines", "/blog/sager-guidelines", "/features/systematic-review", "/blog/how-to-make-a-prisma-flow-diagram", "/templates/systematic-review-protocol", "/templates/screening-decision-log", "/blog/which-statistical-test-to-use", "/blog/ai-for-qualitative-research"]
+updated: "2026-11-13"
 faq:
   - q: "How many items are in the PRISMA 2020 checklist?"
     a: "The PRISMA 2020 checklist has 27 numbered items in seven sections: title, abstract, introduction, methods, results, discussion and other information. Several items have parts, such as 10a and 10b, 13a to 13f, 16a and 16b, 20a to 20d, 23a to 23d and 24a to 24c, so there are 42 lines to complete. The abstract has its own separate checklist."
@@ -40,6 +40,7 @@ PRISMA's flow diagram, item 16a, has its own guide: [how to make a PRISMA flow d
 | A synthesis of qualitative studies | ENTREQ: 21 items in five domains [5] |
 | A qualitative study | SRQR (21 items) or, for interviews and focus groups, COREQ (32 items) [6][7] |
 | The statistics in any biomedical article | SAMPL, alongside the design checklist [8] |
+| Sex and gender in any study with people, animals or cells | SAGER, alongside the design checklist ([SAGER guidelines explained](/blog/sager-guidelines)) |
 
 All of them are listed by the EQUATOR Network, which keeps the current version of each guideline.
 
@@ -98,7 +99,7 @@ Reproduced from Page et al., *BMJ* 2021, under a CC BY 4.0 licence [1]. Item wor
 
 ## SAMPL: reporting statistics (summary checklist)
 
-SAMPL is written as guidance, not a numbered list. This is our condensed summary of its main points for a fillable check; read the full guideline before submission [8].
+SAMPL is written as guidance, not a numbered list. This is our condensed summary of its main points for a fillable check; read the full guideline before submission [8]. For each point with examples, see [the SAMPL guidelines explained](/blog/sampl-guidelines).
 
 | Area | Check that you report | Done |
 | --- | --- | --- |
@@ -153,9 +154,21 @@ The Systematic Review workspace produces the material for several items; you wri
 
 <!-- SCREENSHOT: the Report tab: the PRISMA 2020 diagram with its SVG and PNG buttons, and the Methods section card with "Draft from this review" and its 3-credit cost -->
 
+## Check the finished manuscript in the Reviewer
+
+Once the draft exists, the Reviewer's guideline check does the first pass of the checklist for you. It covers PRISMA 2020, SAMPL and SAGER, and also CONSORT 2010, STROBE, STARD 2015, CARE, COREQ, SRQR and SQUIRE 2.0.
+
+1. Open the **Reviewer** and choose the guideline check. Upload or paste the manuscript and pick the guideline, for example PRISMA 2020 plus SAMPL for a review with a meta-analysis, or SAGER for any study of people or animals.
+2. For each item, it shows the passage that reports it, or **Check by hand** when it finds none.
+3. Read every item yourself, then download the checklist with a page column to fill before you submit.
+
+It costs 5 credits per 10,000 words. It drafts the checklist; you confirm it, and the journal's own checklist form is what you submit. More on the [reporting guideline checker](/features/reporting-guideline-checker) page.
+
+<!-- SCREENSHOT: the Reviewer guideline check with SAMPL selected, items with their quoted passages and two "Check by hand" items -->
+
 ## What these checklists and the workspace do not do
 
-- **The workspace does not fill the checklist.** It has no checklist view and doesn't track page numbers; copy the table above.
+- **The Systematic Review workspace does not fill the checklist.** The Reviewer's guideline check drafts it from the finished manuscript, but page numbers depend on the journal's layout, so you add them yourself.
 - **No meta-analysis, reporting bias or certainty tools.** Items 12 to 15 and 19 to 22 need software such as RevMan or R and a GRADE assessment done outside the workspace.
 - **Risk of bias is three fields.** Randomisation, allocation concealment and blinding are not a complete RoB 2 or ROBINS-I assessment.
 - **A checklist is not a quality score.** Ticking an item means you reported it, not that the method was sound.

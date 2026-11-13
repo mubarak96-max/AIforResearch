@@ -63,11 +63,11 @@ console.log(`blog: ${posts.length} articles -> ${outFile.slice(root.length + 1)}
 
 // ------------------------------------------------------------------ landing pages
 // content/pages/<section>/<slug>.md -> lib/pages.generated.ts. Long-form landing pages (audience,
-// feature, alternatives, templates): frontmatter for the hero, FAQ and links, Markdown for the body.
+// feature, alternatives, templates, fields): frontmatter for the hero, FAQ and links, Markdown for the body.
 
 const pagesDir = join(root, 'content', 'pages');
 const pagesOut = join(root, 'lib', 'pages.generated.ts');
-const SECTIONS = ['for', 'features', 'alternatives', 'templates'];
+const SECTIONS = ['for', 'features', 'alternatives', 'templates', 'fields'];
 const PAGE_REQUIRED = ['slug', 'seo_title', 'description', 'heading', 'intro', 'primary_keyword', 'hero', 'cta', 'faq', 'updated'];
 
 const pages = [];

@@ -16,7 +16,7 @@ function knownPaths() {
 }
 
 /** App routes a call to action may open. */
-const APP_ROUTE = /^\/(signup|home|deep-research|papers|citation-map|landscape|library|projects|history|write|thesis|proposals|slides|reviewer|systematic-review|data-lab|all-tools|editor)(\?[a-z=&-]+)?$/;
+const APP_ROUTE = /^\/(signup|home|deep-research|papers|citation-map|landscape|library|projects|history|write|thesis|proposals|slides|reviewer|systematic-review|data-lab|all-tools|editor|convert|workbooks|official-sources|surveys)(\?[a-z=&-]+)?$/;
 
 describe('landing pages', () => {
   it('has one page per URL and no clash with the short feature pages', () => {

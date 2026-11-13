@@ -6,6 +6,7 @@
  * email, role, added_at }], member_ids, invite_emails, created_at, updated_at }.
  * Roles: owner, edit (run and change work), comment (read and comment; "supervisor"), view.
  * The plan limits how many projects an account owns and how many people each one has.
+ * projects/{id}/progress and projects/{id}/progress_summaries hold the Progress tab (see the end of this file).
  */
 import { HTTPException } from 'hono/http-exception';
 import type { AuthUser } from '../auth.js';
@@ -179,4 +180,144 @@ export function publicProject(project: Project & { role: ProjectRole }) {
     members: project.members.map((member) => ({ email: member.email, name: member.name, role: member.role, pending: !member.user_id })),
     created_at: project.created_at, updated_at: project.updated_at,
   };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Progress tracker: projects/{id}/progress/{entryId} and projects/{id}/progress_summaries/{id}.
+// Dated entries (done, blockers, next actions, optional status and mood). Owners and editors
+// write entries (an editor changes only their own, the owner any), commenters add comments, and
+// viewers read. Deleted with the project (deleteDeep).
+// ---------------------------------------------------------------------------------------------
+
+export const PROGRESS_STATUSES = ['on_track', 'at_risk', 'blocked', 'done'] as const;
+export type ProgressStatus = (typeof PROGRESS_STATUSES)[number];
+export type ProgressComment = { id: string; user_id: string; name: string; text: string; at: Date };
+export type ProgressEntry = {
+  id: string; date: string; done: string; blockers: string; next: string; status: ProgressStatus | null; mood: number | null;
+  author_user_id: string; author_name: string; comments: ProgressComment[]; created_at: Date; updated_at: Date;
+};
+export type ProgressInput = { date: string; done?: string; blockers?: string; next?: string; status?: ProgressStatus | null; mood?: number | null };
+export type ProgressSummary = { id: string; from: string; to: string; markdown: string; entries: number; author_name: string; task_id: string | null; created_at: Date };
+
+const progressRef = (projectId: string) => col(C.projects).doc(projectId).collection('progress');
+const summariesRef = (projectId: string) => col(C.projects).doc(projectId).collection('progress_summaries');
+const WRITERS: ProjectRole[] = ['owner', 'edit'];
+const COMMENTERS: ProjectRole[] = ['owner', 'edit', 'comment'];
+const DATE = /^\d{4}-\d{2}-\d{2}$/;
+const clip = (value: string | undefined, max: number) => (value ?? '').trim().slice(0, max);
+
+function cleanProgress(input: ProgressInput) {
+  if (!DATE.test(input.date) || Number.isNaN(Date.parse(input.date))) throw new HTTPException(422, { message: 'Give the entry a date.' });
+  const entry = {
+    date: input.date, done: clip(input.done, 4000), blockers: clip(input.blockers, 4000), next: clip(input.next, 4000),
+    status: input.status && PROGRESS_STATUSES.includes(input.status) ? input.status : null,
+    mood: typeof input.mood === 'number' && Number.isInteger(input.mood) && input.mood >= 1 && input.mood <= 5 ? input.mood : null,
+  };
+  if (!entry.done && !entry.blockers && !entry.next) throw new HTTPException(422, { message: 'Write what you did, what is blocking you or what comes next.' });
+  return entry;
+}
+
+const timeOf = (value: unknown) => new Date(value as string | number | Date).getTime() || 0;
+const byDateDesc = (a: ProgressEntry, b: ProgressEntry) => b.date.localeCompare(a.date) || timeOf(b.created_at) - timeOf(a.created_at);
+
+/** Entries, newest first, optionally within a period (inclusive dates), and saved summaries. Any member may read. */
+export async function listProgress(user: AuthUser, projectId: string, period: { from?: string; to?: string } = {}) {
+  const project = await getProjectFor(user, projectId);
+  const entries = rows<ProgressEntry>(await progressRef(projectId).get())
+    .filter((entry) => (!period.from || entry.date >= period.from) && (!period.to || entry.date <= period.to))
+    .map((entry) => ({ ...entry, comments: entry.comments ?? [] }))
+    .sort(byDateDesc);
+  const summaries = rows<ProgressSummary>(await summariesRef(projectId).get()).sort((a, b) => timeOf(b.created_at) - timeOf(a.created_at)).slice(0, 20);
+  return { project, entries, summaries };
+}
+
+export async function addProgress(user: AuthUser, projectId: string, input: ProgressInput): Promise<ProgressEntry> {
+  await getProjectFor(user, projectId, WRITERS);
+  const now = new Date();
+  const id = newId();
+  const entry: Omit<ProgressEntry, 'id'> = { ...cleanProgress(input), author_user_id: user.id, author_name: user.full_name || user.email, comments: [], created_at: now, updated_at: now };
+  await progressRef(projectId).doc(id).set(entry);
+  return { id, ...entry };
+}
+
+async function writableEntry(user: AuthUser, projectId: string, entryId: string) {
+  const project = await getProjectFor(user, projectId, WRITERS);
+  if (!entryId || entryId.includes('/')) throw new HTTPException(404, { message: 'Entry not found' });
+  const entry = row<ProgressEntry>(await progressRef(projectId).doc(entryId).get());
+  if (!entry) throw new HTTPException(404, { message: 'Entry not found' });
+  if (project.role !== 'owner' && entry.author_user_id !== user.id) throw new HTTPException(403, { message: 'You can change only your own entries.' });
+  return entry;
+}
+
+export async function updateProgress(user: AuthUser, projectId: string, entryId: string, input: ProgressInput) {
+  await writableEntry(user, projectId, entryId);
+  await progressRef(projectId).doc(entryId).update({ ...cleanProgress(input), updated_at: new Date() });
+}
+
+export async function deleteProgress(user: AuthUser, projectId: string, entryId: string) {
+  await writableEntry(user, projectId, entryId);
+  await progressRef(projectId).doc(entryId).delete();
+}
+
+/** Owners, editors and commenters (supervisors) comment on an entry. */
+export async function commentProgress(user: AuthUser, projectId: string, entryId: string, text: string): Promise<ProgressComment> {
+  await getProjectFor(user, projectId, COMMENTERS);
+  const body = text.trim().slice(0, 2000);
+  if (!body) throw new HTTPException(422, { message: 'Write a comment.' });
+  if (!entryId || entryId.includes('/')) throw new HTTPException(404, { message: 'Entry not found' });
+  const comment: ProgressComment = { id: newId(), user_id: user.id, name: user.full_name || user.email, text: body, at: new Date() };
+  await db().runTransaction(async (tx) => {
+    const ref = progressRef(projectId).doc(entryId);
+    const snapshot = await tx.get(ref);
+    if (!snapshot.exists) throw new HTTPException(404, { message: 'Entry not found' });
+    const comments = ((snapshot.data() as { comments?: ProgressComment[] }).comments ?? []).slice(-199);
+    tx.update(ref, { comments: [...comments, comment] });
+  });
+  return comment;
+}
+
+/** A comment is removed by its author or the project owner. */
+export async function deleteProgressComment(user: AuthUser, projectId: string, entryId: string, commentId: string) {
+  const project = await getProjectFor(user, projectId, COMMENTERS);
+  if (!entryId || entryId.includes('/')) throw new HTTPException(404, { message: 'Entry not found' });
+  await db().runTransaction(async (tx) => {
+    const ref = progressRef(projectId).doc(entryId);
+    const snapshot = await tx.get(ref);
+    if (!snapshot.exists) throw new HTTPException(404, { message: 'Entry not found' });
+    const comments = (snapshot.data() as { comments?: ProgressComment[] }).comments ?? [];
+    const target = comments.find((comment) => comment.id === commentId);
+    if (!target) throw new HTTPException(404, { message: 'Comment not found' });
+    if (project.role !== 'owner' && target.user_id !== user.id) throw new HTTPException(403, { message: 'You can remove only your own comments.' });
+    tx.update(ref, { comments: comments.filter((comment) => comment.id !== commentId) });
+  });
+}
+
+const STATUS_WORDS: Record<ProgressStatus, string> = { on_track: 'on track', at_risk: 'at risk', blocked: 'blocked', done: 'done' };
+
+/** The entries of a period as plain text for the summary prompt, oldest first. Pure, for tests. */
+export function progressDigest(entries: Pick<ProgressEntry, 'date' | 'done' | 'blockers' | 'next' | 'status' | 'mood' | 'author_name' | 'comments'>[]): string {
+  return [...entries].sort((a, b) => a.date.localeCompare(b.date)).map((entry) => [
+    `## ${entry.date} (${entry.author_name})${entry.status ? ` · status: ${STATUS_WORDS[entry.status]}` : ''}${entry.mood ? ` · mood ${entry.mood}/5` : ''}`,
+    entry.done && `Done: ${entry.done}`, entry.blockers && `Blockers: ${entry.blockers}`, entry.next && `Next: ${entry.next}`,
+    ...(entry.comments ?? []).map((comment) => `Comment from ${comment.name}: ${comment.text}`),
+  ].filter(Boolean).join('\n')).join('\n\n');
+}
+
+export function progressSummaryPrompt(projectName: string, from: string, to: string, digest: string, language?: string | null) {
+  return [
+    {
+      role: 'system' as const,
+      content: 'You write a short progress update that a researcher sends to their supervisor, from their own dated log. ' +
+        `Use only what the log says; never invent results, dates or work. Write in the first person, plainly, in ${language || 'the language of the log'}. ` +
+        'Markdown with these headings: "Summary" (two or three sentences), "Done", "Blockers and where I need help", "Next steps" (bullets), and "Questions for our meeting" only if the log raises any. ' +
+        'Keep it under 350 words. Mention mood only if the log shows a clear change.',
+    },
+    { role: 'user' as const, content: `Project: ${projectName}\nPeriod: ${from} to ${to}\n\n${digest}` },
+  ];
+}
+
+export async function saveProgressSummary(projectId: string, summary: Omit<ProgressSummary, 'id'>): Promise<ProgressSummary> {
+  const id = newId();
+  await summariesRef(projectId).doc(id).set(summary);
+  return { id, ...summary };
 }

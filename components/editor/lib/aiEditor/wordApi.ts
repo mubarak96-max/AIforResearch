@@ -49,13 +49,15 @@ export type WordExportPayload = {
 };
 
 export async function exportWordDocument(payload: WordExportPayload): Promise<Blob> {
+  // Diagrams go as PNG images (mermaid loads only when the document has one).
+  const blocks = await import('./mermaid').then(({ blocksWithDiagramImages }) => blocksWithDiagramImages(payload.blocks)).catch(() => payload.blocks);
   const response = await fetch('/api/ai-editor/word/export', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
     body: JSON.stringify({
       document_id: payload.documentId || undefined,
       title: payload.title,
-      blocks: payload.blocks,
+      blocks,
       comments: payload.comments,
       settings: payload.settings || undefined,
       format: payload.format,

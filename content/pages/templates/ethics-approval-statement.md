@@ -8,11 +8,11 @@ primary_keyword: "ethics approval statement"
 secondary_keywords: ["irb checklist", "irb application template", "ethics statement example", "ethical approval statement", "informed consent statement", "ethics statement for journal"]
 hero: "cta"
 cta:
-  label: "Draft the ethics application"
-  href: "/proposals?module=ethics"
-plan_note: "The wordings and checklist are free to copy. A drafted ethics application in Proposal Studio costs 15 credits; the free plan has 45 credits a month."
-related: ["/blog/how-to-write-an-irb-application", "/features/proposal-studio", "/templates/research-proposal", "/for/medicine", "/blog/how-to-write-a-research-proposal"]
-updated: "2026-11-12"
+  label: "Draft your ethics statement"
+  href: "/proposals?module=ethics-statement"
+plan_note: "The wordings and checklist are free to copy. In Proposal Studio an ethics statement for a manuscript costs 1 credit and a full ethics application 15; the free plan has 45 credits a month."
+related: ["/blog/how-to-write-an-irb-application", "/features/proposal-studio", "/features/clinical-research-checklists", "/features/journal-formatter", "/blog/how-to-format-a-paper-for-a-journal", "/templates/research-proposal", "/for/medicine", "/blog/how-to-write-a-research-proposal"]
+updated: "2026-11-13"
 faq:
   - q: "What is an ethics approval statement?"
     a: "An ethics approval statement is a short paragraph, usually in the methods or the declarations section of a paper or thesis, saying which ethics committee or IRB approved the study, the approval reference number and date, and how participants gave consent. Where no approval was needed, it says why and who decided. Journals check it before peer review."
@@ -134,7 +134,19 @@ Use this before you submit. It is grouped the way committees read an application
 | Transfers outside your country or to cloud tools named | ☐ |
 | Data sharing plan matches what the consent form says | ☐ |
 
-## How to draft the ethics application in AI for Research
+## How to draft the ethics statement in AI for Research
+
+The statement for your manuscript has its own module:
+
+1. Open **Proposal Studio** and choose **Ethics statement**.
+2. Enter the committee's name, the approval reference number and date, how consent was obtained, or that a waiver was granted and by whom, and the journal you are submitting to.
+3. You get the statement in the journal's wording, ready to paste into the methods or the declarations section. Check that every name, number and date matches your approval letter before you submit. 1 credit.
+<!-- VERIFY: that the ethics-statement module leaves [placeholders] for missing details (reference number, date) rather than omitting them -->
+
+
+<!-- SCREENSHOT: the Ethics statement form with committee, reference number and consent filled in, and the drafted statement beside it -->
+
+If you have not applied yet, start with the application, and use the checklist above with the [clinical research checklists](/features/clinical-research-checklists), which include an IRB submission checklist you can tailor to your study:
 
 1. Open **Proposal Studio** and choose **Ethics application**.
 2. Describe the study: aim, design, who takes part, how they are recruited, what they do, what data you collect. Or upload your protocol.
@@ -146,6 +158,8 @@ Use this before you submit. It is grouped the way committees read an application
 | Task | Where | Credits |
 | --- | --- | --- |
 | Copy a wording or the checklist | This page | 0 |
+| Ethics statement for a manuscript, in the journal's wording | Proposal Studio, Ethics statement | 1 |
+| IRB submission checklist, blank or tailored to your study | Proposal Studio, Checklists | 0 blank, 3 tailored |
 | Ethics application draft | Proposal Studio | 15 |
 | Data management plan (generic, NIH, NSF, Horizon Europe, UKRI) | Proposal Studio | 3 |
 | Ethical considerations section of a proposal | Proposal Studio, Research proposal | 3 |

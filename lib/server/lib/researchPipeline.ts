@@ -28,12 +28,13 @@ import { USER_AGENT } from '../env.js';
 import { dropInventedMarkers, queryFromText, sharesTopic, usedSources } from './assist-papers.js';
 import { extractText } from './fileText.js';
 import {
-  applyFilters, crossrefUpdates, crossrefWork, doiKey, mergeResults, searchSources, semanticScholarLinks, sortPapers, titleKey, unpaywall,
-  type FoundPaper, type SearchFilters, type StudyType,
+  applyFilters, cleanRecordTerms, crossrefUpdates, crossrefWork, doiKey, findRecords, isRecordGroup, mergeResults, recordTermsFromText, recordTermsPrompt, searchSources,
+  semanticScholarLinks, sortPapers, titleKey, unpaywall,
+  type FoundPaper, type RecordGroup, type RecordSource, type SearchFilters, type StudyType,
 } from './sources/index.js';
 import { net } from './sources/http.js';
 import {
-  DEPTH_SETTINGS, ResearchEmptyError, STEP_IDS, addUsage, consensusOf, fileSource, paperSource, parseJson, relevantPassages, researchPrompt, sourceEvidenceBasis, stripHeadings, usage0, webSource,
+  DEPTH_SETTINGS, ResearchEmptyError, STEP_IDS, addUsage, consensusOf, fileSource, paperSource, parseJson, recordSource, relevantPassages, researchPrompt, sourceEvidenceBasis, stripHeadings, usage0, webSource,
   type Depth, type ResearchEvents, type ResearchInput, type ResearchPlan, type ResearchResult, type ResearchSource, type ResearchStep, type Stance,
   type StepId, type SubQuestion, type Verification,
 } from './research.js';
@@ -188,6 +189,30 @@ async function searchStep(input: ResearchInput, plan: ResearchPlan, userId: stri
   const merged = sortPapers(mergeResults(lists));
   const candidates = [...new Map([...merged.slice(0, settings.candidates), ...merged.filter((paper) => library.some((item) => paperKey(item) === paperKey(paper)))].map((paper) => [paperKey(paper), paper])).values()];
   return { candidates, web: results[0]?.web.slice(0, input.depth === 'summary' ? 3 : 8) ?? [], counts, errors, found, unique: merged.length, chased, subsOf, seen: new Set(merged.map(paperKey)) };
+}
+
+/**
+ * Database records for the field source groups (life sciences, chemistry): a fast model names the
+ * genes, proteins, compounds and variants in the question (a pattern match when it names none),
+ * then each database is asked for a few records. Never fails the run.
+ */
+export async function recordStep(llm: LlmSlot, question: string, groups: RecordGroup[], usage: LlmUsage, signal?: Signal): Promise<{ records: RecordSource[]; counts: Record<string, number> }> {
+  if (!groups.length) return { records: [], counts: {} };
+  let terms = recordTermsFromText(question);
+  try {
+    const { text, usage: used } = await llm.complete({ task: 'fast', temperature: 0, maxTokens: 250, json: true, signal, messages: recordTermsPrompt(question, groups) });
+    addUsage(usage, used);
+    const picked = cleanRecordTerms(parseJson(text));
+    if (picked.genes.length || picked.proteins.length || picked.compounds.length || picked.variants.length) terms = picked;
+  } catch (error) {
+    if (signal?.aborted) throw error;
+  }
+  try {
+    return await findRecords(groups, terms);
+  } catch (error) {
+    console.warn(`[records] skipped: ${(error as Error)?.message || 'failed'}`);
+    return { records: [], counts: {} };
+  }
 }
 
 // ------------------------------------------------------------------ 3. Screen
@@ -620,7 +645,7 @@ export async function checkReferences(sources: ResearchSource[], max: number): P
 
 // ------------------------------------------------------------------ the run
 
-const GROUP_NAMES: Record<string, string> = { papers: 'OpenAlex and Semantic Scholar', medical: 'PubMed and Europe PMC', preprints: 'arXiv and preprint servers', web: 'the web', library: 'your Library' };
+const GROUP_NAMES: Record<string, string> = { papers: 'OpenAlex and Semantic Scholar', medical: 'PubMed and Europe PMC', preprints: 'arXiv and preprint servers', dblp: 'DBLP', web: 'the web', library: 'your Library', 'life-sciences': 'life-sciences databases', chemistry: 'chemistry databases' };
 
 /** The step list and how each change reaches the browser. */
 function stepTracker(events: ResearchEvents) {
@@ -814,12 +839,16 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
 
     // 2. Search
     track.start('search', `Searching ${input.groups.map((group) => GROUP_NAMES[group] || group).join(', ')}`, { queries: searches.map((item) => item.query) });
+    const recordsFound = recordStep(llm, input.question, input.groups.filter(isRecordGroup), usage, signal);
+    recordsFound.catch(() => undefined); // awaited below; a failed search must not leave it unhandled
     const searched = await searchStep(input, plan, context.userId);
+    const { records, counts: recordCounts } = await recordsFound;
+    Object.assign(searched.counts, recordCounts);
     const queries = searches.map((item) => item.query);
     const duplicates = Math.max(0, searched.found - searched.unique);
     track.done('search', [`${plural(searched.found, 'result')} found`, duplicates ? `${plural(duplicates, 'duplicate')} removed` : null, searched.chased ? `${searched.chased} from citation chasing` : null].filter(Boolean).join(' · '),
-      { queries, counts: searched.counts, errors: searched.errors, found: searched.found, unique: searched.unique, duplicates, chased: searched.chased, web: searched.web.length });
-    if (!searched.candidates.length && !input.attachments.length && !searched.web.length) throw new ResearchEmptyError();
+      { queries, counts: searched.counts, errors: searched.errors, found: searched.found, unique: searched.unique, duplicates, chased: searched.chased, web: searched.web.length, records: records.length });
+    if (!searched.candidates.length && !input.attachments.length && !searched.web.length && !records.length) throw new ResearchEmptyError();
 
     // 3. Screen
     track.start('screen', `Screening ${plural(searched.candidates.length, 'title and abstract', 'titles and abstracts')}`);
@@ -839,7 +868,7 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
       by_relevance: [3, 2, 1, 0].map((level) => verdicts.filter((item) => item.relevance === level).length),
       examples: excluded.slice(0, 25).map((item) => ({ title: item.paper.title, year: item.paper.year, reason: item.reason || (item.relevance === 1 ? 'Background only' : 'Off-topic') })),
     });
-    if (!kept.length && !input.attachments.length && !searched.web.length) throw new ResearchEmptyError();
+    if (!kept.length && !input.attachments.length && !searched.web.length && !records.length) throw new ResearchEmptyError();
 
     // 4. Rank
     const method = researchMethod(input.method);
@@ -857,7 +886,11 @@ export async function runResearch(llm: LlmSlot, input: ResearchInput, context: {
       numbered.push(source);
       reading.push({ paper: item.paper, source });
     }
-    const webSources = searched.web.map((result, index) => webSource(result, numbered.length + 1 + index));
+    // Database records are numbered after the web pages and travel in the same list.
+    const webSources = [
+      ...searched.web.map((result, index) => webSource(result, numbered.length + 1 + index)),
+      ...records.map((record, index) => recordSource(record, numbered.length + 1 + searched.web.length + index)),
+    ];
     if (!numbered.length && !webSources.length) throw new ResearchEmptyError();
     track.done('rank', `Kept the best ${plural(picked.length, 'paper')}${designs.size ? ` · ${[...designs].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([type, count]) => `${count} ${numbered.find((source) => source.study_type === type)?.study_type_label?.toLowerCase() ?? type}`).join(', ')}` : ''}`, {
       kept: picked.length, method, method_label: RESEARCH_METHOD_LABELS[method], ranking_description: RANKING_DESCRIPTIONS[method],

@@ -32,11 +32,13 @@ import {
 } from '@/lib/server/lib/studioCatalog';
 import { wordDiff } from './diff';
 import { downloadPptx, type Deck } from './pptx';
+import { PosterView } from './PosterView';
+import type { Poster } from '@/lib/server/lib/posterModule';
 
 type Pair = { before: string; after: string; note: string };
 type Result = {
   taskId: string | null; module: string; running: boolean; status: string | null; error: string | null;
-  markdown: string; sources: Source[]; allSources: Source[]; pairs: Pair[]; deck: Deck | null; lockedSlides: number; title: string;
+  markdown: string; sources: Source[]; allSources: Source[]; pairs: Pair[]; deck: Deck | null; lockedSlides: number; title: string; poster?: Poster | null;
 };
 const emptyResult = (module: string, title = ''): Result => ({ taskId: null, module, running: false, status: null, error: null, markdown: '', sources: [], allSources: [], pairs: [], deck: null, lockedSlides: 0, title });
 
@@ -320,7 +322,7 @@ export function StudioWorkspace({ workspace, intro }: { workspace: WorkspaceId; 
         setResult({
           ...emptyResult(saved.id, task.title), taskId: task.id, error: task.status === 'failed' ? task.error || 'This did not finish.' : null,
           markdown: String(data.markdown ?? ''), sources: data.sources ?? [], allSources: data.all_sources ?? [], pairs: saved.output === 'compare' ? data.pairs ?? [] : [],
-          deck: data.deck ?? null, lockedSlides: data.locked_slides ?? 0,
+          deck: data.deck ?? null, lockedSlides: data.locked_slides ?? 0, poster: data.poster ?? null,
         });
         if (typeof task.inputs?.from_task === 'string') loadFrom(task.inputs.from_task).then((work) => work && setFrom(work)).catch(() => undefined);
       }).catch(showError);
@@ -349,7 +351,7 @@ export function StudioWorkspace({ workspace, intro }: { workspace: WorkspaceId; 
   const cost = useMemo(() => (!credits ? 0 : module.output === 'slides' && freePlan ? credits.costs.review_preview ?? 3 : studioCredits(module, inputs, credits.costs, highQuality)), [module, inputs, credits, highQuality, freePlan]);
   const missing = module.fields.find((field) => field.required && (inputs[field.name] || '').trim().length < (field.min ?? 1));
   const running = Boolean(result?.running);
-  const grounded = Boolean(module.grounded) && !(module.id === 'slides' && inputs.text?.trim());
+  const grounded = Boolean(module.grounded) && !((module.id === 'slides' || module.id === 'poster') && inputs.text?.trim());
   const chosenTemplate = module.id === 'template' ? findTemplate(inputs.template) : null;
   const runLabel = module.output === 'papers' ? 'Find papers' : chosenTemplate ? `Write the ${chosenTemplate.label.replace(/\s*\(.*\)$/, '').toLowerCase()}` : 'Run';
 
@@ -390,7 +392,7 @@ export function StudioWorkspace({ workspace, intro }: { workspace: WorkspaceId; 
             case 'sources': return { ...current, allSources: data.sources };
             case 'delta': return { ...current, markdown: current.markdown + data.text };
             case 'pairs': return { ...current, pairs: data.pairs };
-            case 'done': return { ...current, running: false, status: null, markdown: data.markdown ?? current.markdown, sources: data.sources ?? [], allSources: data.all_sources ?? current.allSources, pairs: data.pairs ?? current.pairs, deck: data.deck ?? null, lockedSlides: data.locked_slides ?? 0 };
+            case 'done': return { ...current, running: false, status: null, markdown: data.markdown ?? current.markdown, sources: data.sources ?? [], allSources: data.all_sources ?? current.allSources, pairs: data.pairs ?? current.pairs, deck: data.deck ?? null, lockedSlides: data.locked_slides ?? 0, poster: data.poster ?? null };
             case 'error': return { ...current, running: false, status: null, error: data.detail };
             default: return current;
           }
@@ -508,6 +510,7 @@ export function StudioWorkspace({ workspace, intro }: { workspace: WorkspaceId; 
               {result.error && <p className="mb-3 rounded-xl bg-red-50 px-4 py-3 text-[14.5px] text-red-700">{result.error}</p>}
               {module.output === 'compare' && result.pairs.length > 0 && !result.running && <CompareView pairs={result.pairs} title={result.title || 'Improved document'} />}
               {module.output === 'slides' && result.deck && <SlidesView deck={result.deck} sources={result.allSources} locked={result.lockedSlides} />}
+              {module.id === 'poster' && result.poster && <PosterView poster={result.poster} sources={result.allSources} inputs={inputs} />}
               {module.output === 'papers' && !result.running && (
                 <Card><ul className="p-1.5">{result.sources.length ? result.sources.map((source) => <SourceRow key={source.n} source={source} />) : <li className="px-3 py-6 text-center text-[14px] text-muted">No similar papers found.</li>}</ul></Card>
               )}

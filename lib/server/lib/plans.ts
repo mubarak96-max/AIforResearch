@@ -50,6 +50,8 @@ export const CREDIT_COSTS = {
   /** A chat message, a Chat with PDF question, an AI edit or a short rewrite. */
   chat: 1,
   ai_edit: 1,
+  /** A short piece: a research email, an ethics statement, a diagram, a progress summary. */
+  short: 1,
   /** One editor check (claim check, proofread, tone, source quality). */
   review: 2,
   /** A 2,500 to 4,000-word report with figures: 5 sub-questions, about 250 papers screened, 45+ kept, 12 full texts, a gap round, every citation checked. */

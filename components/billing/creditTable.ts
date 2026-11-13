@@ -4,6 +4,7 @@
  */
 export const CREDIT_TABLE: { job: string; credits: string; note?: string }[] = [
   { job: 'Summary answer, chat or PDF question, AI edit', credits: '1' },
+  { job: 'Short piece (research email, ethics statement, diagram, progress summary)', credits: '1' },
   { job: 'Editor check (claim check, proofread, tone)', credits: '2' },
   { job: 'Section, abstract, outline or gap analysis', credits: '3' },
   { job: 'Deep Research report', credits: '15', note: '45+ papers, figures, a gap search, every citation checked' },

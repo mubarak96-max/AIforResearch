@@ -196,6 +196,7 @@ describe('the pricing page’s credit table', () => {
     const cost = (prefix: string) => CREDIT_TABLE.find((row) => row.job.startsWith(prefix))!.credits;
     expect(cost('Summary answer')).toBe(String(CREDIT_COSTS.summary));
     expect(cost('Editor check')).toBe(String(CREDIT_COSTS.review));
+    expect(cost('Short piece')).toBe(String(CREDIT_COSTS.short));
     expect(cost('Section')).toBe(String(CREDIT_COSTS.section));
     expect(cost('Deep Research')).toBe(String(CREDIT_COSTS.deep));
     expect(cost('Document review')).toBe(String(CREDIT_COSTS.review_standard));

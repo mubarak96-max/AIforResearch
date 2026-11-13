@@ -78,12 +78,12 @@ export function WriteIntro({ from, startTemplate }: StudioIntroContext) {
         </div>
         <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {TEMPLATES.map((template) => {
-            const Icon = TEMPLATE_ICONS[template.id] ?? LuFileText;
+            const Icon = TEMPLATE_ICONS[template.id] ?? (template.id.startsWith('checklist-') ? LuClipboardList : LuFileText);
             return (
               <li key={template.id}>
                 <button
                   type="button"
-                  onClick={() => (from ? startTemplate(template.id) : openTemplate(template.id))}
+                  onClick={() => (from && !template.blankOnly ? startTemplate(template.id) : openTemplate(template.id))}
                   className="group flex h-full w-full flex-col rounded-xl border border-line bg-surface p-4 text-left transition hover:-translate-y-0.5 hover:border-brand hover:shadow-md"
                 >
                   <span className="flex w-full items-center justify-between">

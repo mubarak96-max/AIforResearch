@@ -45,23 +45,29 @@ export type CatalogItem = {
 export const CATALOG: CatalogItem[] = [
   {
     id: 'workbooks', name: 'Workbooks', hub: 'research', workspace: true,
-    description: 'Keep sources, exact quotations, appraisals and reviewer sign-off together, then draft a literature review or findings report from them.',
+    description: 'Keep sources, exact quotations, appraisals and reviewer sign-off together, then draft a literature review or findings report from them. Qualitative workbooks code transcripts.',
     href: '/workbooks', credits: 'No credits to save · AI suggestions 3 credits', phase1: false, marketing: null, landing: null,
     keywords: ['workbook', 'evidence table', 'appraisal', 'journal club', 'qualitative', 'coding', 'themes', 'deliverable', 'supervisor review'],
   },
   { id: 'evidence-monitoring', name: 'Saved searches', hub: 'research', workspace: true, description: 'Save searches, compare new results and publication notices, and review updates in a decision journal.', href: '/monitoring', credits: 'No credits', phase1: false, marketing: null, landing: null, keywords: ['alerts', 'saved searches', 'retractions', 'updates', 'monitor'] },
-  { id: 'official-sources', name: 'Trial registries', hub: 'research', description: 'Find trial registrations, link them to publications and save them with their provenance.', href: '/official-sources', credits: 'No credits', phase1: false, marketing: null, landing: null, keywords: ['clinical trials', 'registry', 'registration', 'outcomes', 'official'] },
+  {
+    id: 'qualitative-coding', name: 'Qualitative coding', hub: 'research',
+    description: 'Upload interview transcripts, select text to code it, get AI code suggestions that quote the text, and see code frequency and co-occurrence.',
+    href: '/workbooks', credits: 'No credits · AI code suggestions 3', phase1: false, marketing: null, landing: '/features/qualitative-coding',
+    keywords: ['qualitative', 'coding', 'codebook', 'themes', 'thematic analysis', 'interviews', 'transcripts'],
+  },
+  { id: 'official-sources', name: 'Official sources', hub: 'research', description: 'Trial registries, openFDA, FRED, US Treasury, OECD, World Bank and patents, linked to publications and saved with their provenance.', href: '/official-sources', credits: 'No credits', phase1: false, marketing: null, landing: null, keywords: ['clinical trials', 'registry', 'registration', 'outcomes', 'official', 'fda', 'openfda', 'fred', 'economic data', 'treasury', 'oecd', 'world bank', 'patents', 'prior art'] },
   // ---------------------------------------------------------------- Research
   {
     id: 'deep-research', name: 'Deep Research', hub: 'research', workspace: true,
     description: 'Ask a question and get an answer built from real papers, with every claim cited and a consensus line.',
     href: '/deep-research', credits: 'Summary 1 credit · Deep 15 · Detailed 45', phase1: true,
-    marketing: '/features/research-assistant', landing: '/features/deep-research', keywords: ['ask', 'chat', 'report', 'consensus', 'summary'],
+    marketing: '/features/research-assistant', landing: '/features/deep-research', keywords: ['ask', 'chat', 'report', 'consensus', 'summary', 'genes', 'proteins', 'compounds', 'pubchem', 'uniprot'],
   },
   {
     id: 'find-papers', name: 'Find Papers', hub: 'research',
-    description: 'Search papers, PubMed, preprints and the web, and filter by year, study type, journal and citations.',
-    href: '/papers', credits: 'No credits', phase1: true, marketing: '/features/paper-search', landing: '/features/paper-search', keywords: ['search', 'articles', 'journals', 'pubmed', 'filters'],
+    description: 'Search papers, PubMed, preprints, DBLP and the web, and filter by year, study type, journal and citations.',
+    href: '/papers', credits: 'No credits', phase1: true, marketing: '/features/paper-search', landing: '/features/paper-search', keywords: ['search', 'articles', 'journals', 'pubmed', 'filters', 'dblp', 'computer science'],
   },
   {
     id: 'citation-map', name: 'Citation Map', hub: 'research',
@@ -133,6 +139,21 @@ export const CATALOG: CatalogItem[] = [
     href: '/write?module=white-paper', credits: 'Whole 15 credits · section 3', phase1: false, marketing: '/tools/white-paper-generator', landing: '/features/white-paper-writer', keywords: ['white paper', 'whitepaper', 'technical', 'scientific', 'b2b', 'report'],
   },
   {
+    id: 'conference-paper', name: 'Conference paper', hub: 'write',
+    description: 'A 4–8 page conference paper in IEEE, ACM or a general format, with contribution statements and real citations.',
+    href: '/write?module=conference-paper', credits: '15 credits', phase1: false, marketing: null, landing: '/features/conference-paper-writer', keywords: ['conference', 'ieee', 'acm', 'proceedings', 'contributions'],
+  },
+  {
+    id: 'journal-format', name: 'Journal formatter', hub: 'write',
+    description: 'Your manuscript in a journal’s section order and reference style, with what still breaks its guidelines.',
+    href: '/write?module=journal-format', credits: '3 credits per 10,000 words', phase1: false, marketing: null, landing: '/features/journal-formatter', keywords: ['format manuscript', 'author guidelines', 'nature', 'ieee', 'apa 7', 'vancouver', 'icmje', 'submission'],
+  },
+  {
+    id: 'research-email', name: 'Researcher email', hub: 'write',
+    description: 'Emails to co-authors, data holders, authors and prospective supervisors, with a subject line and placeholders.',
+    href: '/write?module=research-email', credits: '1 credit', phase1: false, marketing: '/templates/research-emails', landing: null, keywords: ['email', 'professor', 'co-author', 'data request', 'request paper', 'supervisor', 'follow-up'],
+  },
+  {
     id: 'policy-brief', name: 'Policy brief', hub: 'write',
     description: 'Key messages, the evidence, policy options compared and recommendations, cited to real research.',
     href: '/write?module=policy-brief', credits: '15 credits', phase1: false, marketing: null, landing: '/features/policy-brief', keywords: ['policy', 'government', 'options', 'brief'],
@@ -158,9 +179,24 @@ export const CATALOG: CatalogItem[] = [
     href: '/thesis', credits: '3 credits a module', phase1: false, marketing: '/tools/thesis-chapter-planner', landing: '/thesis-ai', keywords: ['ai thesis', 'dissertation', 'outline', 'methodology', 'defence', 'defense'],
   },
   {
+    id: 'operationalisation', name: 'Operationalising variables', hub: 'write',
+    description: 'Each construct defined and made measurable: indicators, instrument, level of measurement, validity and reliability.',
+    href: '/thesis?module=operationalisation', credits: '3 credits', phase1: false, marketing: null, landing: '/features/variable-operationalization', keywords: ['operationalization', 'operational definition', 'conceptual definition', 'variables', 'measurement'],
+  },
+  {
     id: 'proposal-studio', name: 'Proposal Studio', hub: 'write', workspace: true,
     description: 'Research and grant proposals and ethics applications, section by section or in one run.',
     href: '/proposals', credits: '3 credits a section · 15 a full proposal', phase1: false, marketing: '/tools/research-proposal-generator', landing: '/features/proposal-studio', keywords: ['proposal', 'grant', 'ethics', 'irb'],
+  },
+  {
+    id: 'ethics-statement', name: 'Ethics statement', hub: 'write',
+    description: 'The ethics approval and consent statement for your manuscript, in journal wording.',
+    href: '/proposals?module=ethics-statement', credits: '1 credit', phase1: false, marketing: '/templates/ethics-approval-statement', landing: null, keywords: ['ethics statement', 'ethics approval', 'irb statement', 'informed consent', 'declarations'],
+  },
+  {
+    id: 'study-checklist', name: 'Study checklists', hub: 'write',
+    description: 'IRB submission, site initiation visit, ClinicalTrials.gov results, consent translation and incidental findings checklists, fitted to your study.',
+    href: '/proposals?module=study-checklist', credits: 'Blank free · tailored 3 credits', phase1: false, marketing: null, landing: '/features/clinical-research-checklists', keywords: ['irb checklist', 'site initiation visit', 'clinicaltrials.gov', 'consent translation', 'incidental findings', 'clinical trial'],
   },
   {
     id: 'thesis-to-manuscript', name: 'Thesis to manuscript', hub: 'write',
@@ -169,8 +205,23 @@ export const CATALOG: CatalogItem[] = [
   },
   {
     id: 'slides', name: 'Slides', hub: 'write',
-    description: 'A presentation from a research result or a document, exported to PowerPoint.',
-    href: '/slides', credits: '10 credits', phase1: false, marketing: null, landing: '/features/research-slides', keywords: ['deck', 'presentation', 'powerpoint', 'defence'],
+    description: 'A presentation from a research result or a document, exported to PowerPoint, and conference posters in PowerPoint or LaTeX.',
+    href: '/slides', credits: '10 credits · poster 3', phase1: false, marketing: null, landing: '/features/research-slides', keywords: ['deck', 'presentation', 'powerpoint', 'defence', 'poster', 'tikzposter', 'latex'],
+  },
+  {
+    id: 'poster', name: 'Research poster', hub: 'write',
+    description: 'A conference poster from your paper or topic, at A0, A1 or 48×36 in, as PowerPoint or a LaTeX file.',
+    href: '/slides?module=poster', credits: '3 credits', phase1: false, marketing: '/templates/research-poster', landing: '/features/research-poster-maker', keywords: ['poster', 'conference poster', 'academic poster', 'tikzposter', 'a0'],
+  },
+  {
+    id: 'diagrams', name: 'Diagrams', hub: 'write',
+    description: 'Flowcharts, conceptual frameworks, study flows and timelines in the editor, drawn by you or with AI, exported as SVG or PNG.',
+    href: '/editor', credits: 'No credits · Draw with AI 1', phase1: false, marketing: null, landing: '/features/scientific-diagrams', keywords: ['diagram', 'flowchart', 'conceptual framework', 'mermaid', 'figure'],
+  },
+  {
+    id: 'document-converter', name: 'Document converter', hub: 'write',
+    description: 'PDF, Word or PowerPoint to Markdown, or opened as a document you can edit.',
+    href: '/convert', credits: 'No credits', phase1: false, marketing: null, landing: '/features/document-converter', keywords: ['convert', 'pdf to markdown', 'docx', 'pptx', 'word', 'powerpoint'],
   },
   {
     id: 'abstract-generator', name: 'Abstract generator', hub: 'write',
@@ -196,8 +247,8 @@ export const CATALOG: CatalogItem[] = [
   },
   {
     id: 'guideline-check', name: 'Reporting-guideline check', hub: 'review',
-    description: 'Check a manuscript against CONSORT, STROBE, PRISMA, CARE, STARD, COREQ, SRQR or SQUIRE, item by item, with the passage for each.',
-    href: '/reviewer?module=guidelines', credits: '5 credits per 10,000 words', phase1: false, marketing: null, landing: '/features/reporting-guideline-checker', keywords: ['consort', 'strobe', 'prisma', 'care', 'stard', 'coreq', 'equator', 'checklist'],
+    description: 'Check a manuscript against CONSORT, STROBE, PRISMA, CARE, STARD, COREQ, SRQR, SQUIRE, SAGER or SAMPL, item by item, with the passage for each.',
+    href: '/reviewer?module=guidelines', credits: '5 credits per 10,000 words', phase1: false, marketing: null, landing: '/features/reporting-guideline-checker', keywords: ['consort', 'strobe', 'prisma', 'care', 'stard', 'coreq', 'sager', 'sampl', 'equator', 'checklist'],
   },
   {
     id: 'claim-check', name: 'Claim check', hub: 'review',
@@ -208,6 +259,11 @@ export const CATALOG: CatalogItem[] = [
     id: 'citation-check', name: 'Citation check', hub: 'review',
     description: 'Check that every reference exists, is not retracted and says what your sentence claims.',
     href: '/reviewer?module=citations', credits: '2 credits', phase1: false, marketing: '/features/citation-checker', landing: null, keywords: ['references', 'retracted', 'doi'],
+  },
+  {
+    id: 'reference-formatter', name: 'Reference formatter', hub: 'review',
+    description: 'Paste a messy reference list: duplicates merged, each one checked, then formatted in your style with RIS and BibTeX.',
+    href: '/reviewer?module=references', credits: 'No credits · AI cleanup 1', phase1: false, marketing: null, landing: '/features/reference-list-formatter', keywords: ['reference list', 'bibliography', 'format references', 'duplicates', 'ris', 'bibtex'],
   },
   {
     id: 'authorship-report', name: 'Authorship report', hub: 'review',
@@ -223,15 +279,15 @@ export const CATALOG: CatalogItem[] = [
   // ---------------------------------------------------------------- Systematic Review
   {
     id: 'systematic-review', name: 'Systematic Review', hub: 'systematic', workspace: true,
-    description: 'Protocol, PubMed search, import, de-duplication, screening, agreement and the PRISMA flow diagram.',
+    description: 'Protocol, PubMed search, import, de-duplication, screening, agreement, the PRISMA flow diagram, and screening forms and the decision log in Word or PDF.',
     href: '/systematic-review', credits: 'No credits · AI screening 1 credit per 25 records', phase1: false, marketing: null, landing: '/features/systematic-review', keywords: ['prisma', 'screening', 'meta-analysis', 'scoping'],
   },
 
   // ---------------------------------------------------------------- Data
   {
     id: 'data-lab', name: 'Data Lab', hub: 'data', workspace: true,
-    description: 'Upload a table: t-tests to logistic regression, survival curves, diagnostic accuracy, ROC, reliability and sample size, with R, Python and SPSS code.',
-    href: '/data-lab', credits: 'Statistics free · AI write-up 2 credits', phase1: false, marketing: '/tools/data-analysis', landing: '/features/data-lab', keywords: ['statistics', 't-test', 'anova', 'chart', 'csv', 'logistic regression', 'survival', 'kaplan-meier', 'roc', 'sensitivity', 'cronbach', 'sample size', 'spss', 'r code'],
+    description: 'Upload a table: t-tests to logistic regression, Bayesian tests, survival curves, diagnostic accuracy, ROC, reliability and sample size, with R, Python and SPSS code and a PDF report.',
+    href: '/data-lab', credits: 'Statistics free · AI write-up 2 credits', phase1: false, marketing: '/tools/data-analysis', landing: '/features/data-lab', keywords: ['statistics', 't-test', 'anova', 'chart', 'csv', 'logistic regression', 'survival', 'kaplan-meier', 'roc', 'sensitivity', 'cronbach', 'sample size', 'spss', 'r code', 'bayesian', 'bayes factor', 'pdf report'],
   },
   {
     id: 'surveys', name: 'Survey builder', hub: 'data', workspace: true,

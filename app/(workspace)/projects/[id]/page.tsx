@@ -2,17 +2,17 @@
 
 import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { LuArrowRight, LuSparkles, LuTrash2, LuUserPlus, LuX } from 'react-icons/lu';
 import { AppFrame } from '@/components/app/AppFrame';
-import { Button, Card, inputClass } from '@/components/app/ui';
+import { Button, Card, inputClass, Segmented } from '@/components/app/ui';
 import { useSignedIn } from '@/components/app/useSignedIn';
 import { api } from '@/lib/session';
-import { KIND_LABELS, taskHref, type TaskRecord } from '@/components/app/research/handoff';
+import { taskLabel, taskHref, type TaskRecord } from '@/components/app/research/handoff';
 import { showError } from '@/components/app/research/parts';
 import { ProjectEvidence } from '@/components/app/ProjectEvidence';
-import { ProjectHub } from '@/components/app/ProjectHub';
+import { ProjectHub, ProjectProgress } from '@/components/app/ProjectHub';
 
 type Member = { email: string; name: string | null; role: 'edit' | 'comment' | 'view'; pending: boolean };
 type Project = {
@@ -34,6 +34,9 @@ function ProjectPage() {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<Member['role']>('comment');
   const [busy, setBusy] = useState(false);
+  const params = useSearchParams();
+  const [tab, setTab] = useState<'work' | 'progress'>(params.get('tab') === 'progress' ? 'progress' : 'work');
+  const switchTab = (next: 'work' | 'progress') => { setTab(next); window.history.replaceState(null, '', next === 'progress' ? `/projects/${id}?tab=progress` : `/projects/${id}`); };
 
   const load = () => api<Project>(`/api/projects/${encodeURIComponent(id)}`).then(setProject).catch((error) => { showError(error); router.replace('/projects'); });
   useEffect(() => { if (user) load(); }, [user, id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -79,6 +82,8 @@ function ProjectPage() {
       actions={canEdit ? <Link href="/home?new=1" className="inline-flex h-[42px] items-center gap-2 rounded-[11px] bg-brand px-[18px] text-[15px] font-semibold text-on-brand shadow-brand"><LuSparkles className="h-4 w-4" />New research</Link> : undefined}>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <section aria-labelledby="work-title">
+          <div className="mb-4"><Segmented label="Project view" value={tab} onChange={switchTab} options={[{ value: 'work', label: 'Work' }, { value: 'progress', label: 'Progress' }]} /></div>
+          {tab === 'progress' ? <><h2 id="work-title" className="text-[15px] font-bold">Progress</h2><ProjectProgress id={id} role={project.role} userId={user?.id ?? null} /></> : <>
           <h2 id="work-title" className="text-[15px] font-bold">Work in this project</h2>
           {project.tasks.length === 0 ? (
             <Card className="mt-2.5 px-5 py-6 text-[14px] text-muted">Nothing yet. Move work here from <Link href="/history" className="font-semibold text-brand hover:underline">History</Link> (the project menu on each row).</Card>
@@ -89,7 +94,7 @@ function ProjectPage() {
                   <Link href={taskHref(task)} className="flex items-center gap-3 px-4 py-3 hover:bg-soft">
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[15px] font-medium text-ink">{task.title}</span>
-                      <span className="text-[13px] text-muted">{KIND_LABELS[task.kind] || task.kind} · {new Date(task.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                      <span className="text-[13px] text-muted">{taskLabel(task)} · {new Date(task.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                     </span>
                     <LuArrowRight className="h-4 w-4 text-subtle" aria-hidden="true" />
                   </Link>
@@ -99,6 +104,7 @@ function ProjectPage() {
           )}
           <ProjectHub id={id} role={project.role} members={project.members} onChange={load} />
           <ProjectEvidence projectId={id} role={project.role} />
+          </>}
         </section>
         <aside aria-labelledby="people-title">
           <Card className="p-4">

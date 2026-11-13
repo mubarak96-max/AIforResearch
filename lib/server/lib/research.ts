@@ -19,7 +19,7 @@
  * (researchReport.ts, researchFigures.ts).
  */
 import type { LlmSlot, ChatMessage, LlmUsage } from '../slots/types.js';
-import { STUDY_TYPE_LABELS, type FoundPaper, type SearchFilters, type SourceGroup, type WebResult } from './sources/index.js';
+import { STUDY_TYPE_LABELS, type FoundPaper, type RecordSource, type SearchFilters, type SourceGroup, type WebResult } from './sources/index.js';
 import type { ResearchProfile } from './users.js';
 import type { Effect, ResearchFigure } from './researchFigures.js';
 import { appraisalGuidance, searchLanguageGuidance, type ResearchMethod } from '../../researchMethods.js';
@@ -135,12 +135,15 @@ export type ResearchSource = {
   effect?: Effect | null;
   /** Found by the Fill gaps round. */
   gap?: boolean;
+  /** A database record (field source groups): the database's name. Such sources travel with the web list. */
+  database?: string | null;
 };
 
 export type ReferenceCheck = { status: 'confirmed' | 'retracted' | 'corrected' | 'concern' | 'unconfirmed' | 'unverified' | 'no_doi'; note: string | null; attempted?: boolean; notices_checked?: boolean };
 export type EvidenceBasis = 'full_text_excerpt' | 'abstract' | 'source_summary' | 'web_summary' | 'file_excerpt' | 'metadata_only';
 export const sourceEvidenceBasis = (source: ResearchSource): EvidenceBasis => source.passage?.trim() ? 'full_text_excerpt'
   : source.kind === 'file' && source.abstract?.trim() ? 'file_excerpt'
+    : source.database && source.abstract?.trim() ? 'source_summary'
     : source.kind === 'web' && source.abstract?.trim() ? 'web_summary'
       : source.abstract?.trim() ? 'abstract' : source.tldr?.trim() ? 'source_summary' : 'metadata_only';
 
@@ -272,6 +275,16 @@ export function webSource(result: WebResult, n: number): ResearchSource {
   };
 }
 
+/** A database record (gene, protein, compound…) as a numbered source; it is listed with the web results. */
+export function recordSource(record: RecordSource, n: number): ResearchSource {
+  return {
+    n, marker: `S${n}`, kind: 'web', id: record.id, title: record.title, authors: [], more_authors: 0, year: null,
+    venue: `${record.database_name} ${record.identifier}`, doi: null, url: record.url, pdf_url: null, is_oa: true, cited_by_count: null, study_type: null,
+    study_type_label: `${record.database_name} record`, journal_tier: null, is_preprint: false, is_retracted: false, providers: [record.database],
+    abstract: record.summary, tldr: null, database: record.database_name,
+  };
+}
+
 export function fileSource(file: Attachment, question: string, n: number): ResearchSource {
   return {
     n, marker: `S${n}`, kind: 'file', id: `file:${n}`, title: file.name, authors: [], more_authors: 0, year: null, venue: 'Attached file',
@@ -294,7 +307,7 @@ export function sourcesBlock(sources: ResearchSource[], abstractChars: number): 
       source.effect ? `Effect size: ${source.effect.measure} ${source.effect.value} (95% CI ${source.effect.low} to ${source.effect.high})${source.effect.outcome ? ` for ${source.effect.outcome}` : ''}` : null,
       source.passage ? `Full-text excerpt: ${source.passage.replace(/\s+/g, ' ').slice(0, 2400)}` : null,
     ].filter(Boolean).join('\n');
-    return `[${source.marker}] ${authors || source.venue || 'Unknown'} (${source.year ?? 'n.d.'}). ${source.title}. ${source.venue || ''}${labels ? ` [${labels}]` : ''}\n${source.kind === 'file' ? 'Excerpt' : source.kind === 'web' ? 'Page summary' : 'Abstract'}: ${body}${read ? `\n${read}` : ''}`;
+    return `[${source.marker}] ${authors || source.venue || 'Unknown'} (${source.year ?? 'n.d.'}). ${source.title}. ${source.venue || ''}${labels ? ` [${labels}]` : ''}\n${source.kind === 'file' ? 'Excerpt' : source.database ? 'Database record' : source.kind === 'web' ? 'Page summary' : 'Abstract'}: ${body}${read ? `\n${read}` : ''}`;
   }).join('\n\n');
 }
 

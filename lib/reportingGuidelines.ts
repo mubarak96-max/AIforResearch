@@ -7,7 +7,7 @@
 
 export type GuidelineItem = { id: string; section: string; topic: string; text: string };
 export type Guideline = {
-  id: 'consort' | 'strobe' | 'prisma' | 'care' | 'stard' | 'coreq' | 'srqr' | 'squire';
+  id: 'consort' | 'strobe' | 'prisma' | 'care' | 'stard' | 'coreq' | 'srqr' | 'squire' | 'sager' | 'sampl';
   name: string;
   version: string;
   /** What kind of study it is for. */
@@ -15,6 +15,8 @@ export type Guideline = {
   url: string;
   citation: string;
   note?: string;
+  /** True for checklists used alongside a study-design checklist (SAGER, SAMPL) rather than instead of one. */
+  complements?: boolean;
   items: GuidelineItem[];
 };
 
@@ -322,16 +324,70 @@ export const GUIDELINES: Guideline[] = [
       item('18', 'Other information', 'Funding', 'Sources of funding that supported the work, and the role of the funding organisation.'),
     ],
   },
+  {
+    id: 'sager', name: 'SAGER', version: '2016', for: 'Sex and gender reporting (any study of people, animals or cells)', url: 'https://www.equator-network.org/reporting-guidelines/sager-guidelines/',
+    citation: 'Heidari S, Babor TF, De Castro P, Tort S, Curno M. Sex and Gender Equity in Research: rationale for the SAGER guidelines and recommended use. Res Integr Peer Rev 2016;1:2.',
+    note: 'SAGER complements a study-design checklist (CONSORT, STROBE and so on); use both. Items 2 and 4 to 6 are split into parts here so each can be checked.',
+    complements: true,
+    items: [
+      item('1', 'General principles', 'Terms', 'The terms sex (biological attributes) and gender (socially shaped roles, identities and behaviours) are used carefully and not interchangeably.'),
+      item('2a', 'Title and abstract', 'Single sex in title', 'If only one sex was studied, or the findings apply to only one sex or gender, the title says so.'),
+      item('2b', 'Title and abstract', 'Sex in abstract', 'The abstract names the sex of the participants or source material and gives results by sex or gender where relevant.'),
+      item('3', 'Introduction', 'Expected differences', 'Whether sex or gender differences may be expected, based on earlier work, where relevant.'),
+      item('4a', 'Methods', 'Design', 'How sex and gender were taken into account in the study design.'),
+      item('4b', 'Methods', 'Representation', 'Whether males and females (or gender groups) were adequately represented, and how sex or gender was determined.'),
+      item('4c', 'Methods', 'Exclusions', 'The reasons for excluding either sex or any gender group, if this was done.'),
+      item('5a', 'Results', 'Disaggregated data', 'Data presented separately by sex and gender where appropriate.'),
+      item('5b', 'Results', 'Sex and gender analyses', 'Sex- and gender-based analyses reported whatever their outcome, positive or negative.'),
+      item('5c', 'Results', 'Withdrawals by sex', 'For trials, withdrawals and dropouts reported by sex.'),
+      item('6a', 'Discussion', 'Implications', 'The possible effect of sex and gender on the results and their interpretation.'),
+      item('6b', 'Discussion', 'No analysis', 'If no sex or gender analysis was done, the reason and what this means for interpreting and generalising the findings.'),
+    ],
+  },
+  {
+    id: 'sampl', name: 'SAMPL', version: '2013', for: 'Basic statistical reporting (any study with statistics)', url: 'https://www.equator-network.org/reporting-guidelines/sampl/',
+    citation: 'Lang TA, Altman DG. Basic statistical reporting for articles published in biomedical journals: the SAMPL Guidelines. In: Smart P, Maisonneuve H, Polderman A, eds. Science Editors’ Handbook. European Association of Science Editors, 2013.',
+    note: 'SAMPL complements a study-design checklist (CONSORT, STROBE and so on); use both. SAMPL gives its guidance as points under headings; they are numbered here for reference (M for methods, R for results).',
+    complements: true,
+    items: [
+      item('M1', 'Methods: preliminary analyses', 'Data preparation', 'Any procedures used to change the raw data before analysis (such as transformations, categorisation or imputing missing values).'),
+      item('M2', 'Methods: primary analyses', 'Purpose', 'The purpose of each analysis, tied to the study objectives.'),
+      item('M3', 'Methods: primary analyses', 'Variables', 'The variables used in each analysis, each summarised with suitable descriptive statistics.'),
+      item('M4', 'Methods: primary analyses', 'Important difference', 'Where possible, the smallest difference considered clinically or practically important.'),
+      item('M5', 'Methods: primary analyses', 'Methods described', 'The main statistical methods described fully, making clear which method was used for which analysis.'),
+      item('M6', 'Methods: primary analyses', 'Assumptions', 'That the data met the assumptions of each test, and how this was checked.'),
+      item('M7', 'Methods: primary analyses', 'Alpha and sidedness', 'The alpha level that defines significance and whether tests were one- or two-sided.'),
+      item('M8', 'Methods: primary analyses', 'Software', 'The statistical software used, with its version.'),
+      item('M9', 'Methods: supplementary analyses', 'Supplementary methods', 'Methods used for any supplementary analyses, such as sensitivity analyses or the handling of missing data.'),
+      item('M10', 'Methods: supplementary analyses', 'Post hoc analyses', 'Post hoc or unplanned analyses, including unplanned subgroup analyses, identified as exploratory.'),
+      item('R1', 'Results: participants and data', 'Sample size and losses', 'The number analysed in each group, with the numbers of and reasons for losses or exclusions.'),
+      item('R2', 'Results: descriptive statistics', 'Summary statistics', 'Roughly normal data summarised with means and standard deviations; skewed data with medians and interquartile ranges or ranges.'),
+      item('R3', 'Results: descriptive statistics', 'Percentages', 'Numerators and denominators given with percentages.'),
+      item('R4', 'Results: hypothesis tests', 'Effect and precision', 'For the main comparisons, the size of the difference or effect with a confidence interval.'),
+      item('R5', 'Results: hypothesis tests', 'P values', 'Exact P values (not only "NS" or P < 0.05), with the test used.'),
+      item('R6', 'Results: association analyses', 'Associations', 'The measure of association (such as a correlation coefficient) with its confidence interval, and the variables and direction involved.'),
+      item('R7', 'Results: regression analyses', 'Model building', 'The response and explanatory variables and how they were chosen and entered into the model.'),
+      item('R8', 'Results: regression analyses', 'Model checks', 'How assumptions, collinearity and goodness of fit were assessed, and any validation of the model.'),
+      item('R9', 'Results: regression analyses', 'Coefficients', 'Regression coefficients or effect estimates with confidence intervals (and P values where used).'),
+      item('R10', 'Results: analysis of variance', 'ANOVA', 'For analyses of variance, the model, the factors and the tests of between-group differences, with effect sizes.'),
+      item('R11', 'Results: survival analyses', 'Time to event', 'For time-to-event data, the event, how censoring was handled, and survival estimates with confidence intervals (such as median survival).'),
+      item('R12', 'Results: Bayesian analyses', 'Bayesian reporting', 'For Bayesian analyses, the priors and their justification, the model, and the posterior estimates with credible intervals and any sensitivity to the priors.'),
+    ],
+  },
 ];
 
 export const guideline = (id: string) => GUIDELINES.find((item) => item.id === id) ?? null;
 export const GUIDELINE_IDS = GUIDELINES.map((item) => item.id) as [Guideline['id'], ...Guideline['id'][]];
 
-/** The guideline a manuscript most likely follows, from words in its text. A suggestion, not a decision. */
+/**
+ * The guideline a manuscript most likely follows, from words in its text. A suggestion, not a decision.
+ * Study-design checklists come first. SAGER and SAMPL complement them, so one of those is suggested only
+ * when no design checklist fits and the text is clearly about sex and gender, or about statistics.
+ */
 export function suggestGuideline(text: string): Guideline['id'] | null {
   const head = text.slice(0, 20_000).toLowerCase();
   const count = (pattern: RegExp) => (head.match(pattern) ?? []).length;
-  const scores: [Guideline['id'], number][] = [
+  const design = bestScore([
     ['prisma', count(/systematic review|meta-analys[ie]s|prisma|search strateg|risk of bias/g) * 2],
     ['consort', count(/randomi[sz]ed|randomly (assigned|allocated)|allocation conceal|placebo|trial registration/g) * 2],
     ['care', count(/case report|we (report|present|describe) (a|an|the) (case|patient)|year-old (man|woman|male|female|boy|girl|patient)/g) * 3],
@@ -340,7 +396,13 @@ export function suggestGuideline(text: string): Guideline['id'] | null {
     ['srqr', count(/qualitative|phenomenolog|grounded theory|ethnograph/g)],
     ['strobe', count(/cohort study|case-control|cross-sectional|retrospective|prospective|odds ratio|confounder/g)],
     ['squire', count(/quality improvement|clinical audit|plan-do-study-act|pdsa|re-audit/g) * 3],
-  ];
-  const [best, score] = scores.sort((a, b) => b[1] - a[1])[0];
-  return score >= 3 ? best : null;
+  ]);
+  if (design[1] >= 3) return design[0];
+  const complement = bestScore([
+    ['sager', count(/sex differences?|gender differences?|sex-disaggregated|sex-specific|gender-specific|disaggregated by (sex|gender)|sex and gender|gender analysis|sager/g) * 2],
+    ['sampl', count(/statistical analys[ie]s|p-?values?|confidence intervals?|standard deviations?|interquartile|regression|anova|two-(sided|tailed)|sampl/g)],
+  ]);
+  return complement[1] >= 4 ? complement[0] : null;
 }
+
+const bestScore = (scores: [Guideline['id'], number][]) => scores.sort((a, b) => b[1] - a[1])[0];

@@ -2,11 +2,12 @@
  * Long-form landing pages written as Markdown in content/pages/<section>/<slug>.md and compiled by
  * scripts/build-blog.mjs into lib/pages.generated.ts. Sections map to URLs:
  *   for → /for/<slug> (audiences), features → /features/<slug> (workspaces; the short pages in
- *   lib/features.ts share the URL space), alternatives → /alternatives/<slug>, templates → /templates/<slug>.
+ *   lib/features.ts share the URL space), alternatives → /alternatives/<slug>, templates → /templates/<slug>,
+ *   fields → /fields/<slug> (one page per research field: its sources, tools and checklists).
  */
 import { LANDING_PAGES } from './pages.generated';
 
-export type LandingSection = 'for' | 'features' | 'alternatives' | 'templates';
+export type LandingSection = 'for' | 'features' | 'alternatives' | 'templates' | 'fields';
 
 export type LandingPageSource = {
   section: LandingSection;
@@ -36,6 +37,7 @@ export const SECTION_NAMES: Record<LandingSection, string> = {
   features: 'Features',
   alternatives: 'Alternatives',
   templates: 'Templates',
+  fields: 'Research fields',
 };
 
 export function landingPages(section: LandingSection): LandingPageSource[] {

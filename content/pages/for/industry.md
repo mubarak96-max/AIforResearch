@@ -11,8 +11,8 @@ cta:
   label: "Run a Deep report"
   href: "/deep-research"
 plan_note: "Free plan: 45 credits and up to 2 Deep reports a day. A Deep report costs 15 credits; Landscape and paper search are free."
-related: ["/features/deep-research", "/features/research-landscape", "/features/research-slides", "/features/projects", "/blog/what-is-deep-research-ai"]
-updated: "2026-11-12"
+related: ["/features/deep-research", "/features/research-landscape", "/features/research-slides", "/features/projects", "/blog/what-is-deep-research-ai", "/fields/business-and-economics", "/fields/law-and-patents"]
+updated: "2026-11-13"
 faq:
   - q: "Can AI for Research replace a market research firm?"
     a: "No. It reads published research papers and open web pages, such as company reports, guidelines and news, and writes a cited report. It has no paid market databases, survey panels, sales data or financial filings beyond what is public on the web. Use it for evidence-led questions and the scientific side of a market, and buy data where you need market sizes."
@@ -93,7 +93,7 @@ An analyst running a few reports a week fits **Pro**: 1,500 credits a month, 40 
 
 ## What it does not do
 
-- No market sizing data, survey panels, company financials, patent search or paid databases such as Gartner or Statista.
+- No market sizing data, survey panels or paid databases such as Gartner or Statista. Public economic series, SEC filings and US patents are in Official Sources; patent results are not a freedom-to-operate opinion.
 - The Web source reads open pages; it cannot read paywalled reports or sites behind a login.
 - Paywalled papers are read from the abstract.
 - It does not forecast. Reports summarize published evidence.
@@ -101,6 +101,8 @@ An analyst running a few reports a week fits **Pro**: 1,500 credits a month, 40 
 ## Who else it is for
 
 Academic teams, see [AI for professors](/for/academics). Health and life sciences, see [AI for medical research](/for/medicine).
+
+Economists and analysts, see [AI for economics research](/fields/business-and-economics) for FRED, OECD, US Treasury and SEC data. R&D and IP teams, see the [patent search tool](/fields/law-and-patents) page for USPTO PatentsView. Chemistry and life sciences teams, see [AI for chemistry research](/fields/chemistry-and-materials) and [AI for biology research](/fields/life-sciences).
 
 ## Learn more
 

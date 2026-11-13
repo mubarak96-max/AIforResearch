@@ -11,8 +11,8 @@ cta:
   label: "Review a draft"
   href: "/reviewer"
 plan_note: "Free plan: 45 credits a month. A Reviewer pass costs 10 credits per 10,000 words; a whole grant proposal draft costs 15."
-related: ["/features/ai-peer-review", "/features/proposal-studio", "/features/projects", "/features/citation-checker", "/blog/ai-tools-for-research-labs"]
-updated: "2026-11-12"
+related: ["/features/ai-peer-review", "/features/proposal-studio", "/features/projects", "/features/citation-checker", "/blog/ai-tools-for-research-labs", "/features/journal-formatter", "/features/reporting-guideline-checker"]
+updated: "2026-11-13"
 faq:
   - q: "Can I use AI to give feedback on students' theses?"
     a: "Check your institution's policy first: many have rules on putting student work into AI tools, and students should know if you do. If it is allowed, the Reviewer gives you a structured first read at the right level, with scores out of 10 and comments that quote the passage. Read the draft yourself and decide the feedback; the scores are not marks."
@@ -107,6 +107,8 @@ Rules change: check the funder's or journal's current page before each submissio
 ## Who else it is for
 
 Your students may want [AI for a master's thesis](/for/masters) or [AI tools for PhD students](/for/phd). Clinical academics, see [AI for medical research](/for/medicine).
+
+Preparing a submission? The [manuscript formatting tool](/features/journal-formatter) sets a paper to a journal's style, the [conference paper writer](/features/conference-paper-writer) drafts a 4 to 8 page paper, and the [reporting guideline checker](/features/reporting-guideline-checker) drafts the CONSORT, STROBE, PRISMA, SAGER or SAMPL checklist. The sources for each discipline are on the field pages, for example [engineering and computing](/fields/engineering-and-computing) and [social sciences](/fields/social-sciences).
 
 ## Learn more
 

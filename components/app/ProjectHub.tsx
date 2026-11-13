@@ -4,7 +4,10 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/session';
 import { Button, Card, inputClass } from './ui';
-import { showError } from './research/parts';
+import toast from 'react-hot-toast';
+import { LuCopy, LuLoaderCircle, LuSparkles, LuTrash2, LuX } from 'react-icons/lu';
+import { CreditCost, creditsChanged, showError, Tag } from './research/parts';
+import { markdownToHtml } from '@/components/tools/toolOutput';
 import { openResultInEditor } from './research/handoff';
 
 type Item = { id: string; kind: string; title: string; status: string; href: string; pending: number };
@@ -80,4 +83,154 @@ export function ProjectHub({ id, role, members, onChange }: { id: string; role: 
       {!!governance?.events.length && <details className="mt-4"><summary className="cursor-pointer text-sm">Ownership and retention history</summary><ul className="mt-2 space-y-1 text-xs text-muted">{governance.events.map((event, index) => <li key={index}>{new Date(event.at).toLocaleString()}: {event.action.replaceAll('_', ' ')}</li>)}</ul></details>}
     </details>
   </section>;
+}
+
+type ProgressStatus = 'on_track' | 'at_risk' | 'blocked' | 'done';
+type ProgressComment = { id: string; user_id: string; name: string; text: string; at: string };
+type ProgressEntry = { id: string; date: string; done: string; blockers: string; next: string; status: ProgressStatus | null; mood: number | null; author_user_id: string; author_name: string; comments: ProgressComment[]; created_at: string };
+type ProgressSummary = { id: string; from: string; to: string; markdown: string; entries: number; author_name: string; created_at: string };
+type Draft = { date: string; done: string; blockers: string; next: string; status: ProgressStatus | ''; mood: string };
+
+const PROGRESS_STATUS: Record<ProgressStatus, { label: string; tone: 'positive' | 'warning' | 'negative' | 'brand' }> = {
+  on_track: { label: 'On track', tone: 'positive' }, at_risk: { label: 'At risk', tone: 'warning' }, blocked: { label: 'Blocked', tone: 'negative' }, done: { label: 'Done', tone: 'brand' },
+};
+const MOODS = ['', 'Very low', 'Low', 'Okay', 'Good', 'Very good'];
+const isoDay = (date: Date) => new Date(date.getTime() - date.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
+const emptyDraft = (): Draft => ({ date: isoDay(new Date()), done: '', blockers: '', next: '', status: '', mood: '' });
+
+/** The Progress tab: dated entries (owners and editors write, commenters comment, viewers read) and a summary for a supervisor. */
+export function ProjectProgress({ id, role, userId }: { id: string; role: string; userId: string | null }) {
+  const base = `/api/projects/${encodeURIComponent(id)}/progress`;
+  const canWrite = role === 'owner' || role === 'edit';
+  const canComment = canWrite || role === 'comment';
+  const [entries, setEntries] = useState<ProgressEntry[] | null>(null);
+  const [summaries, setSummaries] = useState<ProgressSummary[]>([]);
+  const [draft, setDraft] = useState<Draft>(emptyDraft);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [comment, setComment] = useState<Record<string, string>>({});
+  const [from, setFrom] = useState(() => isoDay(new Date(Date.now() - 14 * 86_400_000)));
+  const [to, setTo] = useState(() => isoDay(new Date()));
+  const [busy, setBusy] = useState(false);
+  const [summarising, setSummarising] = useState(false);
+
+  const load = async () => {
+    const data = await api<{ entries: ProgressEntry[]; summaries: ProgressSummary[] }>(base);
+    setEntries(data.entries); setSummaries(data.summaries);
+  };
+  useEffect(() => { load().catch(showError); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const run = async (work: () => Promise<unknown>) => {
+    setBusy(true);
+    try { await work(); await load(); } catch (error) { showError(error); } finally { setBusy(false); }
+  };
+  const submit = () => run(async () => {
+    const body = JSON.stringify({ date: draft.date, done: draft.done, blockers: draft.blockers, next: draft.next, status: draft.status || null, mood: draft.mood ? Number(draft.mood) : null });
+    await api(editing ? `${base}/${encodeURIComponent(editing)}` : base, { method: editing ? 'PATCH' : 'POST', body });
+    setDraft(emptyDraft()); setEditing(null);
+  });
+  const edit = (entry: ProgressEntry) => {
+    setEditing(entry.id);
+    setDraft({ date: entry.date, done: entry.done, blockers: entry.blockers, next: entry.next, status: entry.status ?? '', mood: entry.mood ? String(entry.mood) : '' });
+  };
+  const summarise = async () => {
+    setSummarising(true);
+    try {
+      const result = await api<{ summary: ProgressSummary }>(`${base}/summary`, { method: 'POST', body: JSON.stringify({ from, to }) });
+      setSummaries((list) => [result.summary, ...list]);
+    } catch (error) {
+      showError(error);
+    } finally {
+      setSummarising(false);
+      creditsChanged();
+    }
+  };
+
+  return (
+    <section className="mt-2.5 space-y-4" aria-label="Progress">
+      {canWrite && (
+        <Card className="p-4">
+          <h3 className="font-bold">{editing ? 'Edit entry' : 'New entry'}</h3>
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            <label className="block text-sm font-medium">Date<input type="date" className={`${inputClass} mt-1 w-full`} value={draft.date} onChange={(event) => setDraft({ ...draft, date: event.target.value })} /></label>
+            <label className="block text-sm font-medium">Status (optional)<select className={`${inputClass} mt-1 w-full`} value={draft.status} onChange={(event) => setDraft({ ...draft, status: event.target.value as Draft['status'] })}><option value="">None</option>{(Object.keys(PROGRESS_STATUS) as ProgressStatus[]).map((status) => <option key={status} value={status}>{PROGRESS_STATUS[status].label}</option>)}</select></label>
+            <label className="block text-sm font-medium">Mood (optional)<select className={`${inputClass} mt-1 w-full`} value={draft.mood} onChange={(event) => setDraft({ ...draft, mood: event.target.value })}><option value="">None</option>{[1, 2, 3, 4, 5].map((mood) => <option key={mood} value={mood}>{mood}: {MOODS[mood]}</option>)}</select></label>
+          </div>
+          {([['done', 'Done', 'What you finished or moved forward'], ['blockers', 'Blockers', 'What is in the way, and what help you need'], ['next', 'Next actions', 'What you will do next']] as const).map(([key, label, hint]) => (
+            <label key={key} className="mt-3 block text-sm font-medium">{label}<textarea className={`${inputClass} mt-1 min-h-20 w-full py-2`} placeholder={hint} maxLength={4000} value={draft[key]} onChange={(event) => setDraft({ ...draft, [key]: event.target.value })} /></label>
+          ))}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button variant="primary" size="sm" disabled={busy || !draft.date || !(draft.done.trim() || draft.blockers.trim() || draft.next.trim())} onClick={submit}>{editing ? 'Save changes' : 'Add entry'}</Button>
+            {editing && <Button size="sm" disabled={busy} onClick={() => { setEditing(null); setDraft(emptyDraft()); }}>Cancel</Button>}
+          </div>
+        </Card>
+      )}
+      <Card className="p-4">
+        <h3 className="font-bold">Summarise for my supervisor</h3>
+        <p className="mt-1 text-sm text-muted">An AI summary of the entries in a period, written from your log only: done, blockers, next steps and questions for your meeting.</p>
+        <div className="mt-3 flex flex-wrap items-end gap-3">
+          <label className="block text-sm font-medium">From<input type="date" className={`${inputClass} mt-1`} value={from} onChange={(event) => setFrom(event.target.value)} /></label>
+          <label className="block text-sm font-medium">To<input type="date" className={`${inputClass} mt-1`} value={to} onChange={(event) => setTo(event.target.value)} /></label>
+          <CreditCost credits={1} />
+          <Button size="sm" variant="primary" disabled={summarising || !from || !to || !entries?.length} onClick={summarise}>{summarising ? <><LuLoaderCircle className="h-4 w-4 animate-spin" />Writing…</> : <><LuSparkles className="h-4 w-4" />Summarise</>}</Button>
+        </div>
+        {summaries.length > 0 && (
+          <ul className="mt-4 space-y-3">
+            {summaries.map((summary) => (
+              <li key={summary.id} className="rounded-xl border border-line p-3">
+                <p className="text-xs text-muted">{summary.from} to {summary.to} · {summary.entries} entries · by {summary.author_name}</p>
+                <div className="wo-prose mt-2 text-sm leading-relaxed text-ink [&_h2]:mt-3 [&_h2]:font-semibold [&_h3]:mt-3 [&_h3]:font-semibold [&_li]:my-0.5 [&_p]:my-2 [&_ul]:list-disc [&_ul]:pl-5" dangerouslySetInnerHTML={{ __html: markdownToHtml(summary.markdown) }} />
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <Button size="sm" onClick={() => navigator.clipboard.writeText(summary.markdown).then(() => toast.success('Copied'))}><LuCopy className="h-4 w-4" />Copy</Button>
+                  <Button size="sm" onClick={() => openResultInEditor(`Progress update ${summary.from} to ${summary.to}`, summary.markdown, [])}>Open in editor</Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+      {entries === null ? <p className="text-sm text-muted">Loading…</p> : !entries.length ? (
+        <Card className="px-5 py-6 text-sm text-muted">{canWrite ? 'No entries yet. Add one after each working session or each week.' : 'No progress entries yet.'}</Card>
+      ) : (
+        <ol className="space-y-3">
+          {entries.map((entry) => (
+            <li key={entry.id}>
+              <Card className="p-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-semibold">{new Date(`${entry.date}T00:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                  <span className="text-xs text-muted">{entry.author_name}</span>
+                  {entry.status && <Tag tone={PROGRESS_STATUS[entry.status].tone}>{PROGRESS_STATUS[entry.status].label}</Tag>}
+                  {entry.mood && <Tag>Mood: {MOODS[entry.mood]}</Tag>}
+                  {canWrite && (role === 'owner' || entry.author_user_id === userId) && (
+                    <span className="ml-auto flex gap-1">
+                      <Button size="sm" disabled={busy} onClick={() => edit(entry)}>Edit</Button>
+                      <Button size="sm" disabled={busy} onClick={() => { if (window.confirm('Delete this entry?')) run(() => api(`${base}/${encodeURIComponent(entry.id)}`, { method: 'DELETE' })); }}><LuTrash2 className="h-4 w-4" /></Button>
+                    </span>
+                  )}
+                </div>
+                {([['done', 'Done'], ['blockers', 'Blockers'], ['next', 'Next actions']] as const).filter(([key]) => entry[key]).map(([key, label]) => (
+                  <div key={key} className="mt-2"><p className="text-xs font-semibold uppercase tracking-wide text-muted">{label}</p><p className="whitespace-pre-wrap text-sm text-ink">{entry[key]}</p></div>
+                ))}
+                {(entry.comments.length > 0 || canComment) && (
+                  <div className="mt-3 border-t border-line pt-3">
+                    {entry.comments.map((item) => (
+                      <div key={item.id} className="mb-2 flex items-start gap-2 text-sm">
+                        <p className="min-w-0 flex-1"><span className="font-semibold">{item.name}</span> <span className="text-xs text-muted">{new Date(item.at).toLocaleDateString()}</span><span className="block whitespace-pre-wrap text-ink-2">{item.text}</span></p>
+                        {(role === 'owner' || item.user_id === userId) && <button type="button" aria-label="Remove comment" className="grid h-7 w-7 place-items-center rounded-md text-subtle hover:bg-soft hover:text-ink" onClick={() => run(() => api(`${base}/${encodeURIComponent(entry.id)}/comments/${encodeURIComponent(item.id)}`, { method: 'DELETE' }))}><LuX className="h-3.5 w-3.5" /></button>}
+                      </div>
+                    ))}
+                    {canComment && (
+                      <form className="flex gap-2" onSubmit={(event) => { event.preventDefault(); const text = (comment[entry.id] ?? '').trim(); if (text) run(async () => { await api(`${base}/${encodeURIComponent(entry.id)}/comments`, { method: 'POST', body: JSON.stringify({ text }) }); setComment((all) => ({ ...all, [entry.id]: '' })); }); }}>
+                        <input aria-label="Comment" className={`${inputClass} h-9 flex-1 text-sm`} placeholder="Add a comment" maxLength={2000} value={comment[entry.id] ?? ''} onChange={(event) => setComment((all) => ({ ...all, [entry.id]: event.target.value }))} />
+                        <Button size="sm" type="submit" disabled={busy || !(comment[entry.id] ?? '').trim()}>Comment</Button>
+                      </form>
+                    )}
+                  </div>
+                )}
+              </Card>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+  );
 }

@@ -15,6 +15,8 @@ import { exportWorkflowXlsx } from '@/lib/workflowFiles';
 import { TranscriptExcerptImport, WorkbookTableImport } from './WorkbookImport';
 import { WorkbookLibraryPicker } from './WorkbookLibraryPicker';
 import { WorkbookConnections } from './WorkbookConnections';
+import { CodeFrequencyPanel, TranscriptCoding } from './QualitativeCoding';
+import { fileText } from '@/components/app/research/stream';
 
 type Loaded = Workbook & { events?: WorkbookEvent[]; suggestion_cost?: number };
 const labelClass = 'grid gap-1.5 text-[14px] font-semibold';
@@ -99,8 +101,18 @@ export function WorkbookWorkspace() {
   };
   const importText = async (file: File | undefined) => {
     if (!file || !workbook) return;
-    if (file.size > 640000 || !/\.(txt|md|csv|tsv|srt|vtt)$/i.test(file.name)) { setError('Choose a text, Markdown, CSV, TSV or transcript file up to 640 KB. Import PDFs through your Library.'); return; }
-    const text = await file.text();
+    // Transcripts may be Word or PDF files: their text is extracted by the existing file-text service.
+    const extracted = /\.(docx|pdf)$/i.test(file.name);
+    if ((extracted ? file.size > 20 * 1024 * 1024 : file.size > 640000) || !/\.(txt|md|csv|tsv|srt|vtt|docx|pdf)$/i.test(file.name)) { setError('Choose a text, Markdown, CSV, TSV or transcript file up to 640 KB, or a Word or PDF file up to 20 MB.'); return; }
+    let text: string;
+    if (extracted) {
+      setBusy(true); setError('');
+      try {
+        const read = await fileText(file);
+        if (read.truncated) { setError('This file is longer than the text extraction limit. Split it into smaller files; nothing was saved.'); return; }
+        text = read.text;
+      } catch (e) { setError((e as Error).message); return; } finally { setBusy(false); }
+    } else text = await file.text();
     if (text.length > 160000) { setError('Split this source into sections of up to 160,000 characters. Nothing was truncated.'); return; }
     setSectionKey('sources'); setEditing({ values: { title: file.name, kind: workbook.kind === 'qualitative' ? 'transcript' : 'other', text, reference: file.name } });
     setNotice('Review the source and choose its permission before saving.');
@@ -188,9 +200,11 @@ export function WorkbookWorkspace() {
       {suggestions.length > 0 && <div className="mt-4 grid gap-3">{suggestions.map((suggestion, index) => <div key={index} className="rounded-xl border border-line p-4"><dl className="grid gap-2">{section.fields.filter((f) => suggestion.values[f.key]).map((f) => <div key={f.key}><dt className="text-xs font-semibold text-muted">{f.label}</dt><dd className="whitespace-pre-wrap text-sm">{f.type === 'source' ? sources.find((s) => s.id === suggestion.values[f.key])?.values.title : suggestion.values[f.key]}</dd></div>)}</dl><Button className="mt-3" size="sm" onClick={() => { if (!editing || window.confirm('Replace the unsaved form with this suggestion?')) { setEditing({ values: suggestion.values }); setTimeout(() => topForm.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 0); } }}>Review and edit before saving</Button></div>)}</div>}
     </Card>}
     {section.key === 'sources' && canEdit && <Card className="mb-5 p-4"><WorkbookLibraryPicker busy={busy} onImport={(documentId) => mutate('/import', { document_id: documentId, consent: importConsent })} />
-      <label className="mt-3 grid max-w-sm gap-1.5 text-sm font-semibold">Permission to use imported sources<select className={inputClass} value={importConsent} onChange={(e) => setImportConsent(e.target.value)}>{CONSENT_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}</select></label><div className="mt-4"><Button disabled={busy} onClick={() => fileInput.current?.click()}>Add text file</Button><input type="file" ref={fileInput} accept=".txt,.md,.csv,.tsv,.srt,.vtt" className="hidden" aria-label="Add source text file" onChange={(e) => { void importText(e.target.files?.[0]); e.target.value = ''; }} /></div><p className="mt-2 text-xs text-muted">Library imports copy source text into this workbook. Project members can read the copy. Add PDF or Word material to your Library first.</p></Card>}
+      <label className="mt-3 grid max-w-sm gap-1.5 text-sm font-semibold">Permission to use imported sources<select className={inputClass} value={importConsent} onChange={(e) => setImportConsent(e.target.value)}>{CONSENT_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}</select></label><div className="mt-4"><Button disabled={busy} onClick={() => fileInput.current?.click()}>{workbook.kind === 'qualitative' ? 'Upload transcript (text, Word or PDF)' : 'Add text file'}</Button><input type="file" ref={fileInput} accept=".txt,.md,.csv,.tsv,.srt,.vtt,.docx,.pdf" className="hidden" aria-label="Add source text file" onChange={(e) => { void importText(e.target.files?.[0]); e.target.value = ''; }} /></div><p className="mt-2 text-xs text-muted">Library imports copy source text into this workbook. Project members can read the copy. Text, Word and PDF files can also be uploaded here; check the extracted text before saving.</p></Card>}
     {canEdit && section.key !== 'sources' && <WorkbookTableImport key={section.key} workbook={workbook} section={section} busy={busy} save={mutate} />}
     {canEdit && workbook.kind === 'qualitative' && section.key === 'sources' && <TranscriptExcerptImport workbook={workbook} busy={busy} save={mutate} />}
+    {workbook.kind === 'qualitative' && (section.key === 'excerpts' || section.key === 'sources') && <TranscriptCoding key={workbook.id} workbook={workbook} base={base} busy={busy} canEdit={canEdit} save={mutate} onError={setError} onNotice={setNotice} />}
+    {workbook.kind === 'qualitative' && (section.key === 'codes' || section.key === 'excerpts' || section.key === 'themes') && <CodeFrequencyPanel workbook={workbook} />}
     {editing && canEdit && <div ref={topForm}><Card className="mb-5 p-5"><form className="grid gap-4 sm:grid-cols-2" onSubmit={(e) => { e.preventDefault(); void saveEntry(); }}>
       <h3 className="font-bold sm:col-span-2">{editing.id ? 'Edit entry' : 'New entry'}</h3>
       {section.fields.filter((f) => f.type !== 'hidden').map((f) => <label key={f.key} className={`${labelClass} ${f.type === 'long' || f.type === 'source' ? 'sm:col-span-2' : ''}`}>{f.label}{f.required ? ' *' : ''}

@@ -18,7 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/`, changeFrequency: 'weekly', priority: 1 },
     { url: `${SITE_URL}/features`, changeFrequency: 'monthly', priority: 0.8 },
     ...FEATURE_PAGES.map((page) => ({ url: `${SITE_URL}/features/${page.slug}`, changeFrequency: 'monthly' as const, priority: 0.6 })),
-    ...(['for', 'alternatives', 'templates'] as const).map((section) => ({ url: `${SITE_URL}/${section}`, changeFrequency: 'monthly' as const, priority: 0.7 })),
+    ...(['for', 'alternatives', 'templates', 'fields'] as const).map((section) => ({ url: `${SITE_URL}/${section}`, changeFrequency: 'monthly' as const, priority: 0.7 })),
     ...allLandingPages().map((page) => ({ url: `${SITE_URL}${landingPath(page)}`, lastModified: new Date(`${page.updated}T00:00:00Z`), changeFrequency: 'monthly' as const, priority: 0.8 })),
     { url: `${SITE_URL}/tools`, changeFrequency: 'monthly', priority: 0.8 },
     ...TOOLS.map((tool) => ({ url: `${SITE_URL}/tools/${tool.slug}`, changeFrequency: 'monthly' as const, priority: 0.8 })),

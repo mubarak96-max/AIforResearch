@@ -1,13 +1,14 @@
 import { anova, chiSquare, pairedT, parseCsv, pearson, toColumns, welch, type Column, type TestResult } from './stats';
 import { linearRegression, mannWhitney } from '../components/app/analysis/stats';
 import { cronbachAlpha, diagnosticAccuracy, fisherExact, kruskalWallis, logisticRegression, mcnemar, rocAnalysis, spearman, survivalAnalysis, wilcoxonSignedRank, type ChartResult, type SurvivalChart } from './statsMore';
-import { ANALYSIS_IDS, analysisDef, slotOf, variableRange, type AnalysisOptions, type AnalysisTest } from './dataLabAnalyses';
+import { ANALYSIS_IDS, OPTION_KEYS, analysisDef, slotOf, variableRange, type AnalysisOptions, type AnalysisTest } from './dataLabAnalyses';
+import { bayesOneSample, bayesPaired, bayesProportion, bayesTwoSample, numberSetting, priorScale } from './bayes';
 
 export type { AnalysisTest } from './dataLabAnalyses';
 /** The calculation version of new analyses. */
-export const DATA_LAB_VERSION = 'data-lab-2026-11-13';
-/** Versions whose calculations this code reproduces exactly (2026-11-13 only added tests). */
-export const COMPATIBLE_VERSIONS = new Set(['data-lab-2026-11-12', DATA_LAB_VERSION]);
+export const DATA_LAB_VERSION = 'data-lab-2026-11-13b';
+/** Versions whose calculations this code reproduces exactly (2026-11-13 and 2026-11-13b only added tests). */
+export const COMPATIBLE_VERSIONS = new Set(['data-lab-2026-11-12', 'data-lab-2026-11-13', DATA_LAB_VERSION]);
 export type ColumnKinds = Record<string, 'numeric' | 'categorical'>;
 export type AnalysisSpec = { test: AnalysisTest; variables: string[]; options?: AnalysisOptions; kinds: ColumnKinds; at: string; dataset_sha256: string; missing: 'complete_observations'; rows_used: number; rows_omitted: number };
 export type DataTransformation = { at: string; action: 'load' | 'edit_data' | 'column_type' | 'derive'; detail: string };
@@ -77,6 +78,12 @@ export function runAnalysis(text: string, spec: Pick<AnalysisSpec, 'test' | 'var
     case 'diagnostic': result = diagnosticAccuracy({ name: a.name, labels: a.labels }, { name: b.name, labels: b.labels }, options.positive, options.reference_positive); break;
     case 'roc': result = rocAnalysis({ name: a.name, values: a.values }, { name: b.name, labels: b.labels }, options.reference_positive); break;
     case 'alpha': result = cronbachAlpha(cols.map((column) => ({ name: column.name, values: column.values }))); break;
+    case 'bayes_one': result = bayesOneSample(a.values, a.name, numberSetting(options.mu, 0, 'The test value', (value) => Math.abs(value) <= 1e12), priorScale(options.prior_scale)); break;
+    case 'bayes_paired': result = bayesPaired(a.values, b.values, names, priorScale(options.prior_scale)); break;
+    case 'bayes_two': result = bayesTwoSample(a.values, b.labels, names, priorScale(options.prior_scale)); break;
+    case 'bayes_prop': result = bayesProportion(a.labels, a.name, options.positive,
+      numberSetting(options.prior_a, 1, 'Prior a', (value) => value > 0 && value <= 10000), numberSetting(options.prior_b, 1, 'Prior b', (value) => value > 0 && value <= 10000),
+      numberSetting(options.threshold, 0.5, 'The threshold', (value) => value >= 0 && value <= 1)); break;
     default: throw new Error('The bundle contains an unsupported analysis specification.');
   }
   // Complete observations: every chosen column has a value (numbers for numeric slots, categories otherwise).
@@ -109,7 +116,7 @@ export function parseAnalysisBundle(text: string): AnalysisBundle {
   const isHash = (value: unknown) => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
   const isDate = (value: unknown) => typeof value === 'string' && Number.isFinite(Date.parse(value));
   const isCount = (value: unknown) => Number.isInteger(value) && Number(value) >= 0 && Number(value) <= 50_000;
-  const isOptions = (value: unknown) => value === undefined || Boolean(value && typeof value === 'object' && !Array.isArray(value) && Object.entries(value).every(([key, option]) => ['positive', 'reference_positive', 'event'].includes(key) && typeof option === 'string' && option.length <= 200));
+  const isOptions = (value: unknown) => value === undefined || Boolean(value && typeof value === 'object' && !Array.isArray(value) && Object.entries(value).every(([key, option]) => (OPTION_KEYS as readonly string[]).includes(key) && typeof option === 'string' && option.length <= 200));
   const variablesFit = (test: string, variables: unknown) => {
     const def = analysisDef(test);
     if (!def || !Array.isArray(variables) || variables.some((value) => typeof value !== 'string' || value.length > 200)) return false;

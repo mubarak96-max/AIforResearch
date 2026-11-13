@@ -153,9 +153,23 @@ export type ChooserAnswers = {
   groups: 'two' | 'three-plus' | 'none';
   paired: boolean;
   normal: 'yes' | 'no' | 'unsure';
+  /** Report a Bayes factor or a posterior instead of a p-value, where Data Lab has a Bayesian version. */
+  bayes?: boolean;
 };
 
 export type Recommendation = { test: string; inDataLab: string | null; why: string; assumptions: string[]; report: string; alternative: string | null };
+
+/** The Bayesian version of the recommended test, when Data Lab has one (t-tests and a single proportion). */
+function bayesianTest(answers: ChooserAnswers, parametric: boolean): Recommendation | null {
+  const prior = 'State the prior (Cauchy scale r = 0.707) and check r = 0.5 and r = 1 as a sensitivity analysis.';
+  if (answers.goal === 'describe' && answers.outcome === 'categorical') {
+    return { test: 'Bayesian proportion (beta-binomial)', inDataLab: 'Bayesian proportion (beta-binomial)', why: 'Estimate a proportion (e.g. prevalence, pass rate) with a credible interval and the probability that it exceeds a threshold.', assumptions: ['Independent cases', 'A prior stated in advance (Beta(1, 1) is flat)'], report: 'Posterior mean __, 95% CrI [__, __]; P(p > __) = __ (Beta(__, __) prior).', alternative: 'An exact (Clopper-Pearson) confidence interval for a frequentist estimate' };
+  }
+  if (answers.goal !== 'compare' || answers.outcome !== 'numeric' || answers.groups !== 'two' || !parametric) return null;
+  return answers.paired
+    ? { test: 'Bayesian paired t-test', inDataLab: 'Bayesian paired t-test', why: 'The same cases measured twice. The Bayes factor weighs the evidence for a difference against the evidence for none.', assumptions: ['Differences roughly normal', 'Paired observations', prior], report: 'BF10 = __ (BF01 = __), δ = __, 95% CrI [__, __]; JZS prior, r = 0.707.', alternative: 'Paired t-test for a frequentist p-value' }
+    : { test: 'Bayesian independent t-test', inDataLab: 'Bayesian independent t-test', why: 'Two independent groups, numeric outcome. The Bayes factor can also show evidence for no difference, which a p-value cannot.', assumptions: ['Independent groups', 'Outcome roughly normal with similar variances', prior], report: 'BF10 = __ (BF01 = __), δ = __, 95% CrI [__, __]; JZS prior, r = 0.707.', alternative: 'Welch’s t-test for a frequentist p-value' };
+}
 
 /** The test that fits the design, with what it assumes and how to report it. Rule-based. */
 export function chooseTest(answers: ChooserAnswers): Recommendation {
@@ -170,6 +184,10 @@ export function chooseTest(answers: ChooserAnswers): Recommendation {
   }
   if (answers.goal === 'reliability') {
     return { test: 'Cronbach’s alpha', inDataLab: 'Reliability (Cronbach’s alpha)', why: 'How consistently the items of a questionnaire scale measure the same thing.', assumptions: ['Items measure one construct', 'Negatively worded items reverse-scored first'], report: 'Cronbach’s α = __ (__ items, N = __).', alternative: 'McDonald’s omega in a statistics package when items load unequally' };
+  }
+  if (answers.bayes) {
+    const bayesian = bayesianTest(answers, parametric);
+    if (bayesian) return bayesian;
   }
   if (answers.goal === 'describe') {
     return { test: 'Descriptive statistics', inDataLab: 'Describe', why: 'You want to summarise, not test.', assumptions: [], report: answers.outcome === 'numeric' ? 'M = __, SD = __ (or Mdn = __, IQR = __ for skewed data), n = __.' : '__ of __ participants (__%).', alternative: null };

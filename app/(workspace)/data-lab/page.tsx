@@ -25,6 +25,7 @@ import { ANALYSES, ANALYSIS_GROUPS, analysisDef, type AnalysisOptions, type Anal
 import { analysisScript, type CodeLanguage } from '@/lib/dataLabCode';
 import { applyScoring, type ScaleScoring } from '@/lib/surveyScoring';
 import type { XlsxWorkbook } from '@/lib/dataLabXlsx';
+import { dataLabReportHtml, printReport } from '@/lib/dataLabReport';
 
 type Tab = 'data' | 'describe' | 'tests' | 'chooser' | 'power' | 'report';
 
@@ -73,7 +74,7 @@ function ResultCard({ result, onRemove }: { result: AnalysisResult; onRemove?: (
 }
 
 function Chooser() {
-  const [answers, setAnswers] = useState<ChooserAnswers>({ goal: 'compare', outcome: 'numeric', groups: 'two', paired: false, normal: 'unsure' });
+  const [answers, setAnswers] = useState<ChooserAnswers>({ goal: 'compare', outcome: 'numeric', groups: 'two', paired: false, normal: 'unsure', bayes: false });
   const result = chooseTest(answers);
   const field = <K extends keyof ChooserAnswers>(key: K, label: string, options: [ChooserAnswers[K], string][]) => (
     <label className="block">
@@ -91,6 +92,7 @@ function Chooser() {
         {answers.goal === 'compare' && field('groups', 'How many groups or times?', [['two', 'Two'], ['three-plus', 'Three or more']])}
         {answers.goal === 'compare' && field('paired', 'Same people measured more than once?', [[false, 'No: different people in each group'], [true, 'Yes: the same people (before and after, repeated)']])}
         {answers.outcome === 'numeric' && ['compare', 'relate', 'predict'].includes(answers.goal) && field('normal', 'Is the outcome roughly normal?', [['unsure', 'Not sure (check the histogram)'], ['yes', 'Yes, or 30+ per group'], ['no', 'No: skewed or with outliers']])}
+        {((answers.goal === 'compare' && answers.outcome === 'numeric' && answers.groups === 'two') || (answers.goal === 'describe' && answers.outcome === 'categorical')) && field('bayes', 'How do you want to report it?', [[false, 'A p-value or confidence interval (frequentist)'], [true, 'A Bayes factor or credible interval (Bayesian)']])}
       </div>
       <Card className="p-5">
         <p className="text-[13px] font-semibold text-muted">Recommended</p>
@@ -390,7 +392,8 @@ function DataLab() {
     const multiple = def.slots.find((slot) => slot.multiple);
     if (multiple?.multiple && (many.length < multiple.multiple.min || many.length > multiple.multiple.max)) { toast.error(`Choose ${multiple.multiple.min} to ${multiple.multiple.max} ${multiple.label.toLowerCase()}.`); return; }
     const variables = [...singles.map((_, at) => vars[at] ?? '').filter(Boolean), ...many];
-    const options: AnalysisOptions = Object.fromEntries((def.options ?? []).map((option) => [option.key, opts[option.key]]).filter(([, value]) => value));
+    // Unset settings with a default are stored with their default, so a rerun or code export uses the same value.
+    const options: AnalysisOptions = Object.fromEntries((def.options ?? []).map((option) => [option.key, opts[option.key] || option.default]).filter(([, value]) => value));
     let run: ReturnType<typeof runAnalysis>;
     try { run = runAnalysis(text, { test, variables, kinds, ...(Object.keys(options).length ? { options } : {}) }); } catch (error) { showError(error); return; }
     const { result, rows_used, rows_omitted } = run;
@@ -432,6 +435,19 @@ function DataLab() {
       setTaskId(result.task_id);
       window.history.replaceState(null, '', `/data-lab?task=${result.task_id}`);
     } catch (error) { showError(error); } finally { setBusy(false); creditsChanged(); }
+  };
+  const pdfReport = async () => {
+    try {
+      const provenance = await reproduction();
+      const title = name ? `Analysis of ${name}`.slice(0, 200) : 'Data analysis';
+      const html = dataLabReportHtml({
+        title, dataset: name || 'Pasted data', rows: parsed?.rows.length ?? loadedReproduction?.rows ?? null, question,
+        columns: columns.map((column) => ({ name: column.name, kind: column.kind, summary: summaryOf(column) })),
+        results, reportHtml: report ? markdownToHtml(report) : '', software: provenance?.software ?? DATA_LAB_VERSION,
+        datasetSha256: provenance?.dataset_sha256, generatedAt: new Date().toLocaleString(),
+      });
+      printReport(html, title);
+    } catch (error) { showError(error); }
   };
   const exportResults = () => download('results.csv', toCsv([['Analysis', 'Statistic', 'Value'], ...results.flatMap((result) => result.rows.map(([label, value]) => [result.title, label, value]))]), 'text/csv');
   const exportDescriptives = () => download('descriptives.csv', toCsv([['Variable', 'Type', 'Summary'], ...columns.map((column) => [column.name, column.kind, summaryOf(column)])]), 'text/csv');
@@ -578,7 +594,16 @@ function DataLab() {
                       </select>
                     ))}
                     {(def.options ?? []).map((option) => {
-                      const levels = levelsOf(option.slot);
+                      if (option.choices) return (
+                        <select key={option.key} aria-label={option.label} value={opts[option.key] ?? option.default ?? ''} onChange={(event) => setOpts({ ...opts, [option.key]: event.target.value })} className={select}>
+                          {option.choices.map(([value, text]) => <option key={value} value={value}>{text}</option>)}
+                        </select>
+                      );
+                      if (option.number) return (
+                        <label key={option.key} className="block"><span className="mb-1 block text-[13px] font-semibold text-ink-2">{option.label}</span>
+                          <input type="number" min={option.number.min} max={option.number.max} step={option.number.step} value={opts[option.key] ?? option.default ?? ''} onChange={(event) => setOpts({ ...opts, [option.key]: event.target.value })} className="h-10 w-full rounded-[10px] border border-line px-3 text-[14.5px]" /></label>
+                      );
+                      const levels = levelsOf(option.slot ?? 0);
                       return (
                         <select key={option.key} aria-label={option.label} value={opts[option.key] ?? ''} disabled={!levels.length} onChange={(event) => setOpts({ ...opts, [option.key]: event.target.value })} className={select}>
                           <option value="">{option.label}{levels.length ? '' : ' (choose the column first)'}</option>{levels.map((level) => <option key={level} value={level}>{level}</option>)}
@@ -609,6 +634,7 @@ function DataLab() {
               <div className="flex flex-wrap gap-2">
                 <Button onClick={save}><LuSave className="h-4 w-4" />Save to History</Button>
                 <Button onClick={exportResults}><LuDownload className="h-4 w-4" />Results as CSV</Button>
+                <Button onClick={pdfReport}><LuDownload className="h-4 w-4" />Download PDF report</Button>
                 <Button variant="primary" onClick={() => setTab('report')}><LuSparkles className="h-4 w-4" />Write the results section</Button>
               </div>
             )}
@@ -637,6 +663,7 @@ function DataLab() {
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Button variant="primary" size="sm" onClick={() => openInEditor({ title: name ? `Results: ${name}` : 'Results', html: markdownToHtml(report), markdown: report, style: 'apa' })}><LuFilePen className="h-4 w-4" />Open in editor</Button>
                   <Button size="sm" onClick={() => navigator.clipboard.writeText(report).then(() => toast.success('Copied'))}>Copy</Button>
+                  <Button size="sm" onClick={pdfReport}><LuDownload className="h-4 w-4" />Download PDF report</Button>
                 </div>
               </Card>
             )}

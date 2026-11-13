@@ -6,7 +6,8 @@
 import type { ChatMessage } from '../slots/types.js';
 import type { ResearchSource } from './research.js';
 import { sourcesBlock } from './research.js';
-import { template, type StudioModule } from './studioCatalog.js';
+import { posterBuilder } from './posterModule.js';
+import { JOURNAL_STYLES, STUDY_CHECKLISTS, template, wordCount, type StudioModule } from './studioCatalog.js';
 
 export type StudioLength = 'short' | 'standard' | 'long';
 export type StudioContext = {
@@ -74,6 +75,33 @@ const WHITE_PAPER_LABEL: Record<string, string> = {
   backgrounder: 'backgrounder white paper', numbered: 'numbered-list white paper',
 };
 
+/** What each researcher email asks for (the Researcher email module). */
+const EMAIL_KINDS: Record<string, string> = {
+  coauthor: 'an invitation to co-author a paper: what the paper is and how far along it is, why this person (their expertise, as the writer gives it), what their role and contribution would be, how authorship order and credit will be handled, the timeline, and a clear question asking whether they are interested',
+  meeting: 'an invitation to a meeting, seminar or talk: the purpose, the date, time and time zone, the place or video link, how long it lasts, what is asked of them (attend, present, comment), and how to confirm',
+  data: 'a request for data, code or materials from a study: which study and which data exactly, what the writer will use them for, how the data will be stored and protected, any agreement or ethics approval the writer has or can sign, how the source will be acknowledged or cited, and what format would help',
+  paper: 'a request for the full text of a paper: the full reference, why the writer needs it, that it is for personal research use, and thanks',
+  supervisor: 'an enquiry to a prospective supervisor: who the writer is (degree, institution, background, from the notes), the research interest in one or two sentences and how it relates to this person\'s work (only what the writer says about it), the programme and start date, funding status, what is attached (CV, proposal), and a specific question such as whether they are taking students',
+  followup: 'a polite follow-up to an earlier email that has had no reply: what was asked and when (as given), a one-line restatement of the request, any new deadline, and an easy way to say no',
+};
+
+/** Section order and reference style per target journal style (the Journal formatter). */
+const JOURNAL_STYLE_SPEC: Record<string, string> = {
+  nature: 'Nature-family research article: Title; a referenced summary paragraph without headings (no separate Abstract heading); the main text opening without an "Introduction" heading, then short subheadings for results and a discussion; Methods at the end; Data availability; Code availability; References (numbered in the order first cited, superscript numbers in the text); Acknowledgements; Author contributions; Competing interests; Figure legends (a bold title sentence, then the description).',
+  science: 'Science research article: Title; a one-paragraph Abstract; the main text opening without an "Introduction" heading, with short subheadings; Materials and methods summarised in the text with full detail in the supplementary materials; References and Notes (numbered in the order cited, in parentheses in the text); Acknowledgments (funding, author contributions, competing interests, data and materials availability); a list of Supplementary Materials.',
+  ieee: 'IEEE paper: Title; Authors and affiliations; Abstract (one paragraph, no citations); Index Terms; numbered sections in Roman numerals (I. Introduction, II. Related Work, III. Method, IV. Experiments and Results, V. Discussion, VI. Conclusion); Acknowledgment; References (IEEE style: numbered in square brackets [1] in the order first cited, initials before surnames, abbreviated journal names).',
+  acm: 'ACM paper (acmart): Title; Authors and affiliations; Abstract; CCS Concepts; Keywords; ACM Reference Format line; numbered sections (1 Introduction, 2 Related Work, 3 Approach, 4 Evaluation, 5 Discussion, 6 Conclusion); Acknowledgments; References (ACM Reference Format, with DOIs).',
+  apa: 'APA 7th edition manuscript: Title page (title, authors, affiliations, author note); Abstract (one paragraph) with Keywords; the introduction under the paper\'s title (no "Introduction" heading); Method (Participants, Measures or Materials, Procedure); Results; Discussion; References (APA 7 author–date, alphabetical, DOIs as https://doi.org/ links); Tables and figures (numbered, each with a title and note); APA heading levels 1–3.',
+  vancouver: 'Medical journal following the ICMJE recommendations: Title page (title, authors, affiliations, corresponding author, word count, number of tables and figures); a structured Abstract (Background, Methods, Results, Conclusions; trial registration for trials); Keywords; Introduction; Methods (with ethics approval, consent and registration); Results; Discussion (with limitations); Acknowledgments; Funding; Competing interests; Data sharing statement; References (Vancouver: numbered in the order first cited, NLM journal abbreviations); Tables; Figure legends.',
+  custom: 'the journal\'s own instructions for authors given below. If none are given, use a general IMRaD order (Title, Abstract, Keywords, Introduction, Methods, Results, Discussion, Conclusion, Declarations, References) and say at the top that the author guidelines are needed for a proper check.',
+};
+
+/** Free validated scales the Survey builder can insert (lib/surveyInstruments.ts), for the operationalisation prompt. */
+export const SURVEY_SCALES: [name: string, measures: string][] = [
+  ['PHQ-9', 'depression severity'], ['GAD-7', 'anxiety severity'], ['WHO-5', 'current mental wellbeing'],
+  ['PSS-10', 'perceived stress'], ['RSES', 'global self-esteem'], ['SUS', 'perceived usability of a product or system'],
+];
+
 type Builder = (context: StudioContext) => { user: string; maxTokens: number; grounded?: boolean; json?: boolean; task?: 'fast' | 'review'; system?: string };
 
 const BUILDERS: Record<string, Builder> = {
@@ -125,6 +153,54 @@ const BUILDERS: Record<string, Builder> = {
     user: `Paraphrase this text in a natural, human style${{ light: ', keeping the sentence structure close', strong: ' with new sentence structures' }[c.inputs.strength] ?? ''}. Return only the paraphrase.\n\n${(c.inputs.text || '').slice(0, 40000)}`,
     maxTokens: Math.min(12000, Math.ceil(((c.inputs.text || '').length / 3.5) * 1.3) + 200),
   }),
+  'conference-paper': (c) => {
+    const pages = [4, 6, 8].includes(Number(c.inputs.pages)) ? Number(c.inputs.pages) : 6;
+    const target = Math.min(pages * 800, words(pages * 700, c));
+    const formats: Record<string, { name: string; sections: string }> = {
+      ieee: { name: 'the IEEE conference format (two columns, numbered references)', sections: 'Abstract (one paragraph, 150–200 words, no citations), Index Terms, I. Introduction, II. Related Work, III. Method, IV. Experiments and Results, V. Discussion, VI. Conclusion' },
+      acm: { name: 'the ACM format (acmart)', sections: 'Abstract, CCS Concepts (as [placeholders] for terms from the ACM Computing Classification System), Keywords, 1 Introduction, 2 Related Work, 3 Approach, 4 Evaluation, 5 Discussion and Limitations, 6 Conclusion' },
+      generic: { name: 'a general conference format', sections: 'Abstract, Keywords, Introduction, Related Work, Method, Results, Discussion and Limitations, Conclusion' },
+    };
+    const format = formats[c.inputs.format] ?? formats.ieee;
+    const study = c.inputs.study?.trim();
+    return {
+      user: `Write a conference paper titled or asking "${c.inputs.topic}"${c.inputs.venue?.trim() ? ` for ${c.inputs.venue.trim().slice(0, 200)}` : ''}, in ${format.name}. It must fit a ${pages}-page limit with its figures and references, so write about ${target} words of text. ` +
+        `Start with a "**Title:**" line. Use these sections as "##" headings: ${format.sections}. ` +
+        'End the Introduction with "Our contributions are:" and a bulleted list of 2–4 specific contributions; each must match something the paper reports, and none may claim more than the study supports. ' +
+        'Related Work compares the closest work with this paper and states the difference, citing it. Do not call the work "novel", "first", "state-of-the-art" or "significant" unless a source or the writer\'s study supports it with a test or comparison; never claim to be the first. ' +
+        'Mark where figures and tables belong with "[Figure N: what it shows]" or "[Table N: what it compares]", and fill a table only with numbers the writer gave. ' +
+        (study
+          ? `Base the method, set-up and results only on the writer's study below; never invent data, metrics, baselines, numbers or participants.\n\nThe writer's study:\n${study.slice(0, 30000)}`
+          : 'The writer has not given their study: in the method, set-up and results write clear [placeholders] for what they must fill in (data, baselines, metrics, findings); never invent results.') +
+        notesLine(c.inputs.notes),
+      maxTokens: 8000, grounded: true, task: 'review',
+    };
+  },
+  'journal-format': (c) => {
+    const style = JOURNAL_STYLE_SPEC[c.inputs.style] ? c.inputs.style : 'nature';
+    const label = JOURNAL_STYLES.find((item) => item.id === style)?.label ?? style;
+    const manuscript = (c.inputs.text || '').slice(0, 300_000);
+    const count = wordCount(manuscript);
+    const long = count > 5000;
+    const guidelines = c.inputs.guidelines?.trim();
+    const journal = c.inputs.journal?.trim();
+    return {
+      system: `${BASE} You are a journal production editor working for ${reader(c)}. ${language(c)} ` +
+        'Never change the scientific content: findings, numbers, statistics, claims, interpretations, quotations and citations stay exactly as written. ' +
+        'You may move text between sections, rename and renumber headings, split a paragraph where a section boundary falls inside it, label the sentences of an existing abstract with the target\'s headings, and reformat references. ' +
+        'Do not shorten, summarise or rewrite text to meet a limit: report it instead. Never invent missing elements (declarations, funding, ethics approval numbers, keywords, affiliations, DOIs, page numbers): write a [placeholder] naming what is needed. ' +
+        'Do not state a word, abstract, figure or reference limit unless the author guidelines given state it or it is part of the style described; otherwise say "check the current author guide".',
+      user: `Format this manuscript (about ${count.toLocaleString('en-US')} words) for ${journal ? `${journal.slice(0, 200)} (${label})` : label}. The target structure: ${JOURNAL_STYLE_SPEC[style]}` +
+        (guidelines ? `\n\nThe journal's author guidelines (they take precedence over the structure above):\n${guidelines.slice(0, 30000)}\n\n` : '\n\n') +
+        (long
+          ? 'The manuscript is too long to reproduce in one answer, so return "## New structure": for each section of the target, a "###" heading, then the parts of the manuscript that go there, each named by its current heading and paragraph and its first words in quotation marks (e.g. Methods, paragraph 3: "Participants were recruited…"), with a note where a paragraph must be split or moved. List every new element the target needs as a [placeholder]. Start this section with one sentence saying the text itself is unchanged and should be moved as listed. '
+          : 'Return "## Formatted manuscript": the whole manuscript in the target\'s order and headings, every sentence kept, with [placeholders] for required elements that are missing. ') +
+        'Then "## Reference style": one line naming the target style, how in-text citations change (e.g. author–date to numbered), and the reference list reformatted to the style using only the elements each original reference contains; mark a missing element as [missing: pages] rather than adding it. ' +
+        'Then "## What still breaks the guidelines": a table: issue | where | what the guideline asks | what to do. Check the total and abstract word counts against stated limits (give your counts as estimates), the title, the abstract format, keywords, required sections and statements (ethics approval and consent, funding, competing interests, author contributions, data and code availability, trial registration where it applies), figure and table counts and legends, and anything the guidelines ask that the manuscript lacks. If nothing breaks a rule, say so.' +
+        `\n\nThe manuscript:\n${manuscript}`,
+      maxTokens: long ? 6000 : Math.min(8000, Math.ceil(count * 1.6) + 2000), task: 'review',
+    };
+  },
 
   // ---------------------------------------------------------------- Writing Studio: deliverables
   'white-paper': (c) => {
@@ -244,6 +320,23 @@ const BUILDERS: Record<string, Builder> = {
     };
   },
 
+  // ---------------------------------------------------------------- Writing Studio: correspondence
+  'research-email': (c) => {
+    const kind = EMAIL_KINDS[c.inputs.kind] ? c.inputs.kind : 'coauthor';
+    const brief = kind === 'followup' || kind === 'paper';
+    return {
+      system: `${BASE.replace('Markdown only: "##" and "###" headings, paragraphs, lists and tables. ', '')} You write short, professional emails for ${reader(c)}. ${language(c)} ` +
+        'Use only the facts the writer gives. Never invent names, titles, institutions, dates, results, funding, shared history, or praise of the recipient\'s work beyond what the writer says. ' +
+        'Where a detail is needed and not given, write a [bracketed placeholder] such as [your name] or [date and time zone]. No flattery, no superlatives, no exclamation marks.',
+      user: `Write ${EMAIL_KINDS[kind]}.\n\nTo: ${c.inputs.recipient?.trim() || '[recipient’s name and title]'}\nAbout: "${c.inputs.topic}"` +
+        (c.inputs.purpose?.trim() ? `\nWhat the writer wants:\n${c.inputs.purpose.trim().slice(0, 4000)}` : '') +
+        (c.inputs.deadline?.trim() ? `\nDeadline or date: ${c.inputs.deadline.trim().slice(0, 200)}` : '') +
+        `\n\nFormat: a first line "**Subject:** …" (specific, under 10 words), a blank line, the greeting, the body in short paragraphs (under ${brief ? 120 : 200} words), one clear request near the end, and a sign-off with a signature of [placeholders] for name, position, institution and email unless the notes give them. ` +
+        'Then a line "---" and "**Before sending:**" with a short list of the placeholders to fill and anything to attach.' + notesLine(c.inputs.notes),
+      maxTokens: 900,
+    };
+  },
+
   // ---------------------------------------------------------------- Thesis Suite
   question: (c) => ({
     user: `Refine this topic or draft question into a focused, researchable question for ${reader(c)}: "${c.inputs.topic}". ` +
@@ -269,6 +362,24 @@ const BUILDERS: Record<string, Builder> = {
     user: `Build a theoretical framework for a study on "${c.inputs.topic}". ${headingsRule(c, 'Candidate theories (2–4, each with its core idea and how it has been used, cited), The theory or combination to use and why, Key constructs (a table: construct | definition | how to measure or observe it), How the variables relate (the propositions, and a simple text diagram such as A → B → C), Limits of the framework')}.${notesLine(c.inputs.notes)}`,
     maxTokens: 3200, grounded: true,
   }),
+  operationalisation: (c) => {
+    const constructs = (c.inputs.constructs || '').split(/\r?\n|;/).map((line) => line.replace(/^\s*[-*•\d.)]+\s*/, '').trim()).filter(Boolean).slice(0, 12);
+    const qualitative = c.inputs.design === 'qualitative';
+    return {
+      user: `Operationalise the constructs of this study for ${reader(c)}: "${c.inputs.topic}". Approach: ${{ qualitative: 'qualitative', mixed: 'mixed methods' }[c.inputs.design] ?? 'quantitative'}.\n\nConstructs:\n${constructs.map((item) => `- ${item}`).join('\n')}\n\n` +
+        (qualitative
+          ? 'Start with "## Operationalisation table": a Markdown table, one row per construct: Construct | Conceptual definition | How it is recognised in the data | Indicators or sensitising questions | Data source (interview, observation, documents) | Level of measurement (not applicable, or how it is counted if it is) | Trustworthiness (credibility, dependability, transferability checks). '
+          : 'Start with "## Operationalisation table": a Markdown table, one row per construct: Construct | Conceptual definition | Operational definition | Indicators | Instrument | Level of measurement | Validity and reliability evidence. ') +
+        'The conceptual definition comes from the literature and is cited. The operational definition says exactly what is observed or asked and how it is scored. The level of measurement is nominal, ordinal, interval or ratio; where a summed Likert score is treated as interval, say that this is a convention. ' +
+        'Name an instrument only if a source describes it or it is one of the scales listed below. Give reliability or validity figures only when a source reports them, with its marker; otherwise write "[report from the instrument\'s validation study]". Never invent an instrument, item wording, cut-off or coefficient. ' +
+        `Free validated scales the Survey builder can add, with their published wording and scoring: ${SURVEY_SCALES.map(([name, measures]) => `${name} (${measures})`).join('; ')}. ` +
+        'Where a construct matches one of these, name it in the Instrument column with "(add it from the Survey builder)", and say whether what it measures fits the construct as defined. ' +
+        'Then "## Notes by construct": a "###" per construct with alternative measures, adaptation or translation needs, and threats to validity. ' +
+        'Then "## Variables for analysis": a table Variable | Construct | Role (independent, dependent, control, moderator or mediator) | Type | Values or range. ' +
+        'End with "## Checks before data collection": 3–5 bullets (pilot test, permission or licence, translation, reliability in your own sample).' + notesLine(c.inputs.notes),
+      maxTokens: 4200, grounded: true,
+    };
+  },
   gaps: (c) => ({
     user: `Identify research gaps on "${c.inputs.topic}" for ${reader(c)}. Start with ## What is well studied (one paragraph, cited). Then ## Possible gaps: 4–6 gaps, each a "###" heading naming the gap, then **Type:** (unanswered question, under-studied population or setting, untested method, conflicting results, or outdated evidence); **Why it may be a gap:** (2–3 cited sentences); **Confidence:** low, medium or high with a reason; **A study that could address it:** (one sentence). Finish with ## Before you rely on these (how to check them).${notesLine(c.inputs.notes)}`,
     maxTokens: 3000, grounded: true,
@@ -323,10 +434,52 @@ const BUILDERS: Record<string, Builder> = {
       `${headingsRule(c, 'Study summary in plain language, Participants and recruitment, Procedures, Risks and how they are reduced, Benefits, Informed consent (and a short draft consent statement), Confidentiality and data protection (storage, access, retention, anonymisation or pseudonymisation), Withdrawal, Conflicts of interest')}. Mark what the researcher must confirm in [square brackets]; never invent approvals or institutions.\n\nThe study:\n${(c.inputs.topic || '').slice(0, 12000)}`,
     maxTokens: 4500,
   }),
+  'ethics-statement': (c) => {
+    const review: Record<string, string> = {
+      approved: 'The study was reviewed and approved by an ethics committee or IRB.',
+      exempt: 'An ethics committee or IRB reviewed the study and granted an exemption or a waiver; say which, as the notes give it, or use a [placeholder].',
+      'not-required': 'The writer says ethics review was not required. State the reason from the notes, or write [reason review was not required, e.g. publicly available anonymised data], and note in the checks that many journals ask for written confirmation from the institution.',
+    };
+    const consent: Record<string, string> = {
+      written: 'Written informed consent was obtained from all participants.', verbal: 'Consent was given verbally or online and documented; say how, from the notes, or use a [placeholder].',
+      parental: 'Parents or guardians gave written informed consent and the children gave assent.', waived: 'The committee waived the requirement for informed consent; give its reason from the notes, or a [placeholder].',
+      na: 'The study had no human participants or personal records, so consent does not apply.',
+    };
+    const value = (input: string | undefined, placeholder: string) => input?.trim() || placeholder;
+    return {
+      system: `${BASE} You write ethics declarations for research manuscripts, in the wording journals use. ${language(c)} ` +
+        'Use only the details the writer gives. Never invent committee names, reference numbers, dates, guidelines followed, registrations or consent procedures: write a [placeholder] for anything missing. Write in the past tense.',
+      user: `Write the ethics statement for the manuscript "${c.inputs.topic}".\n\n` +
+        `Committee and institution: ${value(c.inputs.committee, '[name of the committee, institution]')}\nReference number: ${value(c.inputs.reference, '[approval reference number]')}\nDate of approval: ${value(c.inputs.date, '[date of approval]')}\n` +
+        `Review: ${review[c.inputs.approval] ?? review.approved}\nConsent: ${consent[c.inputs.consent] ?? consent.written}\n` +
+        (c.inputs.animals === 'animals' ? 'Animals: animal work was done. Include the animal ethics approval (the committee, e.g. an IACUC or animal welfare body, and its number as [placeholders] unless given) and the law or guideline followed, as the notes give it or as a [placeholder such as ARRIVE 2.0 or the national legislation].\n' : 'Animals: none.\n') +
+        '\nReturn "## Methods paragraph" (2–4 sentences as they would appear in the Methods section); then "## Declarations" with the bold labels **Ethics approval and consent to participate:**, **Consent for publication:** (needed for identifiable individual data or images; otherwise "Not applicable.")' +
+        (c.inputs.animals === 'animals' ? ' and **Animal research:**' : '') +
+        '; then "## Check before submission": a short list of the placeholders to fill and what journals commonly ask for (the approval letter, the consent form template, a statement of the ethical guideline followed only if the writer confirms it, such as the Declaration of Helsinki for research on people).' +
+        notesLine(c.inputs.notes),
+      maxTokens: 1200,
+    };
+  },
   dmp: (c) => ({
     user: `Write a data management plan in the ${{ nih: 'NIH Data Management and Sharing Plan', nsf: 'NSF', horizon: 'Horizon Europe', ukri: 'UKRI' }[c.inputs.funder] ?? 'generic'} format for this project. ${headingsRule(c, 'Data description (types, formats, volume), Collection and documentation (metadata standards), Storage and security, Ethics and personal data, Sharing and access (repository, timing, licence), Preservation, Roles and costs')}. Name real repositories that fit the field (e.g. Zenodo, Dryad, OSF, discipline repositories). Mark choices the researcher must confirm in [square brackets].\n\nThe project:\n${(c.inputs.topic || '').slice(0, 12000)}`,
     maxTokens: 3200,
   }),
+  'study-checklist': (c) => {
+    const kind = STUDY_CHECKLISTS.some((item) => item.id === c.inputs.kind) ? c.inputs.kind : STUDY_CHECKLISTS[0].id;
+    const base = template(`checklist-${kind}`)!;
+    return {
+      system: `${BASE} You prepare study checklists for ${reader(c)}. ${language(c)} Start from the base checklist, which paraphrases public guidance, and tailor it to the study. ` +
+        'Never invent regulations, deadlines, form numbers, committee names or an institution\'s own rules: where a local rule decides, write [check with your committee, registry or sponsor]. This is a working checklist, not legal or regulatory advice.',
+      user: `Tailor the checklist "${base.label.replace(/^Checklist:\s*/, '')}" to the study below. The base checklist:\n` +
+        base.sections.map(([heading, hint], index) => `${index + 1}. ${heading}${hint ? `: ${hint}` : ''}`).join('\n') +
+        (kind === 'ctgov-results' ? '\nKeep the order of the PRS results sections; outcome measures must match the registered outcomes exactly.' : '') +
+        '\n\nReturn "## Checklist": a Markdown table: # | Item | What this study needs | Applies (yes, no or check) | Owner | Done, with "[ ]" in every Done cell and "[owner]" where the owner is not known. ' +
+        'Keep every base item (mark "no" with the reason when it does not apply), split an item where the study needs more detail, and add items the study clearly needs, marked "(added)". ' +
+        'Then "## Easy to miss for this study": 3–5 bullets. Then "## Open questions": what the writer must find out or decide.' +
+        `\n\nThe study:\n${(c.inputs.topic || '').slice(0, 12000)}${notesLine(c.inputs.notes)}`,
+      maxTokens: 3800,
+    };
+  },
 
   // ---------------------------------------------------------------- Slides
   slides: (c) => {
@@ -347,6 +500,7 @@ const BUILDERS: Record<string, Builder> = {
       maxTokens: Math.min(9000, 700 + count * 380), grounded: !c.inputs.text?.trim(), json: true,
     };
   },
+  poster: posterBuilder,
 };
 
 export const hasStudioPrompt = (id: string) => Boolean(BUILDERS[id]);

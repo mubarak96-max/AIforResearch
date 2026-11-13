@@ -8,11 +8,11 @@ primary_keyword: "research poster template"
 secondary_keywords: ["academic poster template", "conference poster", "scientific poster template", "poster presentation template", "latex poster template", "powerpoint poster size"]
 hero: "cta"
 cta:
-  label: "Write the poster text"
-  href: "/write"
-plan_note: "The template is free. A blank poster outline in Writing Studio costs nothing; having it written from your topic with citations costs 15 credits."
-related: ["/features/research-slides", "/templates/research-proposal", "/blog/how-to-write-a-research-proposal", "/features/ai-writing-editor", "/blog/which-statistical-test-to-use"]
-updated: "2026-11-12"
+  label: "Make the poster in Slides"
+  href: "/slides?module=poster"
+plan_note: "The template is free. In Slides a poster costs 3 credits, as a PowerPoint file (A0, A1 or 48 x 36 in) or a LaTeX tikzposter file; the Free plan has 45 credits a month."
+related: ["/features/research-poster-maker", "/blog/how-to-make-a-research-poster", "/features/research-slides", "/templates/research-proposal", "/blog/how-to-write-a-research-proposal", "/features/ai-writing-editor", "/blog/which-statistical-test-to-use"]
+updated: "2026-11-13"
 faq:
   - q: "What size should a research poster be?"
     a: "Use the size the conference states, which is usually in the call for abstracts or the presenter instructions. Common sizes are A0 portrait (841 by 1189 mm) at European meetings and 48 by 36 inches landscape at many North American ones. Set the size before you start designing, because scaling a finished poster changes font sizes and spacing."
@@ -23,7 +23,7 @@ faq:
   - q: "Can I make a research poster in PowerPoint?"
     a: "Yes. Make one slide, then set Design, Slide Size, Custom Slide Size to the poster's dimensions before adding anything. PowerPoint allows up to 56 inches on each side, so A0 and 48 by 36 inches both fit. Export to PDF for printing and check the figures at 100% zoom first."
   - q: "Can AI make my research poster?"
-    a: "AI can write the poster text. In AI for Research, Writing Studio's Poster text template writes short blocks for each section from your topic or results, with real citations, for 15 credits. It does not lay out or design the poster. You place the text and your own figures in PowerPoint, LaTeX or a design tool."
+    a: "AI can write the text and lay out a first version. In AI for Research, the Poster module in Slides turns your poster text or a document into a one-slide PowerPoint poster (A0 portrait, A1 or 48 by 36 inches landscape) or a LaTeX tikzposter file, for 3 credits. You still add your own figures, check every number and adjust the design before printing."
 ---
 This research poster template is for students and researchers presenting at a conference or poster session. It gives two layouts, the sections organizers expect, a word and font budget for each, PowerPoint setup steps and a LaTeX file you can copy. Write the text here or in Writing Studio, then lay it out in the tool you prefer.
 
@@ -143,20 +143,31 @@ This file uses the tikzposter class [2]. It compiles with pdfLaTeX in Overleaf o
 - **Results:** Students attending 6 or more sessions left at 11% against 24% for non-attenders. The figure shows dropout by attendance band.
 - **Conclusions:** Attendance is strongly linked to retention. A randomized invitation study is needed to rule out motivation as the cause.
 
-## How to write the poster text in AI for Research
+## How to make the poster in AI for Research
 
-AI for Research writes the words for the poster. It does not lay out the poster itself.
+AI for Research writes the poster text and builds a first layout you can edit. The [research poster maker](/features/research-poster-maker) page has the details.
+
+**Write the text** (skip this if you start from a finished paper):
 
 1. Open **Writing Studio**.
 2. For a blank outline, choose **Poster text** under **Start from a template**. A document opens with Title and authors, Introduction, Methods, Results, Conclusions, and References and contact, each with a hint. No credits.
 3. For a draft, choose **Fill a template**, pick **Poster text** and enter your topic, with your results in the notes. It writes about 700 words under those headings, cites real papers and leaves [placeholders] where only you have the facts.
-4. Edit it in the editor, cut each block to the word budget above and paste it into PowerPoint or the LaTeX file.
+4. Edit it in the editor and cut each block to the word budget above.
+
+**Build the poster:**
+
+5. Open **Slides** and choose **Poster**. Paste the poster text or pick a document.
+6. Pick the size: A0 portrait, A1, or 48 x 36 in landscape.
+7. Download the PowerPoint file, the tikzposter `.tex` file, or both. Add your figures, check the fonts at 100% zoom and export to PDF for printing.
+
+<!-- VERIFY: whether the poster's PPTX and .tex downloads need a paid plan, as deck downloads do -->
 
 | Task | Where | Credits |
 | --- | --- | --- |
 | Copy the layouts or LaTeX file | This page | 0 |
 | Blank Poster text outline | Writing Studio | 0 |
 | Poster text written from your topic, with citations | Writing Studio, Fill a template | 15 |
+| Poster as a PowerPoint or LaTeX file | Slides, Poster | 3 |
 | Run a statistical test for the results block | Data Lab | 0 |
 
 The free plan has 45 credits a month. See [pricing](/pricing). If you also present the work as a talk, the [research presentation maker](/features/research-slides) builds a slide deck with speaker notes.
@@ -165,8 +176,7 @@ The free plan has 45 credits a month. See [pricing](/pricing). If you also prese
 
 ## What this template and the tool do not do
 
-- There is no PowerPoint or PDF poster file to download. Copy the layouts and LaTeX code from this page.
-- AI for Research does not design, lay out or print posters. You place the text and figures yourself.
+- The Poster module gives a first layout, not a finished design. You add your figures, logos and final styling. AI for Research does not print posters.
 - The AI does not know your results. Paste them in the notes, or it leaves placeholders; it never invents your numbers.
 - Conference rules on size, orientation and printing win over this template. Check them first.
 
@@ -176,6 +186,7 @@ Undergraduates at a research day, master's and PhD students at their first confe
 
 ## Learn more
 
+- [How to make a research poster](/blog/how-to-make-a-research-poster)
 - [Which statistical test to use](/blog/which-statistical-test-to-use)
 - [How to write a research question](/blog/how-to-write-a-research-question)
 - [Thesis defense presentation, slide by slide](/blog/thesis-defense-presentation)

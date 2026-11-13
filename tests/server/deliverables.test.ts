@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { STUDIO_MODULES, TEMPLATES, studioCredits, studioModule, workspaceModules } from '../../lib/server/lib/studioCatalog';
-import { buildStudioPrompt, hasStudioPrompt, type StudioContext } from '../../lib/server/lib/studioModules';
+import { JOURNAL_STYLES, STUDIO_MODULES, STUDY_CHECKLISTS, TEMPLATES, studioCredits, studioModule, workspaceModules } from '../../lib/server/lib/studioCatalog';
+import { SURVEY_SCALES, buildStudioPrompt, hasStudioPrompt, type StudioContext } from '../../lib/server/lib/studioModules';
+import { INSTRUMENTS } from '../../lib/surveyInstruments';
 import { checkInputs } from '../../lib/server/routes/studio';
 import { CREDIT_COSTS } from '../../lib/server/lib/plans';
 
@@ -22,7 +23,7 @@ describe('deliverable templates', () => {
       expect(module).toMatchObject({ workspace: 'write', group: 'Deliverables' });
       expect(hasStudioPrompt(id)).toBe(true);
     }
-    expect(workspaceModules('write').map((module) => module.id).slice(-6)).toEqual(NEW);
+    expect(workspaceModules('write').filter((module) => module.group === 'Deliverables').map((module) => module.id).slice(-6)).toEqual(NEW);
     expect(new Set(STUDIO_MODULES.map((module) => module.id)).size).toBe(STUDIO_MODULES.length);
   });
 
@@ -94,8 +95,122 @@ describe('deliverable templates', () => {
 
   it('adds blank editor templates without offering them to “Fill a template”', () => {
     const blank = TEMPLATES.filter((item) => item.blankOnly).map((item) => item.id);
-    expect(blank).toEqual(['case-report', 'clinical-audit', 'evaluation-report', 'policy-brief', 'white-paper', 'annotated-bibliography']);
+    expect(blank.slice(0, 6)).toEqual(['case-report', 'clinical-audit', 'evaluation-report', 'policy-brief', 'white-paper', 'annotated-bibliography']);
     const fill = studioModule('template')!.fields[0].options!.map(([id]) => id);
     expect(fill.some((id) => blank.includes(id))).toBe(false);
+  });
+});
+
+describe('catalogue features: emails, conference papers, journal formatting, ethics statements, checklists, operationalisation', () => {
+  const SPEC: [id: string, workspace: string, action: keyof typeof CREDIT_COSTS, grounded: false | 'single' | 'multi', group?: string][] = [
+    ['research-email', 'write', 'short', false, 'Correspondence'],
+    ['conference-paper', 'write', 'draft', 'multi'],
+    ['journal-format', 'write', 'section', false],
+    ['ethics-statement', 'proposals', 'short', false],
+    ['study-checklist', 'proposals', 'section', false, 'Checklists'],
+    ['operationalisation', 'thesis', 'section', 'single'],
+  ];
+
+  it('each module exists in its workspace with its price, grounding and prompt', () => {
+    for (const [id, workspace, action, grounded, group] of SPEC) {
+      const module = studioModule(id)!;
+      expect(module, id).toMatchObject({ workspace, grounded });
+      expect(module.group, id).toBe(group);
+      expect(hasStudioPrompt(id), id).toBe(true);
+      expect(module.cost({ text: 'word '.repeat(100) }).action, id).toBe(action);
+      expect(studioCredits(module, { text: 'word '.repeat(100) }, CREDIT_COSTS), id).toBe(CREDIT_COSTS[action]);
+    }
+    expect(CREDIT_COSTS.short).toBe(1);
+    expect(studioModule('conference-paper')!.lengthOption).toBe(true);
+    // A grouped module comes last in its workspace, so its heading does not sit above ungrouped modules.
+    expect(workspaceModules('write').at(-1)!.id).toBe('research-email');
+    expect(workspaceModules('proposals').at(-1)!.id).toBe('study-checklist');
+  });
+
+  it('the journal formatter is priced per 10,000 words, capped at 4 units', () => {
+    const module = studioModule('journal-format')!;
+    const credits = (count: number) => studioCredits(module, { text: 'word '.repeat(count) }, CREDIT_COSTS);
+    expect(credits(300)).toBe(CREDIT_COSTS.section);
+    expect(credits(10_001)).toBe(CREDIT_COSTS.section * 2);
+    expect(credits(35_000)).toBe(CREDIT_COSTS.section * 4);
+    expect(credits(45_000)).toBe(CREDIT_COSTS.section * 4);
+    expect(module.fields.find((field) => field.name === 'text')!.max).toBeGreaterThanOrEqual(200_000);
+  });
+
+  it('a researcher email has a subject line, placeholders and no invented facts', () => {
+    const { system, user } = prompt('research-email', { kind: 'data', topic: 'Sleep and exam performance', purpose: 'The anonymised actigraphy data from your 2021 cohort.' });
+    expect(system).toMatch(/Never invent names/);
+    expect(system).toMatch(/No flattery, no superlatives/);
+    expect(user).toMatch(/\*\*Subject:\*\*/);
+    expect(user).toMatch(/request for data/);
+    expect(user).toContain('[recipient’s name and title]');
+    expect(user).toContain('actigraphy data');
+    expect(prompt('research-email', { kind: 'supervisor', topic: 'Coral bleaching', recipient: 'Prof. Lee' }).user).toMatch(/prospective supervisor[\s\S]*To: Prof\. Lee/);
+  });
+
+  it('a conference paper states its contributions, fits the page limit and never invents results', () => {
+    const ieee = prompt('conference-paper', { topic: 'Edge anomaly detection', pages: '4' }, 6).user;
+    expect(ieee).toMatch(/Our contributions are:/);
+    expect(ieee).toMatch(/4-page limit/);
+    expect(ieee).toMatch(/Index Terms/);
+    expect(ieee).toMatch(/never invent results/);
+    expect(prompt('conference-paper', { topic: 'Edge anomaly detection', format: 'acm', study: 'F1 0.91 on the SWaT dataset.' }, 6).user).toMatch(/CCS Concepts[\s\S]*F1 0\.91/);
+  });
+
+  it('the journal formatter keeps the science, notes the reference style and lists what still breaks the guidelines', () => {
+    const short = prompt('journal-format', { text: 'Results. We found X in 40 of 52 samples. '.repeat(20), style: 'vancouver' });
+    expect(short.system).toMatch(/Never change the scientific content/);
+    expect(short.user).toMatch(/## Formatted manuscript/);
+    expect(short.user).toMatch(/## Reference style/);
+    expect(short.user).toMatch(/## What still breaks the guidelines/);
+    expect(short.user).toMatch(/ICMJE/);
+    const long = prompt('journal-format', { text: 'word '.repeat(6000), style: 'custom', guidelines: 'Abstract at most 200 words.' });
+    expect(long.user).toMatch(/## New structure/);
+    expect(long.user).toContain('Abstract at most 200 words.');
+    expect(JOURNAL_STYLES.map((style) => style.id)).toEqual(['nature', 'science', 'ieee', 'acm', 'apa', 'vancouver', 'custom']);
+  });
+
+  it('an ethics statement uses placeholders for every missing detail', () => {
+    const empty = prompt('ethics-statement', { topic: 'Sleep in students' });
+    expect(empty.user).toContain('[name of the committee, institution]');
+    expect(empty.user).toContain('[approval reference number]');
+    expect(empty.system).toMatch(/Never invent committee names/);
+    expect(empty.user).not.toMatch(/Animal research/);
+    const full = prompt('ethics-statement', { topic: 'Mouse model', committee: 'IACUC, Example University', reference: 'A-123', animals: 'animals', consent: 'na' });
+    expect(full.user).toContain('A-123');
+    expect(full.user).toMatch(/\*\*Animal research:\*\*/);
+  });
+
+  it('a study checklist starts from its blank template and tailors it', () => {
+    expect(studioModule('study-checklist')!.fields[0].options!.map(([id]) => id)).toEqual(STUDY_CHECKLISTS.map((item) => item.id));
+    const ctgov = prompt('study-checklist', { kind: 'ctgov-results', topic: 'A two-arm randomised trial of drug A versus placebo in 300 adults with asthma.' });
+    expect(ctgov.user).toMatch(/Participant Flow[\s\S]*Baseline Characteristics[\s\S]*Outcome Measures[\s\S]*Adverse Event Information/);
+    expect(ctgov.user).toMatch(/registered outcomes exactly/);
+    expect(ctgov.system).toMatch(/Never invent regulations/);
+    expect(prompt('study-checklist', { kind: 'not-a-kind', topic: 'A survey of nurses about burnout at three hospitals.' }).user).toMatch(/IRB or ethics/);
+  });
+
+  it('operationalisation tables each construct and points matching constructs to the Survey builder scales', () => {
+    expect(SURVEY_SCALES.map(([name]) => name)).toEqual(INSTRUMENTS.map((item) => item.name));
+    const { user } = prompt('operationalisation', { topic: 'Stress and sleep in nursing students', constructs: '- Perceived stress\n- Sleep quality' }, 5);
+    expect(user).toContain('Construct | Conceptual definition | Operational definition | Indicators | Instrument | Level of measurement | Validity and reliability evidence');
+    expect(user).toContain('- Perceived stress\n- Sleep quality');
+    expect(user).toContain('PSS-10 (perceived stress)');
+    expect(user).toMatch(/add it from the Survey builder/);
+    expect(user).toMatch(/Never invent an instrument/);
+  });
+
+  it('adds blank venue and checklist templates that “Fill a template” does not offer', () => {
+    const ids = ['venue-ieee', 'venue-acm', 'venue-apa', 'venue-nature', 'venue-vancouver', ...STUDY_CHECKLISTS.map((item) => `checklist-${item.id}`)];
+    const fill = studioModule('template')!.fields[0].options!.map(([id]) => id);
+    for (const id of ids) {
+      const item = TEMPLATES.find((entry) => entry.id === id);
+      expect(item, id).toBeDefined();
+      expect(item!.blankOnly, id).toBe(true);
+      expect(item!.sections.length, id).toBeGreaterThanOrEqual(8);
+      expect(fill, id).not.toContain(id);
+    }
+    for (const style of JOURNAL_STYLES) if (style.template) expect(ids).toContain(style.template);
+    expect(new Set(TEMPLATES.map((item) => item.id)).size).toBe(TEMPLATES.length);
   });
 });

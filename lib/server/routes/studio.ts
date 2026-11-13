@@ -3,6 +3,7 @@
  *   POST /run/:module             any module of studioCatalog.ts (Server-Sent Events: task, status, sources, delta, done | error)
  *   POST /similar                 Similar papers from a title or abstract (no credits)
  *   GET  /slides/export-allowed   200 when the plan includes PowerPoint export, 402 otherwise
+ *   GET  /poster/latex-allowed    200 when the plan includes LaTeX export (the poster's .tex), 402 otherwise
  *
  * A run takes its credits first and gives them back when it fails. Grounded modules search the
  * chosen sources (or reuse the sources of the research task they continue, `from_task`) and may
@@ -26,6 +27,7 @@ import { Filters, toFilters } from './research.js';
 import { figuresAsText, type ResearchFigure } from '../lib/researchFigures.js';
 import { STUDIO_KIND, studioCredits, studioModule, type StudioField, type StudioModule } from '../lib/studioCatalog.js';
 import { batches, buildStudioPrompt, cleanDeck, hasStudioPrompt, improvePrompt, paragraphsOf, type StudioLength } from '../lib/studioModules.js';
+import { cleanPoster, mapPosterText, posterText } from '../lib/posterModule.js';
 
 const RunRequest = z.object({
   inputs: z.record(z.string(), z.string()).default({}),
@@ -101,6 +103,11 @@ export function studioRoutes(slots: Slots) {
 
   app.get('/slides/export-allowed', async (c) => {
     await requireFeature(currentUser(c).account_id, 'pptx_export');
+    return c.json({ allowed: true });
+  });
+
+  app.get('/poster/latex-allowed', async (c) => {
+    await requireFeature(currentUser(c).account_id, 'latex_export');
     return c.json({ allowed: true });
   });
 
@@ -220,7 +227,7 @@ async function gatherStudioSources(slots: Slots, user: AuthUser, module: StudioM
     const map = new Map(found.map((source, index) => [source.marker, sources[files.length + index].marker]));
     const markdown = typeof task.result?.markdown === 'string' ? remapMarkers(figuresAsText(task.result.markdown, task.result.figures as ResearchFigure[] | undefined), map).trim() : '';
     return { sources, prior: markdown ? { title: task.title, markdown } : null };
-  } else if (module.grounded && !(module.id === 'slides' && inputs.text)) {
+  } else if (module.grounded && !((module.id === 'slides' || module.id === 'poster') && inputs.text)) {
     const groups: SourceGroup[] = body.library_document_ids.length && !body.groups.includes('library') ? [...body.groups, 'library'] : body.groups;
     send('status', { stage: 'planning', detail: module.grounded === 'multi' ? 'Planning the searches' : 'Searching the literature' });
     const queries = module.grounded === 'multi' ? await planQueries(slots.llm, topic, 3, usage) : [topic.slice(0, 300)];
@@ -264,6 +271,16 @@ async function runModule(slots: Slots, user: AuthUser, module: StudioModule, inp
   if (sources.length) send('sources', { sources });
   const prompt = buildStudioPrompt(module, { inputs, sources, prior, role, field: profile.field, headings: body.headings, length: body.length as StudioLength, language: body.language ?? null, highQuality: body.high_quality });
   send('status', { stage: 'writing', detail: sources.length ? `Reading ${sources.length} sources and writing` : 'Writing' });
+
+  // Posters: JSON, with only real source markers kept. The whole poster is shown on every plan; the downloads are gated in the browser.
+  if (module.id === 'poster') {
+    const { text, usage: used } = await slots.llm.complete({ ...prompt, signal });
+    add(used);
+    const cleaned = cleanPoster(parseJson(text), inputs.topic);
+    if (!cleaned) throw new HTTPException(503, { message: 'The poster could not be made this time. Try again.' });
+    const poster = mapPosterText(cleaned, (value) => dropInventedMarkers(value, sources, '').trim());
+    return { poster, sources: usedSources(posterText(poster), sources), all_sources: sources, summary: `Poster: ${poster.title}` };
+  }
 
   if (module.output === 'slides') {
     const { text, usage: used } = await slots.llm.complete({ ...prompt, signal });

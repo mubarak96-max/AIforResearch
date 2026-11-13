@@ -10,9 +10,9 @@ hero: "cta"
 cta:
   label: "Screen in the workspace"
   href: "/systematic-review"
-plan_note: "Copying the forms is free. Screening by hand in the Systematic Review workspace costs 0 credits; AI suggestions cost 1 credit per 25 records. The free plan holds one review of up to 50 records."
+plan_note: "Copying the forms is free. In the Systematic Review workspace, screening by hand and the Word or PDF screening form cost 0 credits; AI suggestions cost 1 credit per 25 records. Free holds one review of 50 records."
 related: ["/features/systematic-review", "/templates/screening-decision-log", "/templates/inclusion-exclusion-criteria", "/blog/cohens-kappa-inter-rater-reliability", "/blog/scoping-review-vs-systematic-review", "/alternatives/rayyan"]
-updated: "2026-11-12"
+updated: "2026-11-13"
 faq:
   - q: "What is title and abstract screening?"
     a: "Title and abstract screening is the first pass through the records your searches found. Each reviewer reads only the title and abstract and decides whether the record could meet the eligibility criteria. Clearly irrelevant records are excluded without reasons; anything that might qualify goes on to full-text screening, where reasons for every exclusion are recorded for the PRISMA flow diagram."
@@ -124,6 +124,9 @@ The Systematic Review workspace builds the form from your review: the criteria c
 3. On the **Screening** tab, choose **Title and abstract**. Each record shows its title, authors, abstract and DOI or PubMed link. Press **I** to include, **E** to exclude (with a reason from the list) or **M** for maybe.
 4. Switch to **Full text**. Records you included or marked maybe at title and abstract are there. Read the paper through the DOI link and decide again.
 5. Optional: **Suggest for the next 25** (1 credit) adds an AI suggestion with a one-sentence reason to each record. It is labeled as a suggestion; your vote is what counts.
+6. Screening somewhere else, or on paper? On the **Report** tab, download the screening form, the exclusion-reason list and the decision log as **Word** or **PDF**. They are built from your protocol's criteria and the review type's reasons, so a team that screens in a spreadsheet or another tool uses the same form. No credits.
+
+<!-- SCREENSHOT: the Report tab with the screening form, exclusion reasons and decision log download buttons (Word and PDF) -->
 
 | Review type | Exclusion reasons offered in the workspace |
 | --- | --- |
@@ -138,7 +141,9 @@ To add a second reviewer, put the review in a project and share it as **can edit
 
 ## What these forms and the workspace do not do
 
-- **The workspace does not show your own form questions.** It records Include, Exclude or Maybe and one reason from the review type's fixed list. Keep the Yes/No/Unclear answers in your own sheet if your protocol needs them.
+- **The workspace does not show your own form questions.** It records Include, Exclude or Maybe and one reason from the review type's fixed list. Keep the Yes/No/Unclear answers in your own sheet if your protocol needs them, or start from the Word export and add your questions to it.
+<!-- VERIFY: what the exported Word/PDF screening form contains (criteria as questions, or a list of criteria with a decision box) once the Report step export ships -->
+- **Decisions made outside the workspace do not flow back in.** The Word and PDF documents are for teams screening elsewhere; their answers are not imported.
 - **Decisions are not hidden from each other.** Once your co-reviewer, or the AI, has decided on a record, that decision shows under the abstract. Screen before you read it.
 - **Full texts are not attached.** You open the paper through its DOI or PubMed link; there is no PDF upload at the screening stage.
 - **"Not retrieved" has no separate box.** "Full text not available" is recorded as an exclusion reason, so move those reports to "reports not retrieved" when you draw the final PRISMA diagram.

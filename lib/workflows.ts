@@ -151,6 +151,109 @@ export function sourceContainsQuote(sourceText: string | undefined, quote: strin
   return Boolean(sourceText && needle && normalizeQuoteText(sourceText).includes(needle));
 }
 
+// ------------------------------------------------------------------ qualitative coding
+
+/** Code labels of an excerpt ("codes" is a comma-separated list, kept for existing workbooks). */
+export const splitCodes = (value: string | undefined) => [...new Set((value || '').split(',').map((code) => code.trim()).filter(Boolean))];
+const codeKey = (label: string) => label.normalize('NFKC').trim().toLowerCase();
+
+/** The line numbers and character offsets of a passage, e.g. "Lines 4–6, characters 120–188". */
+export function quoteLocator(text: string, start: number, end: number): string {
+  const lineOf = (offset: number) => text.slice(0, offset).split(/\r\n|\n|\r/).length;
+  const first = lineOf(start); const last = lineOf(Math.max(start, end - 1));
+  return `${first === last ? `Line ${first}` : `Lines ${first}–${last}`}, characters ${start}–${end}`;
+}
+
+/** Where a saved excerpt sits in its source: its recorded character offsets, else its first exact occurrence. */
+export function locateExcerpt(text: string, quote: string, locator?: string): { start: number; end: number } | null {
+  const offsets = (locator || '').match(/characters (\d+)–(\d+)/);
+  if (offsets) {
+    const start = Number(offsets[1]); const end = Number(offsets[2]);
+    if (text.slice(start, end) === quote) return { start, end };
+  }
+  const at = quote ? text.indexOf(quote) : -1;
+  return at >= 0 ? { start: at, end: at + quote.length } : null;
+}
+
+/** The speaker label at the start of the line holding an offset ("Interviewer: …", "P3: …"). */
+export function speakerAt(text: string, offset: number): string {
+  const lineStart = Math.max(text.lastIndexOf('\n', offset - 1), text.lastIndexOf('\r', offset - 1)) + 1;
+  const line = text.slice(lineStart, lineStart + 200);
+  return line.match(/^\s*([^:\n]{1,80}):\s+\S/)?.[1].trim() ?? '';
+}
+
+export type CodeSuggestion = { label: string; definition: string; quote: string; locator: string; speaker: string; existing: boolean };
+
+/**
+ * Keeps the AI's code suggestions whose quotation is in the transcript word for word (whitespace
+ * and page markers aside, as every saved quotation) and, when a passage was chosen, inside that
+ * passage. Everything else is dropped. Labels that match the codebook keep the codebook's wording.
+ */
+export function verifyCodeSuggestions(sourceText: string, raw: unknown, codebook: string[], passage?: string): { suggestions: CodeSuggestion[]; dropped: number } {
+  const items = Array.isArray(raw) ? raw : [];
+  const known = new Map(codebook.map((label) => [codeKey(label), label]));
+  const seen = new Set<string>();
+  const suggestions: CodeSuggestion[] = [];
+  let dropped = 0;
+  for (const item of items.slice(0, 20)) {
+    const value = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+    const label = typeof value.label === 'string' ? value.label.trim().replace(/,/g, ' ').slice(0, 80) : '';
+    const quote = typeof value.quote === 'string' ? value.quote.trim() : '';
+    if (!label || !quote || quote.length > 4000 || !sourceContainsQuote(sourceText, quote) || (passage && !sourceContainsQuote(passage, quote))) { dropped += 1; continue; }
+    const key = `${codeKey(label)}\u0000${normalizeQuoteText(quote)}`;
+    if (seen.has(key)) { dropped += 1; continue; }
+    seen.add(key);
+    const place = locateExcerpt(sourceText, quote);
+    suggestions.push({
+      label: known.get(codeKey(label)) ?? label, existing: known.has(codeKey(label)),
+      definition: typeof value.definition === 'string' ? value.definition.trim().slice(0, 1000) : '',
+      quote, locator: place ? quoteLocator(sourceText, place.start, place.end) : '',
+      speaker: place ? speakerAt(sourceText, place.start) : '',
+    });
+  }
+  return { suggestions: suggestions.slice(0, 12), dropped: dropped + Math.max(0, suggestions.length - 12) };
+}
+
+export type CodeFrequency = {
+  codes: { label: string; total: number }[];
+  columns: { key: string; label: string }[];
+  /** counts[code index][column index]: coded excerpts. */
+  counts: number[][];
+  /** cooccurrence[i][j]: excerpts coded with both codes i and j (the diagonal is each code's total). */
+  cooccurrence: number[][];
+  uncoded: number;
+};
+
+/** Code frequency by source or by participant (speaker label), and co-occurrence within excerpts. */
+export function codeFrequency(entries: WorkbookEntry[], by: 'source' | 'speaker' = 'source'): CodeFrequency {
+  const excerpts = entries.filter((entry) => entry.section === 'excerpts');
+  const labels = new Map<string, string>();
+  for (const code of entries.filter((entry) => entry.section === 'codes')) if (code.values.label) labels.set(codeKey(code.values.label), code.values.label);
+  for (const excerpt of excerpts) for (const code of splitCodes(excerpt.values.codes)) if (!labels.has(codeKey(code))) labels.set(codeKey(code), code);
+  const sourceTitle = new Map(entries.filter((entry) => entry.section === 'sources').map((entry) => [entry.id, entry.values.title || entry.id]));
+  const columnOf = (excerpt: WorkbookEntry) => (by === 'source'
+    ? { key: excerpt.values.source_id || '', label: sourceTitle.get(excerpt.values.source_id) || 'No source' }
+    : { key: codeKey(excerpt.values.speaker || ''), label: excerpt.values.speaker?.trim() || 'No speaker label' });
+  const columns: { key: string; label: string }[] = [];
+  for (const excerpt of excerpts) { const column = columnOf(excerpt); if (!columns.some((item) => item.key === column.key)) columns.push(column); }
+  const keys = [...labels.keys()];
+  const counts = keys.map(() => columns.map(() => 0));
+  const cooccurrence = keys.map(() => keys.map(() => 0));
+  let uncoded = 0;
+  for (const excerpt of excerpts) {
+    const codes = [...new Set(splitCodes(excerpt.values.codes).map(codeKey))].map((key) => keys.indexOf(key)).filter((index) => index >= 0);
+    if (!codes.length) { uncoded += 1; continue; }
+    const column = columns.findIndex((item) => item.key === columnOf(excerpt).key);
+    for (const i of codes) { counts[i][column] += 1; for (const j of codes) cooccurrence[i][j] += 1; }
+  }
+  const order = keys.map((_, i) => i).sort((a, b) => cooccurrence[b][b] - cooccurrence[a][a] || labels.get(keys[a])!.localeCompare(labels.get(keys[b])!));
+  return {
+    codes: order.map((i) => ({ label: labels.get(keys[i])!, total: cooccurrence[i][i] })),
+    columns, counts: order.map((i) => counts[i]),
+    cooccurrence: order.map((i) => order.map((j) => cooccurrence[i][j])), uncoded,
+  };
+}
+
 const NUMBER_PATTERN = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i;
 const isIsoDate = (value: string) =>
   /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;

@@ -8,10 +8,20 @@ import { Button, Card, inputClass } from '@/components/app/ui';
 import { useSignedIn } from '@/components/app/useSignedIn';
 import { api } from '@/lib/session';
 import { download, toCsv } from '@/components/app/analysis/stats';
-import { OFFICIAL_LABELS, type OfficialLocator, type OfficialProvider, type OfficialRecord, type OfficialSearch } from '@/lib/officialSources';
+import { OFFICIAL_DATA_KINDS, OFFICIAL_LABELS, OPENFDA_NOTE, PATENT_NOTE, type OfficialLocator, type OfficialProvider, type OfficialRecord, type OfficialSearch } from '@/lib/officialSources';
 
 type WorkbookDestination = { id: string; title: string; revision: number; project_id: string | null };
-const examples: Record<OfficialProvider, string> = { clinical_trials: 'e.g. type 2 diabetes AND exercise', world_bank: 'e.g. school enrollment or SE.PRM.ENRR', reliefweb: 'e.g. food insecurity assessment', sec: 'Numeric company CIK, e.g. 320193' };
+const examples: Record<OfficialProvider, string> = {
+  clinical_trials: 'e.g. type 2 diabetes AND exercise', world_bank: 'e.g. school enrollment or SE.PRM.ENRR', reliefweb: 'e.g. food insecurity assessment', sec: 'Numeric company CIK, e.g. 320193',
+  openfda_label: 'Drug name, e.g. metformin', openfda_event: 'Drug name, e.g. metformin', openfda_device: 'Device or company, e.g. insulin pump', fred: 'e.g. unemployment rate or GDPC1',
+  treasury: 'e.g. debt to the penny', oecd: 'e.g. unemployment monthly', uspto_patents: 'e.g. solid-state battery electrolyte',
+};
+const NOTES: Partial<Record<OfficialProvider, string>> = {
+  openfda_label: 'Drug labels as submitted by manufacturers, from openFDA.', openfda_event: 'Counts of reactions in FDA Adverse Event Reporting System reports that name the drug. Reports do not show that a drug caused a reaction.',
+  openfda_device: 'FDA 510(k) premarket clearances. A clearance is not an approval or evidence of effectiveness.', fred: 'Economic time series from the Federal Reserve Bank of St. Louis. Load observations for a period, e.g. 2015:2025.',
+  treasury: 'US federal finance tables from Fiscal Data. Load observations for a period, e.g. 2020:2025.', oecd: 'OECD statistical datasets. Load observations with an optional series key and a period, e.g. 2015:2025; without a period only the latest value of each series is loaded.',
+  uspto_patents: `US patent applications and grants from the USPTO Open Data Portal. ${PATENT_NOTE}`,
+};
 
 export default function OfficialSourcesPage() {
   const { user } = useSignedIn();
@@ -25,6 +35,7 @@ export default function OfficialSourcesPage() {
   const [period, setPeriod] = useState('');
   const [taxonomy, setTaxonomy] = useState('us-gaap');
   const [concept, setConcept] = useState('');
+  const [seriesKey, setSeriesKey] = useState('');
   const [destinations, setDestinations] = useState<WorkbookDestination[]>([]);
   const [destination, setDestination] = useState('');
   const [busy, setBusy] = useState(false);
@@ -72,6 +83,7 @@ export default function OfficialSourcesPage() {
     <p className="text-xs font-semibold uppercase tracking-wide text-muted">{record.kind.replaceAll('_', ' ')} · {record.publisher}</p>
     <h2 className="mt-2 text-lg font-bold"><a href={record.url} target="_blank" rel="noreferrer" className="hover:text-brand hover:underline">{record.title}</a></h2>
     {!!record.dates.length && <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-xs">{record.dates.map((item) => <div key={item.label}><dt className="font-semibold text-ink-2">{item.label}</dt><dd className="mt-0.5 text-muted">{item.value}</dd></div>)}</dl>}
+    {record.warnings.filter((warning) => warning === OPENFDA_NOTE || warning === PATENT_NOTE).map((warning) => <p key={warning} className="mt-3 text-xs font-semibold text-ink-2">{warning}</p>)}
     {record.summary && <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-ink-2">{record.summary.slice(0, 1000)}{record.summary.length > 1000 ? '…' : ''}</p>}
     {record.trial && <div className="mt-4 space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
@@ -81,7 +93,7 @@ export default function OfficialSourcesPage() {
       <section><h3 className="text-sm font-bold">Registry-linked publications</h3><p className="mt-1 text-xs text-muted">Reference types come from the registry. A background or automatically derived reference is not necessarily a results paper.</p>{record.trial.references.length ? <ul className="mt-2 space-y-2">{record.trial.references.map((reference, index) => <li key={index} className="rounded-lg border border-line p-3 text-xs"><span className="font-semibold">{reference.kind}: </span>{reference.citation || 'Citation not supplied'}{reference.url && <a href={reference.url} target="_blank" rel="noreferrer" className="ml-2 font-semibold text-brand underline">PubMed {reference.pmid}</a>}</li>)}</ul> : <p className="mt-2 text-xs text-muted">No linked publications returned in this snapshot.</p>}</section>
     </div>}
     <details className="mt-3 text-sm"><summary className="cursor-pointer font-semibold">Source details and limitations</summary><div className="mt-2 space-y-2">{record.warnings.map((warning) => <p key={warning} className="text-xs text-muted">{warning}</p>)}<pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-lg bg-soft p-3 text-xs">{JSON.stringify(record.metadata, null, 2)}</pre></div></details>
-    <div className="mt-4 flex flex-wrap gap-2"><Button disabled={busy} onClick={() => save(record)}>{destination ? 'Save to Library and workbook' : 'Save to Library'}</Button><Button onClick={() => download('official-source.json', JSON.stringify({ record, downloaded_at: new Date().toISOString() }, null, 2), 'application/json')}>Download source JSON</Button>{record.kind === 'trial_registration' && !record.trial && <Button disabled={busy} onClick={() => loadData(record.locator)}>Load registration details</Button>}{record.kind === 'indicator_metadata' && <Button disabled={busy} onClick={() => loadData({ ...record.locator, countries: countries.trim() || 'all', ...(period.trim() ? { date: period.trim() } : {}), page: 1 })}>Load observations</Button>}</div>
+    <div className="mt-4 flex flex-wrap gap-2"><Button disabled={busy} onClick={() => save(record)}>{destination ? 'Save to Library and workbook' : 'Save to Library'}</Button><Button onClick={() => download('official-source.json', JSON.stringify({ record, downloaded_at: new Date().toISOString() }, null, 2), 'application/json')}>Download source JSON</Button>{record.kind === 'trial_registration' && !record.trial && <Button disabled={busy} onClick={() => loadData(record.locator)}>Load registration details</Button>}{record.kind === 'indicator_metadata' && <Button disabled={busy} onClick={() => loadData({ ...record.locator, countries: countries.trim() || 'all', ...(period.trim() ? { date: period.trim() } : {}), page: 1 })}>Load observations</Button>}{OFFICIAL_DATA_KINDS.includes(record.kind) && record.kind !== 'indicator_metadata' && <Button disabled={busy} onClick={() => loadData({ ...record.locator, ...(period.trim() ? { date: period.trim() } : {}), ...(record.locator.provider === 'oecd' && seriesKey.trim() ? { key: seriesKey.trim() } : {}), page: 1 })}>Load observations</Button>}</div>
   </Card>;
 
   return <AppFrame wide title="Official sources" subtitle="Find trial registrations and other official records, and keep their provenance with your work.">
@@ -104,6 +116,11 @@ export default function OfficialSourcesPage() {
           <label className="block text-xs font-semibold">XBRL concept (optional)<input className={`${inputClass} mt-1`} value={concept} onChange={(event) => setConcept(event.target.value)} placeholder="e.g. Revenues or Assets" /></label>
           <Button className="self-end" disabled={busy || !availability.sec || !concept || !query} onClick={() => loadData({ provider: 'sec', id: query.trim(), taxonomy, concept, page: 1 })}>Load reported facts</Button>
           <p className="text-xs text-muted sm:col-span-3">SEC submissions cover SEC filers. Search retrieves recent filing metadata; concept facts retain every reported unit, period and filing date.</p>
+        </div>}
+        {NOTES[provider] && <p className="text-xs text-muted">{NOTES[provider]}</p>}
+        {(provider === 'fred' || provider === 'treasury' || provider === 'oecd') && <div className="grid gap-3 sm:grid-cols-3">
+          <label className="block text-xs font-semibold">Observation period (optional)<input className={`${inputClass} mt-1`} value={period} onChange={(event) => setPeriod(event.target.value)} placeholder="2015:2025" /></label>
+          {provider === 'oecd' && <label className="block text-xs font-semibold sm:col-span-2">Series key (optional)<input className={`${inputClass} mt-1`} value={seriesKey} onChange={(event) => setSeriesKey(event.target.value)} maxLength={300} placeholder="e.g. AUS+FRA........." /><span className="mt-1 block font-normal text-muted">Dimension codes joined by dots, from the OECD Data Explorer; empty loads every series.</span></label>}
         </div>}
         {availability[provider] === false && <p role="status" className="text-sm text-muted">This source is not connected on this deployment. Other sources remain available.</p>}
       </form>

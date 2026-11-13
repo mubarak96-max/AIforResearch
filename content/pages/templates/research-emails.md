@@ -8,11 +8,11 @@ primary_keyword: "email to professor for research"
 secondary_keywords: ["data request email", "coauthor invitation email", "email to potential phd supervisor", "how to email a professor about research opportunities", "research assistant email to professor", "follow up email to professor"]
 hero: "cta"
 cta:
-  label: "Draft it in the editor"
-  href: "/editor"
-plan_note: "The templates and the editor are free. An AI rewrite of your draft costs 1 credit and a tone check 2; the free plan has 45 credits a month."
-related: ["/features/projects", "/features/paper-search", "/templates/research-progress-tracker", "/blog/how-to-write-a-research-question", "/for/undergraduates", "/for/phd"]
-updated: "2026-11-12"
+  label: "Draft a research email"
+  href: "/write?module=research-email"
+plan_note: "The templates are free. The Research email module in the Writing Studio drafts one for 1 credit; the free plan has 45 credits a month."
+related: ["/features/projects", "/features/conference-paper-writer", "/features/paper-search", "/templates/research-progress-tracker", "/blog/how-to-write-a-research-question", "/for/undergraduates", "/for/phd"]
+updated: "2026-11-13"
 faq:
   - q: "How do I email a professor about research opportunities?"
     a: "Keep it under 200 words. Use a subject line that names the topic and your status, say who you are in one line, name one of their recent papers and what interested you in it, state what you are asking for, attach a CV and transcript, and offer a short meeting. Send it to their university address from yours, on a weekday morning."
@@ -23,7 +23,7 @@ faq:
   - q: "What should a coauthor invitation email include?"
     a: "Say what the paper is, its working title and target journal, why you are inviting this person in particular, and what you expect them to contribute, such as the analysis or one section. Give the timeline and say how authorship order will be decided. Point to the CRediT contributor roles if your field uses them, and give them an easy way to decline."
   - q: "Can AI write an email to a professor?"
-    a: "It can tidy a draft, shorten it or adjust the tone. It cannot know why you want to work with this person, which is the part professors read for. Write the specific sentences yourself: the paper you read and what you would like to do. AI for Research's editor rewrites a draft for 1 credit, and its tone check costs 2."
+    a: "It can tidy a draft, shorten it or adjust the tone. It cannot know why you want to work with this person, which is the part professors read for. Write the specific sentences yourself: the paper you read and what you would like to do. In AI for Research, the Research email module in the Writing Studio drafts a co-author invitation, meeting invitation, data request, paper request, prospective-supervisor enquiry or follow-up for 1 credit, with [placeholders] for the details only you know."
 ---
 A cold email to professor for research has one job: get a reply from a busy person who does not know you. These six templates cover it and the emails that follow: asking about a research position, contacting a possible PhD supervisor, booking a meeting, requesting data, inviting a co-author and following up. Each is under 200 words.
 
@@ -199,13 +199,15 @@ The email itself is short. What makes it work is the specific detail, and that c
 
 1. Search their topic in **Find Papers**, filter to the last few years and open their recent papers. No credits.
 2. Save one or two papers to the **Library** and ask a question of the PDF (1 credit per question) to check you understood the method you mention.
-3. Paste your draft into the **editor**. Ask for a shorter rewrite (1 credit) or run a tone check (2 credits).
-4. For a co-author or supervisor, share a **Project** with them by email as can edit, can comment or can view, so the draft and papers sit in one place.
+3. Open the **Writing Studio** and choose **Research email** under **Correspondence**. Pick the kind (co-author invitation, meeting invitation, data request, paper request, prospective-supervisor enquiry or follow-up), then fill in the recipient's role, the purpose, the study and any deadline. You get a short draft with [placeholders] for what only you know. 1 credit.
+4. Replace every placeholder and write the one sentence about why you chose this person yourself. Ask the **editor** for a shorter rewrite (1 credit) or run a tone check (2 credits) if you want.
+5. For a co-author or supervisor, share a **Project** with them by email as can edit, can comment or can view, so the draft and papers sit in one place.
 
 | Task | Where | Credits |
 | --- | --- | --- |
 | Find the professor's recent papers | Find Papers | 0 |
 | Ask a question of one of their PDFs | Library | 1 |
+| Draft the email from the kind and your details | Writing Studio, Research email | 1 |
 | Rewrite or shorten your draft | Editor | 1 |
 | Tone check | Editor | 2 |
 | Share a project with a co-author | Projects | 0 |

@@ -11,8 +11,8 @@ cta:
   label: "Open Thesis Suite"
   href: "/thesis"
 plan_note: "Free plan: 45 credits a month. A Thesis Suite module costs 3 credits; a review costs 10 credits per 10,000 words."
-related: ["/features/methodology-builder", "/features/ai-peer-review", "/features/projects", "/blog/how-to-write-a-thesis-outline", "/blog/thesis-defense-guide"]
-updated: "2026-11-12"
+related: ["/features/methodology-builder", "/features/ai-peer-review", "/features/projects", "/blog/how-to-write-a-thesis-outline", "/blog/thesis-defense-guide", "/features/variable-operationalization", "/features/qualitative-coding"]
+updated: "2026-11-13"
 faq:
   - q: "Can AI write my master's thesis?"
     a: "It can draft parts, but your program decides what you may submit, and most require the thesis to be your own work with AI use disclosed. Use AI for Research to plan, find and read sources, and get feedback; write the argument yourself. Agree any AI use with your supervisor in writing and keep a record of what you used it for."
@@ -109,6 +109,8 @@ The editor's [authorship report](/features/authorship-report) records what you t
 ## Who else it is for
 
 Writing your first essays? See [AI for college students](/for/undergraduates). Starting a doctorate? See [AI tools for PhD students](/for/phd).
+
+Writing the methods chapter? [Operationalize your variables](/features/variable-operationalization) into a table of definitions, indicators and instruments, code interviews with [qualitative coding](/features/qualitative-coding), and turn the results into a poster with the [research poster maker](/features/research-poster-maker).
 
 ## Learn more
 

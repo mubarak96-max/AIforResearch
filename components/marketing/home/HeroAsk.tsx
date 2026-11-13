@@ -110,7 +110,7 @@ export function HeroAsk() {
         <DepthSwitch value={depth} onChange={setDepth} detailedAllowed={limits.detailed} />
         <AttachMenu files={files} onFiles={setFiles} library={library} onLibrary={setLibrary}
           onBlocked={signedIn ? undefined : () => setNote('Create a free account to attach PDF, Word, text, data, web page and LaTeX files. Your question will wait for you.')} />
-        {signedIn ? <SourcePicker value={effectiveGroups} onChange={setGroups} /> : <SourceDropdown value={effectiveGroups} onChange={setGroups} />}
+        {signedIn ? <SourcePicker value={effectiveGroups} onChange={setGroups} records /> : <SourceDropdown value={effectiveGroups} onChange={setGroups} />}
         <FiltersToggle value={filters} onChange={setFilters} />
         <div className="ml-auto flex items-center gap-2.5">
           <CreditCost credits={credits} className="hidden sm:inline" />

@@ -5,6 +5,7 @@
  * against it (prompts live in studioModules.ts).
  */
 import type { CreditAction } from './plans.js';
+import { POSTER_MODULE } from './posterModule.js';
 
 export type StudioWorkspace = 'write' | 'thesis' | 'proposals' | 'slides';
 export type StudioTaskKind = 'writing' | 'thesis' | 'proposal' | 'slides';
@@ -30,7 +31,7 @@ export type StudioField = {
  * - slides: a deck as JSON (Slides).
  * - papers: a list of papers, no AI writing (Similar papers finder).
  */
-export type StudioOutput = 'markdown' | 'compare' | 'slides' | 'papers';
+export type StudioOutput = 'markdown' | 'compare' | 'slides' | 'papers' | 'poster';
 
 export type StudioModule = {
   id: string;
@@ -99,7 +100,44 @@ export const TEMPLATES: { id: string; label: string; short: string; sections: [s
   { id: 'policy-brief', blankOnly: true, label: 'Policy brief', short: 'Key messages, the problem, evidence, options and recommendations.', sections: [['Key messages', '3–5 bullet points a busy reader can act on.'], ['The problem', ''], ['What the evidence says', ''], ['Policy options', 'A table: option, benefits, costs and risks, strength of evidence.'], ['Recommendations', ''], ['Implementation considerations', 'Feasibility, cost, equity and who must act.'], ['References', '']] },
   { id: 'white-paper', blankOnly: true, label: 'White paper', short: 'Executive summary, the problem, the evidence, the approach and recommendations.', sections: [['Title and subtitle', 'A title that names the problem or the outcome, and a subtitle that names the approach.'], ['Executive summary', 'The problem, why it matters now, the approach and the main recommendation, in 150–250 words.'], ['Introduction', 'Who this paper is for, what it covers and what the reader will be able to decide.'], ['The problem', 'What is wrong or changing, who it affects and what it costs, with cited numbers.'], ['What the evidence says', 'The research and data, with how strong each finding is.'], ['The approach', 'The principles or method that address the problem; your product or programme only after the principles.'], ['Implementation', 'Steps, timeline, costs, risks and what the reader needs to start.'], ['Recommendations', 'Numbered, specific actions for the reader.'], ['Conclusion and next step', 'The case in three sentences and one clear next step.'], ['About the author or organisation', ''], ['References', '']] },
   { id: 'annotated-bibliography', blankOnly: true, label: 'Annotated bibliography', short: 'An introduction, then each source with its annotation.', sections: [['Introduction', 'The topic, the scope and how the sources were chosen.'], ['Source 1', 'Full reference, then summary, evaluation and relevance.'], ['Source 2', ''], ['Source 3', '']] },
+
+  // Venue layouts (the Journal formatter restructures an existing manuscript into these). Limits change: check the venue's current author guide.
+  { id: 'venue-ieee', blankOnly: true, label: 'IEEE paper', short: 'IEEE conference or journal layout: abstract, index terms, numbered sections, numbered references.', sections: [['Title', 'Capitalise the main words; no abbreviations unless widely known.'], ['Authors and affiliations', ''], ['Abstract', 'One paragraph, no citations, no abbreviations left undefined; check the venue’s word limit.'], ['Index Terms', 'Keywords in alphabetical order.'], ['I. Introduction', 'The problem, the gap and the contributions, often as a short list.'], ['II. Related Work', ''], ['III. Method', ''], ['IV. Experiments and Results', 'Set-up, data, metrics, results with tables and figures.'], ['V. Discussion', ''], ['VI. Conclusion', ''], ['Acknowledgment', 'Funding and help; IEEE uses the American spelling without an “e”.'], ['References', 'IEEE style: numbered in square brackets [1] in the order first cited.']] },
+  { id: 'venue-acm', blankOnly: true, label: 'ACM paper', short: 'ACM layout (acmart): abstract, CCS concepts, keywords, sections, ACM reference format.', sections: [['Title', ''], ['Authors and affiliations', ''], ['Abstract', 'One paragraph.'], ['CCS Concepts', 'Terms from the ACM Computing Classification System.'], ['Keywords', ''], ['1 Introduction', 'The problem, the gap and the contributions.'], ['2 Related Work', ''], ['3 Approach', ''], ['4 Evaluation', ''], ['5 Discussion', 'Including limitations and threats to validity.'], ['6 Conclusion', ''], ['Acknowledgments', 'Funding and help.'], ['References', 'ACM Reference Format; numbered or author–year citations, as the venue sets.']] },
+  { id: 'venue-apa', blankOnly: true, label: 'APA 7 manuscript', short: 'APA 7th edition: title page, abstract, introduction, method, results, discussion, references.', sections: [['Title page', 'Title, authors, affiliations and the author note (ORCID, disclosures, correspondence).'], ['Abstract', 'One paragraph, usually up to 250 words, then keywords.'], ['Introduction', 'Starts under the paper’s title, not a heading “Introduction”.'], ['Method', 'Participants, Materials or Measures, Procedure, and the transparency details the JARS standards ask for.'], ['Results', ''], ['Discussion', ''], ['References', 'APA 7 author–date style, alphabetical, hanging indent, DOIs as URLs.'], ['Tables and figures', 'Numbered, each with a title and a note.']] },
+  { id: 'venue-nature', blankOnly: true, label: 'Nature-style article', short: 'Nature-family layout: a referenced summary paragraph, main text, Methods at the end, availability statements.', sections: [['Title', 'Short, without jargon or abbreviations.'], ['Summary paragraph', 'Referenced, for readers outside the field, without headings; check the journal’s word limit.'], ['Main text', 'Opens without an “Introduction” heading; short subheadings after it.'], ['Methods', 'At the end, with enough detail to repeat the work.'], ['Data availability', ''], ['Code availability', ''], ['References', 'Numbered in the order cited, superscript in the text; Methods references follow on.'], ['Acknowledgements', ''], ['Author contributions', ''], ['Competing interests', ''], ['Figure legends', 'A short bold title sentence, then the description.']] },
+  { id: 'venue-vancouver', blankOnly: true, label: 'Medical journal (ICMJE / Vancouver)', short: 'ICMJE recommendations: structured abstract, IMRaD, declarations, Vancouver references.', sections: [['Title page', 'Title, authors, affiliations, corresponding author, word count, number of tables and figures.'], ['Abstract', 'Structured: Background, Methods, Results, Conclusions; trial registration number for trials.'], ['Keywords', 'MeSH terms where possible.'], ['Introduction', ''], ['Methods', 'Including ethics approval, consent and trial registration.'], ['Results', ''], ['Discussion', 'Including limitations.'], ['Acknowledgments', 'People who helped but do not meet authorship criteria.'], ['Funding', ''], ['Competing interests', 'The ICMJE disclosure form for each author.'], ['Data sharing statement', 'Required by ICMJE for clinical trials.'], ['References', 'Vancouver style: numbered in the order first cited, journal names abbreviated as in NLM.'], ['Tables and figure legends', '']] },
+
+  // Study checklists (paraphrased from public guidance; the Study checklist module tailors them to a study).
+  { id: 'checklist-irb-submission', blankOnly: true, label: 'Checklist: IRB or ethics submission', short: 'What an ethics committee or IRB application package usually needs.', sections: [['Application form', 'The committee’s current form, complete, signed by the principal investigator and by the department or sponsor if required.'], ['Protocol', 'Version number and date; background, aims, design, eligibility, procedures, risks and benefits, analysis and data management.'], ['Investigator qualifications', 'CVs and human-subjects or GCP training certificates for the principal investigator and key staff.'], ['Recruitment materials', 'Adverts, emails, scripts, flyers and social media posts exactly as participants will see them.'], ['Consent documents', 'Information sheet and consent form, assent forms for minors, translated versions, the consent process; or a request for a waiver or alteration of consent with its justification.'], ['Data collection instruments', 'Questionnaires, interview guides, case report forms and scales.'], ['Risks and safety', 'Each risk and how it is reduced; data and safety monitoring; how adverse events are reported.'], ['Privacy and confidentiality', 'Identifiers collected, storage, access, retention, de-identification and data sharing; authorisation or waiver for health records where the law requires it.'], ['Vulnerable participants', 'Extra safeguards for children, prisoners, pregnant people, people with impaired decision-making capacity, and the researcher’s own students or staff.'], ['Payment and costs', 'Amount and schedule of any payment, and costs to participants.'], ['Conflicts of interest', 'Financial and other interests of the investigators and how they are managed.'], ['Other approvals', 'Site permissions, reliance agreements with other committees, and radiation, biosafety or drug and device regulatory approvals where they apply.'], ['Funding', 'The grant or contract, so the committee can check it matches the protocol.'], ['Version control', 'Every document carries a version and date; keep a list of what was submitted.']] },
+  { id: 'checklist-site-initiation-visit', blankOnly: true, label: 'Checklist: site initiation visit', short: 'Essential documents, training and set-up to confirm before a trial site opens.', sections: [['Approvals and agreements', 'Ethics approval of the protocol and consent form, regulatory approval or notification, the signed clinical trial agreement and budget.'], ['Investigator site file', 'Set up in the agreed index: signed protocol and amendments, investigator brochure, CVs, GCP certificates, licences, financial disclosures, lab certification and normal ranges.'], ['Delegation log', 'Signed by the principal investigator; every delegated task matches the person’s training.'], ['Protocol training', 'Objectives, design, eligibility, visit schedule, procedures, prohibited medication and endpoints; a training log signed by each attendee.'], ['Informed consent process', 'The current approved version, who may take consent, how it is documented, re-consent after amendments, translated versions.'], ['Investigational product', 'Receipt, storage and temperature monitoring, accountability, dispensing and returns, randomisation and unblinding.'], ['Safety reporting', 'Definitions of adverse events and serious adverse events, reporting timelines, forms and contacts.'], ['Data collection', 'Case report forms or EDC access and training, what counts as source documents, how queries are handled.'], ['Monitoring', 'The monitoring plan, visit frequency, source data verification and access to medical records.'], ['Samples and laboratory', 'Collection, processing, storage and shipping; lab kits and manuals.'], ['Equipment and facilities', 'Calibrated equipment, secure storage, pharmacy arrangements.'], ['Recruitment', 'Screening and enrolment logs, targets and the recruitment plan.'], ['Close of the visit', 'Open questions, actions with owners and dates, the visit report, and the site activation once actions are closed.']] },
+  { id: 'checklist-ctgov-results', blankOnly: true, label: 'Checklist: ClinicalTrials.gov results', short: 'The results sections of the PRS record, in order, with what each needs.', sections: [['Before you start', 'The protocol section is current: overall status, actual enrolment, actual primary completion date. Results are usually due within one year of the primary completion date for applicable clinical trials.'], ['Participant Flow', 'Recruitment details, pre-assignment details, arms or groups, and numbers started, completed and not completed for each period, with reasons for not completing.'], ['Baseline Characteristics', 'Arms or groups, overall number of baseline participants, age and sex or gender, race and ethnicity where collected, and other prespecified measures.'], ['Outcome Measures', 'Every primary and secondary outcome as registered: title, description, time frame, unit, measure type and dispersion, number analysed, and the data for each arm.'], ['Statistical Analyses', 'For each analysis: the groups compared, hypothesis, method, p-value or estimate with its confidence interval.'], ['Adverse Event Information', 'Time frame, how adverse events were defined and collected, all-cause mortality, serious adverse events and other adverse events above the frequency threshold, by arm.'], ['Limitations and Caveats', 'Problems that limit the results, such as early termination or measurement issues.'], ['Certain Agreements', 'Whether there is an agreement restricting the principal investigator’s right to publish or discuss the results.'], ['Results Point of Contact', 'Name or title, organisation, phone and email.'], ['Documents', 'The protocol and the statistical analysis plan (and an informed consent form where required) as PDF/A.'], ['Review', 'Check against the PRS review criteria, answer reviewer comments, and release.']] },
+  { id: 'checklist-consent-translation', blankOnly: true, label: 'Checklist: translating consent forms', short: 'Forward and back translation, review, attestation and approval of a translated consent form.', sections: [['Source version', 'Translate only the current approved version; record its version number and date.'], ['Translator', 'A qualified translator fluent in the target language, or a certified service; keep a record of qualifications.'], ['Forward translation', 'Plain language at the participants’ reading level; meaning over word-for-word.'], ['Back translation or independent review', 'A second translator, who has not seen the original, translates back; or an independent review of accuracy, as the committee requires.'], ['Reconciliation', 'Differences reviewed and resolved; the decisions recorded.'], ['Local and cultural review', 'Terms, examples, units, contact numbers and local legal requirements fit the participants; reviewed by someone from the community or the local investigator.'], ['Attestation', 'A statement of accuracy signed and dated by the translator.'], ['Ethics approval', 'Submit the translated documents and the attestation; use them only once approved.'], ['Version control', 'Translated versions match the source version; every amendment to the source is translated and approved again.'], ['Short form process (if used)', 'For participants whose language was not expected: a short form in their language, the approved written summary, an interpreter and a witness, as the regulations allow.'], ['Interpreters and witnesses', 'Who interprets during consent, an impartial witness for participants who cannot read, and how this is documented.'], ['Other study materials', 'Questionnaires, diaries and contact information for questions available in the same language.']] },
+  { id: 'checklist-incidental-findings', blankOnly: true, label: 'Checklist: incidental findings plan', short: 'Anticipate, decide and communicate incidental and secondary findings.', sections: [['Anticipate', 'Which incidental or secondary findings the methods may reveal: imaging, genomic sequencing, laboratory tests, screening questionnaires such as suicidal ideation items.'], ['What will be returned', 'Which findings will and will not be returned, and why: clinical significance, whether action is possible, and analytic validity.'], ['Expertise', 'Who reviews the data for findings (for example a radiologist for research scans), or a clear statement that research data are not reviewed clinically.'], ['Consent', 'Participants are told what may be found, what will and will not be returned, and can choose where options exist.'], ['Confirmation', 'Results confirmed in a certified clinical laboratory before they are returned, where required.'], ['Communication', 'Who tells the participant, how and how quickly, with counselling or clinical follow-up offered.'], ['Referral and costs', 'The referral route to the participant’s own doctor, and who pays for follow-up.'], ['Urgent findings', 'The process and timelines for findings that need immediate action.'], ['Records', 'How findings and their disclosure are documented, and whether they enter the medical record.'], ['Special situations', 'Children (and when they reach adulthood), relatives, participants who have withdrawn, died or cannot be reached.'], ['Ethics review', 'The plan is in the protocol and the consent form, and approved by the committee.']] },
 ];
+
+/** The checklists the Study checklist module tailors; each is also a blank template `checklist-<id>`. */
+export const STUDY_CHECKLISTS: { id: string; label: string }[] = [
+  { id: 'irb-submission', label: 'IRB or ethics committee submission' },
+  { id: 'site-initiation-visit', label: 'Site initiation visit (clinical trial)' },
+  { id: 'ctgov-results', label: 'ClinicalTrials.gov results submission' },
+  { id: 'consent-translation', label: 'Translating consent forms' },
+  { id: 'incidental-findings', label: 'Incidental findings plan' },
+];
+
+/** Target styles for the Journal formatter; each named style has its blank venue template where one exists. */
+export const JOURNAL_STYLES: { id: string; label: string; template: string | null }[] = [
+  { id: 'nature', label: 'Nature and Nature-family journals', template: 'venue-nature' },
+  { id: 'science', label: 'Science', template: null },
+  { id: 'ieee', label: 'IEEE', template: 'venue-ieee' },
+  { id: 'acm', label: 'ACM', template: 'venue-acm' },
+  { id: 'apa', label: 'APA 7th edition', template: 'venue-apa' },
+  { id: 'vancouver', label: 'Medical journal (ICMJE / Vancouver)', template: 'venue-vancouver' },
+  { id: 'custom', label: 'Another journal (paste its author guidelines)', template: null },
+];
+
+/** The Journal formatter's units: one per 10,000 words, at least 1, at most 4. */
+export const journalFormatUnits = (text: string) => Math.min(4, Math.max(1, Math.ceil(wordCount(text) / 10_000)));
 export const template = (id: string) => TEMPLATES.find((item) => item.id === id) ?? null;
 
 export const STUDIO_MODULES: StudioModule[] = [
@@ -117,6 +155,18 @@ export const STUDIO_MODULES: StudioModule[] = [
   {
     id: 'paper', workspace: 'write', label: 'Research paper', short: 'A first draft in IMRaD: introduction, methods, results and discussion.',
     fields: [topic('Title or research question', 'e.g. Sleep quality and exam performance in first-year students'), { name: 'study', label: 'Your study (optional)', kind: 'textarea', placeholder: 'What you did and found: design, sample, measures, main results. Leave empty for a structure with placeholders.', max: 12_000, upload: true }, notes()],
+    grounded: 'multi', output: 'markdown', topicField: 'topic', cost: fixed('draft'), lengthOption: true,
+  },
+  {
+    id: 'conference-paper', workspace: 'write', label: 'Conference paper', short: 'A 4–8 page conference paper with contribution statements, in IEEE, ACM or a general format.',
+    fields: [
+      topic('Title or research question', 'e.g. Lightweight anomaly detection for edge sensor networks'),
+      { name: 'venue', label: 'Conference (optional)', kind: 'text', placeholder: 'e.g. IEEE ICC 2027, CHI 2027', max: 200 },
+      select('format', 'Format', [['ieee', 'IEEE (two columns, numbered references)'], ['acm', 'ACM (acmart, CCS concepts)'], ['generic', 'General conference format']]),
+      select('pages', 'Page limit', [['6', '6 pages'], ['4', '4 pages'], ['8', '8 pages']]),
+      { name: 'study', label: 'Your study (optional)', kind: 'textarea', placeholder: 'What you built or did and what you found: method, data, set-up, metrics, results. Upload a draft or notes. Leave empty for a structure with placeholders.', max: 30_000, upload: true },
+      notes('Anything to include (optional)', 'The call’s topics, required sections, double-blind rules, figures you have…'),
+    ],
     grounded: 'multi', output: 'markdown', topicField: 'topic', cost: fixed('draft'), lengthOption: true,
   },
   {
@@ -138,6 +188,16 @@ export const STUDIO_MODULES: StudioModule[] = [
     id: 'paraphrase', workspace: 'write', label: 'Paraphrase', short: 'Rewrite a passage in your own natural style, keeping its meaning and citations.',
     fields: [text('Text to paraphrase', 'Paste the passage.', 40_000, 20), select('strength', 'How much to change', [['standard', 'Standard'], ['light', 'Light: keep the structure'], ['strong', 'Strong: new sentence structure']])],
     grounded: false, output: 'markdown', topicField: 'text', cost: (inputs) => ({ action: 'ai_edit', units: rewriteUnits(inputs.text || '') }),
+  },
+  {
+    id: 'journal-format', workspace: 'write', label: 'Journal formatter', short: 'Your manuscript in a journal’s section order and reference style, with what still breaks its guidelines.',
+    fields: [
+      text('Your manuscript', 'Upload the manuscript (Word or PDF) or paste it.', 300_000, 200),
+      select('style', 'Target journal style', JOURNAL_STYLES.map(({ id, label }): [string, string] => [id, label])),
+      { name: 'guidelines', label: 'Author guidelines (optional)', kind: 'textarea', placeholder: 'Paste the journal’s instructions for authors: word and abstract limits, section order, required statements, reference style. Needed for “Another journal”.', max: 30_000, upload: true },
+      { name: 'journal', label: 'Journal name (optional)', kind: 'text', placeholder: 'e.g. Nature Communications, IEEE Access, BMJ Open', max: 200 },
+    ],
+    grounded: false, output: 'markdown', topicField: 'text', cost: (inputs) => ({ action: 'section', units: journalFormatUnits(inputs.text || '') }),
   },
   {
     id: 'template', workspace: 'write', label: 'Fill a template', short: 'A template written out section by section from your topic or research, with real citations.',
@@ -222,6 +282,20 @@ export const STUDIO_MODULES: StudioModule[] = [
     grounded: false, output: 'markdown', topicField: 'text', cost: (inputs) => ({ action: 'section', units: Math.min(5, Math.max(1, Math.ceil(wordCount(inputs.text || '') / 10_000))) }),
   },
 
+  // ---------------------------------------------------------------- Writing Studio: correspondence
+  {
+    id: 'research-email', workspace: 'write', group: 'Correspondence', label: 'Researcher email', short: 'A short, clear email to a co-author, a data holder, an author or a prospective supervisor.',
+    fields: [
+      select('kind', 'Email', [['coauthor', 'Invite a co-author'], ['meeting', 'Invite to a meeting or talk'], ['data', 'Request data or materials'], ['paper', 'Request a paper (full text)'], ['supervisor', 'Enquire with a prospective supervisor'], ['followup', 'Follow up on an earlier email']]),
+      { name: 'recipient', label: 'To (optional)', kind: 'text', placeholder: 'Their name and role, e.g. Dr Ana Ruiz, epidemiologist at the study’s coordinating centre', max: 300 },
+      topic('The study or paper it is about', 'e.g. Sleep and exam performance in first-year students'),
+      { name: 'purpose', label: 'What you want', kind: 'textarea', placeholder: 'What you ask for and why: their role, the dataset or paper, the meeting time, your research interests…', max: 4000 },
+      { name: 'deadline', label: 'Deadline or date (optional)', kind: 'text', placeholder: 'e.g. reply by 15 January; meeting on 3 February at 14:00 CET', max: 200 },
+      notes('About you and anything else (optional)', 'Your name, position, institution, how you know them, what you attach…'),
+    ],
+    grounded: false, output: 'markdown', topicField: 'topic', cost: fixed('short'),
+  },
+
   // ---------------------------------------------------------------- Thesis Suite
   {
     id: 'similar', workspace: 'thesis', label: 'Similar papers', short: 'Papers like yours, from a title or abstract. No credits.',
@@ -253,6 +327,16 @@ export const STUDIO_MODULES: StudioModule[] = [
   {
     id: 'framework', workspace: 'thesis', label: 'Theoretical framework', short: 'Theories that fit your study, their constructs and how your variables relate.',
     fields: [topic('Topic or question', 'e.g. Why do employees resist new hospital software?'), notes()],
+    grounded: 'single', output: 'markdown', topicField: 'topic', cost: fixed('section'),
+  },
+  {
+    id: 'operationalisation', workspace: 'thesis', label: 'Operationalising variables', short: 'Each construct defined and made measurable: indicators, instrument, level of measurement, validity and reliability.',
+    fields: [
+      topic('Research question', 'e.g. Does perceived stress predict sleep quality in nursing students?'),
+      { name: 'constructs', label: 'Constructs or variables', kind: 'textarea', placeholder: 'One per line, e.g.\nPerceived stress\nSleep quality\nSocial support', max: 4000, min: 3, required: true },
+      select('design', 'Approach', [['quantitative', 'Quantitative (survey, experiment, secondary data)'], ['qualitative', 'Qualitative (how each concept is recognised in the data)'], ['mixed', 'Mixed methods']]),
+      notes('Context (optional)', 'Population, setting, language of the instruments, data you already have…'),
+    ],
     grounded: 'single', output: 'markdown', topicField: 'topic', cost: fixed('section'),
   },
   {
@@ -299,9 +383,34 @@ export const STUDIO_MODULES: StudioModule[] = [
     grounded: false, output: 'markdown', topicField: 'topic', cost: fixed('draft'),
   },
   {
+    id: 'ethics-statement', workspace: 'proposals', label: 'Ethics statement', short: 'The ethics approval and consent statement for your manuscript, in journal wording.',
+    fields: [
+      topic('Study title', 'e.g. Sleep quality and exam performance in first-year students'),
+      select('approval', 'Ethics review', [['approved', 'Approved by a committee or IRB'], ['exempt', 'Exempt, or a waiver granted by a committee'], ['not-required', 'Review not required (e.g. public or anonymous data)']]),
+      { name: 'committee', label: 'Committee and institution (optional)', kind: 'text', placeholder: 'e.g. Research Ethics Committee, University of Leeds', max: 300 },
+      { name: 'reference', label: 'Reference number (optional)', kind: 'text', placeholder: 'e.g. MREC 24-017', max: 120 },
+      { name: 'date', label: 'Date of approval (optional)', kind: 'text', placeholder: 'e.g. 12 March 2026', max: 80 },
+      select('consent', 'Consent', [['written', 'Written informed consent'], ['verbal', 'Verbal or online consent, documented'], ['parental', 'Parental consent and child assent'], ['waived', 'Consent waived by the committee'], ['na', 'Not applicable (no human participants or records)']]),
+      select('animals', 'Animal work', [['none', 'No animals'], ['animals', 'Animals were used']]),
+      notes('Anything else (optional)', 'The journal, trial registration, the guideline followed (e.g. Declaration of Helsinki, ARRIVE), the reason a review was not required…'),
+    ],
+    grounded: false, output: 'markdown', topicField: 'topic', cost: fixed('short'),
+  },
+  {
     id: 'dmp', workspace: 'proposals', label: 'Data management plan', short: 'How data is collected, stored, shared and kept, in your funder’s format.',
     fields: [{ name: 'topic', label: 'Your project', kind: 'textarea', placeholder: 'What data you collect or reuse, its formats and size, and any personal data.', max: 12_000, min: 30, required: true, upload: true },
       select('funder', 'Format', [['generic', 'Generic'], ['nih', 'NIH Data Management and Sharing Plan'], ['nsf', 'NSF'], ['horizon', 'Horizon Europe'], ['ukri', 'UKRI']])],
+    grounded: false, output: 'markdown', topicField: 'topic', cost: fixed('section'),
+  },
+
+  // ---------------------------------------------------------------- Proposal Studio: checklists
+  {
+    id: 'study-checklist', workspace: 'proposals', group: 'Checklists', label: 'Study checklist', short: 'An IRB, site initiation, ClinicalTrials.gov results, consent translation or incidental findings checklist, fitted to your study.',
+    fields: [
+      select('kind', 'Checklist', STUDY_CHECKLISTS.map(({ id, label }): [string, string] => [id, label])),
+      { name: 'topic', label: 'Your study', kind: 'textarea', placeholder: 'Design, population, sites, what you collect, the intervention or product, languages, the committee or registry involved.', max: 12_000, min: 40, required: true, upload: true },
+      notes('Anything else (optional)', 'Deadlines, what is already done, the institution’s own requirements…'),
+    ],
     grounded: false, output: 'markdown', topicField: 'topic', cost: fixed('section'),
   },
 
@@ -316,6 +425,7 @@ export const STUDIO_MODULES: StudioModule[] = [
     ],
     grounded: 'single', output: 'slides', topicField: 'topic', cost: fixed('slides'),
   },
+  POSTER_MODULE,
 ];
 
 export const studioModule = (id: string) => STUDIO_MODULES.find((module) => module.id === id) ?? null;

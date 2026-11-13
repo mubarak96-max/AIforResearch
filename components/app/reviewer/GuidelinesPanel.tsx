@@ -1,6 +1,6 @@
 'use client';
 
-/** Reporting-guideline check: choose CONSORT, STROBE, PRISMA … and see each item reported, partly, missing or to check. */
+/** Reporting-guideline check: choose CONSORT, STROBE, PRISMA … (or the add-ons SAGER and SAMPL) and see each item reported, partly, missing or to check. */
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { LuCopy, LuDownload, LuExternalLink, LuFilePen, LuLoaderCircle, LuSparkles } from 'react-icons/lu';
@@ -58,7 +58,7 @@ export function GuidelinesPanel({ onDone }: { onDone: (result: GuidelineResult) 
         {GUIDELINES.map((item) => (
           <button key={item.id} type="button" aria-pressed={chosen === item.id} onClick={() => setChosen(item.id)}
             className={`rounded-xl border px-3.5 py-2.5 text-left ${chosen === item.id ? 'border-brand bg-brand-50' : 'border-line hover:bg-soft'}`}>
-            <span className="flex items-center gap-1.5 text-[15px] font-semibold text-ink">{item.name} <span className="text-[12px] font-normal text-muted">{item.version}</span>{suggested === item.id && <Tag tone="brand">Suggested</Tag>}</span>
+            <span className="flex items-center gap-1.5 text-[15px] font-semibold text-ink">{item.name} <span className="text-[12px] font-normal text-muted">{item.version}</span>{suggested === item.id && <Tag tone="brand">Suggested</Tag>}{item.complements && <Tag tone="neutral">Add-on</Tag>}</span>
             <span className="mt-0.5 block text-[12.5px] leading-snug text-muted">{item.for}</span>
           </button>
         ))}
@@ -67,7 +67,8 @@ export function GuidelinesPanel({ onDone }: { onDone: (result: GuidelineResult) 
       <div className="mt-5">
         <p className="mb-1.5 text-[13px] font-semibold text-ink-2">Manuscript</p>
         <DocumentInput value={doc} onChange={setDoc} pastePlaceholder="Paste the whole manuscript, from the title to the funding statement" />
-        {suggested && suggested !== chosen && <p className="mt-2 text-[13px] text-muted">This reads like a {findGuideline(suggested)!.for.toLowerCase()} paper: <button type="button" className="font-semibold text-brand hover:underline" onClick={() => setChosen(suggested)}>use {findGuideline(suggested)!.name}</button>.</p>}
+        {current.complements && <p className="mt-2 text-[13px] text-muted">{current.name} is checked on its own here. Run a second check with your study-design checklist as well.</p>}
+        {suggested && suggested !== chosen && <p className="mt-2 text-[13px] text-muted">{findGuideline(suggested)!.complements ? `This text reports ${suggested === 'sager' ? 'sex or gender results' : 'statistics'} and no study design was recognised` : `This reads like a ${findGuideline(suggested)!.for.toLowerCase()} paper`}:{' '}<button type="button" className="font-semibold text-brand hover:underline" onClick={() => setChosen(suggested)}>use {findGuideline(suggested)!.name}</button>.</p>}
       </div>
       <div className="mt-5 flex flex-wrap items-center justify-end gap-3">
         {credits !== null && <CreditCost credits={credits} />}

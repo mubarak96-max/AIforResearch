@@ -9,7 +9,7 @@ pillar: "/blog/ai-for-qualitative-research"
 author: "Mubarak"
 compares_tools: false
 published: "2026-11-12"
-updated: "2026-11-12"
+updated: "2026-11-13"
 faq:
   - q: "Can AI do thematic analysis?"
     a: "AI can do parts of it. It can suggest first-pass codes, summarize transcripts and find quotes that fit a code. It cannot do the analysis itself, because themes in reflexive thematic analysis come from your interpretation of the data against your question and theory. A study that re-ran two analyses with ChatGPT found it reproduced concrete, descriptive themes but missed subtle, interpretive ones. Treat AI output as suggestions you accept or reject."
@@ -25,7 +25,7 @@ faq:
 
 # AI for qualitative research: what it can code, and what stays human
 
-*Last updated: 12 November 2026*
+*Last updated: 13 November 2026*
 
 AI for qualitative research works best as a fast junior assistant: it can suggest first-pass codes, summarize transcripts and find quotes that match a code. It must not decide your themes or your interpretation, because those come from your reading of the data. Use it only on de-identified data your ethics approval covers, check every output against the transcript, and report how you used it.
 
@@ -143,7 +143,7 @@ For publisher and funder rules on disclosure, see [AI tools for research labs](/
 
 ## Doing the work around your analysis in AI for Research
 
-AI for Research does not have a qualitative coding feature: there is no codebook, transcript coder or theme map. Code in NVivo, ATLAS.ti, MAXQDA, Taguette or a spreadsheet; use AI for Research for the literature, planning and writing around it. <!-- LINK: /fields/social-sciences when L39 ships -->
+AI for Research now has [qualitative coding](/features/qualitative-coding) in its Qualitative analysis workbook: upload de-identified transcripts, build a codebook (code, definition, include when, exclude when), select text to code it, mark negative cases, and develop themes with their supporting and contradictory excerpts. AI code suggestions quote the passage they come from and cost 3 credits; you accept or reject each one, and coding by hand is free. Code frequency by source shows which transcripts carry each code. If you already code in NVivo, ATLAS.ti, MAXQDA or Taguette, keep doing so and use AI for Research for the literature, planning and writing around it. The step-by-step method is in [how to code qualitative data](/blog/how-to-code-qualitative-data), and the tools for the whole discipline are on the [social sciences](/fields/social-sciences) page.
 
 - **Find the methods literature.** [Find Papers](/features/paper-search) searches 250M+ scholarly works with filters for year, study type and open access, at 0 credits. Save papers to your Library.
 - **Ask questions of methods papers.** Upload PDFs to [My Library](/features/research-library) and ask a question such as "How do the authors define a theme?" Answers cite the page. Storage is free; a question costs 1 credit. Only upload participant data if your ethics approval allows it, and only de-identified. Our privacy policy says documents are never used to train AI and that the text needed for a request is sent to our AI provider [13].

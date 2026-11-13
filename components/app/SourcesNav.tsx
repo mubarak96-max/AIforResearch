@@ -2,12 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { expansionWorkbooksEnabled } from '@/lib/workflows';
 
 /** One "Find Papers" area: scholarly search, official records and saved searches share a sidebar entry. */
 const LINKS = [
   { href: '/papers', label: 'Search papers' },
-  { href: '/official-sources', label: expansionWorkbooksEnabled() ? 'Official sources' : 'Trial registries' },
+  { href: '/official-sources', label: 'Official sources' },
   { href: '/monitoring', label: 'Saved searches' },
 ];
 

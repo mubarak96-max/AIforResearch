@@ -27,6 +27,8 @@ export type ReferenceCheck = {
   /** Filled by the optional AI pass. */
   support?: { verdict: 'consistent' | 'not_consistent' | 'unclear'; sentence: string; note: string }[];
   abstract?: string | null;
+  /** Fuller metadata for formatting the reference (the reference list formatter); not saved by the citation check. */
+  biblio?: { authors: string[]; more_authors: number; volume: string | null; issue: string | null; first_page: string | null; last_page: string | null } | null;
 };
 
 const DOI_PATTERN = /10\.\d{4,9}\/[^\s"<>,;]+[^\s"<>,;.)\]]/i;
@@ -164,6 +166,11 @@ export async function checkReference(input: ReferenceInput, index: number): Prom
     type: crossref?.type ?? work?.type ?? null,
   };
   check.abstract = work?.abstract_inverted_index ? reconstructAbstract(work.abstract_inverted_index) : null;
+  const text = (value: unknown) => (value === null || value === undefined || value === '' ? null : String(value).slice(0, 40));
+  check.biblio = {
+    authors: authors.slice(0, 30), more_authors: Math.max(0, authors.length - 30),
+    volume: text(work?.biblio?.volume), issue: text(work?.biblio?.issue), first_page: text(work?.biblio?.first_page), last_page: text(work?.biblio?.last_page),
+  };
 
   // Problems, most serious first.
   const notices = foundDoi ? await crossrefUpdates(foundDoi).catch(() => []) : [];

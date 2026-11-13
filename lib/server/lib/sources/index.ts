@@ -7,42 +7,53 @@
 import { libraryHits } from '../assist-papers.js';
 import { doiKey, titleKey } from './classify.js';
 import {
-  coreAvailable, searchArxiv, searchClinicalTrials, searchCore, searchDatacite, searchEuropePmc, searchOpenAlex, searchPubmed, searchSemanticScholar,
+  coreAvailable, searchArxiv, searchClinicalTrials, searchCore, searchDatacite, searchDblp, searchEuropePmc, searchOpenAlex, searchPubmed, searchSemanticScholar,
   searchWeb, webSearchAvailable, type ProviderSearch,
 } from './providers.js';
 import {
-  JOURNAL_TIER_ORDER, emptyPaper, type FoundPaper, type ProviderId, type SearchFilters, type SearchInput, type SearchOutput, type SourceGroup,
+  JOURNAL_TIER_ORDER, emptyPaper, isRecordGroup, type FoundPaper, type ProviderId, type SearchFilters, type SearchInput, type SearchOutput, type SourceGroup,
 } from './types.js';
 
 export * from './types.js';
+export { RECORD_DATABASES, cleanRecordTerms, findRecords, recordTermsFromText, recordTermsPrompt, type RecordTerms } from './records.js';
 export { classifyStudy, doiKey, titleKey } from './classify.js';
 export {
   crossrefUpdates, crossrefWork, openCitationsLinks, pubmedCount, pubmedRecords, pubmedTerm, searchWeb, semanticScholarLinks, semanticScholarPaper,
   semanticScholarSimilar, unpaywall, webSearchAvailable,
 } from './providers.js';
 
-/** Which services answer for each group (CORE joins All papers only when its key is set). */
+/** Which services answer for each group (CORE joins All papers only when its key is set). Record groups have no paper services. */
 export const GROUP_PROVIDERS: Record<SourceGroup, ProviderId[]> = {
   papers: ['openalex', 'semantic_scholar', 'core'],
   medical: ['pubmed', 'europepmc'],
   preprints: ['arxiv', 'europepmc'],
   trials: ['clinicaltrials'],
   datasets: ['datacite'],
+  dblp: ['dblp'],
   web: ['web'],
   library: ['library'],
+  'life-sciences': [],
+  chemistry: [],
 };
 
-/** What the source picker shows, and whether each group can be used on this server. */
-export function sourceGroups() {
-  return [
+/**
+ * What the source picker shows, and whether each group can be used on this server. The record
+ * groups (`kind: 'records'`) are Deep Research only and are listed only when asked for.
+ */
+export function sourceGroups(options: { records?: boolean } = {}) {
+  const groups = [
     { id: 'papers', label: 'All papers', detail: 'OpenAlex and Semantic Scholar: 250M+ works in every field', available: true },
     { id: 'medical', label: 'Medical', detail: 'PubMed and Europe PMC', available: true },
     { id: 'preprints', label: 'Preprints', detail: 'arXiv, bioRxiv and medRxiv', available: true },
     { id: 'trials', label: 'Clinical trials', detail: 'Registered trials, including ones not yet published', available: true },
     { id: 'datasets', label: 'Datasets', detail: 'Research datasets with DOIs', available: true },
+    { id: 'dblp', label: 'Computer science', detail: 'DBLP: journals, conferences and CoRR preprints', available: true },
     { id: 'web', label: 'Web', detail: 'Web pages, reports and news', available: webSearchAvailable() },
     { id: 'library', label: 'My Library', detail: 'Your PDFs and saved papers', available: true },
+    { id: 'life-sciences', label: 'Life sciences databases', detail: 'Genes, proteins, structures, pathways and variants (NCBI Gene, UniProt, Ensembl, Reactome, PDB, AlphaFold, GWAS Catalog, ClinVar)', available: true, kind: 'records' },
+    { id: 'chemistry', label: 'Chemistry databases', detail: 'Compounds and drug-like molecules (PubChem, ChEMBL)', available: true, kind: 'records' },
   ] as const;
+  return groups.filter((group) => options.records || !('kind' in group));
 }
 
 /** Two records are the same paper when their DOIs, PubMed ids or titles match. */
@@ -153,7 +164,9 @@ export async function searchSources(input: SearchInput, context: SearchContext =
   const limit = Math.min(Math.max(input.limit ?? 20, 1), 100);
   // Each service is asked for more than wanted when filters are applied here afterwards.
   const ask: ProviderSearch = { query: input.query, filters, limit: Math.min(100, Math.ceil(limit * (filters.studyTypes?.length || filters.journalTier ? 2.5 : 1.3))), sort: input.sort ?? 'relevance' };
-  const groups = new Set(input.groups.length ? input.groups : (['papers'] as SourceGroup[]));
+  // Record groups add database records in Deep Research (records.ts), not papers; with only those chosen, All papers answers.
+  const paperGroups = input.groups.filter((group) => !isRecordGroup(group));
+  const groups = new Set(paperGroups.length ? paperGroups : (['papers'] as SourceGroup[]));
   const tasks: { provider: ProviderId; run: () => Promise<FoundPaper[]> }[] = [];
   if (groups.has('papers')) {
     tasks.push({ provider: 'openalex', run: () => searchOpenAlex(ask) });
@@ -170,6 +183,7 @@ export async function searchSources(input: SearchInput, context: SearchContext =
   }
   if (groups.has('trials')) tasks.push({ provider: 'clinicaltrials', run: () => searchClinicalTrials(ask) });
   if (groups.has('datasets')) tasks.push({ provider: 'datacite', run: () => searchDatacite(ask) });
+  if (groups.has('dblp')) tasks.push({ provider: 'dblp', run: () => searchDblp({ ...ask, limit: Math.min(ask.limit, 50) }) });
   if (groups.has('library') && context.userId) {
     tasks.push({ provider: 'library', run: () => libraryPapers(context.userId!, input.query, input.libraryDocumentIds ?? [], Math.min(limit, 12)) });
   }

@@ -6,17 +6,28 @@
 
 export type AnalysisTest =
   | 'pearson' | 'regression' | 'welch' | 'mann' | 'paired' | 'anova' | 'chi'
-  | 'spearman' | 'wilcoxon' | 'kruskal' | 'fisher' | 'mcnemar' | 'logistic' | 'survival' | 'diagnostic' | 'roc' | 'alpha';
+  | 'spearman' | 'wilcoxon' | 'kruskal' | 'fisher' | 'mcnemar' | 'logistic' | 'survival' | 'diagnostic' | 'roc' | 'alpha'
+  | 'bayes_one' | 'bayes_paired' | 'bayes_two' | 'bayes_prop';
 
 export type SlotKind = 'numeric' | 'categorical' | 'any';
 /** One column the test needs. `multiple` slots come last and take several columns. */
 export type AnalysisSlot = { label: string; kind: SlotKind; optional?: boolean; multiple?: { min: number; max: number } };
-/** A setting chosen from the categories of one of the test's columns. */
-export type AnalysisOption = { key: 'positive' | 'reference_positive' | 'event'; label: string; slot: number };
+/** Every setting a saved analysis can carry (the server and the bundle reader accept only these). */
+export const OPTION_KEYS = ['positive', 'reference_positive', 'event', 'prior_scale', 'mu', 'prior_a', 'prior_b', 'threshold'] as const;
+export type OptionKey = typeof OPTION_KEYS[number];
+/**
+ * A setting: chosen from the categories of one of the test's columns (`slot`), from a fixed list
+ * (`choices`), or typed as a number (`number`). `default` is stored with the analysis when left unset.
+ */
+export type AnalysisOption = {
+  key: OptionKey; label: string; slot?: number; choices?: readonly (readonly [string, string])[];
+  number?: { min: number; max: number; step: string }; default?: string;
+};
 
-export type AnalysisDef = { id: AnalysisTest; name: string; group: 'Compare groups' | 'Relationships' | 'Prediction' | 'Clinical and diagnostic' | 'Scales and surveys'; slots: AnalysisSlot[]; options?: AnalysisOption[]; hint?: string };
+export type AnalysisDef = { id: AnalysisTest; name: string; group: 'Compare groups' | 'Relationships' | 'Prediction' | 'Clinical and diagnostic' | 'Scales and surveys' | 'Bayesian'; slots: AnalysisSlot[]; options?: AnalysisOption[]; hint?: string };
 
 const numeric = (label: string): AnalysisSlot => ({ label, kind: 'numeric' });
+const PRIOR_SCALE: AnalysisOption = { key: 'prior_scale', label: 'Prior scale on the effect size', choices: [['0.707', 'Medium prior (r = 0.707)'], ['0.5', 'Narrow prior (r = 0.5)'], ['1', 'Wide prior (r = 1)']], default: '0.707' };
 const categorical = (label: string, optional = false): AnalysisSlot => ({ label, kind: 'categorical', optional });
 
 export const ANALYSES: AnalysisDef[] = [
@@ -36,6 +47,10 @@ export const ANALYSES: AnalysisDef[] = [
   { id: 'survival', name: 'Survival (Kaplan-Meier, log-rank)', group: 'Clinical and diagnostic', slots: [numeric('Follow-up time'), categorical('Event (e.g. died, relapsed)'), categorical('Compare groups (optional)', true)], options: [{ key: 'event', label: 'Value that means the event happened', slot: 1 }] },
   { id: 'diagnostic', name: 'Diagnostic accuracy (2 × 2)', group: 'Clinical and diagnostic', slots: [categorical('Index test result'), categorical('Reference standard')], options: [{ key: 'positive', label: 'Positive test result', slot: 0 }, { key: 'reference_positive', label: 'Has the condition', slot: 1 }], hint: 'Sensitivity, specificity, PPV, NPV and likelihood ratios with exact CIs.' },
   { id: 'roc', name: 'ROC curve and AUC', group: 'Clinical and diagnostic', slots: [numeric('Score or measurement'), categorical('Reference standard')], options: [{ key: 'reference_positive', label: 'Has the condition', slot: 1 }], hint: 'The area under the curve and the best cut-off.' },
+  { id: 'bayes_two', name: 'Bayesian independent t-test', group: 'Bayesian', slots: [numeric('Outcome'), categorical('Group (two groups)')], options: [PRIOR_SCALE], hint: 'The JZS Bayes factor (BF10 and BF01) and the effect size with a 95% credible interval.' },
+  { id: 'bayes_paired', name: 'Bayesian paired t-test', group: 'Bayesian', slots: [numeric('First measure'), numeric('Second measure')], options: [PRIOR_SCALE], hint: 'The JZS Bayes factor for the same cases measured twice.' },
+  { id: 'bayes_one', name: 'Bayesian one-sample t-test', group: 'Bayesian', slots: [numeric('Outcome')], options: [{ key: 'mu', label: 'Test value', number: { min: -1e12, max: 1e12, step: 'any' }, default: '0' }, PRIOR_SCALE], hint: 'The JZS Bayes factor for a mean against a test value.' },
+  { id: 'bayes_prop', name: 'Bayesian proportion (beta-binomial)', group: 'Bayesian', slots: [categorical('Outcome (categories)')], options: [{ key: 'positive', label: 'Value counted as a success', slot: 0 }, { key: 'prior_a', label: 'Prior a (Beta)', number: { min: 0.001, max: 10000, step: 'any' }, default: '1' }, { key: 'prior_b', label: 'Prior b (Beta)', number: { min: 0.001, max: 10000, step: 'any' }, default: '1' }, { key: 'threshold', label: 'Threshold for P(p > threshold)', number: { min: 0, max: 1, step: '0.01' }, default: '0.5' }], hint: 'Posterior mean, 95% credible interval and the probability the proportion exceeds a threshold. Beta(1, 1) is a flat prior.' },
   { id: 'alpha', name: 'Reliability (Cronbach’s alpha)', group: 'Scales and surveys', slots: [{ label: 'Items of the scale', kind: 'numeric', multiple: { min: 2, max: 40 } }], hint: 'Internal consistency of questionnaire items; reverse-score negative items first.' },
 ];
 
