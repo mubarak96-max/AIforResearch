@@ -17,6 +17,8 @@ import { CitationGenerator } from './CitationGenerator';
 import { DataAnalysis } from './DataAnalysis';
 import { PatternChecker } from './PatternChecker';
 import { PdfTools } from './PdfTools';
+import { UtilityTool } from './utilities';
+import { BlogMarkdown } from '@/components/marketing/BlogMarkdown';
 
 export function ToolRunner({ tool, defaultStyle }: { tool: Tool; defaultStyle?: string }) {
   switch (tool.kind) {
@@ -25,6 +27,7 @@ export function ToolRunner({ tool, defaultStyle }: { tool: Tool; defaultStyle?: 
     case 'patterns': return <PatternChecker />;
     case 'data': return <DataAnalysis />;
     case 'pdf': return <PdfTools />;
+    case 'utility': return <UtilityTool slug={tool.slug} />;
   }
 }
 
@@ -77,6 +80,19 @@ export function ToolPage({ tool, heading, intro, description, faq: faqOverride, 
       </section>
 
       {children}
+
+      {tool.guide && (
+        <section aria-label={`${tool.name}: guide`} className={`${container} pt-20 md:pt-24`}>
+          <article className="mx-auto min-w-0 max-w-[740px]">
+            {tool.reviewed && (
+              <p className="text-[13.5px] text-muted">
+                Guide written by the AI for Research editorial team · Last reviewed <time dateTime={tool.reviewed}>{new Date(`${tool.reviewed}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })}</time>
+              </p>
+            )}
+            <BlogMarkdown markdown={tool.guide} />
+          </article>
+        </section>
+      )}
 
       <section aria-labelledby="steps-title" className={`${container} pt-20 md:pt-24`}>
         <h2 id="steps-title" className={h2}>How to use it</h2>

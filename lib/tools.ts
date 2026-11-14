@@ -8,6 +8,8 @@
  * (lib/server/lib/toolPrompts.ts). Pure data, safe to import anywhere.
  */
 
+import { UTILITY_TOOLS } from './utilityTools';
+
 export type ToolCategory = 'citations' | 'research' | 'writing' | 'editing' | 'data' | 'utilities';
 
 export const TOOL_CATEGORIES: { id: ToolCategory; name: string; blurb: string }[] = [
@@ -45,7 +47,9 @@ export type ToolKind =
   /** Statistics in the browser. */
   | 'data'
   /** PDF operations in the browser; files never leave the device. */
-  | 'pdf';
+  | 'pdf'
+  /** A small utility that runs in the browser (components/tools/utilities, keyed by slug). */
+  | 'utility';
 
 export type Tool = {
   slug: string;
@@ -71,6 +75,10 @@ export type Tool = {
   /** Feature pages (lib/features.ts) and other tools that go with this one. */
   features: string[];
   related: string[];
+  /** Long-form guide shown under the tool (Markdown, rendered like a blog post), with numbered sources. */
+  guide?: string;
+  /** YYYY-MM-DD the guide was last reviewed. Shown with the guide. */
+  reviewed?: string;
 };
 
 const LEVEL: ToolField = {
@@ -606,6 +614,8 @@ export const TOOLS: Tool[] = [
     features: ['research-library', 'chat-with-pdf'],
     related: ['citation-generator'],
   },
+  // Browser utilities (citations, searching, planning), one file each in lib/utilityTools.
+  ...UTILITY_TOOLS,
 ];
 
 const BY_SLUG = new Map(TOOLS.map((tool) => [tool.slug, tool]));

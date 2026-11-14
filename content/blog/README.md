@@ -106,3 +106,13 @@ Written 13 November 2026 for the features in the build spec of [docs/redesign/09
 | 147 | [Gene and protein databases](147-gene-and-protein-databases-for-literature-review.md) | /fields/life-sciences |
 | 148 | [FRED economic data](148-fred-economic-data-for-research.md) | /fields/business-and-economics |
 | 149 | [openFDA for researchers](149-openfda-for-researchers.md) | /fields/medicine-and-health |
+
+## Articles 150 to 172: the November–December content calendar
+
+Written 14 November 2026 from the content calendar; the plan, what was left out (duplicates and drug explainers) and the writing rules are in [docs/redesign/12-content-calendar-nov-dec.md](../../docs/redesign/12-content-calendar-nov-dec.md). The nine free browser tools from the same calendar live in `lib/utilityTools/`.
+
+| Posts | Cluster | Pillar |
+| --- | --- | --- |
+| 150–158 | T. Citation styles | 150 apa-reference-list |
+| 159–166 | U. Research methods and design | 159 types-of-research-design |
+| 167–172 | V. Essays, theses and sources | 167 what-is-a-thesis-statement |

@@ -341,6 +341,47 @@ export const CITATION_STYLES: CitationStyle[] = [
     ],
   },
   {
+    slug: 'cse',
+    name: 'CSE',
+    edition: '8th edition',
+    // The citation-sequence version. The CSL repository also has council-of-science-editors-alphabetical
+    // (citation-name) and council-of-science-editors-author-date (name-year), which users can pick in the style menu.
+    cslId: 'council-of-science-editors',
+    seoTitle: 'Free CSE citation generator (8th edition)',
+    description: 'Create CSE 8 citations and reference lists for free, in citation-sequence form. See CSE examples for journal articles, books and websites in biology and science.',
+    heading: 'CSE citation generator (8th edition)',
+    intro: 'CSE style, from the Council of Science Editors’ Scientific Style and Format, is used in biology and the life sciences. It has three systems: citation-sequence, citation-name and name-year. This generator uses citation-sequence; search the style menu for the other two.',
+    keywords: ['cse citation generator', 'cse citation', 'cse reference', 'cse format', 'council of science editors citation', 'cse 8th edition'],
+    kind: 'Numbered',
+    usedIn: 'Biology, the life sciences, agriculture and environmental science',
+    listName: 'References (or Cited References)',
+    inText: [
+      { label: 'Citation-sequence (superscript)', text: '…a double helix.¹' },
+      { label: 'Citation-sequence (in brackets)', text: '…a double helix [1].' },
+      { label: 'Name-year system', text: '(Watson and Crick 1953)' },
+    ],
+    // VERIFY against Scientific Style and Format 8th ed. (journal references): full page range and the "doi:" form.
+    reference: '1. Watson JD, Crick FHC. Molecular structure of nucleic acids: a structure for deoxyribose nucleic acid. Nature. 1953;171(4356):737–738. doi:10.1038/171737a0.',
+    patterns: [
+      { label: 'Journal article', text: 'n. Last AA, Last BB. Title of the article in sentence case. Abbrev Journal. Year;Volume(Issue):pages. doi:xxxx.' },
+      { label: 'Book', text: 'n. Last AA. Title of the book. Edition. Place (Country): Publisher; Year.' },
+      { label: 'Web page', text: 'n. Organization or Author. Title of the page. Place: Publisher; Year [updated Year Mon Day; accessed Year Mon Day]. URL' },
+      { label: 'Name-year reference', text: 'Last AA, Last BB. Year. Title of the article. Abbrev Journal. Volume(Issue):pages. doi:xxxx.' },
+    ],
+    rules: [
+      'Choose one system and use it throughout: citation-sequence (numbered in order of first citation), citation-name (list sorted by author, then numbered) or name-year (author and year in the text).',
+      'Write authors as surname then initials, with no full stops or spaces between initials (Watson JD). List up to 10 authors; for more, give the first 10 and “et al.”',
+      'Use sentence case for article titles and no italics or quotation marks. Abbreviate journal names without full stops (Proc Natl Acad Sci USA).',
+      'Reuse a source’s first number each time you cite it again.',
+      'In name-year, put the year straight after the authors and sort the list alphabetically by first author.',
+    ],
+    faq: [
+      { q: 'Which CSE system should I use?', a: 'The one your instructor or journal names. Citation-sequence is the most common in biology courses and journals. Citation-name suits long lists you want sorted by author, and name-year suits readers who want to see who and when in the text.' },
+      { q: 'Is CSE the same as CBE?', a: 'Yes, in origin. The Council of Biology Editors renamed itself the Council of Science Editors in 2000, so older guides call the style CBE.' },
+      { q: 'Do CSE references use italics?', a: 'Not for journal articles: titles and journal names are in plain type. Genus and species names inside a title stay in italics, as in any scientific text.' },
+    ],
+  },
+  {
     slug: 'bluebook',
     name: 'Bluebook',
     edition: '21st edition',

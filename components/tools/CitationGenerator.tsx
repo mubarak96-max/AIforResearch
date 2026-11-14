@@ -14,11 +14,11 @@ import { api } from '@/lib/session';
 import { COMMON_STYLES, loadCslStyle, normalizeStyleId, searchStyles, type CslStyleInfo } from '@/components/editor/lib/citations/cslStyles';
 import { btnPrimary, focusRing } from '@/components/marketing/styles';
 
-type Csl = Record<string, unknown> & { id: string; type: string; title: string };
+export type Csl = Record<string, unknown> & { id: string; type: string; title: string };
 type Mode = 'search' | 'webpage' | 'book' | 'article-journal';
 
 const STORAGE_KEY = 'writeorbit_citation_list';
-const control = `w-full rounded-xl border border-line bg-surface px-3.5 text-[15px] text-ink placeholder:text-subtle ${focusRing}`;
+export const control = `w-full rounded-xl border border-line bg-surface px-3.5 text-[15px] text-ink placeholder:text-subtle ${focusRing}`;
 const tab = (active: boolean) => `inline-flex h-9 items-center rounded-lg px-3 text-[14px] ${focusRing} ${active ? 'bg-ink text-on-ink' : 'text-ink-2 hover:bg-soft'}`;
 
 /** "Jane Smith; World Health Organization" -> CSL names. One word, or a name with "Organization"-style words, is a literal. */
@@ -43,7 +43,7 @@ function dateParts(value: string): { 'date-parts': number[][] } | undefined {
 const today = () => new Date().toISOString().slice(0, 10);
 const newId = () => `manual-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 
-async function format(items: Csl[], styleId: string): Promise<{ entries: { id: string; html: string; inText: string }[]; numeric: boolean } | null> {
+export async function format(items: Csl[], styleId: string): Promise<{ entries: { id: string; html: string; inText: string }[]; numeric: boolean } | null> {
   const id = normalizeStyleId(styleId);
   const loaded = await loadCslStyle(id);
   if (!loaded) return null;
@@ -58,13 +58,13 @@ async function format(items: Csl[], styleId: string): Promise<{ entries: { id: s
   return { entries, numeric: /<category citation-format="numeric"/.test(loaded) || template === 'vancouver' };
 }
 
-const textOf = (html: string) => {
+export const textOf = (html: string) => {
   const div = document.createElement('div');
   div.innerHTML = html;
   return (div.textContent || '').replace(/\s+/g, ' ').trim();
 };
 
-async function copyRich(html: string, text: string) {
+export async function copyRich(html: string, text: string) {
   try {
     if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
       await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([text], { type: 'text/plain' }) })]);
@@ -77,7 +77,7 @@ async function copyRich(html: string, text: string) {
   }
 }
 
-function StylePicker({ value, onChange }: { value: string; onChange: (id: string) => void }) {
+export function StylePicker({ value, onChange }: { value: string; onChange: (id: string) => void }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<CslStyleInfo[]>([]);
   const common = COMMON_STYLES.slice(0, 22);
