@@ -93,6 +93,14 @@ export const aiEditorCitationInlineContentSpec = createReactInlineContentSpec(
       libraryDocumentId: { default: '' },
       evidencePage: { default: '' },
       evidenceQuote: { default: '' },
+      // Project evidence behind the citation (a reader highlight or a shared finding), and the
+      // fingerprint of the sentence when someone last checked it against that evidence.
+      highlightId: { default: '' },
+      projectId: { default: '' },
+      sourceId: { default: '' },
+      findingId: { default: '' },
+      claimHash: { default: '' },
+      checkedAt: { default: '' },
     },
   },
   {
@@ -115,6 +123,12 @@ export const aiEditorCitationInlineContentSpec = createReactInlineContentSpec(
         libraryDocumentId: element.getAttribute('data-library-document-id') ?? '',
         evidencePage: element.getAttribute('data-evidence-page') ?? '',
         evidenceQuote: element.getAttribute('data-evidence-quote') ?? '',
+        highlightId: element.getAttribute('data-highlight-id') ?? '',
+        projectId: element.getAttribute('data-project-id') ?? '',
+        sourceId: element.getAttribute('data-source-id') ?? '',
+        findingId: element.getAttribute('data-finding-id') ?? '',
+        claimHash: element.getAttribute('data-claim-hash') ?? '',
+        checkedAt: element.getAttribute('data-checked-at') ?? '',
       };
     },
     render: ({ inlineContent }) => {
@@ -136,6 +150,12 @@ export const aiEditorCitationInlineContentSpec = createReactInlineContentSpec(
           data-library-document-id={inlineContent.props.libraryDocumentId || undefined}
           data-evidence-page={inlineContent.props.evidencePage || undefined}
           data-evidence-quote={inlineContent.props.evidenceQuote || undefined}
+          data-highlight-id={inlineContent.props.highlightId || undefined}
+          data-project-id={inlineContent.props.projectId || undefined}
+          data-source-id={inlineContent.props.sourceId || undefined}
+          data-finding-id={inlineContent.props.findingId || undefined}
+          data-claim-hash={inlineContent.props.claimHash || undefined}
+          data-checked-at={inlineContent.props.checkedAt || undefined}
           className="citation-token inline-flex items-center rounded-sm border-b border-[var(--theme-primary-border)] bg-[var(--theme-primary-tint)] px-1 align-middle text-[0.95em] font-medium text-[var(--theme-primary-dark)]"
           title={bibliography}
           onMouseDown={(event) => {

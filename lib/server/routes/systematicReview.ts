@@ -18,7 +18,11 @@
  *   POST   /:id/methods/draft        a Methods section from the log and counts (AI, CREDIT_COSTS.section)
  *   GET    /:id/export?format=csv|ris
  *   GET    /:id/screening-documents  screening forms, exclusion reasons and decision log as editor blocks (exported as Word or PDF)
- * Searching, importing, removing duplicates, screening by hand, agreement, PRISMA and exports cost no credits.
+ *   GET    /:id/analyses             the meta-analyses (one per outcome), calculated in the browser
+ *   POST   /:id/analyses             a new outcome
+ *   PUT    /:id/analyses/:aid        its data, model and GRADE judgements (with base_revision)
+ *   DELETE /:id/analyses/:aid
+ * Searching, importing, removing duplicates, screening by hand, agreement, PRISMA, meta-analysis and exports cost no credits.
  */
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -38,6 +42,7 @@ import {
   storeSuggestions, suggestDecisions, updateReview, vote, attachFullText, fullTextPages, withFullTexts, reviewAudit, type RecordRow,
 } from '../lib/systematicReview.js';
 import { screeningDocuments } from '../lib/systematicReviewDocuments.js';
+import { AnalysisBody, createAnalysis, deleteAnalysis, listAnalyses, updateAnalysis } from '../lib/systematicReviewAnalyses.js';
 
 const Decision = z.enum(['include', 'exclude', 'maybe']);
 const Stage = z.enum(['title', 'full']);
@@ -299,6 +304,24 @@ export function systematicReviewRoutes(slots: Slots) {
     const audit = await reviewAudit(user, state.review.id);
     c.header('cache-control', 'private, no-store');
     return c.json(screeningDocuments({ review: state.review, records: state.records, reviewers: state.reviewers, audit, generated: new Date().toISOString() }));
+  });
+
+  app.get('/:id/analyses', async (c) => c.json(await listAnalyses(currentUser(c), c.req.param('id'))));
+
+  app.post('/:id/analyses', async (c) => {
+    const body = await parseBody(c, AnalysisBody);
+    return c.json({ analysis: await createAnalysis(currentUser(c), c.req.param('id'), body) }, 201);
+  });
+
+  app.put('/:id/analyses/:aid', async (c) => {
+    const body = await parseBody(c, AnalysisBody.extend({ base_revision: z.number().int().min(1) }));
+    const { base_revision: base, ...input } = body;
+    return c.json({ analysis: await updateAnalysis(currentUser(c), c.req.param('id'), c.req.param('aid'), input, base) });
+  });
+
+  app.delete('/:id/analyses/:aid', async (c) => {
+    await deleteAnalysis(currentUser(c), c.req.param('id'), c.req.param('aid'));
+    return c.json({ ok: true });
   });
 
   app.get('/:id/export', async (c) => {

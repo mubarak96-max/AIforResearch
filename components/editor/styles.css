@@ -275,6 +275,19 @@ html button, html input, html textarea, html select {
 .citation-token:hover {
   background-color: var(--color-accent-50);
 }
+/* Claim checks (lib/aiEditor/claimCheck.ts): the sentence changed since it was checked against its evidence. */
+.citation-claim-changed .citation-token,
+.citation-claim-changed.citation-token {
+  text-decoration: underline wavy #d97706;
+  text-underline-offset: 3px;
+}
+@media print {
+  .citation-claim-changed .citation-token,
+  .citation-claim-changed.citation-token { text-decoration: none; }
+}
+
+/* A paragraph opened from a link (?block=): a brief highlight. */
+.ce-block-flash { background-color: var(--color-accent-50); transition: background-color 0.6s ease; border-radius: 6px; }
 
 /* Footnote texts of a pageless document: printed at the end, never shown on screen. */
 .ce-print-notes { display: none; }

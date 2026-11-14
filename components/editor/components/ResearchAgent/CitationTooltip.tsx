@@ -17,7 +17,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LuBookmark, LuCheck, LuExternalLink, LuPencil } from 'react-icons/lu';
+import { LuBookmark, LuCheck, LuExternalLink, LuFileSearch, LuPencil } from 'react-icons/lu';
 import {
   getBibtexFromBase64,
   getDecodedCitationPayload,
@@ -62,6 +62,8 @@ export interface CitationTooltipProps {
   onSave?: (metadata: CitationMetadata) => void;
   /** Callback when "Narrative" is clicked (with the citation element) */
   onNarrative?: (metadata: CitationMetadata, target: HTMLElement | null) => void;
+  /** Callback when "Evidence" is clicked: the passage and project finding behind the citation */
+  onEvidence?: (metadata: CitationMetadata, target: HTMLElement | null) => void;
   /** Extra details (cited by, open access, abstract) fetched when the card opens */
   lookup?: (metadata: CitationMetadata) => Promise<CitationLookupResult | null>;
   /** Also open the card on click and keep it open (touch screens) */
@@ -158,6 +160,7 @@ const CitationTooltip: React.FC<CitationTooltipProps> = ({
   onView,
   onSave,
   onNarrative,
+  onEvidence,
   lookup,
   openOnClick = false,
 }) => {
@@ -382,7 +385,7 @@ const CitationTooltip: React.FC<CitationTooltipProps> = ({
           <p className="mt-2 line-clamp-3 text-[12.5px] leading-[1.5] text-ink-3">{truncatedAbstract}</p>
         ) : null}
 
-        {onEdit || onNarrative || onView || onSave ? (
+        {onEdit || onNarrative || onView || onSave || onEvidence ? (
           <div className="-ml-1 mt-2.5 flex flex-wrap items-center gap-0.5">
             {onSave ? (
               <button
@@ -413,6 +416,19 @@ const CitationTooltip: React.FC<CitationTooltipProps> = ({
                 className={CARD_ACTION}
               >
                 {isNarrative ? '(Author, Year)' : 'Author (Year)'}
+              </button>
+            ) : null}
+            {onEvidence ? (
+              <button
+                type="button"
+                onClick={() => {
+                  pinnedRef.current = false;
+                  setIsVisible(false);
+                  onEvidence(metadata, currentTargetRef.current);
+                }}
+                className={CARD_ACTION}
+              >
+                <LuFileSearch className="h-3.5 w-3.5" />Evidence
               </button>
             ) : null}
             {onEdit ? (

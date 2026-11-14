@@ -9,14 +9,15 @@ import { Button, Card, inputClass } from '@/components/app/ui';
 import { CitedMarkdown, CreditCost, creditsChanged, showError } from '@/components/app/research/parts';
 import { downloadFile } from './client';
 import { PrismaDiagram, downloadPrisma } from './Prisma';
-import type { ReviewState, SrRecord } from './types';
+import type { ReviewState, SavedAnalysis, SrRecord } from './types';
 import { FullTextPanel } from './FullTextPanel';
 import { exportWordDocument } from '@/components/editor/lib/aiEditor/wordApi';
+import { analyse, certainty, summaryCsv, summaryRow } from '@/lib/metaAnalysis';
 
 const ROB_VALUES = ['low', 'some concerns', 'high', 'unclear', 'not applicable'];
 
-const included = (records: SrRecord[]) => records.filter((record) => !record.duplicate_of && record.full_state?.status === 'final' && record.full_state.decision === 'include');
-const shortCite = (record: SrRecord) => `${record.authors[0]?.split(/\s+/).pop() ?? 'Unknown'}${record.authors.length > 1 ? ' et al.' : ''} ${record.year ?? 'n.d.'}`;
+export const included = (records: SrRecord[]) => records.filter((record) => !record.duplicate_of && record.full_state?.status === 'final' && record.full_state.decision === 'include');
+export const shortCite = (record: SrRecord) => `${record.authors[0]?.split(/\s+/).pop() ?? 'Unknown'}${record.authors.length > 1 ? ' et al.' : ''} ${record.year ?? 'n.d.'}`;
 
 function Cell({ record, column, canEdit, onSave }: { record: SrRecord; column: { id: string; label: string }; canEdit: boolean; onSave: (value: string) => void }) {
   const cell = record.extraction?.[column.id];
@@ -129,7 +130,36 @@ export function ExtractionTab({ state, reload }: { state: ReviewState; reload: (
   );
 }
 
-export function ReportTab({ state, reload }: { state: ReviewState; reload: () => Promise<void> }) {
+/** The Report step's pointer to the meta-analyses: the summary of findings as CSV, the plots in the Meta-analysis tab. */
+function MetaAnalysisExports({ reviewId, name, openMeta }: { reviewId: string; name: string; openMeta?: () => void }) {
+  const [analyses, setAnalyses] = useState<SavedAnalysis[] | null>(null);
+  useEffect(() => {
+    let current = true;
+    api<{ analyses: SavedAnalysis[] }>(`/api/systematic-reviews/${reviewId}/analyses`).then((result) => { if (current) setAnalyses(result.analyses); }).catch(() => { if (current) setAnalyses([]); });
+    return () => { current = false; };
+  }, [reviewId]);
+  const rows = useMemo(() => (analyses ?? []).map((analysis) => summaryRow(analysis.outcome, analyse(analysis.rows, analysis), analysis.grade)), [analyses]);
+  const csv = () => {
+    const url = URL.createObjectURL(new Blob([`﻿${summaryCsv(rows)}`], { type: 'text/csv;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${name}-summary-of-findings.csv`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  };
+  return (
+    <Card className="p-5">
+      <div className="flex flex-wrap items-center gap-2">
+        <h2 className="flex-1 text-[16px] font-bold">Meta-analysis</h2>
+        {rows.length > 0 && <Button size="sm" onClick={csv}><LuDownload className="h-4 w-4" />Summary of findings (CSV)</Button>}
+        {openMeta && <Button size="sm" onClick={openMeta}>{rows.length ? 'Forest and funnel plots' : 'Open Meta-analysis'}</Button>}
+      </div>
+      <p className="mt-1 text-[13.5px] text-muted">{analyses === null ? 'Loading…' : rows.length ? `${rows.length} ${rows.length === 1 ? 'outcome' : 'outcomes'}: ${rows.map((row, index) => `${row.outcome} (${row.effect}, ${certainty(analyses[index].grade).label} certainty)`).join('; ')}. Forest and funnel plots save as SVG or PNG from the Meta-analysis step.` : 'No meta-analyses yet. Pool your included studies by outcome in the Meta-analysis step; it is calculated in your browser and free.'}</p>
+    </Card>
+  );
+}
+
+export function ReportTab({ state, reload, openMeta }: { state: ReviewState; reload: () => Promise<void>; openMeta?: () => void }) {
   const { review, prisma, can_edit: canEdit } = state;
   const svg = useRef<SVGSVGElement>(null);
   const [methods, setMethods] = useState(review.methods);
@@ -203,6 +233,8 @@ export function ReportTab({ state, reload }: { state: ReviewState; reload: () =>
           </div>
         )}
       </Card>
+
+      <MetaAnalysisExports reviewId={review.id} name={name} openMeta={openMeta} />
 
       <Card className="p-5">
         <div className="flex flex-wrap items-center gap-2">

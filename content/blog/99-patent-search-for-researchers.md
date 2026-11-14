@@ -141,7 +141,7 @@ Do not treat an AI chatbot's view on any of these as an answer. Language models 
 
 ## Using AI for Research for the non-patent literature
 
-AI for Research searches US patents through USPTO PatentsView in Official Sources, at no credit cost. It does not cover other offices, so use the free databases above (Google Patents, Espacenet and WIPO Patentscope) for patents filed elsewhere, and use AI for Research for the scholarly side and for keeping the work in order. Nothing it returns is a patentability, validity or freedom-to-operate opinion. More on the [patent search tool](/fields/law-and-patents) page.
+AI for Research does not search patent databases, so use the free databases above (Google Patents, Espacenet, Patent Public Search and WIPO Patentscope) for the patents themselves. Use AI for Research for the non-patent literature, which is prior art too, and for keeping the work in order. Nothing it returns is a patentability, validity or freedom-to-operate opinion.
 
 - **Search papers as prior art.** [Find Papers](/features/paper-search) searches 250M+ scholarly works, including preprints, with a year filter so you can see what was public before a date. 0 credits.
 - **Trace a key paper's citations.** Citation Map shows the references and citing papers of a seed paper, 0 credits.

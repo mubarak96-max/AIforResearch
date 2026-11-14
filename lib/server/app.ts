@@ -27,6 +27,7 @@ import { convertRoutes } from './routes/convert.js';
 import { diagramRoutes } from './routes/diagram.js';
 import { analysisRoutes } from './routes/analysis.js';
 import { projectEvidenceRoutes } from './routes/projectEvidence.js';
+import { projectAttentionRoutes } from './routes/projectAttention.js';
 import { workflowRoutes } from './routes/workflows.js';
 import { monitoringRoutes } from './routes/monitoring.js';
 import { analyticsRoutes } from './routes/analytics.js';
@@ -84,6 +85,7 @@ export function createApp() {
   app.route('/api/surveys', surveyRoutes(slots));
   app.route('/api/public/surveys', publicSurveyRoutes());
   app.route('/api', projectEvidenceRoutes());
+  app.route('/api', projectAttentionRoutes());
   app.route('/api', researchRoutes(slots));
   app.route('/api/newsletter', newsletterRoutes());
   app.route('/api/billing', billingRoutes());

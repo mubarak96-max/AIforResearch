@@ -1,16 +1,19 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { LuChevronRight, LuCopy, LuExternalLink, LuFileText, LuFolder, LuLibrary, LuMessageCircle, LuQuote, LuSearch, LuUpload, LuX } from 'react-icons/lu';
+import { LuBookOpen, LuChevronRight, LuCopy, LuExternalLink, LuFileText, LuFolder, LuHighlighter, LuLibrary, LuMessageCircle, LuQuote, LuSearch, LuUpload, LuX } from 'react-icons/lu';
 import { toast } from 'react-hot-toast';
 import { getDocuments, getFolders, type FolderResponse, type LibraryDocumentResponse } from '../../../utils/libraryApi';
 import { copyLibraryReference, LIBRARY_CHANGED_EVENT } from '../../../lib/aiEditor/references';
 import LibraryAddDialog, { type AddTab } from './LibraryAddDialog';
 import { askAboutInSideloadChat } from '../../../lib/sideloads';
+import { listHighlights, type LibraryHighlight } from '../../../lib/aiEditor/assistApi';
 
 type Props = {
   /** In a document: cite into it. Elsewhere "Copy" puts the reference on the clipboard. */
   onCite?: (document: LibraryDocumentResponse) => void;
+  /** In a document: cite a highlight from the reader, with its passage and page as the citation's evidence. */
+  onCiteHighlight?: (document: LibraryDocumentResponse, highlight: LibraryHighlight) => void;
   /** Defaults to the app's AI Chat with this source attached. */
   onAsk?: (document: LibraryDocumentResponse) => void;
   citing?: boolean;
@@ -32,7 +35,40 @@ export function libraryDocumentUrl(document: LibraryDocumentResponse) {
 }
 
 /** The writer's Library (beside the document or in the app's left drawer): search, cite, ask about a PDF, upload. */
-export default function LibraryPanel({ onCite, onAsk, citing, visible = true }: Props) {
+/** A paper's reader highlights, each citable with its passage. Loaded when the paper is opened in the list. */
+function PaperHighlights({ document, citing, onCite }: { document: LibraryDocumentResponse; citing?: boolean; onCite: (highlight: LibraryHighlight) => void }) {
+  const [highlights, setHighlights] = useState<LibraryHighlight[] | null>(null);
+  const [error, setError] = useState('');
+  useEffect(() => {
+    let live = true;
+    listHighlights(document.id)
+      .then((result) => { if (live) setHighlights(result.highlights); })
+      .catch((reason: Error) => { if (live) setError(reason.message); });
+    return () => { live = false; };
+  }, [document.id]);
+  if (error) return <p className="text-[12.5px] text-muted">{error}</p>;
+  if (!highlights) return <p className="text-[12.5px] text-muted">Loading highlights…</p>;
+  if (!highlights.length) return <p className="text-[12.5px] text-muted">No highlights yet. Open the paper in the reader and highlight the passages you want to cite.</p>;
+  return (
+    <div className="space-y-1.5">
+      <p className="flex items-center gap-1 text-[12px] font-semibold text-muted"><LuHighlighter className="h-3.5 w-3.5" />Your highlights</p>
+      {highlights.slice(0, 30).map((highlight) => (
+        <div key={highlight.id} className="rounded-lg border border-line px-2 py-1.5">
+          <p className="line-clamp-3 text-[12.5px] leading-[1.45] text-ink-2">“{highlight.quote}”</p>
+          {highlight.note ? <p className="mt-0.5 line-clamp-2 text-[12px] text-muted">{highlight.note}</p> : null}
+          <div className="mt-1 flex items-center gap-2 text-[11.5px] text-muted">
+            <span>Page {highlight.page}{highlight.project_links?.length ? ' · in a project' : ''}</span>
+            <button type="button" disabled={citing} onClick={() => onCite(highlight)} className="ml-auto inline-flex h-6 items-center gap-1 rounded-md px-1.5 font-semibold text-[var(--theme-primary,var(--color-brand))] hover:bg-soft disabled:opacity-60">
+              <LuQuote className="h-3 w-3" />Cite this
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function LibraryPanel({ onCite, onCiteHighlight, onAsk, citing, visible = true }: Props) {
   const ask = onAsk || ((document: LibraryDocumentResponse) => askAboutInSideloadChat({ id: document.id, title: document.title || document.filename }));
   const cite = (document: LibraryDocumentResponse) => {
     if (onCite) {
@@ -272,6 +308,7 @@ export default function LibraryPanel({ onCite, onAsk, citing, visible = true }: 
                           <LuCopy className="h-3.5 w-3.5" /> {document.doi}
                         </button>
                       ) : null}
+                      {onCiteHighlight && document.file_type === 'pdf' ? <PaperHighlights document={document} citing={citing} onCite={(highlight) => onCiteHighlight(document, highlight)} /> : null}
                     </div>
                   ) : null}
                   <div className="-ml-0.5 mt-1.5 flex flex-wrap gap-0.5">
@@ -286,6 +323,11 @@ export default function LibraryPanel({ onCite, onAsk, citing, visible = true }: 
                     <button type="button" onClick={() => ask(document)} className={smallButton}>
                       <LuMessageCircle className="h-3.5 w-3.5" />Ask
                     </button>
+                    {document.file_type === 'pdf' ? (
+                      <a href={`/library/${encodeURIComponent(document.id)}`} target="_blank" rel="noopener" className={smallButton}>
+                        <LuBookOpen className="h-3.5 w-3.5" />Read
+                      </a>
+                    ) : null}
                     {url ? (
                       <button type="button" onClick={() => window.open(url, '_blank', 'noopener')} className={smallButton}>
                         <LuExternalLink className="h-3.5 w-3.5" />Open

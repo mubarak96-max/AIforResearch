@@ -1,29 +1,28 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { AppFrame } from '@/components/app/AppFrame';
 import { SourcesNav } from '@/components/app/SourcesNav';
 import { Button, Card, inputClass } from '@/components/app/ui';
 import { useSignedIn } from '@/components/app/useSignedIn';
 import { api } from '@/lib/session';
 import { download, toCsv } from '@/components/app/analysis/stats';
-import { OFFICIAL_DATA_KINDS, OFFICIAL_LABELS, OPENFDA_NOTE, PATENT_NOTE, type OfficialLocator, type OfficialProvider, type OfficialRecord, type OfficialSearch } from '@/lib/officialSources';
+import { OFFICIAL_DATA_KINDS, OFFICIAL_LABELS, OPENFDA_NOTE, type OfficialLocator, type OfficialProvider, type OfficialRecord, type OfficialSearch } from '@/lib/officialSources';
 
 type WorkbookDestination = { id: string; title: string; revision: number; project_id: string | null };
 const examples: Record<OfficialProvider, string> = {
   clinical_trials: 'e.g. type 2 diabetes AND exercise', world_bank: 'e.g. school enrollment or SE.PRM.ENRR', reliefweb: 'e.g. food insecurity assessment', sec: 'Numeric company CIK, e.g. 320193',
   openfda_label: 'Drug name, e.g. metformin', openfda_event: 'Drug name, e.g. metformin', openfda_device: 'Device or company, e.g. insulin pump', fred: 'e.g. unemployment rate or GDPC1',
-  treasury: 'e.g. debt to the penny', oecd: 'e.g. unemployment monthly', uspto_patents: 'e.g. solid-state battery electrolyte',
+  treasury: 'e.g. debt to the penny', oecd: 'e.g. unemployment monthly',
 };
 const NOTES: Partial<Record<OfficialProvider, string>> = {
   openfda_label: 'Drug labels as submitted by manufacturers, from openFDA.', openfda_event: 'Counts of reactions in FDA Adverse Event Reporting System reports that name the drug. Reports do not show that a drug caused a reaction.',
   openfda_device: 'FDA 510(k) premarket clearances. A clearance is not an approval or evidence of effectiveness.', fred: 'Economic time series from the Federal Reserve Bank of St. Louis. Load observations for a period, e.g. 2015:2025.',
   treasury: 'US federal finance tables from Fiscal Data. Load observations for a period, e.g. 2020:2025.', oecd: 'OECD statistical datasets. Load observations with an optional series key and a period, e.g. 2015:2025; without a period only the latest value of each series is loaded.',
-  uspto_patents: `US patent applications and grants from the USPTO Open Data Portal. ${PATENT_NOTE}`,
 };
 
-export default function OfficialSourcesPage() {
+function OfficialSourcesPage() {
   const { user } = useSignedIn();
   const [provider, setProvider] = useState<OfficialProvider>('clinical_trials');
   const [query, setQuery] = useState('');
@@ -83,7 +82,7 @@ export default function OfficialSourcesPage() {
     <p className="text-xs font-semibold uppercase tracking-wide text-muted">{record.kind.replaceAll('_', ' ')} · {record.publisher}</p>
     <h2 className="mt-2 text-lg font-bold"><a href={record.url} target="_blank" rel="noreferrer" className="hover:text-brand hover:underline">{record.title}</a></h2>
     {!!record.dates.length && <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-xs">{record.dates.map((item) => <div key={item.label}><dt className="font-semibold text-ink-2">{item.label}</dt><dd className="mt-0.5 text-muted">{item.value}</dd></div>)}</dl>}
-    {record.warnings.filter((warning) => warning === OPENFDA_NOTE || warning === PATENT_NOTE).map((warning) => <p key={warning} className="mt-3 text-xs font-semibold text-ink-2">{warning}</p>)}
+    {record.warnings.filter((warning) => warning === OPENFDA_NOTE).map((warning) => <p key={warning} className="mt-3 text-xs font-semibold text-ink-2">{warning}</p>)}
     {record.summary && <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-ink-2">{record.summary.slice(0, 1000)}{record.summary.length > 1000 ? '…' : ''}</p>}
     {record.trial && <div className="mt-4 space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
@@ -135,3 +134,5 @@ export default function OfficialSourcesPage() {
     {results && <div className="space-y-3"><p className="text-sm text-muted">{results.records.length} records on this page{results.total !== null ? ` · ${results.total.toLocaleString()} in the returned scope` : ''} · Retrieved {new Date(results.fetched_at).toLocaleString()}</p>{results.warnings.map((warning) => <p key={warning} className="text-xs text-muted">{warning}</p>)}{!results.records.length && <Card className="p-6 text-sm text-muted">No records on this page. Change the query or inspect another available catalogue page.</Card>}{results.records.map(renderRecord)}{(results.next_page || results.next_token) && <Button disabled={busy} onClick={() => search(results.next_page || 1, results.next_token || undefined, true)}>Next results page</Button>}</div>}
   </AppFrame>;
 }
+
+export default function Page() { return <Suspense fallback={null}><OfficialSourcesPage /></Suspense>; }

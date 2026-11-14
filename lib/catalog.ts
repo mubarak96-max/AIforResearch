@@ -56,7 +56,7 @@ export const CATALOG: CatalogItem[] = [
     href: '/workbooks', credits: 'No credits · AI code suggestions 3', phase1: false, marketing: null, landing: '/features/qualitative-coding',
     keywords: ['qualitative', 'coding', 'codebook', 'themes', 'thematic analysis', 'interviews', 'transcripts'],
   },
-  { id: 'official-sources', name: 'Official sources', hub: 'research', description: 'Trial registries, openFDA, FRED, US Treasury, OECD, World Bank and patents, linked to publications and saved with their provenance.', href: '/official-sources', credits: 'No credits', phase1: false, marketing: null, landing: null, keywords: ['clinical trials', 'registry', 'registration', 'outcomes', 'official', 'fda', 'openfda', 'fred', 'economic data', 'treasury', 'oecd', 'world bank', 'patents', 'prior art'] },
+  { id: 'official-sources', name: 'Official sources', hub: 'research', description: 'Trial registries, openFDA, FRED, US Treasury and OECD data, linked to publications and saved with their provenance.', href: '/official-sources', credits: 'No credits', phase1: false, marketing: null, landing: null, keywords: ['clinical trials', 'registry', 'registration', 'outcomes', 'official', 'fda', 'openfda', 'fred', 'economic data', 'treasury', 'oecd'] },
   // ---------------------------------------------------------------- Research
   {
     id: 'deep-research', name: 'Deep Research', hub: 'research', workspace: true,
@@ -90,6 +90,11 @@ export const CATALOG: CatalogItem[] = [
     id: 'library', name: 'My Library', hub: 'library',
     description: 'Your papers and PDFs in folders, searchable, ready to cite and to use as sources in any job.',
     href: '/editor?tool=library', credits: 'No credits', phase1: true, marketing: '/features/research-library', landing: null, keywords: ['pdf', 'papers', 'saved'],
+  },
+  {
+    id: 'pdf-reader', name: 'PDF reader', hub: 'library',
+    description: 'Read your PDFs and highlight passages with notes. Send a highlight to a project finding or a matrix cell, or cite it with its page; the citation keeps the passage, and changing the sentence flags it for another check.',
+    href: '/editor?tool=library', credits: 'No credits', phase1: false, marketing: null, landing: null, keywords: ['read', 'highlight', 'annotate', 'notes', 'pdf viewer', 'evidence'],
   },
   {
     id: 'chat-with-pdf', name: 'Chat with PDF', hub: 'library',
@@ -279,8 +284,8 @@ export const CATALOG: CatalogItem[] = [
   // ---------------------------------------------------------------- Systematic Review
   {
     id: 'systematic-review', name: 'Systematic Review', hub: 'systematic', workspace: true,
-    description: 'Protocol, PubMed search, import, de-duplication, screening, agreement, the PRISMA flow diagram, and screening forms and the decision log in Word or PDF.',
-    href: '/systematic-review', credits: 'No credits · AI screening 1 credit per 25 records', phase1: false, marketing: null, landing: '/features/systematic-review', keywords: ['prisma', 'screening', 'meta-analysis', 'scoping'],
+    description: 'Protocol, PubMed search, import, de-duplication, screening, agreement, extraction, meta-analysis with forest plots and GRADE certainty, the PRISMA flow diagram, and screening forms and the decision log in Word or PDF.',
+    href: '/systematic-review', credits: 'No credits · AI screening 1 credit per 25 records', phase1: false, marketing: null, landing: '/features/systematic-review', keywords: ['prisma', 'screening', 'meta-analysis', 'scoping', 'forest plot', 'grade', 'heterogeneity', 'summary of findings'],
   },
 
   // ---------------------------------------------------------------- Data

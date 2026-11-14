@@ -4,7 +4,7 @@
  * Document converter: a PDF, Word (.docx) or PowerPoint (.pptx) file as Markdown, to copy,
  * download or open as an editor document. No credits; the plan's upload size applies.
  */
-import { useRef, useState } from 'react';
+import { Suspense, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { LuCopy, LuDownload, LuFilePen, LuLoaderCircle, LuUpload } from 'react-icons/lu';
 import { AppFrame } from '@/components/app/AppFrame';
@@ -17,7 +17,7 @@ import { openResultInEditor } from '@/components/app/research/handoff';
 type Converted = { title: string; kind: 'pdf' | 'docx' | 'pptx'; markdown: string; words: number; truncated: boolean; warnings: string[] };
 const KIND_LABEL: Record<Converted['kind'], string> = { pdf: 'PDF', docx: 'Word', pptx: 'PowerPoint' };
 
-export default function ConvertPage() {
+function ConvertPage() {
   const { user } = useSignedIn();
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -80,3 +80,5 @@ export default function ConvertPage() {
     </AppFrame>
   );
 }
+
+export default function Page() { return <Suspense fallback={null}><ConvertPage /></Suspense>; }

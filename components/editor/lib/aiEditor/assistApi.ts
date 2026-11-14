@@ -486,3 +486,32 @@ export async function sendWritingActivity(documentId: string, activity: WritingA
     body: JSON.stringify(activity),
   });
 }
+
+// ------------------------------------------------------------------ evidence behind citations
+
+/** A highlight saved in the PDF reader (/library/[id]). */
+export type LibraryHighlight = {
+  id: string;
+  page: number;
+  quote: string;
+  note: string;
+  color: string;
+  verified?: boolean;
+  project_links?: { project_id: string; source_id: string; finding_id: string }[];
+};
+
+export function listHighlights(libraryDocumentId: string) {
+  return request<{ highlights: LibraryHighlight[] }>(`/api/library/documents/${encodeURIComponent(libraryDocumentId)}/highlights`, {}, 'Highlights could not be loaded.');
+}
+
+export type ProjectFinding = { id: string; finding: string; quote: string; page: number | null; status: string; reviewed_by?: string };
+export type ProjectSourceDetail = { id: string; title: string; basis: string; findings?: ProjectFinding[] };
+
+export function getProjectSource(projectId: string, sourceId: string) {
+  return request<ProjectSourceDetail>(`/api/projects/${encodeURIComponent(projectId)}/evidence/${encodeURIComponent(sourceId)}`, {}, 'The project evidence could not be opened.');
+}
+
+/** What this document's citations say about project evidence, for the project's "Needs another look" list. */
+export function reportEvidenceLinks(documentId: string, links: unknown[]) {
+  return request<{ saved: boolean }>(`/api/documents/${encodeURIComponent(documentId)}/evidence-links`, { method: 'PUT', json: { links } }, 'Evidence links could not be saved.');
+}

@@ -19,7 +19,7 @@ async function execute<T>(operation: () => Promise<T>): Promise<T> {
   }
 }
 
-const Provider = z.enum(['clinical_trials', 'world_bank', 'reliefweb', 'sec', 'openfda_label', 'openfda_event', 'openfda_device', 'fred', 'treasury', 'oecd', 'uspto_patents']);
+const Provider = z.enum(['clinical_trials', 'world_bank', 'reliefweb', 'sec', 'openfda_label', 'openfda_event', 'openfda_device', 'fred', 'treasury', 'oecd']);
 /** OECD dataflow ids are "AGENCY,FLOW@VIEW,VERSION"; every other provider keeps the plain form (checked below). */
 const Id = z.string().regex(/^[A-Za-z0-9_.@,-]{1,160}$/);
 const Page = z.number().int().min(1).max(100).default(1);
@@ -35,7 +35,7 @@ export const OfficialLocatorSchema = z.object({
   if (value.provider === 'sec' && !value.concept && !value.accession) context.addIssue({ code: z.ZodIssueCode.custom, message: 'Select a filing or enter an XBRL concept.' });
   const pattern: Partial<Record<typeof value.provider, RegExp>> = {
     world_bank: /^[A-Za-z0-9_.-]{1,100}$/, openfda_label: /^[0-9a-f-]{36}$/i, openfda_event: /^[a-z0-9_.-]{1,100}$/, openfda_device: /^(?:K|DEN)\d{5,7}$/i,
-    fred: /^[A-Za-z0-9_.-]{1,40}$/, treasury: /^\d{1,6}$/, oecd: /^[A-Za-z0-9_.-]+,[A-Za-z0-9_.@-]+,[0-9.]+$/, uspto_patents: /^\d{6,12}$/,
+    fred: /^[A-Za-z0-9_.-]{1,40}$/, treasury: /^\d{1,6}$/, oecd: /^[A-Za-z0-9_.-]+,[A-Za-z0-9_.@-]+,[0-9.]+$/,
   };
   if (pattern[value.provider] && !pattern[value.provider]!.test(value.id)) context.addIssue({ code: z.ZodIssueCode.custom, message: 'Use the official identifier from a search result.' });
   if (value.key && value.provider !== 'oecd') context.addIssue({ code: z.ZodIssueCode.custom, message: 'A series key applies to OECD data only.' });
@@ -46,7 +46,7 @@ export function officialSourceRoutes() {
   const app = new Hono<{ Variables: AppVariables }>();
   app.use('*', requireUser);
   app.use('*', rateLimit({ key: 'official-sources', limit: 180, windowSeconds: 3600 }));
-  // Trial registries and the research data sources (openFDA, FRED, Treasury, OECD, USPTO) are
+  // Trial registries and the research data sources (openFDA, FRED, Treasury, OECD) are
   // always on. The World Bank, ReliefWeb and SEC connectors stay behind the expansion flag with
   // their policy and finance workbooks; a gated provider is omitted entirely.
   const GATED = new Set(['world_bank', 'reliefweb', 'sec']);
@@ -60,7 +60,7 @@ export function officialSourceRoutes() {
   });
   app.get('/availability', (c) => {
     const keys = officialKeys();
-    const always = { clinical_trials: true, openfda_label: true, openfda_event: true, openfda_device: true, fred: keys.fred, treasury: true, oecd: true, uspto_patents: keys.uspto_patents };
+    const always = { clinical_trials: true, openfda_label: true, openfda_event: true, openfda_device: true, fred: keys.fred, treasury: true, oecd: true };
     if (!expansionWorkbooksEnabled()) return c.json(always);
     return c.json({ ...always, world_bank: true, reliefweb: true, sec: true });
   });

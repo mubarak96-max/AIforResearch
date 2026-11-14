@@ -323,8 +323,11 @@ export async function fillRow(slots: Slots, user: AuthUser, matrix: MatrixDoc, d
   return saveMatrixFill(matrix.id, user.id, documentId, columns.map((column) => column.id), cells);
 }
 
-/** The writer's own text in a cell (kept on later fills); an empty value hands the cell back to the AI. */
-export async function editCell(matrix: MatrixDoc, documentId: string, columnIdValue: string, value: string, actorId = matrix.user_id) {
+/**
+ * The writer's own text in a cell (kept on later fills); an empty value hands the cell back to the AI.
+ * `evidence` is the passage the writer took it from (a PDF highlight).
+ */
+export async function editCell(matrix: MatrixDoc, documentId: string, columnIdValue: string, value: string, actorId = matrix.user_id, evidence?: { quote: string; page: number | null }) {
   if (!matrix.document_ids.includes(documentId) || !matrix.columns.some((column) => column.id === columnIdValue)) {
     throw new HTTPException(404, { message: 'Cell not found' });
   }
@@ -336,10 +339,28 @@ export async function editCell(matrix: MatrixDoc, documentId: string, columnIdVa
     const latest = await editableMatrixInTransaction(tx, matrix.id, actorId);
     if (!latest?.document_ids.includes(documentId) || !latest.columns.some((column) => column.id === columnIdValue)) throw new HTTPException(409, { message: 'This matrix changed. Reload before saving the cell.' });
     const before = cells[columnIdValue] ?? null;
-    if (clean) cells[columnIdValue] = { value: clean, quote: null, page: null, status: 'done', basis: 'writer', edited: true, updated_at: now };
+    if (clean) cells[columnIdValue] = evidence
+      ? { value: clean, quote: evidence.quote, page: evidence.page, status: 'done', basis: 'full_text', edited: true, updated_at: now }
+      : { value: clean, quote: null, page: null, status: 'done', basis: 'writer', edited: true, updated_at: now };
     else delete cells[columnIdValue];
     tx.set(rowRef, { cells, updated_at: now });
     tx.update(matricesRef().doc(matrix.id), { updated_at: now, ...(actorId !== latest.user_id ? { shared_contributions: true } : {}) });
     tx.create(matricesRef().doc(matrix.id).collection('events').doc(newId()), { action: 'manual_edit', by: actorId, document_id: documentId, column_id: columnIdValue, before, after: cells[columnIdValue] ?? null, at: now });
+  });
+}
+
+/** Adds the writer's own Library documents (already checked) as rows; the matrix must still be where the caller saw it. */
+export async function addMatrixSources(matrix: MatrixDoc, userId: string, ids: string[]) {
+  return db().runTransaction(async (tx) => {
+    const latest = await editableMatrixInTransaction(tx, matrix.id, userId);
+    if (latest.project_id !== matrix.project_id) throw new HTTPException(409, { message: 'This matrix moved to another project. Reload before adding sources.' });
+    const next = [...new Set([...latest.document_ids, ...ids])];
+    if (next.length > MAX_PAPERS) throw new HTTPException(422, { message: `A matrix holds up to ${MAX_PAPERS} papers. Start a second matrix for the rest.` });
+    const owners = { ...latest.document_owners, ...Object.fromEntries(ids.map((id) => [id, userId])) };
+    const added = ids.filter((id) => !latest.document_ids.includes(id));
+    const now = new Date();
+    tx.update(matricesRef().doc(matrix.id), { document_ids: next, document_owners: owners, updated_at: now, ...(ids.length && userId !== latest.user_id ? { shared_contributions: true } : {}) });
+    if (added.length) tx.create(matricesRef().doc(matrix.id).collection('events').doc(newId()), { action: 'sources_added', by: userId, document_ids: added, before: { document_ids: latest.document_ids, document_owners: latest.document_owners ?? {} }, after: { document_ids: next, document_owners: owners }, at: now });
+    return { added: next.length - latest.document_ids.length, paper_count: next.length, document_ids: next, document_owners: owners };
   });
 }

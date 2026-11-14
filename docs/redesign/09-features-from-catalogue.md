@@ -89,7 +89,7 @@ This is the contract every workstream builds to. Ids, routes and prices are fixe
 | 14 | Document converter | `/convert`: PDF, Word, PowerPoint to Markdown or an editor document | 0 |
 | 15 | DBLP | paper source id `dblp` (Find Papers, Deep Research) | 0 |
 | 16 | Field sources | Deep Research source groups `life-sciences` (NCBI Gene, UniProt, Ensembl, Reactome, PDB, AlphaFold DB, GWAS Catalog, ClinVar) and `chemistry` (PubChem, ChEMBL) | as the run's depth |
-| 17 | Official Sources | `/official-sources` adds openFDA, FRED (`FRED_API_KEY`), US Treasury Fiscal Data, OECD, USPTO PatentsView (`PATENTSVIEW_API_KEY`) | 0 |
+| 17 | Official Sources | `/official-sources` adds openFDA, FRED (`FRED_API_KEY`), US Treasury Fiscal Data, OECD (USPTO patents removed 14 Nov: no key could be obtained) | 0 |
 | 18 | Qualitative coding | Qualitative workbook: transcript upload, select text to code, AI code suggestions that quote the text, code frequency by source | AI suggestions as now (3) |
 | 19 | Bayesian basics | Data Lab: Bayesian t-tests (one-sample, paired, two-sample; JZS Bayes factor) and a Bayesian proportion (beta-binomial) | 0 |
 
@@ -101,3 +101,27 @@ This is the contract every workstream builds to. Ids, routes and prices are fixe
 2. Tier 2, starting with posters.
 3. Tier 3, starting with DBLP, openFDA and FRED, then the biology pack.
 4. Tier 4.
+
+## What was built (13 November 2026)
+
+All 19 rows are built. Nothing is committed or deployed, and no page has been clicked through in a browser while signed in. `tsc --noEmit` is clean and all 72 test files pass. `node scripts/build-blog.mjs` compiles 125 posts and 63 landing pages.
+
+**Content:** 11 feature pages, 7 field pages under the new `/fields` section (linked from the footer), posts 132–149, 7 template pages pointed at the new features, and `/features/data-lab` brought up to date. Details and the "before publishing" checklist are in [10-content-catalogue-features.md](10-content-catalogue-features.md).
+
+**New settings** (in `.env.example`; there is no `apphosting.yaml` in the repo):
+
+| Setting | For | Without it |
+| --- | --- | --- |
+| `OPENFDA_API_KEY` (optional) | openFDA | 1,000 requests a day per IP |
+| `FRED_API_KEY` | FRED | FRED is shown as not connected |
+
+**Open items:**
+
+- **DBLP** answered every test request with a bot check (Anubis). The provider is built and tested with mocks; check whether it answers from the production server.
+- **Journal formatter:** model output is capped at 8,192 tokens (`lib/server/slots/llm.ts`), so manuscripts over about 5,000 words get a restructuring map, not the full text. A section-by-section pass would fix it.
+- **FRED** response fields are untested live (no key yet). The **Treasury** table search uses an undocumented catalogue endpoint, and **OECD** is flaky (one 500, fine on retry).
+- **Official Sources:** openFDA, FRED, Treasury and OECD are always on. World Bank, ReliefWeb and SEC stay behind the expansion flag, as before.
+- **Data Lab PDF** is saved through the browser's print dialog, like the editor's PDF export.
+- **Content:** no keyword volumes (the Ubersuggest quota was used up), and about 125 `<!-- VERIFY -->` comments to resolve before publishing.
+
+**14 November:** US patent search (USPTO Open Data Portal) was removed, because no API key could be obtained. That removed the provider and its tests, `PATENTSVIEW_API_KEY`, the `/fields/law-and-patents` page and the patent claims on `/for/industry`; post 99 now says patents are not searched. The pages that claimed World Bank, SEC EDGAR, ReliefWeb or the Financial research workbook were corrected too, since those stay behind the expansion flag.

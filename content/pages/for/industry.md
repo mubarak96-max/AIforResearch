@@ -11,7 +11,7 @@ cta:
   label: "Run a Deep report"
   href: "/deep-research"
 plan_note: "Free plan: 45 credits and up to 2 Deep reports a day. A Deep report costs 15 credits; Landscape and paper search are free."
-related: ["/features/deep-research", "/features/research-landscape", "/features/research-slides", "/features/projects", "/blog/what-is-deep-research-ai", "/fields/business-and-economics", "/fields/law-and-patents"]
+related: ["/features/deep-research", "/features/research-landscape", "/features/research-slides", "/features/projects", "/blog/what-is-deep-research-ai", "/fields/business-and-economics"]
 updated: "2026-11-13"
 faq:
   - q: "Can AI for Research replace a market research firm?"
@@ -93,7 +93,7 @@ An analyst running a few reports a week fits **Pro**: 1,500 credits a month, 40 
 
 ## What it does not do
 
-- No market sizing data, survey panels or paid databases such as Gartner or Statista. Public economic series, SEC filings and US patents are in Official Sources; patent results are not a freedom-to-operate opinion.
+- No market sizing data, survey panels or paid databases such as Gartner or Statista. Public economic series from FRED, the OECD and US Treasury are in Official Sources. Patent databases and company filings are not searched.
 - The Web source reads open pages; it cannot read paywalled reports or sites behind a login.
 - Paywalled papers are read from the abstract.
 - It does not forecast. Reports summarize published evidence.
@@ -102,7 +102,7 @@ An analyst running a few reports a week fits **Pro**: 1,500 credits a month, 40 
 
 Academic teams, see [AI for professors](/for/academics). Health and life sciences, see [AI for medical research](/for/medicine).
 
-Economists and analysts, see [AI for economics research](/fields/business-and-economics) for FRED, OECD, US Treasury and SEC data. R&D and IP teams, see the [patent search tool](/fields/law-and-patents) page for USPTO PatentsView. Chemistry and life sciences teams, see [AI for chemistry research](/fields/chemistry-and-materials) and [AI for biology research](/fields/life-sciences).
+Economists and analysts, see [AI for economics research](/fields/business-and-economics) for FRED, OECD and US Treasury data. Chemistry and life sciences teams, see [AI for chemistry research](/fields/chemistry-and-materials) and [AI for biology research](/fields/life-sciences).
 
 ## Learn more
 

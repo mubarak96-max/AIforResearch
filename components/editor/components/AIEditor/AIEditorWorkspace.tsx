@@ -84,8 +84,11 @@ import CustomCitationDialog from './assistant/CustomCitationDialog';
 import VersionHistoryDialog from './assistant/VersionHistoryDialog';
 import CreditsUpsell from './assistant/CreditsUpsell';
 import CitationEditPopover from './assistant/CitationEditPopover';
+import CitationEvidencePopover from './assistant/CitationEvidencePopover';
+import { citationClaimAt, evidenceLinks } from '../../lib/aiEditor/claimCheck';
+import { claimHash, type ClaimState } from '../../lib/aiEditor/claimText';
 import { AI_BLOCK_TYPES, AIEditBox, BlockAIMenu, BlockSideMenu, blockWords, useUnfreezeSideMenu, type AIEditResult, type BlockAIAction } from './assistant/BlockAITools';
-import { AssistError, DEFAULT_AUTOCOMPLETE_SETTINGS, aiCommentReply, evidenceCheck, lookupPaper, peerReview, reviewBlocks, saveAIVersion, sourceQuality, type AssistSource, type EvidenceCitationInput, type AutocompleteSettings, type ChatMessage, type DocumentVersionContent, type Paper } from '../../lib/aiEditor/assistApi';
+import { AssistError, DEFAULT_AUTOCOMPLETE_SETTINGS, aiCommentReply, evidenceCheck, lookupPaper, peerReview, reportEvidenceLinks, reviewBlocks, saveAIVersion, sourceQuality, type AssistSource, type LibraryHighlight, type EvidenceCitationInput, type AutocompleteSettings, type ChatMessage, type DocumentVersionContent, type Paper } from '../../lib/aiEditor/assistApi';
 import { aiTextToInline, replaceSourceMarkersInBlocks, serializeInlineForAI, visibleText } from '../../lib/aiEditor/aiText';
 import { noteAIInsertion, useWritingActivity } from '../../hooks/useWritingActivity';
 import { useAutocomplete } from '../../lib/aiEditor/useAutocomplete';
@@ -2113,6 +2116,7 @@ export default function AIEditorWorkspace() {
   const [autocompleteOutOfCredits, setAutocompleteOutOfCredits] = useState(false);
   const [isCustomCitationOpen, setIsCustomCitationOpen] = useState(false);
   const [citationEditor, setCitationEditor] = useState<{ anchor: DOMRect; pos: number; title: string; attrs: Record<string, any> } | null>(null);
+  const [citationEvidence, setCitationEvidence] = useState<{ anchor: DOMRect; pos: number; title: string; attrs: Record<string, any>; claim: string; state: ClaimState } | null>(null);
   const [activeCommentId, setActiveCommentId] = useState<string | null>(null);
   const [reviewIssuesByBlockId, setReviewIssuesByBlockId] = useState<Record<string, AIEditorReviewIssue[]>>({});
   // Cached results are read by the scheduler, not a scheduling dependency.
@@ -4376,7 +4380,7 @@ export default function AIEditorWorkspace() {
   }, []);
 
   const handleCitationPick = useCallback(
-    async (libraryDocument: LibraryDocumentResponse) => {
+    async (libraryDocument: LibraryDocumentResponse, evidence?: LibraryHighlight) => {
       if (!documentId) {
         return;
       }
@@ -4441,6 +4445,18 @@ export default function AIEditorWorkspace() {
             style: citationFormat.style,
             url: citationUrl ?? '',
             libraryDocumentId: resolved.document.id,
+            // Cited from a reader highlight: the passage, its page, and the project finding it became.
+            ...(evidence
+              ? {
+                  highlightId: evidence.id,
+                  evidenceQuote: evidence.quote.replace(/\s+/g, ' ').trim().slice(0, 400),
+                  evidencePage: String(evidence.page),
+                  locator: `p. ${evidence.page}`,
+                  projectId: evidence.project_links?.[0]?.project_id || '',
+                  sourceId: evidence.project_links?.[0]?.source_id || '',
+                  findingId: evidence.project_links?.[0]?.finding_id || '',
+                }
+              : {}),
           },
         } as any;
         if (selectedText) editor.insertInlineContent([' ', citation, ' ']);
@@ -5145,6 +5161,76 @@ export default function AIEditorWorkspace() {
     },
     [editor, isWritingEnabled],
   );
+
+  // The evidence card: the passage behind a citation and whether its sentence changed since it was checked.
+  const handleCitationEvidence = useCallback(
+    (metadata: CitationMetadata, target: HTMLElement | null) => {
+      const view = safeView(editor);
+      if (!view || !target) return;
+      const pos = findInlineNodePos(view, target, 'aiCitation');
+      const found = pos === null ? null : citationClaimAt(view.state.doc, pos);
+      if (pos === null || !found) return;
+      setCitationEvidence({ anchor: target.getBoundingClientRect(), pos, title: metadata.title, attrs: found.node.attrs, claim: found.claim, state: found.state });
+    },
+    [editor],
+  );
+
+  const markCitationChecked = useCallback(
+    (pos: number) => {
+      const view = safeView(editor);
+      const node = view?.state.doc.nodeAt(pos);
+      const found = view ? citationClaimAt(view.state.doc, pos) : null;
+      if (!view || node?.type.name !== 'aiCitation' || !found) return;
+      view.dispatch(view.state.tr.setNodeMarkup(pos, undefined, { ...node.attrs, claimHash: claimHash(found.claim), checkedAt: new Date().toISOString() }));
+    },
+    [editor],
+  );
+
+  // Citations tied to project evidence are reported (debounced) for the project's "Needs another look" list.
+  const lastEvidenceReport = useRef<{ doc: string; key: string }>({ doc: '', key: '' });
+  useEffect(() => {
+    if (!documentId || !isWritingEnabled) return;
+    let timer: number | undefined;
+    const report = () => {
+      const view = safeView(editor);
+      if (!view) return;
+      const links = evidenceLinks(view.state.doc);
+      const key = JSON.stringify(links);
+      const last = lastEvidenceReport.current;
+      // Nothing to say: no links now, and none were reported from this document in this session.
+      if (last.doc === documentId ? last.key === key : !links.length && !view.state.doc.textContent.trim()) return;
+      lastEvidenceReport.current = { doc: documentId, key };
+      reportEvidenceLinks(documentId, links).catch(() => { lastEvidenceReport.current = { doc: '', key: '' }; });
+    };
+    const schedule = (delay: number) => { window.clearTimeout(timer); timer = window.setTimeout(report, delay); };
+    const unsubscribe = editor.onChange(() => schedule(5000));
+    schedule(8000);
+    return () => {
+      window.clearTimeout(timer);
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
+  }, [documentId, editor, isWritingEnabled]);
+
+  // ?block=<id>: open at a paragraph (links from the project's "Needs another look" list).
+  const focusBlockId = searchParams.get('block');
+  useEffect(() => {
+    if (!focusBlockId) return;
+    let tries = 0;
+    let timer: number | undefined;
+    const find = () => {
+      const element = document.querySelector<HTMLElement>(`[data-node-type="blockOuter"][data-id="${CSS.escape(focusBlockId)}"]`);
+      if (element) {
+        element.scrollIntoView({ block: 'center' });
+        element.classList.add('ce-block-flash');
+        window.setTimeout(() => element.classList.remove('ce-block-flash'), 2400);
+        return;
+      }
+      tries += 1;
+      if (tries < 40) timer = window.setTimeout(find, 250);
+    };
+    find();
+    return () => window.clearTimeout(timer);
+  }, [focusBlockId, documentId]);
 
   const handleCitationSave = useCallback(
     (metadata: CitationMetadata) => {
@@ -6945,6 +7031,7 @@ export default function AIEditorWorkspace() {
                     visible={assistantTab === 'library'}
                     citing={isInsertingCitation}
                     onCite={(libraryDocument) => void handleCitationPick(libraryDocument)}
+                    onCiteHighlight={(libraryDocument, highlight) => void handleCitationPick(libraryDocument, highlight)}
                     onAsk={(libraryDocument) => {
                       setChatMentions((current) =>
                         current.some((mention) => mention.id === libraryDocument.id)
@@ -7395,6 +7482,7 @@ export default function AIEditorWorkspace() {
         onView={handleCitationView}
         onEdit={isWritingEnabled ? handleCitationEdit : undefined}
         onNarrative={isWritingEnabled ? handleCitationNarrative : undefined}
+        onEvidence={handleCitationEvidence}
         onSave={handleCitationSave}
         lookup={lookupCitation}
         openOnClick
@@ -7422,6 +7510,21 @@ export default function AIEditorWorkspace() {
               suffix: value.suffix || '',
             });
             setCitationEditor(null);
+          }}
+        />
+      ) : null}
+      {citationEvidence ? (
+        <CitationEvidencePopover
+          anchor={citationEvidence.anchor}
+          title={citationEvidence.title}
+          attrs={citationEvidence.attrs}
+          claim={citationEvidence.claim}
+          state={citationEvidence.state}
+          canEdit={isWritingEnabled}
+          onClose={() => setCitationEvidence(null)}
+          onMarkChecked={() => {
+            markCitationChecked(citationEvidence.pos);
+            setCitationEvidence(null);
           }}
         />
       ) : null}

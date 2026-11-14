@@ -15,6 +15,7 @@ import {
 } from '../lib/libraryFiles.js';
 import { scholarAccess, scholarPdf } from '../lib/scholar.js';
 import { ownFolder } from './libraryImport.js';
+import { libraryHighlightRoutes } from './libraryHighlights.js';
 
 /**
  * The Library: `library_documents` and `library_folders` in Firestore, PDFs in Storage. An
@@ -222,6 +223,8 @@ export function libraryRoutes(_slots: Slots) {
     await ref.create(created);
     return c.json({ id: ref.id, name: created.name, parent_id: created.parent_id, source: created.source, created_at: created.created_at, document_count: 0, group_library_id: null }, 201);
   });
+
+  app.route('/', libraryHighlightRoutes());
 
   return app;
 }

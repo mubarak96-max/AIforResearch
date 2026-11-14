@@ -95,10 +95,10 @@ describe('official source records', () => {
   });
 
   it('reports every connector as available when the expansion connectors are on', async () => {
-    vi.stubEnv('FRED_API_KEY', ''); vi.stubEnv('PATENTSVIEW_API_KEY', '');
+    vi.stubEnv('FRED_API_KEY', '');
     const response = await make().request('/api/official-sources/availability');
-    // Keyed connectors (FRED, USPTO) report false until their keys are set.
-    expect(await response.json()).toEqual({ clinical_trials: true, world_bank: true, reliefweb: true, sec: true, openfda_label: true, openfda_event: true, openfda_device: true, fred: false, treasury: true, oecd: true, uspto_patents: false });
+    // Keyed connectors (FRED) report false until their keys are set.
+    expect(await response.json()).toEqual({ clinical_trials: true, world_bank: true, reliefweb: true, sec: true, openfda_label: true, openfda_event: true, openfda_device: true, fred: false, treasury: true, oecd: true });
   });
 
   it('hides the World Bank, ReliefWeb and SEC connectors while the expansion flag is off, and keeps the research data sources', async () => {

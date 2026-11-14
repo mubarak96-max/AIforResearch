@@ -56,6 +56,7 @@ export const C = {
   libraryDocuments: 'library_documents',
   libraryDoi: 'library_doi',      // library_doi/{user}__{sha1(lower doi)}: one document per DOI per person
   chunks: 'chunks',                // library_documents/{id}/chunks
+  highlights: 'highlights',        // library_documents/{id}/highlights (PDF reader)
   assets: 'assets',
   usageEvents: 'usage_events',
   billingEvents: 'billing_events',

@@ -136,7 +136,7 @@ Add the exact queries in an appendix and state that results change as reports ar
 
 ## openFDA in AI for Research
 
-Official Sources (the /official-sources route) looks up openFDA alongside ClinicalTrials.gov, FRED, US Treasury Fiscal Data, the OECD, USPTO PatentsView, the World Bank, SEC EDGAR and ReliefWeb, at 0 credits. You see the FDA record with a link back to the source. <!-- VERIFY: which openFDA endpoints the Official Sources integration queries -->
+Official Sources (the /official-sources route) looks up openFDA alongside ClinicalTrials.gov, FRED, US Treasury Fiscal Data and the OECD, at 0 credits. You see the FDA record with a link back to the source. <!-- VERIFY: which openFDA endpoints the Official Sources integration queries -->
 
 <!-- SCREENSHOT: Official Sources showing an openFDA drug adverse event result with its source link -->
 

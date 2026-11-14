@@ -9,7 +9,7 @@ import { currentUser, parseBody, withHttpErrors } from '../lib/assist-llm.js';
 import { getLibraryDocuments, isUuid, libraryDocumentIdsInFolders } from '../lib/assist-store.js';
 import {
   DEFAULT_COLUMNS, MAX_COLUMNS, MAX_PAPERS, columnId, deleteMatrix, editCell, fillRow, listMatrices, matricesRef,
-  matrixPapers, matrixRows, papersForMatrix, matrixRowsRef, ownMatrix, matrixFor, editableMatrixInTransaction, type MatrixColumn, type MatrixDoc,
+  matrixPapers, matrixRows, papersForMatrix, matrixRowsRef, ownMatrix, matrixFor, editableMatrixInTransaction, addMatrixSources, type MatrixColumn, type MatrixDoc,
 } from '../lib/matrix.js';
 import { C, col, db, newId, rows } from '../firebase.js';
 import { getProjectFor, listProjects } from '../lib/projects.js';
@@ -183,19 +183,8 @@ export function matrixRoutes(slots: Slots) {
     const matrix = await matrixFor(user, c.req.param('id'), true);
     const body = await parseBody(c, PapersBody);
     const ids = await ownedIds(user.id, body.document_ids, body.folder_ids);
-    const changed = await db().runTransaction(async (tx) => {
-      const latest = await editableMatrixInTransaction(tx, matrix.id, user.id);
-      if (latest.project_id !== matrix.project_id) throw new HTTPException(409, { message: 'This matrix moved to another project. Reload before adding sources.' });
-      const next = [...new Set([...latest.document_ids, ...ids])];
-      if (next.length > MAX_PAPERS) throw new HTTPException(422, { message: `A matrix holds up to ${MAX_PAPERS} papers. Start a second matrix for the rest.` });
-      const owners = { ...latest.document_owners, ...Object.fromEntries(ids.map((id) => [id, user.id])) };
-      const added = ids.filter((id) => !latest.document_ids.includes(id));
-      const now = new Date();
-      tx.update(matricesRef().doc(matrix.id), { document_ids: next, document_owners: owners, updated_at: now, ...(ids.length && user.id !== latest.user_id ? { shared_contributions: true } : {}) });
-      if (added.length) tx.create(matricesRef().doc(matrix.id).collection('events').doc(newId()), { action: 'sources_added', by: user.id, document_ids: added, before: { document_ids: latest.document_ids, document_owners: latest.document_owners ?? {} }, after: { document_ids: next, document_owners: owners }, at: now });
-      return { added: next.length - latest.document_ids.length, paper_count: next.length };
-    });
-    return c.json(changed);
+    const { added, paper_count } = await addMatrixSources(matrix, user.id, ids);
+    return c.json({ added, paper_count });
   });
 
   app.delete('/:id/papers/:documentId', async (c) => {

@@ -13,9 +13,10 @@ import { ProtocolTab, SearchTab } from '@/components/app/systematic-review/Setup
 import { ScreeningTab } from '@/components/app/systematic-review/ScreeningTab';
 import { ExtractionTab, ReportTab } from '@/components/app/systematic-review/ResultTabs';
 import { AuditTab } from '@/components/app/systematic-review/AuditTab';
+import { MetaAnalysisTab } from '@/components/app/systematic-review/MetaAnalysisTab';
 import type { ReviewState, SrRecord } from '@/components/app/systematic-review/types';
 
-const TABS = [['protocol', 'Protocol'], ['search', 'Search'], ['screening', 'Screening'], ['extraction', 'Extraction'], ['report', 'Report'], ['history', 'Decision history']] as const;
+const TABS = [['protocol', 'Protocol'], ['search', 'Search'], ['screening', 'Screening'], ['extraction', 'Extraction'], ['meta', 'Meta-analysis'], ['report', 'Report'], ['history', 'Decision history']] as const;
 type Tab = (typeof TABS)[number][0];
 
 function Workspace() {
@@ -47,7 +48,7 @@ function Workspace() {
   const choose = (next: Tab) => {
     setTab(next);
     window.history.replaceState(null, '', `/systematic-review/${id}?tab=${next}`);
-    if (next === 'report' || next === 'extraction') reload();
+    if (next === 'report' || next === 'extraction' || next === 'meta') reload();
   };
   const remove = async () => {
     if (!state || !window.confirm(`Delete "${state.review.title}" with all its records and decisions? This cannot be undone.`)) return;
@@ -85,7 +86,8 @@ function Workspace() {
       {tab === 'search' && <SearchTab state={state} reload={reload} />}
       {tab === 'screening' && <ScreeningTab state={state} setRecords={setRecords} reload={reload} />}
       {tab === 'extraction' && <ExtractionTab state={state} reload={reload} />}
-      {tab === 'report' && <ReportTab state={state} reload={reload} />}
+      {tab === 'meta' && <MetaAnalysisTab state={state} />}
+      {tab === 'report' && <ReportTab state={state} reload={reload} openMeta={() => choose('meta')} />}
       {tab === 'history' && <AuditTab state={state} />}
     </AppFrame>
   );

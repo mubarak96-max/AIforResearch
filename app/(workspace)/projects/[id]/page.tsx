@@ -12,6 +12,7 @@ import { api } from '@/lib/session';
 import { taskLabel, taskHref, type TaskRecord } from '@/components/app/research/handoff';
 import { showError } from '@/components/app/research/parts';
 import { ProjectEvidence } from '@/components/app/ProjectEvidence';
+import { ProjectAttention } from '@/components/app/ProjectAttention';
 import { ProjectHub, ProjectProgress } from '@/components/app/ProjectHub';
 
 type Member = { email: string; name: string | null; role: 'edit' | 'comment' | 'view'; pending: boolean };
@@ -84,6 +85,7 @@ function ProjectPage() {
         <section aria-labelledby="work-title">
           <div className="mb-4"><Segmented label="Project view" value={tab} onChange={switchTab} options={[{ value: 'work', label: 'Work' }, { value: 'progress', label: 'Progress' }]} /></div>
           {tab === 'progress' ? <><h2 id="work-title" className="text-[15px] font-bold">Progress</h2><ProjectProgress id={id} role={project.role} userId={user?.id ?? null} /></> : <>
+          <ProjectAttention projectId={id} />
           <h2 id="work-title" className="text-[15px] font-bold">Work in this project</h2>
           {project.tasks.length === 0 ? (
             <Card className="mt-2.5 px-5 py-6 text-[14px] text-muted">Nothing yet. Move work here from <Link href="/history" className="font-semibold text-brand hover:underline">History</Link> (the project menu on each row).</Card>

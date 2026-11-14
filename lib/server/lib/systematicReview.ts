@@ -7,6 +7,7 @@
  *   extraction_columns, ai_second_reviewer, methods, created_at, updated_at }
  * systematic_reviews/{id}/records/{recordId}: { title, authors, year, venue, doi, pmid, abstract, url,
  *   source, search_id, duplicate_of, dup_reason, order, votes, ai, resolved, extraction, rob }
+ * systematic_reviews/{id}/analyses/{analysisId}: one meta-analysis per outcome (systematicReviewAnalyses.ts)
  *
  * Who may do what: the owner and project members with edit access screen and change it; comment
  * and view members read it. With editors on the project, every record needs two reviewers.
@@ -70,10 +71,10 @@ export type RecordRow = ScreeningRecord & ImportedRecord & {
 
 const reviews = () => col(C.reviews);
 const recordsOf = (reviewId: string) => reviews().doc(reviewId).collection(C.reviewRecords);
-const auditOf = (reviewId: string) => reviews().doc(reviewId).collection('audit');
+export const auditOf = (reviewId: string) => reviews().doc(reviewId).collection('audit');
 const pagesOf = (reviewId: string, recordId: string) => recordsOf(reviewId).doc(recordId).collection('full_text_pages');
 
-function auditEvent(actor: string, action: string, recordId: string | null, before: unknown, after: unknown, stage: Stage | null = null) {
+export function auditEvent(actor: string, action: string, recordId: string | null, before: unknown, after: unknown, stage: Stage | null = null) {
   return { actor, action, record_id: recordId, stage, before: before ?? null, after: after ?? null, at: new Date().toISOString() };
 }
 
@@ -185,7 +186,7 @@ async function isFreePlan(accountId: string) {
 }
 
 /** Saved account_id is provenance; membership changes must not retain a departed Team's limits. */
-async function currentRecordLimit(review: Review, actor: AuthUser) {
+export async function currentRecordLimit(review: Review, actor: AuthUser) {
   if (review.user_id === actor.id) return (await isFreePlan(actor.account_id)) ? FREE_RECORD_LIMIT : PAID_RECORD_LIMIT;
   const owner = await col(C.users).doc(review.user_id).get();
   const accountId = owner.get('account_id');

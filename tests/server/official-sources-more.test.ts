@@ -13,11 +13,11 @@ import { HTTPException } from 'hono/http-exception';
 import type { AppVariables } from '../../lib/server/auth.js';
 import { officialSourceRoutes } from '../../lib/server/routes/officialSources.js';
 import {
-  fdaEventRecord, fdaLabelRecord, fredData, oecdData, parseCsv, patentRecord, searchFdaDevices, searchFdaEvents, searchFdaLabels, searchFred, searchOecd,
-  searchPatents, searchTreasury, treasuryData,
+  fdaEventRecord, fdaLabelRecord, fredData, oecdData, parseCsv, searchFdaDevices, searchFdaEvents, searchFdaLabels, searchFred, searchOecd,
+  searchTreasury, treasuryData,
 } from '../../lib/server/lib/officialSources.js';
 import { SourceError } from '../../lib/server/lib/sources/http.js';
-import { OPENFDA_NOTE, PATENT_NOTE } from '../../lib/officialSources.js';
+import { OPENFDA_NOTE } from '../../lib/officialSources.js';
 import { WORKBOOK_FEATURES } from '../../lib/workflows.js';
 import { USER } from './assist-helpers.js';
 
@@ -152,37 +152,3 @@ describe('OECD', () => {
   });
 });
 
-describe('USPTO patents', () => {
-  const ITEM = { applicationNumberText: '17123456', applicationMetaData: { inventionTitle: 'Solid electrolyte', patentNumber: '12000001', grantDate: '2026-05-05', filingDate: '2021-01-04', firstApplicantName: 'Battery Co', applicationStatusDescriptionText: 'Patented Case' } };
-
-  it('is skipped until PATENTSVIEW_API_KEY is set', async () => {
-    vi.stubEnv('PATENTSVIEW_API_KEY', '');
-    await expect(searchPatents('battery')).rejects.toThrow('not connected');
-    expect(remote.fetch).not.toHaveBeenCalled();
-  });
-
-  it('searches the Open Data Portal with the key header and carries the opinion disclaimer', async () => {
-    vi.stubEnv('PATENTSVIEW_API_KEY', 'odp-key');
-    remote.fetch.mockResolvedValue({ count: 1, patentFileWrapperDataBag: [ITEM] });
-    const found = await searchPatents('solid electrolyte');
-    expect(remote.fetch.mock.calls[0][1]).toMatchObject({ headers: { 'X-API-KEY': 'odp-key' } });
-    expect(urlOf(0).hostname).toBe('api.uspto.gov');
-    expect(found.records[0]).toMatchObject({ kind: 'patent_application', title: 'Solid electrolyte — US 12000001', publication_date: '2026-05-05', locator: { provider: 'uspto_patents', id: '17123456' } });
-    expect(found.records[0].warnings[0]).toBe(PATENT_NOTE);
-    expect(found.records[0].text).toContain('not a validity, infringement or freedom-to-operate opinion');
-    expect(found.warnings).toContain(PATENT_NOTE);
-    remote.fetch.mockResolvedValue({ count: 0 });
-    expect((await searchPatents('nothing')).records).toEqual([]);
-    expect(() => patentRecord({ applicationNumberText: 'abc' })).toThrow(SourceError);
-  });
-
-  it('saves a patent snapshot with provenance by refetching it', async () => {
-    vi.stubEnv('PATENTSVIEW_API_KEY', 'odp-key');
-    remote.fetch.mockResolvedValue({ patentFileWrapperDataBag: [ITEM] });
-    const response = await post('/save', { locator: { provider: 'uspto_patents', id: '17123456' } });
-    expect(response.status).toBe(201);
-    const saved = await response.json();
-    expect(String(remote.fetch.mock.calls[0][0])).toBe('https://api.uspto.gov/api/v1/patent/applications/17123456');
-    expect(fake.read(`library_documents/${saved.library_document_id}`)).toMatchObject({ metadata: { official_source: { provider: 'uspto_patents', kind: 'patent_application' } } });
-  });
-});

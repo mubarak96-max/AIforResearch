@@ -130,7 +130,7 @@ Example (invented for illustration): a master's student studies how US inflation
 
 ## FRED and economic data in AI for Research
 
-Official Sources (the /official-sources route) looks up FRED, US Treasury Fiscal Data and the OECD alongside the World Bank, SEC EDGAR, ClinicalTrials.gov and ReliefWeb, at 0 credits. You see the series or record with a link back to the source, so you can check its units, frequency and notes before you use it. <!-- VERIFY: what fields Official Sources shows for a FRED series (ID, units, frequency, seasonal adjustment) -->
+Official Sources (the /official-sources route) looks up FRED, US Treasury Fiscal Data and the OECD alongside ClinicalTrials.gov and openFDA, at 0 credits. You see the series or record with a link back to the source, so you can check its units, frequency and notes before you use it. <!-- VERIFY: what fields Official Sources shows for a FRED series (ID, units, frequency, seasonal adjustment) -->
 
 <!-- SCREENSHOT: Official Sources with a FRED series result showing its ID, units, frequency and source link -->
 

@@ -6,6 +6,7 @@ import { createPaginationPlugin, type PaginationConfig } from './pagination';
 import { createSuggestingPlugin } from './suggestions';
 import { createAutocompletePlugin, type GhostState } from './autocomplete';
 import { createFindPlugin } from './find';
+import { createClaimCheckPlugin } from './claimCheck';
 
 /**
  * The editor's own ProseMirror plugins (page view, Suggesting mode, autocomplete, find),
@@ -35,7 +36,8 @@ export function createEditorPlugins(hooks: { current: EditorPluginHooks }) {
   const suggesting = createSuggestingPlugin(() => hooks.current.suggesting());
   const autocomplete = createAutocompletePlugin(() => hooks.current.autocomplete);
   const find = createFindPlugin();
-  const extension = createExtension({ key: 'citedEvidenceEditor', prosemirrorPlugins: [pagination, suggesting, autocomplete, find] });
+  const claimCheck = createClaimCheckPlugin();
+  const extension = createExtension({ key: 'citedEvidenceEditor', prosemirrorPlugins: [pagination, suggesting, autocomplete, find, claimCheck] });
   const editorProps = {
     handleKeyDown(view: EditorView, event: KeyboardEvent) {
       return Boolean(

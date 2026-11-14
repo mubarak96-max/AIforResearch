@@ -1,4 +1,5 @@
 /** The Systematic Review API's shapes, as the browser reads them (GET /api/systematic-reviews/:id). */
+import type { DataType, Grade, InputRow, Measure, Method, Model } from '@/lib/metaAnalysis';
 export type Decision = 'include' | 'exclude' | 'maybe';
 export type Stage = 'title' | 'full';
 export type Vote = { decision: Decision; reason?: string | null; at?: string };
@@ -58,3 +59,10 @@ export const DEFAULT_FRAMEWORK: Record<string, 'PICO' | 'PCC' | 'SPIDER'> = {
   systematic: 'PICO', scoping: 'PCC', rapid: 'PICO', 'meta-analysis': 'PICO', mapping: 'PCC', qualitative: 'SPIDER', realist: 'PCC', living: 'PICO',
 };
 export const DECISION_LABELS: Record<Decision, string> = { include: 'Include', exclude: 'Exclude', maybe: 'Maybe' };
+
+/** A saved meta-analysis (GET /api/systematic-reviews/:id/analyses); numbers are analysed in the browser by lib/metaAnalysis.ts. */
+export type SavedAnalysis = {
+  id: string; outcome: string; data_type: DataType; measure: Measure; model: Model; method: Method; hksj: boolean;
+  favours: { left: string; right: string }; rows: InputRow[]; grade: Grade;
+  revision: number; created_at: string; updated_at: string; updated_by: string;
+};

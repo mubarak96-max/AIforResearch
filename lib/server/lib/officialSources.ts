@@ -7,13 +7,11 @@
  * FRED: https://fred.stlouisfed.org/docs/api/fred/ (free key FRED_API_KEY, skipped until set; 120 requests a minute)
  * US Treasury Fiscal Data: https://fiscaldata.treasury.gov/api-documentation/ (no key; public domain)
  * OECD SDMX API: https://www.oecd.org/en/data/insights/data-explainers/2024/09/api.html (no key; CC BY 4.0; throttled per IP)
- * USPTO Open Data Portal, which replaced the PatentsView search API in March 2026: https://data.uspto.gov/apis/getting-started
- *   (PATENTSVIEW_API_KEY holds the ODP key, sent as X-API-KEY; skipped until set)
  */
 import { HTTPException } from 'hono/http-exception';
 import { C, col, db } from '../firebase.js';
 import { fetchSource, net, SourceError } from './sources/http.js';
-import { OPENFDA_NOTE, PATENT_NOTE, type OfficialLocator, type OfficialProvider, type OfficialRecord, type OfficialSearch } from '../../officialSources.js';
+import { OPENFDA_NOTE, type OfficialLocator, type OfficialProvider, type OfficialRecord, type OfficialSearch } from '../../officialSources.js';
 
 /** SEC EDGAR asks every client to identify itself with a name and contact email (sec.gov/os/accessing-edgar-data). */
 export const SEC_USER_AGENT = 'AIforResearch support@aiforresearch.app';
@@ -179,12 +177,12 @@ export async function officialRecord(locator: OfficialLocator): Promise<Official
   const record = filingRecords(data, locator.id.padStart(10, '0')).find((item) => item.locator.accession === locator.accession); if (!record) throw notFound(); return record;
 }
 
-// ------------------------------------------------------------------ openFDA, FRED, Treasury, OECD, USPTO
+// ------------------------------------------------------------------ openFDA, FRED, Treasury, OECD
 
 /** Keys are read when used, so a key added to the environment takes effect without a code change. */
 const envKey = (name: string) => (process.env[name] ?? '').trim();
 /** Which of the keyed providers can answer on this server (openFDA works without its optional key). */
-export const officialKeys = () => ({ fred: Boolean(envKey('FRED_API_KEY')), uspto_patents: Boolean(envKey('PATENTSVIEW_API_KEY')) });
+export const officialKeys = () => ({ fred: Boolean(envKey('FRED_API_KEY')) });
 const notConnected = (source: string) => new SourceError(source, `${source} is not connected on this deployment.`, 503);
 const clipText = (value: unknown, max: number) => text(value).replace(/\s+/g, ' ').trim().slice(0, max);
 const first = (value: unknown) => Array.isArray(value) ? value[0] : value;
@@ -431,37 +429,6 @@ export async function oecdData(locator: OfficialLocator): Promise<OfficialRecord
     warnings: [...base.warnings, `Page ${page} of ${pages}. Empty values are kept as missing. Without a period, only the latest observation of each series is loaded.`] });
 }
 
-// USPTO Open Data Portal (patents) --------------------------------------
-
-const USPTO = 'https://api.uspto.gov/api/v1/patent/applications';
-const USPTO_PACE = { key: 'uspto', ms: 1100 };
-function usptoHeaders() {
-  const key = envKey('PATENTSVIEW_API_KEY');
-  if (!key) throw notConnected('USPTO');
-  return { 'X-API-KEY': key };
-}
-export function patentRecord(item: any): OfficialRecord {
-  const id = text(item?.applicationNumberText).replace(/\D/g, '');
-  if (!/^\d{6,12}$/.test(id)) throw new SourceError('USPTO', 'The application has no valid number.');
-  const meta = item.applicationMetaData ?? {};
-  const patent = text(meta.patentNumber);
-  return complete({ locator: { provider: 'uspto_patents', id }, title: `${text(meta.inventionTitle) || 'Patent application'} — ${patent ? `US ${patent}` : `application ${id}`}`, url: `https://patentcenter.uspto.gov/applications/${id}`, kind: 'patent_application',
-    publisher: text(meta.firstApplicantName) || text(meta.firstInventorName) || 'USPTO',
-    summary: [text(meta.applicationStatusDescriptionText) && `Status: ${text(meta.applicationStatusDescriptionText)}`, text(meta.applicationTypeLabelName) && `Type: ${text(meta.applicationTypeLabelName)}`].filter(Boolean).join('. '),
-    text: '', publication_date: text(meta.grantDate) || text(meta.earliestPublicationDate) || null, updated_at: text(meta.applicationStatusDate) || null,
-    dates: [...date('Filed', meta.filingDate), ...date('Published', meta.earliestPublicationDate), ...date('Granted', meta.grantDate), ...date('Status date', meta.applicationStatusDate)],
-    metadata: { application_number: id, patent_number: patent || null, publication_number: text(meta.earliestPublicationNumber) || null, applicant: text(meta.firstApplicantName) || null, first_inventor: text(meta.firstInventorName) || null, status: text(meta.applicationStatusDescriptionText) || null, cpc: strings(meta.cpcClassificationBag).slice(0, 20) },
-    warnings: [PATENT_NOTE, 'Bibliographic data from the USPTO Open Data Portal; claims and full text are not imported. Status can change after this snapshot.'] });
-}
-export async function searchPatents(query: string, page = 1) {
-  const headers = usptoHeaders();
-  const url = new URL(`${USPTO}/search`); url.searchParams.set('q', query.slice(0, 300)); url.searchParams.set('offset', String((page - 1) * 20)); url.searchParams.set('limit', '20');
-  const data = await fetchSource<any>(url, { source: 'USPTO', headers, pace: USPTO_PACE });
-  const items = Array.isArray(data?.patentFileWrapperDataBag) ? data.patentFileWrapperDataBag : [];
-  const total = number(data?.count) ?? items.length;
-  return result(items.map(patentRecord), url.toString(), total, total > page * 20 ? page + 1 : null, null, [PATENT_NOTE]);
-}
-
 /** Search for the providers added in November 2026 (null for the original four). */
 export async function searchMoreOfficial(provider: OfficialProvider, query: string, page = 1): Promise<OfficialSearch | null> {
   if (provider === 'openfda_label') return searchFdaLabels(query, page);
@@ -470,7 +437,6 @@ export async function searchMoreOfficial(provider: OfficialProvider, query: stri
   if (provider === 'fred') return searchFred(query, page);
   if (provider === 'treasury') return searchTreasury(query, page);
   if (provider === 'oecd') return searchOecd(query, page);
-  if (provider === 'uspto_patents') return searchPatents(query, page);
   return null;
 }
 /** The data table of a new provider's record ("Load observations"); null for providers without one. */
@@ -493,12 +459,6 @@ async function moreOfficialRecord(locator: OfficialLocator): Promise<OfficialRec
     const data = await fda(fdaUrl('/device/510k.json', { search: `k_number:"${locator.id}"`, limit: '1' }));
     if (!data?.results?.[0]) throw notFound();
     return fdaDeviceRecord(data.results[0]);
-  }
-  if (locator.provider === 'uspto_patents') {
-    const data = await fetchSource<any>(`${USPTO}/${locator.id}`, { source: 'USPTO', headers: usptoHeaders(), pace: USPTO_PACE });
-    const item = Array.isArray(data?.patentFileWrapperDataBag) ? data.patentFileWrapperDataBag[0] : null;
-    if (!item) throw notFound();
-    return patentRecord(item);
   }
   if (locator.provider === 'fred' && !wantsData) {
     const data = await fetchSource<any>(fredUrl('series', { series_id: locator.id }), { source: 'FRED', pace: FRED_PACE });

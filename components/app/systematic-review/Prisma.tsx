@@ -67,13 +67,18 @@ export const PrismaDiagram = forwardRef<SVGSVGElement, { prisma: Prisma }>(funct
 });
 
 /** Saves the diagram as an SVG file, or as a PNG at twice its size. */
-export async function downloadPrisma(svg: SVGSVGElement, format: 'svg' | 'png', name: string) {
+export function downloadPrisma(svg: SVGSVGElement, format: 'svg' | 'png', name: string) {
+  return downloadSvg(svg, format, `${name}-prisma`);
+}
+
+/** Saves an SVG chart (black on white, sized by its viewBox) as SVG, or as PNG at twice its size. */
+export async function downloadSvg(svg: SVGSVGElement, format: 'svg' | 'png', fileName: string) {
   const markup = new XMLSerializer().serializeToString(svg);
   const save = (blob: Blob, extension: string) => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${name}-prisma.${extension}`;
+    link.download = `${fileName}.${extension}`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
   };
