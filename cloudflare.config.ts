@@ -71,6 +71,10 @@ export default defineConfig({
       CORE_API_KEY: bindings.secret(),
       OPENCITATIONS_ACCESS_TOKEN: bindings.secret(),
       SCHOLAR_API_KEY: bindings.secret(),
+      // Official Sources (lib/server/lib/officialSources.ts): FRED is skipped until its key is
+      // set; openFDA works without one but allows far more requests with it.
+      FRED_API_KEY: bindings.secret(),
+      OPENFDA_API_KEY: bindings.secret(),
       // Encrypts the Zotero/Mendeley tokens people connect (lib/server/lib/settings.ts). Keep it
       // stable: changing it disconnects them.
       SETTINGS_KEY: bindings.secret(),
