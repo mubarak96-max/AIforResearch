@@ -30,6 +30,7 @@ type LiveConnection = {
   lastCursor: AIEditorCursorState | null;
   consecutiveFailures: number;
   hasEverConnected: boolean;
+  connectedAt: number;
 };
 
 type RealtimeEnvelope =
@@ -41,6 +42,8 @@ type RealtimeEnvelope =
 
 const HEARTBEAT_INTERVAL_MS = 5000;
 const RECONNECT_DELAY_MS = 1200;
+const MAX_RECONNECT_DELAY_MS = 60_000;
+const STABLE_CONNECTION_MS = 30_000;
 
 const localFallback = createLocalAIEditorProvider();
 const documentListeners = new Map<string, Set<SnapshotListener>>();
@@ -379,10 +382,11 @@ function scheduleReconnect(connection: LiveConnection) {
     return;
   }
 
+  const delay = Math.min(MAX_RECONNECT_DELAY_MS, RECONNECT_DELAY_MS * 2 ** Math.min(connection.consecutiveFailures - 1, 6));
   connection.reconnectTimer = window.setTimeout(() => {
     connection.reconnectTimer = null;
     openRealtimeConnection(connection.documentId);
-  }, RECONNECT_DELAY_MS);
+  }, delay);
 }
 
 function openRealtimeConnection(documentId: string) {
@@ -403,7 +407,7 @@ function openRealtimeConnection(documentId: string) {
   connection.websocket = websocket;
 
   websocket.onopen = () => {
-    connection.consecutiveFailures = 0;
+    connection.connectedAt = Date.now();
     connection.hasEverConnected = true;
 
     websocket.send(
@@ -472,10 +476,13 @@ function openRealtimeConnection(documentId: string) {
   };
 
   websocket.onclose = () => {
-    if (connection.websocket === websocket) {
-      connection.websocket = null;
-    }
+    if (connection.websocket !== websocket) return;
+    connection.websocket = null;
     stopHeartbeat(connection);
+    if (connection.connectedAt && Date.now() - connection.connectedAt >= STABLE_CONNECTION_MS) {
+      connection.consecutiveFailures = 0;
+    }
+    connection.connectedAt = 0;
     connection.consecutiveFailures += 1;
 
     if (!connection.hasEverConnected && connection.consecutiveFailures >= 3) {
@@ -512,6 +519,7 @@ function ensureRealtimeConnection(
     lastCursor: null,
     consecutiveFailures: 0,
     hasEverConnected: false,
+    connectedAt: 0,
   };
   liveConnections.set(documentId, connection);
   openRealtimeConnection(documentId);
@@ -663,6 +671,10 @@ export function createDocsBackendProvider(): AIEditorProvider {
     },
 
     subscribeToDocument({ documentId, session, requestedRole, onSnapshot, onCollaborators }: DocumentSubscriptionOptions) {
+      if (!hasToken()) {
+        return localFallback.subscribeToDocument({ documentId, session, requestedRole, onSnapshot, onCollaborators });
+      }
+
       const snapshotSubscribers = documentListeners.get(documentId) || new Set<SnapshotListener>();
       snapshotSubscribers.add(onSnapshot);
       documentListeners.set(documentId, snapshotSubscribers);
@@ -671,16 +683,6 @@ export function createDocsBackendProvider(): AIEditorProvider {
         collaboratorListeners.get(documentId) || new Set<CollaboratorListener>();
       collaboratorSubscribers.add(onCollaborators);
       collaboratorListeners.set(documentId, collaboratorSubscribers);
-
-      if (!hasToken()) {
-        return localFallback.subscribeToDocument({
-          documentId,
-          session,
-          requestedRole,
-          onSnapshot,
-          onCollaborators,
-        });
-      }
 
       const cachedSnapshot = snapshotCache.get(documentId);
       if (cachedSnapshot) {

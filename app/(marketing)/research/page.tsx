@@ -20,8 +20,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     path: '/research',
     description: 'Search over 250 million scholarly papers. See each paper’s abstract, authors and citations, and cite it in APA, MLA, Chicago or Harvard in one click.',
   });
-  // Search results are not pages of their own: crawlers may follow them, not index them.
-  return q ? { ...base, title: `“${q.slice(0, 60)}” papers`, robots: { index: false, follow: true } } : base;
+  // Search results are not pages of their own: crawlers should neither index nor follow them.
+  return q ? { ...base, title: `“${q.slice(0, 60)}” papers`, robots: { index: false, follow: false } } : base;
 }
 
 export default async function ResearchPage({ searchParams }: Props) {
@@ -83,7 +83,7 @@ export default async function ResearchPage({ searchParams }: Props) {
               <ul className="mt-3 flex flex-wrap justify-center gap-2">
                 {SUGGESTIONS.map((topic) => (
                   <li key={topic}>
-                    <Link href={`/research?q=${encodeURIComponent(topic)}`} className={`inline-flex h-9 items-center rounded-full border border-line bg-surface px-3.5 text-[13.5px] text-ink-2 hover:border-brand-100 hover:text-brand ${focusRing}`}>{topic}</Link>
+                    <Link href={`/research?q=${encodeURIComponent(topic)}`} rel="nofollow" prefetch={false} className={`inline-flex h-9 items-center rounded-full border border-line bg-surface px-3.5 text-[13.5px] text-ink-2 hover:border-brand-100 hover:text-brand ${focusRing}`}>{topic}</Link>
                   </li>
                 ))}
               </ul>

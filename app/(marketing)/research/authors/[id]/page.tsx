@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = `Papers by ${author.name}${where}: ${author.worksCount.toLocaleString('en-US')} works cited ${author.citedByCount.toLocaleString('en-US')} times${author.topics.length ? `, on ${author.topics.slice(0, 3).join(', ')}` : ''}. Cite any of them in one click.`;
   const base = pageMetadata({ title: `${author.name}: papers and citations`, description: description.slice(0, 160), path: `/research/authors/${author.id}` });
   // An author with a single work is usually a name fragment, not a researcher worth a page in search.
-  return author.worksCount < 2 ? { ...base, robots: { index: false, follow: true } } : { ...base, openGraph: { ...base.openGraph, type: 'profile' } };
+  return author.worksCount < 2 ? { ...base, robots: { index: false, follow: false } } : { ...base, openGraph: { ...base.openGraph, type: 'profile' } };
 }
 
 const box = 'rounded-2xl border border-line bg-surface';
@@ -95,7 +95,7 @@ export default async function AuthorPage({ params }: Props) {
               <p className={label}>Research topics</p>
               <ul className="mt-3 flex flex-wrap gap-1.5">
                 {author.topics.map((topic) => (
-                  <li key={topic}><Link href={`/research?q=${encodeURIComponent(topic)}`} className={`inline-flex rounded-full border border-line px-2.5 py-1 text-[12.5px] text-ink-2 hover:border-brand-100 hover:text-brand ${focusRing}`}>{topic}</Link></li>
+                  <li key={topic}><Link href={`/research?q=${encodeURIComponent(topic)}`} rel="nofollow" prefetch={false} className={`inline-flex rounded-full border border-line px-2.5 py-1 text-[12.5px] text-ink-2 hover:border-brand-100 hover:text-brand ${focusRing}`}>{topic}</Link></li>
                 ))}
               </ul>
             </div>

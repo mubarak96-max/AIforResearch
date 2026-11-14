@@ -14,7 +14,8 @@ export function PaperListItem({ paper, showAbstract = false }: { paper: RichPape
   return (
     <article className="border-b border-line py-5">
       <h3 className="text-[17px] font-semibold leading-snug">
-        <Link href={`/research/papers/${paper.id}`} className={`rounded text-ink hover:text-brand ${focusRing}`}>{paper.title}</Link>
+        {/* nofollow and no prefetch: every paper page is an uncached render with upstream calls. */}
+        <Link href={`/research/papers/${paper.id}`} rel="nofollow" prefetch={false} className={`rounded text-ink hover:text-brand ${focusRing}`}>{paper.title}</Link>
       </h3>
       <p className="mt-1 text-[14px] text-muted">
         {[authorLine(paper), paper.venue, paper.year].filter(Boolean).join(' · ')}

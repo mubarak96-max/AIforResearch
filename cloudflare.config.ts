@@ -24,7 +24,14 @@ export default defineConfig({
     assets: {
       htmlHandling: "none",
       notFoundHandling: "none",
-      runWorkerFirst: ["/*", "!/_next/static/*", "!/*/_next/static/*"],
+      // Files from public/ are served straight from the asset store: bots fetching icons and
+      // the manifest should not start the Worker.
+      runWorkerFirst: [
+        "/*", "!/_next/static/*", "!/*/_next/static/*",
+        "!/favicon.ico", "!/favicon.svg", "!/icon.svg", "!/icon-192.png", "!/icon-512.png",
+        "!/icon-maskable.svg", "!/icon-maskable-512.png", "!/apple-touch-icon.png",
+        "!/manifest.webmanifest", "!/social-square.png", "!/author.jpg", "!/screenshots/*",
+      ],
     },
     env: {
       ...cache.env,

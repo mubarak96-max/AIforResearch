@@ -7,8 +7,9 @@ import { accountState, ensureUser } from './lib/users.js';
 
 /**
  * Who is calling. The browser signs in with Firebase Authentication and sends its ID token
- * (`Authorization: Bearer <token>`, or `?token=` on WebSocket URLs). The token's uid is the
- * id of the person's `users/{uid}` document, created on first use (lib/users.ts ensureUser).
+ * (`Authorization: Bearer <token>` for HTTP; the separate collaboration service reads tokens
+ * on WebSocket URLs). The token's uid is the id of the person's `users/{uid}` document,
+ * created on first use (lib/users.ts ensureUser).
  */
 
 export type AuthUser = { id: string; email: string; full_name: string | null; account_id: string; is_admin: boolean };
@@ -78,7 +79,7 @@ export function forgetUser(userId: string) {
 export function bearer(c: Context): string | null {
   const header = c.req.header('authorization') || '';
   if (header.toLowerCase().startsWith('bearer ')) return header.slice(7).trim();
-  return c.req.query('token') || null;
+  return null;
 }
 
 /** Sets c.var.user when a valid ID token is present; never rejects. */

@@ -59,8 +59,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : clip(`${paper.title}${by ? ` by ${by}` : ''}${paper.year ? ` (${paper.year})` : ''}. Cite it in APA, MLA, Chicago or Harvard, and see who cites it.`, 155);
   const base = pageMetadata({ title: clip(paper.title, 70), description, path: `/research/papers/${paper.id}` });
   // Paper pages stay out of the index: only the /research search page is meant to rank.
-  // Crawlers may still follow their links to authors and related papers.
-  return { ...base, robots: { index: false, follow: true }, openGraph: { ...base.openGraph, type: 'article' } };
+  // Not followed either: their links lead into OpenAlex's whole graph (see app/robots.ts).
+  return { ...base, robots: { index: false, follow: false }, openGraph: { ...base.openGraph, type: 'article' } };
 }
 
 function scholarlySchema(record: PaperRecord) {
@@ -213,7 +213,7 @@ export default async function PaperPage({ params }: Props) {
               <p className={label}>Topics</p>
               <ul className="mt-3 flex flex-wrap gap-1.5">
                 {[...record.topics.map((topic) => topic.name), ...record.keywords].filter((value, index, all) => all.indexOf(value) === index).slice(0, 10).map((name) => (
-                  <li key={name}><Link href={`/research?q=${encodeURIComponent(name)}`} className={`inline-flex rounded-full border border-line px-2.5 py-1 text-[12.5px] text-ink-2 hover:border-brand-100 hover:text-brand ${focusRing}`}>{name}</Link></li>
+                  <li key={name}><Link href={`/research?q=${encodeURIComponent(name)}`} rel="nofollow" prefetch={false} className={`inline-flex rounded-full border border-line px-2.5 py-1 text-[12.5px] text-ink-2 hover:border-brand-100 hover:text-brand ${focusRing}`}>{name}</Link></li>
                 ))}
               </ul>
             </div>
